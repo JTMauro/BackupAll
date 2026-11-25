@@ -1,0 +1,214 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta charset="utf-8">
+<title>Valley Casino</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Monoton&family=Press+Start+2P&family=Chakra+Petch:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap">
+<style>
+/* Layout: one full-bleed WebGL casino floor; HUD floats in the corners; each game opens as a full-screen table screen.
+   Deliberately a single dark theme (gold and neon on a night-time casino floor). */
+:root {
+  --ink: #07050a;
+  --panel: rgba(18, 12, 8, .94);
+  --line: rgba(232, 196, 106, .35);
+  --text: #f6efe0;
+  --dim: #c2b79c;
+  --gold: #e8c46a;
+  --red: #e0313f;
+  --cyan: #38f4ff;
+  --f-display: "Monoton", "Bungee", Impact, sans-serif;
+  --f-head: "Bungee", "Arial Black", Impact, sans-serif;
+  --f-pixel: "Press Start 2P", ui-monospace, monospace;
+  --f-body: "Chakra Petch", system-ui, sans-serif;
+  --f-serif: "Playfair Display", Georgia, serif;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--ink); color: var(--text); font-family: var(--f-body); font-size: 15px; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+#title { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; text-align: center;
+  background: radial-gradient(ellipse at 50% 120%, rgba(232, 196, 106, .28), transparent 60%), linear-gradient(rgba(7, 5, 10, .5), rgba(7, 5, 10, .92));
+  padding: 16px max(16px, env(safe-area-inset-left, 0px)); transition: opacity .6s; }
+#title.gone { opacity: 0; pointer-events: none; }
+.title-inner { display: grid; gap: 22px; justify-items: center; max-width: 900px; }
+.logo { margin: 0; font-family: var(--f-serif); font-style: italic; font-weight: 700; line-height: 1; font-size: clamp(46px, 10vw, 118px); color: #fff3cf;
+  text-shadow: 0 0 6px #fff, 0 0 20px #ffb300, 0 0 46px #ff8a00, 0 4px 0 #6b4400; }
+.logo span { display: block; font-family: var(--f-display); font-style: normal; font-weight: 400; font-size: .5em; letter-spacing: .12em; color: #fff;
+  text-shadow: 0 0 6px #fff, 0 0 18px var(--red), 0 0 42px var(--red), 0 0 80px var(--red); animation: flicker 6s infinite; }
+@keyframes flicker { 0%, 92%, 100% { opacity: 1 } 93% { opacity: .55 } 94% { opacity: 1 } 96% { opacity: .7 } }
+.sub { font-size: clamp(13px, 1.8vw, 16px); color: var(--dim); line-height: 1.6; max-width: 60ch; margin: 0; }
+#loadwrap { width: min(420px, 80vw); display: grid; gap: 10px; }
+.bar { height: 10px; border: 2px solid var(--line); border-radius: 6px; overflow: hidden; background: rgba(255, 255, 255, .04); }
+#load-bar { height: 100%; width: 3%; background: linear-gradient(90deg, #a8842c, #ffe08a); transition: width .3s; }
+#load-label { font-family: var(--f-pixel); font-size: 10px; color: var(--dim); letter-spacing: .1em; }
+#enter { display: none; font-family: var(--f-head); font-size: 18px; letter-spacing: .06em; padding: 16px 30px; border: 2px solid #ffe6a0; color: #1d1404;
+  background: linear-gradient(#f3d27e, #c99a34); border-radius: 40px; box-shadow: 0 0 30px rgba(255, 200, 80, .45); }
+#loader.ready #enter { display: inline-block; }
+#loader.ready #loadwrap { display: none; }
+#enter:hover { filter: brightness(1.1); }
+.keys { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; font-size: 13px; color: var(--dim); }
+kbd { font-family: var(--f-pixel); font-size: 9px; padding: 4px 6px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 4px; color: var(--text); background: rgba(255, 255, 255, .05); }
+
+#hud { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 10px; z-index: 10; pointer-events: none; }
+#hud > * { pointer-events: auto; }
+.brand { font-family: var(--f-serif); font-style: italic; font-size: 20px; color: #fff3cf; text-shadow: 0 0 10px #ff9a00; line-height: 1; }
+.brand small { display: block; font-family: var(--f-pixel); font-style: normal; font-size: 7px; color: var(--gold); text-shadow: none; margin-top: 6px; letter-spacing: .1em; }
+#wallet { margin-left: auto; display: grid; justify-items: end; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; }
+#wallet span { font-family: var(--f-pixel); font-size: 7px; color: var(--dim); letter-spacing: .08em; }
+#w-chips { font-family: var(--f-pixel); font-size: 14px; color: var(--gold); font-variant-numeric: tabular-nums; }
+#w-sub { font-size: 11px; color: var(--dim); font-variant-numeric: tabular-nums; }
+#wallet.up #w-chips { animation: up .8s ease-out; } #wallet.down #w-chips { animation: down .8s ease-out; }
+@keyframes up { 0% { color: #7dff9a; transform: scale(1.15); } } @keyframes down { 0% { color: #ff6b6b; transform: scale(1.1); } }
+.hbtn { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-family: var(--f-pixel); font-size: 9px; letter-spacing: .06em; display: inline-flex; gap: 8px; align-items: center; }
+.hbtn:hover { border-color: var(--gold); color: var(--gold); }
+.hbtn kbd { font-size: 8px; padding: 2px 4px; }
+
+#prompt { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); transform: translateX(-50%); z-index: 10; text-align: center;
+  background: var(--panel); border: 1px solid var(--gold); border-radius: 12px; padding: 12px 20px; box-shadow: 0 0 30px rgba(232, 196, 106, .25); max-width: calc(100vw - 32px); }
+#prompt .p1 { font-family: var(--f-pixel); font-size: 9px; color: var(--gold); letter-spacing: .08em; }
+#prompt-title { display: block; font-family: var(--f-head); font-size: 20px; margin-top: 6px; }
+#prompt-blurb { display: block; font-size: 13px; color: var(--dim); margin-top: 4px; max-width: 46ch; }
+#prompt button { margin-top: 10px; background: linear-gradient(#f3d27e, #c99a34); color: #1d1404; border: 0; border-radius: 20px; padding: 9px 18px; font-family: var(--f-head); font-size: 13px; }
+#toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 78px); transform: translateX(-50%); z-index: 60; background: var(--panel); border: 1px solid var(--line);
+  padding: 10px 16px; border-radius: 8px; font-size: 14px; max-width: calc(100vw - 32px); text-align: center; }
+
+.sheet { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 70px); right: max(16px, env(safe-area-inset-right, 0px)); width: min(440px, calc(100vw - 32px));
+  max-height: calc(100% - 96px - env(safe-area-inset-top, 0px)); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px; display: grid; gap: 14px; align-content: start; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.sheet h2 { margin: 0; font-family: var(--f-head); font-size: 18px; font-weight: 400; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+.x { background: none; border: 1px solid var(--line); border-radius: 6px; width: 32px; height: 32px; font-size: 16px; line-height: 1; }
+.hint { font-size: 13px; color: var(--dim); margin: 0; line-height: 1.5; }
+#menu { width: min(680px, calc(100vw - 32px)); }
+.menu-sec { font-family: var(--f-pixel); font-size: 8px; color: var(--dim); letter-spacing: .1em; margin: 4px 0 -4px; }
+.menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.game { text-align: left; background: rgba(255, 255, 255, .03); border: 1px solid var(--line); border-left: 4px solid var(--acc, var(--gold)); border-radius: 8px; padding: 10px 12px; display: grid; gap: 3px; min-width: 0; }
+.game:hover { background: rgba(255, 255, 255, .08); border-color: var(--acc, var(--gold)); }
+.g-title { font-family: var(--f-head); font-size: 14px; line-height: 1.15; }
+.g-blurb { font-size: 12px; color: var(--dim); line-height: 1.35; }
+.g-lim { font-family: var(--f-pixel); font-size: 7px; color: var(--gold); }
+.cage-bal { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cage-bal div { padding: 10px 12px; border-radius: 8px; background: rgba(0, 0, 0, .35); border: 1px solid var(--line); display: grid; gap: 2px; }
+.cage-bal span { font-family: var(--f-pixel); font-size: 7px; color: var(--dim); letter-spacing: .08em; }
+.cage-bal b { font-family: var(--f-pixel); font-size: 13px; font-weight: 400; color: var(--gold); font-variant-numeric: tabular-nums; }
+.cage-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.cage-row button { flex: 1 1 auto; min-width: 90px; padding: 12px 10px; border-radius: 8px; border: 1px solid var(--line); background: rgba(232, 196, 106, .08); font-weight: 600; }
+.cage-row button:hover:not(:disabled) { background: rgba(232, 196, 106, .18); }
+.cage-row button:disabled { opacity: .35; cursor: not-allowed; }
+.cage-h { margin: 0; font-family: var(--f-pixel); font-size: 8px; font-weight: 400; color: var(--dim); letter-spacing: .08em; }
+fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 0; display: grid; gap: 10px; }
+legend { font-family: var(--f-pixel); font-size: 8px; color: var(--dim); padding: 0 6px; letter-spacing: .08em; }
+.presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.presets input { position: absolute; opacity: 0; }
+.presets span { display: block; text-align: center; padding: 9px 4px; border: 1px solid var(--line); border-radius: 6px; font-family: var(--f-pixel); font-size: 8px; cursor: pointer; }
+.presets input:checked + span { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px rgba(232, 196, 106, .3) inset; }
+.presets input:focus-visible + span { outline: 2px solid var(--gold); }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
+.row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--gold); }
+.row input[type=range] { width: 150px; accent-color: var(--gold); }
+
+#play { position: fixed; inset: 0; z-index: 25; background: #000; opacity: 0; transition: opacity .35s; }
+#play.on { opacity: 1; }
+#play-root { position: absolute; inset: 0; }
+#play-loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--f-pixel); font-size: 11px; color: var(--dim); }
+
+#walkstick { display: none; }
+@media (pointer: coarse) {
+  #walkstick { display: block; position: fixed; z-index: 12; left: max(26px, env(safe-area-inset-left, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); width: 120px; height: 120px; border-radius: 50%;
+    border: 2px solid var(--line); background: rgba(18, 12, 8, .5); --kx: 0px; --ky: 0px; touch-action: none; }
+  #walkstick::after { content: ""; position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px; border-radius: 50%; background: rgba(232, 196, 106, .35); border: 2px solid var(--gold); transform: translate(var(--kx), var(--ky)); }
+  .hbtn kbd, .keys { display: none; }
+}
+@media (max-width: 620px) { .brand { font-size: 15px; } .brand small, #w-sub { display: none; } .hbtn { padding: 9px; } .hbtn .lbl-long { display: none; } }
+@media (prefers-reduced-motion: reduce) { .logo span { animation: none; } }
+</style>
+
+<canvas id="scene" tabindex="0"></canvas>
+
+<section id="title">
+  <div class="title-inner" id="loader">
+    <h1 class="logo">Valley<span>CASINO</span></h1>
+    <p class="sub">Slots, video poker and keno along the walls. Craps, blackjack, roulette, baccarat, poker, Sic Bo and the Big Six wheel in the pit. You start with $1,000 in chips, and the cashier cage gives you more if you run dry.</p>
+    <div id="loadwrap"><div class="bar"><div id="load-bar"></div></div><div id="load-label">Turning on the lights</div></div>
+    <button id="enter" type="button">Walk onto the floor</button>
+    <div class="keys"><span><kbd>W A S D</kbd> walk</span><span><kbd>Shift</kbd> run</span><span><kbd>Drag</kbd> look</span><span><kbd>E</kbd> play</span><span><kbd>Tab</kbd> game list</span><span><kbd>Esc</kbd> leave a game</span></div>
+  </div>
+</section>
+
+<header id="hud" hidden>
+  <div class="brand">Valley Casino<small>OPEN 24 HOURS</small></div>
+  <div id="wallet" title="Your chips"><span>CHIPS</span><b id="w-chips">$1,000</b><small id="w-sub"></small></div>
+  <button class="hbtn" id="btn-games" type="button"><span>Games</span><kbd>Tab</kbd></button>
+  <button class="hbtn" id="btn-cage" type="button"><span>Cashier</span><kbd>C</kbd></button>
+  <button class="hbtn" id="btn-settings" type="button"><span class="lbl-long">Graphics</span><span aria-hidden="true">⚙</span><kbd>G</kbd></button>
+</header>
+
+<div id="prompt" hidden><span class="p1" id="prompt-p1">PRESS E TO PLAY</span><span id="prompt-title"></span><span id="prompt-blurb"></span><button type="button" id="prompt-play">Play</button></div>
+<div id="toast" hidden></div>
+<div id="walkstick" aria-hidden="true"></div>
+
+<aside id="menu" class="sheet" hidden>
+  <h2>Pick a game <button class="x" id="menu-close" type="button" aria-label="Close">×</button></h2>
+  <p class="hint">He walks over and takes a seat. Esc (or Leave table) brings you back to the floor.</p>
+  <div id="menu-body"></div>
+</aside>
+
+<aside id="cage" class="sheet" hidden>
+  <h2>Cashier cage <button class="x" id="cage-close" type="button" aria-label="Close">×</button></h2>
+  <div class="cage-bal">
+    <div><span>CHIPS</span><b id="cg-chips">$0</b></div>
+    <div><span>MARKERS OWED</span><b id="cg-owed">$0</b></div>
+    <div><span>NET TONIGHT</span><b id="cg-net">$0</b></div>
+    <div><span>BIGGEST WIN</span><b id="cg-best">$0</b></div>
+  </div>
+  <h3 class="cage-h">TAKE A MARKER (CREDIT)</h3>
+  <div class="cage-row"><button type="button" data-mk="500">$500</button><button type="button" data-mk="1000">$1,000</button><button type="button" data-mk="5000">$5,000</button></div>
+  <h3 class="cage-h">PAY BACK MARKERS</h3>
+  <div class="cage-row"><button type="button" data-pay="500">$500</button><button type="button" data-pay="all">Everything I can</button></div>
+  <div class="cage-row"><button type="button" id="cg-reset">Start over with $1,000</button></div>
+  <p class="hint" id="cage-msg" aria-live="polite">It's play money. Markers let you keep playing when you run dry; the net line counts them against you.</p>
+</aside>
+
+<aside id="settings" class="sheet" hidden>
+  <h2>Graphics <button class="x" id="settings-close" type="button" aria-label="Close">×</button></h2>
+  <fieldset>
+    <legend>QUALITY</legend>
+    <div class="presets">
+      <label><input type="radio" name="preset" value="low"><span>LOW</span></label>
+      <label><input type="radio" name="preset" value="medium"><span>MED</span></label>
+      <label><input type="radio" name="preset" value="high"><span>HIGH</span></label>
+      <label><input type="radio" name="preset" value="ultra"><span>ULTRA</span></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>FLOOR</legend>
+    <label class="row" for="opt-shadows">Soft shadows <input type="checkbox" id="opt-shadows"></label>
+    <label class="row" for="opt-bloom">Glow (bloom) <input type="checkbox" id="opt-bloom"></label>
+    <label class="row" for="opt-aa">Anti-aliasing <input type="checkbox" id="opt-aa"></label>
+    <label class="row" for="opt-dealers">Dealers at the tables <input type="checkbox" id="opt-dealers"></label>
+    <label class="row" for="opt-auto">Auto resolution when the frame rate drops <input type="checkbox" id="opt-auto"></label>
+  </fieldset>
+  <fieldset>
+    <legend>SOUND</legend>
+    <label class="row" for="opt-sound">Sound <input type="checkbox" id="opt-sound"></label>
+    <label class="row" for="opt-ambience">Casino floor ambience <input type="checkbox" id="opt-ambience"></label>
+    <label class="row" for="opt-music">Lounge music <span><input type="range" id="opt-music" min="0" max="1" step="0.05"></span></label>
+  </fieldset>
+</aside>
+
+<section id="play" hidden><div id="play-root"></div><div id="play-loading" hidden>Shuffling up…</div></section>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="main.js"></script>
+
+</body></html>

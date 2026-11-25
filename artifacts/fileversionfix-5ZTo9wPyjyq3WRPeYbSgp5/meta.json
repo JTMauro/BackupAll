@@ -1,0 +1,18 @@
+{
+ "title": "FileVersionFix",
+ "url": "https://claude.ai/artifact/5ZTo9wPyjyq3WRPeYbSgp5",
+ "type": "web page",
+ "updated": "2026-11-02",
+ "files": [
+  {
+   "path": "FileVersionFix.html",
+   "bytes": 28384,
+   "sha256": "55ba5fa7cefdcd8b4ce8c24dda51278a67537066d27de38847ef61dc3ee4dada"
+  },
+  {
+   "path": "index.html",
+   "bytes": 28768,
+   "sha256": "f0a375372b3de2e428493ab2548a96ba0f962ff7586a3708a4b041cfe48e677e"
+  }
+ ]
+}

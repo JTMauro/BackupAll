@@ -1,0 +1,113 @@
+{
+ "title": "Valley Casino",
+ "url": "https://claude.ai/artifact/SyUwoJ4WSwcofd8MMYqGz3",
+ "type": "web page",
+ "updated": "2026-10-28",
+ "files": [
+  {
+   "path": "floor.js",
+   "bytes": 58573,
+   "sha256": "0a0e0e145cb645482e07d508e721d0c1e71e73a06a1c4bc5aca01b791e69a157"
+  },
+  {
+   "path": "games/_kit.js",
+   "bytes": 30791,
+   "sha256": "ea212bb2073a17417e9a54de68e5bda463107d220329c3fd0dd1d8cabcfd6d3f"
+  },
+  {
+   "path": "games/baccarat.js",
+   "bytes": 31783,
+   "sha256": "5ad46904b36f674d4f7f783a96df8d72c8198163b0863f4d9f88b5624cd6a70d"
+  },
+  {
+   "path": "games/bigsix.js",
+   "bytes": 22405,
+   "sha256": "e4111cba377ad8d4adbbee789009c9aed67b0d8d09bb7c4a2fe609cedc91c803"
+  },
+  {
+   "path": "games/blackjack.js",
+   "bytes": 42055,
+   "sha256": "2e8af861efcd31105971f6f6e56931999cc6beb94b1c9cd17c878d486970aeea"
+  },
+  {
+   "path": "games/craps.js",
+   "bytes": 38760,
+   "sha256": "6b08c7bcb5b0e67528f12bdea51a216749cb7dab4a0ce1bc4f79406d5242ca99"
+  },
+  {
+   "path": "games/holdem.js",
+   "bytes": 24342,
+   "sha256": "947e8926feb83d567d8117b9582ea8b5e92252df71809a383763be22a68f86f1"
+  },
+  {
+   "path": "games/keno.js",
+   "bytes": 18455,
+   "sha256": "1e6ab98325a5aae2c8f6a3b7c590361f00d7d2964a3eeb92fca9a5f34912cb17"
+  },
+  {
+   "path": "games/roulette.js",
+   "bytes": 45173,
+   "sha256": "09e590dd96da4c24d6821f35137902759fe823629efbebb2b2418a39166a4ad8"
+  },
+  {
+   "path": "games/sicbo.js",
+   "bytes": 24394,
+   "sha256": "8993bf7e80fbc5cb49440923faa6ce41c69877e5dc726cb21a146a95ca358ffb"
+  },
+  {
+   "path": "games/slots-bonus.js",
+   "bytes": 142299,
+   "sha256": "6f4062f5048b42d715077161a8e0f50bce56f7d8908f6de7b4f96b4219f2c0da"
+  },
+  {
+   "path": "games/slots-buffalo.js",
+   "bytes": 95362,
+   "sha256": "388ef0f6126d36512b041cdc57ad3e070bc11418494890baa81a8d5c73dfee27"
+  },
+  {
+   "path": "games/slots-link.js",
+   "bytes": 130604,
+   "sha256": "98f13a0564c9e35f21aa63e061f26f07b2dd871ff7805234bcd2785e311ab87f"
+  },
+  {
+   "path": "games/slots-modern.js",
+   "bytes": 117472,
+   "sha256": "668043ae8f30fe9dc6cffd849b0ef93e3facd94f5875e7a7d4e55190091e9442"
+  },
+  {
+   "path": "games/slots.js",
+   "bytes": 131157,
+   "sha256": "e94bb145b05a02cddc9f90eb9dea99cc10b9bbf01d4652c482ca17ebd8c06ca4"
+  },
+  {
+   "path": "games/threecard.js",
+   "bytes": 21553,
+   "sha256": "1f0be58e9ae3edca5977de5a54f4aeb95aaa73d7afa711ee67a094f2efd87453"
+  },
+  {
+   "path": "games/videopoker.js",
+   "bytes": 33469,
+   "sha256": "7cf528e49b2555e9e9ff186561dad57438dc2d1dbb13979c467c3902c1891c98"
+  },
+  {
+   "path": "index.html",
+   "bytes": 17213,
+   "sha256": "ea67daa0e8d3e93ca52a5a68f2424b5d05e09a67552e007cb34e9cd379e82054"
+  },
+  {
+   "path": "main.js",
+   "bytes": 79628,
+   "sha256": "83804e246351fd01a4c5050c142458a2724cf12bdf0f4138388e754c7404900d"
+  },
+  {
+   "path": "models/anims.json",
+   "bytes": 2763285,
+   "sha256": "a74e3f1b72aabc62375f1f789be1f86e248282e8560962ead0d3a8675a51fd43"
+  },
+  {
+   "path": "models/boy.json",
+   "bytes": 2441157,
+   "sha256": "476dd6fc105c16939ad33417071650968feb2adb6474c1eb3c9edc49d17ce6e5"
+  }
+ ]
+}

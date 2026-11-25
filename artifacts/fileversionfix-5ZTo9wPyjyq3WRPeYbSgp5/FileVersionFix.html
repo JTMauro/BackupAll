@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FileVersionFix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  :root{
+    --bg1:#0b1020; --bg2:#141b3a;
+    --panel:#1a2245; --panel2:#222c58; --edge:#2f3b75;
+    --text:#e9edff; --muted:#9aa5d6;
+    --accent:#5b8cff; --accent-d:#2f5ee0; --accent-dd:#1f3fa3;
+    --good:#2fd58a; --good-d:#17a466; --good-dd:#0d6b42;
+    --warn:#ffb547; --bad:#ff5d73;
+    --old:#8d93b8;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+    color:var(--text);
+    background:radial-gradient(1200px 700px at 50% -10%, #2a3a8a 0%, transparent 60%),
+               linear-gradient(180deg,var(--bg2),var(--bg1));
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+  /* perspective grid floor */
+  .floor{
+    position:fixed;left:-50%;right:-50%;bottom:-10vh;height:65vh;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(91,140,255,.35) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(91,140,255,.35) 1px,transparent 1px);
+    background-size:60px 60px;
+    transform:perspective(500px) rotateX(62deg);
+    transform-origin:center top;
+    mask-image:linear-gradient(to bottom,transparent 0%,#000 35%,#000 100%);
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 35%,#000 100%);
+    animation:roll 6s linear infinite;
+  }
+  @keyframes roll{to{background-position:0 60px,0 0}}
+
+  .stage{position:relative;z-index:1;perspective:1400px;padding-block:48px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;justify-content:center}
+  .card{
+    width:min(980px,100%);
+    background:linear-gradient(160deg,var(--panel2),var(--panel));
+    border:1px solid var(--edge);
+    border-radius:24px;
+    padding:34px 34px 28px;
+    transform-style:preserve-3d;
+    transition:transform .15s ease-out;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.08) inset,
+      0 -2px 0 rgba(0,0,0,.35) inset,
+      0 30px 60px -10px rgba(0,0,0,.65),
+      0 60px 120px -30px rgba(20,40,140,.55),
+      0 0 0 1px rgba(0,0,0,.4);
+  }
+  .card > *{transform:translateZ(30px)}
+
+  header{display:flex;align-items:center;gap:22px;margin-bottom:26px}
+  h1{margin:0;font-size:34px;letter-spacing:.5px;
+     text-shadow:0 1px 0 #c9d4ff,0 2px 0 #9fb0f5,0 3px 0 #7a8ee0,0 4px 0 #5a6fc7,0 6px 12px rgba(0,0,0,.6)}
+  .sub{color:var(--muted);margin-top:6px;font-size:15px}
+
+  /* 3D folder icon */
+  .folder3d{width:92px;height:72px;position:relative;flex:none;transform-style:preserve-3d;
+            animation:float 4s ease-in-out infinite;filter:drop-shadow(0 18px 14px rgba(0,0,0,.55))}
+  @keyframes float{50%{transform:translateY(-8px) rotateY(-12deg)}}
+  .folder3d .back{position:absolute;inset:8px 0 0 0;border-radius:8px;background:linear-gradient(#f6b93b,#e08e0b)}
+  .folder3d .tab{position:absolute;left:0;top:0;width:40px;height:16px;border-radius:7px 7px 0 0;background:#f6b93b}
+  .folder3d .paper{position:absolute;left:10px;right:10px;top:12px;height:40px;border-radius:4px;background:#fff;
+            box-shadow:0 2px 4px rgba(0,0,0,.25);transform:rotate(-4deg)}
+  .folder3d .front{position:absolute;left:0;right:0;bottom:0;height:46px;border-radius:6px 6px 9px 9px;
+            background:linear-gradient(#ffd36e,#f5a623);transform-origin:bottom;transform:rotateX(-22deg);
+            box-shadow:0 -1px 0 rgba(255,255,255,.6) inset,0 -10px 18px rgba(0,0,0,.15) inset}
+  .folder3d .front::after{content:"(2)→";position:absolute;inset:0;display:grid;place-items:center;
+            font-weight:800;color:#8a5200;font-size:16px;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+
+  /* 3D buttons */
+  .btn{
+    --c:var(--accent); --d:var(--accent-d); --dd:var(--accent-dd);
+    appearance:none;border:0;cursor:pointer;color:#fff;font:inherit;font-weight:700;
+    padding:16px 30px;border-radius:16px;font-size:17px;letter-spacing:.3px;
+    background:linear-gradient(180deg,var(--c),var(--d));
+    box-shadow:0 8px 0 var(--dd),0 14px 24px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.35) inset;
+    transform:translateY(0);transition:transform .08s,box-shadow .08s,filter .2s;
+    text-shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:translateY(6px);box-shadow:0 2px 0 var(--dd),0 4px 10px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.35) inset}
+  .btn:disabled{filter:grayscale(.8) brightness(.7);cursor:not-allowed;transform:none}
+  .btn.good{--c:var(--good);--d:var(--good-d);--dd:var(--good-dd)}
+  .btn.ghost{--c:#3a4580;--d:#2b3466;--dd:#1a2048;font-weight:600;padding:12px 20px;font-size:15px}
+  .btn.big{font-size:21px;padding:22px 40px;border-radius:20px}
+
+  .pick{display:flex;flex-direction:column;align-items:center;gap:18px;padding:30px 10px 34px;
+        border-radius:20px;background:rgba(10,14,35,.45);
+        box-shadow:inset 0 6px 18px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.05)}
+  .pick p{margin:0;color:var(--muted);text-align:center;max-width:560px;line-height:1.5}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;
+        background:#0f1532;border:1px solid var(--edge);box-shadow:0 4px 10px rgba(0,0,0,.4);font-weight:600}
+  .chip .dot{width:9px;height:9px;border-radius:50%;background:var(--good);box-shadow:0 0 10px var(--good)}
+
+  .row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .controls{margin:24px 0 8px;justify-content:space-between}
+
+  /* toggles */
+  .toggle{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;color:var(--text);font-size:14px}
+  .toggle input{display:none}
+  .toggle .sw{width:46px;height:26px;border-radius:999px;background:#0e1430;position:relative;flex:none;
+              box-shadow:inset 0 3px 6px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.06)}
+  .toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+              background:linear-gradient(#fff,#c7cfee);box-shadow:0 3px 6px rgba(0,0,0,.5);transition:left .18s}
+  .toggle input:checked + .sw{background:linear-gradient(var(--accent),var(--accent-d))}
+  .toggle input:checked + .sw::after{left:23px}
+  .num{width:64px;padding:6px 8px;border-radius:10px;border:1px solid var(--edge);background:#0e1430;color:var(--text);
+       font:inherit;box-shadow:inset 0 2px 5px rgba(0,0,0,.6)}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  .stat{padding:16px 18px;border-radius:16px;background:linear-gradient(160deg,#27316a,#1b2350);
+        border:1px solid var(--edge);box-shadow:0 10px 20px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.08) inset}
+  .stat b{display:block;font-size:30px;line-height:1.1;text-shadow:0 3px 8px rgba(0,0,0,.5)}
+  .stat span{color:var(--muted);font-size:13px}
+
+  /* plan list */
+  .plan{display:flex;flex-direction:column;gap:14px;max-height:430px;overflow:auto;padding:6px 6px 14px}
+  .empty{color:var(--muted);text-align:center;padding:26px;border-radius:16px;background:rgba(10,14,35,.4);
+         box-shadow:inset 0 4px 12px rgba(0,0,0,.5)}
+  .group{padding:14px 16px;border-radius:16px;background:linear-gradient(160deg,#232c5e,#1a2149);
+         border:1px solid var(--edge);box-shadow:0 8px 0 #121838,0 16px 24px rgba(0,0,0,.45);
+         transition:transform .15s}
+  .group:hover{transform:translateY(-3px) rotateX(4deg)}
+  .group .path{font-size:12px;color:var(--muted);margin-bottom:8px;word-break:break-all}
+  .ren{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;font-size:14px;padding:4px 0}
+  .ren .from,.ren .to{padding:6px 10px;border-radius:9px;background:#0f1533;word-break:break-all;
+         box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+  .ren .arrow{color:var(--muted)}
+  .ren.promote .to{color:#0b2a1b;background:linear-gradient(var(--good),var(--good-d));font-weight:700;
+         box-shadow:0 3px 0 var(--good-dd)}
+  .ren.archive .to{color:var(--old)}
+  .group.done{opacity:.55}
+  .ghead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .ghead .path{margin:0;min-width:0}
+  .pickf{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:13px;font-weight:700;flex:none}
+  .pickf input{position:absolute;opacity:0;pointer-events:none}
+  .box3d{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:16px;color:transparent;
+         background:linear-gradient(#2a3366,#1c2350);box-shadow:0 4px 0 #11163a,0 6px 10px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.1) inset;
+         transition:transform .08s,box-shadow .08s}
+  .pickf input:checked + .box3d{color:#06301c;background:linear-gradient(var(--good),var(--good-d));box-shadow:0 4px 0 var(--good-dd),0 6px 10px rgba(0,0,0,.45)}
+  .pickf:active .box3d{transform:translateY(3px);box-shadow:0 1px 0 #11163a}
+  .pickf input:focus-visible + .box3d{outline:2px solid var(--accent);outline-offset:3px}
+  .group.skip{opacity:.5;box-shadow:0 3px 0 #121838,0 6px 12px rgba(0,0,0,.35)}
+  .group.skip .to{text-decoration:line-through}
+  .group.skip .ren.promote .to{background:#0f1533;color:var(--muted);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+  .selrow{display:flex;gap:10px;flex-wrap:wrap}
+  .group.err{border-color:var(--bad)}
+  .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:6px;vertical-align:middle}
+  .tag.n{background:var(--good);color:#06301c}
+  .tag.o{background:#3a4170;color:#c9cdf0}
+
+  .log{margin-top:20px;height:140px;overflow:auto;font-family:Consolas,monospace;font-size:12.5px;
+       padding:12px 14px;border-radius:14px;background:#090d22;color:#b8c2ef;
+       box-shadow:inset 0 5px 14px rgba(0,0,0,.7)}
+  .log .ok{color:var(--good)} .log .fail{color:var(--bad)} .log .info{color:var(--warn)}
+
+  .unsupported{display:none;margin-top:16px;padding:14px 18px;border-radius:14px;background:rgba(255,93,115,.12);
+       border:1px solid var(--bad);color:#ffd0d7}
+  .hint{font-size:13px;color:var(--muted)}
+  .getapp{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:22px;
+       padding:16px 18px;border-radius:16px;background:linear-gradient(160deg,#2b3a86,#22306e);border:1px solid #4a63c9;
+       box-shadow:0 6px 0 #18225a,0 14px 26px rgba(0,0,0,.45)}
+  .getapp > div{min-width:0;flex:1 1 320px;line-height:1.5}
+  .getapp.flash{animation:flash 1s ease 2}
+  @keyframes flash{50%{box-shadow:0 6px 0 #18225a,0 0 0 4px var(--warn),0 14px 26px rgba(0,0,0,.45)}}
+  .example-note{text-align:center;color:var(--warn);font-size:13px;font-weight:600;letter-spacing:.4px}
+  .hidden{display:none!important}
+
+  @media (max-width:640px){
+    .card{padding:22px 16px}
+    header{flex-direction:column;text-align:center}
+    h1{font-size:26px}
+    .stats{grid-template-columns:1fr}
+    .ren{grid-template-columns:1fr}
+    .ren .arrow{text-align:center;transform:rotate(90deg)}
+  }
+</style>
+</head>
+<body>
+<div class="floor"></div>
+
+<div class="stage">
+  <main class="card" id="card">
+    <header>
+      <div class="folder3d"><div class="tab"></div><div class="back"></div><div class="paper"></div><div class="front"></div></div>
+      <div>
+        <h1>FileVersionFix</h1>
+        <div class="sub">Turns <b>report (2).pdf</b> into <b>report.pdf</b> and keeps the older ones as <b>report (old).pdf</b>, <b>(old1)</b>…</div>
+      </div>
+    </header>
+
+    <section class="getapp hidden" id="getApp">
+      <div><b>Run it from your PC.</b> Browsers only let a page open your folders when the page is a file on your computer.
+        Save the app once, then double-click it to open it in Edge or Chrome.<br><span class="hint" id="getAppMsg"></span></div>
+      <button class="btn good" id="saveAppBtn">⬇&nbsp; Save FileVersionFix.html</button>
+    </section>
+
+    <section class="pick" id="pickBox">
+      <p id="pickText">Choose the folder you want to fix (for example your <b>Downloads</b> folder).<br>
+         Your browser will ask for permission to view and rename files in it. Nothing leaves your computer.</p>
+      <button class="btn big" id="pickBtn">📂&nbsp; Choose folder to fix</button>
+      <div class="chip hidden" id="folderChip"><span class="dot"></span><span id="folderName"></span></div>
+      <div class="unsupported" id="unsupported">
+        This browser can't open folders. Please open this file in <b>Microsoft Edge</b> or <b>Google Chrome</b> on Windows.
+      </div>
+    </section>
+
+    <div class="row controls">
+      <div class="row">
+        <label class="toggle"><input type="checkbox" id="optSub"><span class="sw"></span>Include subfolders</label>
+        <label class="toggle" title="Keeps names like 'Budget (2024).xlsx' as they are when there is no Budget.xlsx"><input type="checkbox" id="optYears" checked><span class="sw"></span>Leave years like (2024) alone</label>
+        <label class="toggle"><input type="checkbox" id="optWatch"><span class="sw"></span>Auto-fix every</label>
+        <input type="number" class="num" id="optSecs" min="3" max="3600" value="10"><span class="hint">sec</span>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="stGroups">–</b><span>files to fix</span></div>
+      <div class="stat"><b id="stRenames">–</b><span id="stRenLbl">renames planned</span></div>
+      <div class="stat"><b id="stDone">0</b><span>renamed this session</span></div>
+    </div>
+
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <div class="selrow">
+        <button class="btn ghost" id="scanBtn" disabled>🔄&nbsp; Re-scan</button>
+        <button class="btn ghost" id="allBtn" disabled>Select all</button>
+        <button class="btn ghost" id="noneBtn" disabled>Select none</button>
+      </div>
+      <button class="btn good" id="fixBtn" disabled>✨&nbsp; Fix files now</button>
+    </div>
+
+    <div class="plan" id="plan">
+      <div class="example-note">EXAMPLE PREVIEW · choose a folder to see your own files</div>
+      <div class="group">
+        <div class="path">📁 Downloads</div>
+        <div class="ren archive"><div class="from">Q3 Sales Report.xlsx</div><div class="arrow">➜</div><div class="to">Q3 Sales Report (old).xlsx<span class="tag o">OLD</span></div></div>
+        <div class="ren archive"><div class="from">Q3 Sales Report (1).xlsx</div><div class="arrow">➜</div><div class="to">Q3 Sales Report (old1).xlsx<span class="tag o">OLD</span></div></div>
+        <div class="ren promote"><div class="from">Q3 Sales Report (2).xlsx</div><div class="arrow">➜</div><div class="to">Q3 Sales Report.xlsx<span class="tag n">NEWEST</span></div></div>
+      </div>
+    </div>
+
+    <div class="log" id="log"></div>
+  </main>
+</div>
+
+<script>
+(() => {
+  // ---------------------------------------------------------------- config
+  const PARTIAL = ['.crdownload', '.part', '.partial', '.download', '.tmp', '.opdownload'];
+  const COPY_RE = /^(.+?) \((\d{1,4})\)(\.[^.\s]+)?$/;   // "name (3).ext"
+  const $ = id => document.getElementById(id);
+
+  let root = null, plan = [], busy = false, timer = null, doneCount = 0;
+  // Files the viewer unticked. Remembered in this browser, keyed by folder + name + newest copy,
+  // so a brand-new download of the same file shows up ticked again.
+  let skipped = new Set();
+  try { skipped = new Set(JSON.parse(localStorage.getItem('fvf-skip') || '[]')); } catch {}
+  const saveSkip = () => { try { localStorage.setItem('fvf-skip', JSON.stringify([...skipped].slice(-500))); } catch {} };
+  const keyOf = g => g.path + '|' + g.main + '|' + g.newest;
+  const chosen = list => list.filter(g => !skipped.has(keyOf(g)));
+
+  // restore options
+  try {
+    const s = JSON.parse(localStorage.getItem('fvf-opts') || '{}');
+    $('optSub').checked = !!s.sub; $('optYears').checked = s.years !== false;
+    if (s.secs) $('optSecs').value = s.secs;
+  } catch {}
+  const saveOpts = () => { try { localStorage.setItem('fvf-opts', JSON.stringify({
+    sub: $('optSub').checked, years: $('optYears').checked, secs: $('optSecs').value })); } catch {} };
+
+  if (!('showDirectoryPicker' in window)) {
+    $('unsupported').style.display = 'block';
+    $('pickBtn').disabled = true;
+  }
+
+  // ---------------------------------------------------------------- running inside claude.ai?
+  let framed = false;
+  try { framed = window.top !== window.self; } catch { framed = true; }
+  if (framed) $('getApp').classList.remove('hidden');
+  $('saveAppBtn').addEventListener('click', async () => {
+    const msg = $('getAppMsg');
+    try {
+      const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+      if (!dl) { msg.textContent = 'Saving is not available in this view. Ask the person who shared this page for the FileVersionFix.html file.'; return; }
+      const res = await fetch('FileVersionFix.html');
+      if (!res.ok) throw new Error('could not load the app file');
+      await dl.save({ filename: 'FileVersionFix.html', data: await res.text() });
+      msg.textContent = 'Saved. Open your Downloads folder and double-click FileVersionFix.html.';
+    } catch (e) {
+      if (e && e.code === 'declined') { msg.textContent = 'Save cancelled.'; return; }
+      msg.textContent = 'Could not save the app: ' + ((e && (e.message || e.code)) || 'unknown error');
+    }
+  });
+
+  // ---------------------------------------------------------------- 3D tilt
+  const card = $('card');
+  let tiltOn = matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.addEventListener('mousemove', e => {
+    if (!tiltOn) return;
+    const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+    card.style.transform = `rotateY(${x * 6}deg) rotateX(${-y * 5}deg)`;
+  });
+  document.addEventListener('mouseleave', () => card.style.transform = '');
+
+  // ---------------------------------------------------------------- log
+  function log(msg, cls = '') {
+    const d = document.createElement('div');
+    d.className = cls;
+    d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    $('log').appendChild(d);
+    $('log').scrollTop = 1e9;
+  }
+
+  // ---------------------------------------------------------------- scanning
+  async function collectDirs(dir, path, recurse, out) {
+    const files = [], subs = [];
+    for await (const h of dir.values()) {
+      if (h.kind === 'file') files.push(h);
+      else if (recurse) subs.push(h);
+    }
+    out.push({ dir, path, files });
+    for (const s of subs) await collectDirs(s, path + '\\' + s.name, recurse, out);
+  }
+
+  async function buildPlan(minAgeMs = 0) {
+    const dirs = [];
+    await collectDirs(root, root.name, $('optSub').checked, dirs);
+    const protectYears = $('optYears').checked, now = Date.now(), result = [];
+
+    for (const { dir, path, files } of dirs) {
+      const taken = new Set(files.map(f => f.name.toLowerCase()));
+      const groups = new Map();
+
+      for (const f of files) {
+        const ext = (f.name.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+        if (PARTIAL.includes(ext)) continue;
+        const m = f.name.match(COPY_RE);
+        if (!m) continue;
+        const n = parseInt(m[2], 10);
+        if (n < 1) continue;
+        const base = m[1], fext = m[3] || '', main = base + fext, key = main.toLowerCase();
+        if (!groups.has(key)) groups.set(key, { main, base, ext: fext, copies: [] });
+        groups.get(key).copies.push({ n, h: f });
+      }
+
+      for (const g of groups.values()) {
+        const mainH = files.find(f => f.name.toLowerCase() === g.main.toLowerCase());
+        g.copies.sort((a, b) => a.n - b.n);
+        // Original deleted? The highest copy still becomes the original.
+        // Only exception: a lone "(1900-2099)" that is probably a year in the real name.
+        if (!mainH && g.copies.length === 1 && protectYears && g.copies[0].n >= 1900 && g.copies[0].n <= 2099) continue;
+
+        if (minAgeMs > 0) {
+          const hs = g.copies.map(c => c.h).concat(mainH ? [mainH] : []);
+          let fresh = false;
+          for (const h of hs) { if ((await h.getFile()).lastModified > now - minAgeMs) { fresh = true; break; } }
+          if (fresh) continue;
+        }
+
+        const newest = g.copies[g.copies.length - 1].h;
+        const older = (mainH ? [mainH] : []).concat(g.copies.slice(0, -1).map(c => c.h));
+        const archives = [];
+        for (const o of older) {
+          let i = 0, name;
+          do { name = `${g.base} ${i === 0 ? '(old)' : `(old${i})`}${g.ext}`; i++; }
+          while (taken.has(name.toLowerCase()));
+          taken.add(name.toLowerCase());
+          archives.push({ from: o.name, to: name });
+        }
+        result.push({ dir, path, main: g.main, newest: newest.name, archives, state: '' });
+      }
+    }
+    result.sort((a, b) => (a.path + a.main).localeCompare(b.path + b.main));
+    return result;
+  }
+
+  // ---------------------------------------------------------------- renaming
+  async function exists(dir, name) {
+    try { await dir.getFileHandle(name); return true; } catch { return false; }
+  }
+
+  async function renameFile(dir, from, to) {
+    if (await exists(dir, to)) throw new Error(`"${to}" already exists`);
+    const h = await dir.getFileHandle(from);
+    if (typeof h.move === 'function') {
+      try { await h.move(to); return; }
+      catch (e) { if (e.name !== 'NotSupportedError' && e.name !== 'TypeError') throw e; }
+    }
+    // Fallback: copy then delete original
+    const file = await h.getFile();
+    const nh = await dir.getFileHandle(to, { create: true });
+    try {
+      const w = await nh.createWritable();
+      await w.write(file); await w.close();
+    } catch (e) { try { await dir.removeEntry(to); } catch {} throw e; }
+    await dir.removeEntry(from);
+  }
+
+  async function applyPlan(items) {
+    let ok = 0, fail = 0;
+    for (const g of items) {
+      try {
+        for (const a of g.archives) {
+          await renameFile(g.dir, a.from, a.to);
+          ok++; log(`OK    ${a.from}  →  ${a.to}`, 'ok');
+        }
+        await renameFile(g.dir, g.newest, g.main);
+        ok++; log(`OK    ${g.newest}  →  ${g.main}   (now the main file)`, 'ok');
+        g.state = 'done';
+      } catch (e) {
+        fail++; g.state = 'err';
+        log(`FAIL  ${g.main}: ${e.message || e.name}. Is the file open in another program?`, 'fail');
+      }
+    }
+    doneCount += ok; $('stDone').textContent = doneCount;
+    return { ok, fail };
+  }
+
+  // ---------------------------------------------------------------- render
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function render() {
+    const sel = chosen(plan), skipN = plan.length - sel.length;
+    $('stGroups').textContent = sel.length;
+    $('stRenames').textContent = sel.reduce((t, g) => t + g.archives.length + 1, 0);
+    $('stRenLbl').textContent = skipN ? `renames planned · ${skipN} skipped` : 'renames planned';
+    $('fixBtn').disabled = busy || sel.length === 0;
+    $('allBtn').disabled = $('noneBtn').disabled = busy || plan.length === 0;
+    const box = $('plan');
+    if (!plan.length) {
+      box.innerHTML = `<div class="empty">🎉 Nothing to fix. No duplicate downloads in <b>${esc(root ? root.name : '')}</b>.</div>`;
+      return;
+    }
+    box.innerHTML = plan.map((g, i) => {
+      const on = !skipped.has(keyOf(g));
+      return `
+      <div class="group ${g.state} ${on ? '' : 'skip'}">
+        <div class="ghead">
+          <div class="path">📁 ${esc(g.path)}</div>
+          <label class="pickf" title="Untick to leave these files as they are">
+            <input type="checkbox" data-i="${i}" ${on ? 'checked' : ''}><span class="box3d">✓</span>${on ? 'Fix' : 'Skip'}
+          </label>
+        </div>
+        ${g.archives.map(a => `
+          <div class="ren archive"><div class="from">${esc(a.from)}</div><div class="arrow">➜</div>
+          <div class="to">${esc(a.to)}<span class="tag o">OLD</span></div></div>`).join('')}
+        <div class="ren promote"><div class="from">${esc(g.newest)}</div><div class="arrow">➜</div>
+          <div class="to">${esc(g.main)}<span class="tag n">NEWEST</span></div></div>
+      </div>`; }).join('');
+  }
+
+  async function scan() {
+    if (!root || busy) return;
+    busy = true;
+    try { plan = await buildPlan(); render(); }
+    catch (e) { log(`Scan failed: ${e.message || e.name}`, 'fail'); }
+    finally { busy = false; render(); }
+  }
+
+  // ---------------------------------------------------------------- events
+  $('pickBtn').addEventListener('click', async () => {
+    try {
+      root = await window.showDirectoryPicker({ id: 'fileversionfix', mode: 'readwrite', startIn: 'downloads' });
+      if ((await root.queryPermission({ mode: 'readwrite' })) !== 'granted' &&
+          (await root.requestPermission({ mode: 'readwrite' })) !== 'granted') {
+        log('Permission to rename files was not given.', 'fail'); root = null; return;
+      }
+      $('folderName').textContent = root.name;
+      $('folderChip').classList.remove('hidden');
+      $('pickBtn').innerHTML = '📂&nbsp; Choose a different folder';
+      $('pickText').innerHTML = 'Review the renames below, then click <b>Fix files now</b>.';
+      $('scanBtn').disabled = false;
+      log(`Folder selected: ${root.name}`, 'info');
+      await scan();
+      if ($('optWatch').checked) startWatch();
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      if (e.name === 'SecurityError' || framed) {
+        log('This browser view cannot open folders. Save the app above and run it from your PC.', 'info');
+        $('getApp').classList.remove('hidden'); $('getApp').classList.remove('flash'); void $('getApp').offsetWidth; $('getApp').classList.add('flash');
+        $('getApp').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      log(`Could not open folder: ${e.message || e.name}`, 'fail');
+      log('If the browser says the folder contains system files, choose a subfolder instead.', 'info');
+    }
+  });
+
+  $('scanBtn').addEventListener('click', scan);
+
+  $('plan').addEventListener('change', e => {
+    const i = e.target.dataset && e.target.dataset.i;
+    if (i === undefined || !plan[i]) return;
+    const k = keyOf(plan[i]);
+    if (e.target.checked) skipped.delete(k); else skipped.add(k);
+    saveSkip(); render();
+    const again = document.querySelector(`#plan input[data-i="${i}"]`); if (again) again.focus();
+  });
+  $('allBtn').addEventListener('click', () => { plan.forEach(g => skipped.delete(keyOf(g))); saveSkip(); render(); });
+  $('noneBtn').addEventListener('click', () => { plan.forEach(g => skipped.add(keyOf(g))); saveSkip(); render(); });
+
+  $('fixBtn').addEventListener('click', async () => {
+    const sel = chosen(plan);
+    if (busy || !sel.length) return;
+    busy = true; render();
+    const r = await applyPlan(sel);
+    log(`Done: ${r.ok} renamed, ${r.fail} failed.`, 'info');
+    busy = false; render();
+    setTimeout(scan, 1200);
+  });
+
+  function startWatch() {
+    stopWatch();
+    if (!root) return;
+    const secs = Math.max(3, +$('optSecs').value || 10);
+    log(`Auto-fix on: checking every ${secs}s.`, 'info');
+    timer = setInterval(async () => {
+      if (busy || !root) return;
+      busy = true;
+      try {
+        const p = chosen(await buildPlan(5000)); // skip unticked files and files changed in the last 5s (still downloading)
+        if (p.length) { const r = await applyPlan(p); log(`Auto: ${r.ok} renamed, ${r.fail} failed.`, 'info'); }
+      } catch (e) { log(`Auto-fix error: ${e.message || e.name}`, 'fail'); }
+      busy = false;
+      await scan();
+    }, secs * 1000);
+  }
+  function stopWatch() { if (timer) { clearInterval(timer); timer = null; } }
+
+  $('optWatch').addEventListener('change', () => {
+    if ($('optWatch').checked) { if (root) startWatch(); else log('Choose a folder first; auto-fix starts after that.', 'info'); }
+    else { stopWatch(); log('Auto-fix off.', 'info'); }
+  });
+  $('optSecs').addEventListener('change', () => { saveOpts(); if (timer) startWatch(); });
+  $('optSub').addEventListener('change', () => { saveOpts(); scan(); });
+  $('optYears').addEventListener('change', () => { saveOpts(); scan(); });
+})();
+</script>
+</body>
+</html>

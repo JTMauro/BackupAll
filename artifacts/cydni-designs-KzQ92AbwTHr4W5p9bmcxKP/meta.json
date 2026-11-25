@@ -5,6 +5,106 @@
  "updated": "2026-11-03",
  "files": [
   {
+   "path": "SKILL.md",
+   "bytes": 16491,
+   "sha256": "7d9923c12ce7b336fa8b1387f86c6f0e43775164e94d73bbc5d85a265b6b6430"
+  },
+  {
+   "path": "artifact-type/app.css",
+   "bytes": 534733,
+   "sha256": "78f0b25a4bc910d71cf01e584be8e349f484780edfd3fff45b4a9088ea3e25e8"
+  },
+  {
+   "path": "artifact-type/app.js",
+   "bytes": 4959858,
+   "sha256": "ae25b93818d265b6aa107add34221f37a600f709ff0e0513112b650612ee9ab0"
+  },
+  {
+   "path": "artifact-type/dc-runtime.js",
+   "bytes": 188749,
+   "sha256": "b795ee21261f2e7da1b10cb25b4a4cfa275d1b96165f89396f1fed426e191844"
+  },
+  {
+   "path": "artifact-type/fast-edit-worker.js",
+   "bytes": 976520,
+   "sha256": "42335bf8318e811fb6680649681d025e732da74971d39122e07ed5972e69d195"
+  },
+  {
+   "path": "artifact-type/fonts/anthropicons-variable.woff2",
+   "bytes": 153812,
+   "sha256": "0031da8e9104061ea27d074b335cd72911b6a6c97720cd4c65bc3b4574f3d122"
+  },
+  {
+   "path": "artifact-type/reference/brand-colors.md",
+   "bytes": 2234,
+   "sha256": "f451f1e68b640f2bbe4d15420339ddcb7a84595cb7d12e888caa1a6bd5bd4b3a"
+  },
+  {
+   "path": "artifact-type/reference/brand-typography.md",
+   "bytes": 1534,
+   "sha256": "d3aa7f635e355d674680a54fe305d4efc66463c25ec04e0a1243f8937a9ece20"
+  },
+  {
+   "path": "artifact-type/reference/craft.md",
+   "bytes": 15996,
+   "sha256": "73b64cfb2ffb7f0bded39bbd0a71c9795fe887764eb9d18edfa913f31f0ba538"
+  },
+  {
+   "path": "artifact-type/reference/design-system-components.md",
+   "bytes": 12348,
+   "sha256": "be6d36c90371cd28dccc509d4e1cf7bd65f1b8253de8cd4d084123303dcebdb7"
+  },
+  {
+   "path": "artifact-type/reference/diagrams.md",
+   "bytes": 9638,
+   "sha256": "c5747e7ab8d8bd04e7ac484f10be02728b9f8f2df1c024024d1d218be9bb20a7"
+  },
+  {
+   "path": "artifact-type/reference/format.md",
+   "bytes": 11295,
+   "sha256": "b509b31cc2db41a7ddc247f67b164c0f6f755e3f07d909ad3baf20a27718b771"
+  },
+  {
+   "path": "artifact-type/reference/google-fonts-families.json",
+   "bytes": 26440,
+   "sha256": "82a204043c9adf9d3134fa1850513921b4269a3358671a2d6d8831f447b2ed4c"
+  },
+  {
+   "path": "artifact-type/reference/google-fonts-notices.json",
+   "bytes": 60582,
+   "sha256": "b764de9e3b7a62974d60604d0a051a014a9a8e070001835a0964782473b6af64"
+  },
+  {
+   "path": "artifact-type/reference/google-fonts-reserved.json",
+   "bytes": 7403,
+   "sha256": "ce9fc8edddf7222dab49edbdae00b8f7f2bc9c99c8832648e61dd93a0140f9be"
+  },
+  {
+   "path": "artifact-type/reference/make-from-this.md",
+   "bytes": 2014,
+   "sha256": "8089c8f1771fd14a5690f83112174af1fe42fdd2809709b03e4f0579ab94e645"
+  },
+  {
+   "path": "artifact-type/reference/print.md",
+   "bytes": 5827,
+   "sha256": "f2b00538b800f8c3d1456baa916c72db1f2ab82c0ea886b0a3ef8c7a7d3e7c07"
+  },
+  {
+   "path": "artifact-type/reference/questions.md",
+   "bytes": 4419,
+   "sha256": "34139a6b25e7b6048b8c98afbb7892116c9c3dc7369f22b5cf9c88d06cab108e"
+  },
+  {
+   "path": "artifact-type/reference/view-state.md",
+   "bytes": 8779,
+   "sha256": "2b40c2de9bda3130f15d5c4fb5ec8529224d2eea8bf7df6426205dd52bbcb87c"
+  },
+  {
+   "path": "artifact-type/thumbnail/thumbnail.json",
+   "bytes": 359,
+   "sha256": "eb391285e03f9f372be5219759be433cebeee2deda20841593a06f050c3fbb9c"
+  },
+  {
    "path": "index.html",
    "bytes": 36471,
    "sha256": "6b18ab69fe0a8c593c55a3e823666ed59b2bb651f1a8beae12045fc2aa7986ad"
