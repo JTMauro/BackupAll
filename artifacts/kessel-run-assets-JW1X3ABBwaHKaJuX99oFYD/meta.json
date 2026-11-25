@@ -1,0 +1,18 @@
+{
+ "title": "Kessel Run Assets",
+ "url": "https://claude.ai/artifact/JW1X3ABBwaHKaJuX99oFYD",
+ "type": "web page",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 17704,
+   "sha256": "9333648155399b5269d1e5e85313df049b30d8561980fd17477fa621f7a18b6a"
+  },
+  {
+   "path": "kessel-assets.js",
+   "bytes": 64935,
+   "sha256": "6e074a16c1874b7f341e1a5f9530f411c286620a652984bd5d9dfe874285808a"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "title": "DataTerm",
+ "url": "https://claude.ai/artifact/YMxeGFCtjQKvdzLjKz7vcy",
+ "type": "web page",
+ "updated": "2026-11-11",
+ "files": [
+  {
+   "path": "editor.js",
+   "bytes": 39492,
+   "sha256": "c69ad1a5f9ef9e5e47bf88f029bce4f325d8f8068c08ba1449d39e1b18b9eb72"
+  },
+  {
+   "path": "icon.svg",
+   "bytes": 1126,
+   "sha256": "4dc8488e4efd48366d264e99f087b1ac5ea07ce30f4e369d2305633983ee283f"
+  },
+  {
+   "path": "index.html",
+   "bytes": 17254,
+   "sha256": "63e95d2453e8d012b8523d3cdf1439f12219cbf6b36ec739e503467042ab86cb"
+  },
+  {
+   "path": "mock-api.js",
+   "bytes": 27880,
+   "sha256": "c84ed491abcaa394bea987bce8d3d2d8e77a41b38b0a97a02e8e38e94ae98e96"
+  },
+  {
+   "path": "pages.js",
+   "bytes": 29557,
+   "sha256": "bb91b7faa83c0401541eefc8eb0b70abbfa87d50c272daa4f766142702ebc742"
+  },
+  {
+   "path": "style.css",
+   "bytes": 18034,
+   "sha256": "c87c37cfa890272e8f96996cbf333b9f7cf7fbe401257d91e55ef0fd0d46a208"
+  },
+  {
+   "path": "util.js",
+   "bytes": 4177,
+   "sha256": "df3fede1d68d54678c105eb85169e39111714a657ca02bc7fdaf74f47f661ac9"
+  },
+  {
+   "path": "vendor/chartjs/chart.umd.js",
+   "bytes": 205615,
+   "sha256": "3850656abbdc319141e6e8ce8eacde2622fc767c30e20d81704af2bf3159f92d"
+  },
+  {
+   "path": "vendor/codemirror/codemirror.css",
+   "bytes": 8720,
+   "sha256": "eb494ea972d2661ef86f7f6ac656dd6786d721e49c9c1b46e1eb967e4b6f9bf3"
+  },
+  {
+   "path": "vendor/codemirror/codemirror.js",
+   "bytes": 402012,
+   "sha256": "0644e6418c4129c9584b9b772b8b8bdb0b4fbab1efd848a98baf1fe147381f22"
+  },
+  {
+   "path": "vendor/codemirror/comment.js",
+   "bytes": 9230,
+   "sha256": "a65c038258c6541658a0e9f24c56c78255e0e20d4cf06aa9ad83342069a589be"
+  },
+  {
+   "path": "vendor/codemirror/dialog.css",
+   "bytes": 507,
+   "sha256": "5df690d771f12118348562dd2a90060433ae2edeccd0908abcaa4480b1e3e468"
+  },
+  {
+   "path": "vendor/codemirror/dialog.js",
+   "bytes": 5252,
+   "sha256": "fd8c925fcc25357617faff21220c026bb91a617b995268d96c5d39232fd42833"
+  },
+  {
+   "path": "vendor/codemirror/matchbrackets.js",
+   "bytes": 6818,
+   "sha256": "9d0e5ee4c199fcbe487a901860c2cf7d007263852677dd5858098fcaa8580f1e"
+  },
+  {
+   "path": "vendor/codemirror/search.js",
+   "bytes": 11863,
+   "sha256": "4949580371fcd81c0ad70164b169dd8bcab2bd9869eddaa0d7e295508bec7a04"
+  },
+  {
+   "path": "vendor/codemirror/searchcursor.js",
+   "bytes": 12234,
+   "sha256": "2c0b8cd8fe7ca5ca2253f4aacc914b390bff5b3cac3475df66c43a9ea8c8ccbe"
+  },
+  {
+   "path": "vendor/codemirror/show-hint.css",
+   "bytes": 649,
+   "sha256": "9058c1c14fcdae199b490bb6214f36a216b9ce84d7df2084830ebb6a60337651"
+  },
+  {
+   "path": "vendor/codemirror/show-hint.js",
+   "bytes": 19792,
+   "sha256": "f5cba0672058459ef1d9d7f3c7dc94c0078a4a73604fdd4366b2fb51a9aa498d"
+  },
+  {
+   "path": "vendor/codemirror/sql-hint.js",
+   "bytes": 9595,
+   "sha256": "8723e07aa931aafc160404ec65f0cc05b9cb44198edb3d0e61efb5c3f83d202a"
+  },
+  {
+   "path": "vendor/codemirror/sql.js",
+   "bytes": 59280,
+   "sha256": "316d26f2db5fa7d43f20aef358d729ff2d35a30362ba9edfc9e036ba02ee30f3"
+  },
+  {
+   "path": "vendor/sql-formatter/sql-formatter.min.js",
+   "bytes": 235855,
+   "sha256": "36c3c2cce4e44eb5c51f57049d0c5ade483943d9289b5290e7688cf28f3bb6cf"
+  }
+ ]
+}

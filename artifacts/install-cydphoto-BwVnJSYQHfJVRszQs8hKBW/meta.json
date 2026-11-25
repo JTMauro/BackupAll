@@ -1,0 +1,53 @@
+{
+ "title": "Install CydPhoto",
+ "url": "https://claude.ai/artifact/BwVnJSYQHfJVRszQs8hKBW",
+ "type": "web page",
+ "updated": "2026-11-11",
+ "files": [
+  {
+   "path": "full-bar.jpg",
+   "bytes": 7894,
+   "sha256": "3c280cce7d81a7146741208465e5b6a7d96fc94e581eece65f6225440285b660"
+  },
+  {
+   "path": "full-help.jpg",
+   "bytes": 103693,
+   "sha256": "8868ff3af8a80e517f9a6d90d371487a13e050d41915d445edebcb55f6084919"
+  },
+  {
+   "path": "full-home.jpg",
+   "bytes": 278249,
+   "sha256": "fbf43ebe0b322f793fca06acdf3b5aaa9429b4cbee3cf8bc4b586232dc09ab04"
+  },
+  {
+   "path": "icons/icon-192.png",
+   "bytes": 18166,
+   "sha256": "432aa8b34c25256d229da3177a9a813dd4bab9384d5bf489ce868e49ac3d7b0e"
+  },
+  {
+   "path": "icons/icon-lite-192.png",
+   "bytes": 17347,
+   "sha256": "30adcd659c0629dc5b7d0e6743a6f71a05396df542ed664a5654c5632bfb628c"
+  },
+  {
+   "path": "icons/icon.svg",
+   "bytes": 1383,
+   "sha256": "5e96a86837d8458d507a72a79cf9da390046176e93fdc8bb70be7fa399d94ce7"
+  },
+  {
+   "path": "index.html",
+   "bytes": 13340,
+   "sha256": "bfa4ce8ff72a705a1875acc75bbbb424361db08571e2f4b3cf0309b4fb55c41f"
+  },
+  {
+   "path": "js/version.js",
+   "bytes": 2642,
+   "sha256": "d6cb7857048bbc0b5fbee3e2857dddf918544cad7dfb3eedf1df72f382693686"
+  },
+  {
+   "path": "lite-home.jpg",
+   "bytes": 112476,
+   "sha256": "3909c88eb1146b91da0d275a1a8c3c16f2546c24854635c80ef8c7fe4d1a1808"
+  }
+ ]
+}

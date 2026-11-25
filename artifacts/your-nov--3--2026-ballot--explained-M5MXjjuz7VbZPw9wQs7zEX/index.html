@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Nov. 3, 2026 ballot, explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6F4; --sheet:#FFFFFF; --band:#B4A396; --band-ink:#2B2520;
+  --text:#22252B; --muted:#5B6068; --rule:#D6D3CD; --title-bg:#E6E7E5;
+  --ink:#1F3486; --ink-soft:#E3E8F7; --bar:#1A1A1A; --bar-text:#FFFFFF;
+  --yes:#E8F0E6; --no:#F4E9E6;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#15171B; --sheet:#1D2025; --band:#5E534B; --band-ink:#F1ECE7;
+    --text:#E7E7E4; --muted:#A6AAB1; --rule:#3A3D43; --title-bg:#2A2D33;
+    --ink:#9DB0F2; --ink-soft:#28304D; --bar:#E7E7E4; --bar-text:#15171B;
+    --yes:#22301F; --no:#352522;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15171B; --sheet:#1D2025; --band:#5E534B; --band-ink:#F1ECE7;
+  --text:#E7E7E4; --muted:#A6AAB1; --rule:#3A3D43; --title-bg:#2A2D33;
+  --ink:#9DB0F2; --ink-soft:#28304D; --bar:#E7E7E4; --bar-text:#15171B;
+  --yes:#22301F; --no:#352522;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 48px)}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--serif);font-size:14px;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding:0 12px 60px}
+a{color:var(--ink)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.masthead{background:var(--band);color:var(--band-ink);margin:12px 0 0;padding:12px 14px}
+.masthead h1{font-family:var(--cond);font-weight:700;font-size:26px;line-height:1.05;margin:0 0 4px}
+.masthead p{margin:0;font-family:var(--cond);font-size:13px}
+.intro{background:var(--sheet);border:1px solid var(--rule);border-top:none;padding:10px 14px;margin-bottom:12px;font-size:13px}
+.intro p{margin:0 0 6px}
+.dates{width:100%;border-collapse:collapse;font-family:var(--cond);font-size:12.5px;margin-top:4px}
+.dates td{padding:3px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.dates td:first-child{width:72px;font-weight:600}
+.legend{font-family:var(--cond);font-size:12.5px;color:var(--muted);margin-top:6px}
+
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--rule);
+  margin:0 -12px 10px;padding:6px 12px;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;align-items:center}
+.toolbar a,.toolbar button{font-family:var(--cond);font-size:13px;font-weight:500;padding:3px 9px;border:1px solid var(--rule);
+  border-radius:999px;background:var(--sheet);color:var(--text);text-decoration:none;cursor:pointer}
+.toolbar button{border-color:var(--text)}
+.toolbar .count{color:var(--muted)}
+
+.secbar{background:var(--bar);color:var(--bar-text);font-family:var(--cond);font-weight:700;font-size:15px;padding:3px 10px;margin:18px 0 0}
+.secnote{font-size:12.5px;color:var(--muted);margin:4px 0 8px}
+
+.contest{background:var(--sheet);border:1px solid var(--rule);border-left:3px solid var(--bar);margin:0 0 10px}
+.ctitle{background:var(--title-bg);padding:5px 10px 4px}
+.ctitle h2{font-family:var(--cond);font-size:16px;line-height:1.2;margin:0;font-weight:700}
+.ctitle .sub{font-family:var(--cond);font-size:12px;color:var(--muted)}
+.summary{padding:6px 10px 2px;margin:0;font-size:13.5px}
+.opts{list-style:none;margin:0;padding:0}
+.opt{border-top:1px solid var(--rule);padding:6px 10px 7px;display:grid;grid-template-columns:20px 1fr;gap:0 6px}
+.oval{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--text);background:transparent;cursor:pointer;margin-top:3px;padding:0}
+.oval[aria-pressed="true"]{background:var(--ink);border-color:var(--ink)}
+.oname{font-family:var(--cond);font-weight:700;font-size:14.5px;line-height:1.25}
+.odesc{font-family:var(--cond);font-size:12.5px;color:var(--muted)}
+.party{font-family:var(--cond);font-size:12.5px;margin-top:1px}
+.partyline{border-top:1px solid var(--rule);padding:5px 10px;font-size:13px;font-family:var(--cond)}
+.oend{font-size:13px;margin-top:3px;line-height:1.45}
+.lbl{font-family:var(--cond);font-weight:600}
+.stances{margin:4px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.45}
+.stances li{margin:1px 0}
+.stances .k{font-family:var(--cond);font-weight:600;color:var(--muted)}
+.effects{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule)}
+.eff{padding:6px 10px;font-size:13px;line-height:1.45}
+.eff.y{background:var(--yes)} .eff.n{background:var(--no)}
+.eff h3{font-family:var(--cond);font-size:13.5px;margin:0 0 2px;display:flex;align-items:center;gap:6px}
+.eff .who{margin-top:4px;font-size:12.5px}
+details{border-top:1px solid var(--rule)}
+summary{cursor:pointer;padding:5px 10px;font-family:var(--cond);font-weight:600;font-size:13px;color:var(--ink)}
+.analysis{padding:0 10px 8px;font-size:13.5px}
+.analysis p{margin:0 0 6px}
+.analysis h4{font-family:var(--cond);font-size:13.5px;margin:6px 0 2px}
+.src{font-family:var(--cond);font-size:12px;color:var(--muted);margin-top:4px}
+.src a{margin-right:8px}
+
+#picks{background:var(--sheet);border:1.5px solid var(--text);padding:10px 14px;margin-top:24px;break-inside:avoid}
+#picks h2{font-family:var(--cond);margin:0 0 2px;font-size:18px}
+#picks ol{padding-left:20px;margin:6px 0;font-family:var(--cond);font-size:13.5px}
+#picks .empty{color:var(--muted);font-size:13px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.btn{font-family:var(--cond);font-size:13px;font-weight:600;padding:5px 12px;border:1.5px solid var(--text);background:var(--sheet);color:var(--text);cursor:pointer}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.foot{font-size:12px;color:var(--muted);margin-top:16px}
+
+@media (max-width:560px){.effects{grid-template-columns:1fr}}
+
+/* Letter-size print: two columns, everything expanded */
+@page{size:letter;margin:0.45in 0.45in 0.5in}
+@media print{
+  :root{--paper:#fff;--sheet:#fff;--text:#000;--muted:#444;--rule:#bbb;--title-bg:#e9e9e9;--bar:#000;--bar-text:#fff;--yes:#fff;--no:#fff;--band:#d9d0c8;--band-ink:#000;padding:0}
+  body{font-size:8.6pt;line-height:1.35;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .wrap{max-width:none;padding:0}
+  .toolbar,.btnrow,summary,.noprint{display:none!important}
+  main{column-count:2;column-gap:0.22in}
+  .contest{break-inside:auto;margin-bottom:6pt}
+  .opt,.eff,.ctitle{break-inside:avoid}
+  .ctitle{break-after:avoid}
+  .legend{font-size:7.6pt}
+  .secbar{break-after:avoid;font-size:10pt;margin-top:6pt}
+  .secnote{font-size:7.8pt;break-after:avoid}
+  .ctitle h2{font-size:9.6pt} .ctitle .sub,.odesc{font-size:7.6pt}
+  .oname{font-size:9pt} .party,.partyline{font-size:7.8pt} .oend,.stances,.eff,.analysis,.summary{font-size:8pt}
+  .eff h3{font-size:8.4pt}
+  .effects{grid-template-columns:1fr}
+  .eff.y{border-left:2pt solid #6a8f5f}.eff.n{border-left:2pt solid #a46a5c}
+  .oval{width:9pt;height:9pt;border-width:1pt}
+  details{border-top:1px solid var(--rule)}
+  .masthead h1{font-size:15pt}.masthead p,.intro,.dates{font-size:8pt}
+  #picks{margin-top:8pt}
+  a{color:#000;text-decoration:none}
+  .src{font-size:7pt}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <h1>Your ballot, explained</h1>
+    <p>General Election, November 3, 2026. County of Los Angeles, precinct 9000213B</p>
+  </header>
+  <section class="intro">
+    <p>Every contest in ballot order: who's running and where they stand, who endorses them, and for each measure what actually happens if YES wins or NO wins. Nothing here is a recommendation. Tap a bubble to note your choice; picks save on this device and collect at the bottom.</p>
+    <table class="dates" aria-label="Key dates">
+      <tr><td>Oct. 19</td><td>Registration deadline (same-day conditional registration in person after that)</td></tr>
+      <tr><td>Oct. 27</td><td>Safe date to mail your ballot</td></tr>
+      <tr><td>Oct. 31</td><td>All vote centers open</td></tr>
+      <tr><td>Nov. 3</td><td>Election Day, 7 a.m. to 8 p.m. Mail ballots postmarked by today count if received by Nov. 10</td></tr>
+    </table>
+    <div class="legend">Stances come from candidates' own statements and nonpartisan coverage (LAist, CalMatters, KQED). "Party" is the candidate's party; for nonpartisan offices it isn't printed on the ballot, so it comes from the candidate or party endorsements. "Not found" means I couldn't find a sourced answer. For measures, "Democratic Party" means the Los Angeles County Democratic Party's position, and "Republican Party" means the California Republican Party's.</div>
+  </section>
+
+  <nav class="toolbar" id="toolbar" aria-label="Jump to section"></nav>
+  <main id="ballot"></main>
+
+  <section id="picks" aria-live="polite">
+    <h2>My picks</h2>
+    <div id="picklist"></div>
+    <div class="btnrow">
+      <button class="btn primary" id="copyBtn" type="button">Copy my picks</button>
+      <button class="btn" id="clearBtn" type="button">Clear all picks</button>
+    </div>
+  </section>
+
+  <p class="foot">Compiled October 10, 2026 from ballot text, the official state voter guide, LAist Voter Game Plan, CalMatters, KQED, L.A. County Bar Association ratings and news reports linked under each item. Endorsements can change before Election Day. Official guides: voterguide.sos.ca.gov and lavote.gov.</p>
+</div>
+
+<script>
+const L = (label,url)=>[label,url];
+const S = {
+  mayor:L("LAist: Mayor","https://laist.com/news/politics/voter-guides/2026-election-california-general-los-angeles-mayor"),
+  atty:L("LAist: City attorney","https://laist.com/news/politics/voter-guides/2026-election-california-general-los-angeles-city-attorney"),
+  cd3:L("LAist: CD3","https://laist.com/news/politics/voter-guides/2026-general-election-la-city-council-district-3"),
+  judges:L("LAist: Judges","https://laist.com/news/politics/voter-guides/2026-election-california-general-la-county-judges"),
+  lacba:L("LACBA ratings","https://lacba.org/?pg=judicial-elections-evaluation"),
+  sheriff:L("LAist: Sheriff","https://laist.com/news/politics/voter-guides/2026-election-california-general-la-county-sheriff"),
+  measA:L("LAist: Measure A","https://laist.com/news/politics/voter-guides/2026-election-california-general-your-la-county-measure-a-binding-arbitration"),
+  measE:L("LAist: Measure E","https://laist.com/news/politics/voter-guides/2026-election-california-general-la-county-measure-e-ethics-comission-measure-j"),
+  fd:L("LAist: Measure FD","https://laist.com/news/politics/voter-guides/2026-election-general-los-angeles-measure-fd-sales-tax"),
+  prk:L("LAist: PRK","https://laist.com/news/politics/voter-guides/2026-election-california-general-la-charter-amendment-prk"),
+  la:L("LAist: Charter LA","https://laist.com/news/politics/voter-guides/2026-election-california-general-los-angeles-charter-amendment-la"),
+  te:L("LAist: Prop TE","https://laist.com/news/politics/voter-guides/laist-los-angeles-city-voter-game-plan-prop-te"),
+  tax:L("CalMatters: 5 tax measures","https://calmatters.org/politics/2026/10/tax-propositions-ballot-measures/"),
+  sos:L("Official state guide","https://voterguide.sos.ca.gov/propositions/1/index.htm"),
+  gov:L("CalMatters: Governor","https://calmatters.org/california-voter-guide-2026/governor/"),
+  govdeb:L("CalMatters: debate","https://calmatters.org/politics/2026/09/california-general-election-gubernatorial-debate-cnn/"),
+  kqedgov:L("KQED: Governor","https://www.kqed.org/voterguide/california/governor"),
+  ins:L("LAist: Insurance","https://laist.com/news/politics/voter-guides/2026-election-california-general-insurance-commissioner"),
+  spi:L("LAist: Superintendent","https://laist.com/news/politics/voter-guides/2026-election-california-general-superintendent-of-public-instruction"),
+  ltgov:L("CalMatters: Lt. gov","https://calmatters.org/politics/2026/04/california-lieutenant-governor-race/"),
+  sosr:L("CalMatters: Sec. of state","https://calmatters.org/california-voter-guide-2026/secretary-of-state/"),
+  ag:L("CalMatters: Attorney general","https://calmatters.org/california-voter-guide-2026/attorney-general/"),
+  ctrl:L("CalMatters: Controller","https://calmatters.org/politics/elections/2026/05/ca-election-2026-controller/"),
+  treas:L("LAist: Treasurer","https://laist.com/news/politics/voter-guides/2026-election-california-general-state-treasurer"),
+  boe:L("LAist: BOE 3","https://laist.com/news/politics/voter-guides/2026-election-california-general-board-of-equalization-district-3"),
+  asm:L("Ballot Brief: AD46","https://theballotbrief.com/state/california/los-angeles-county/california-assembly-district-46"),
+  ca32:L("Cook: CA-32","https://www.cookpolitical.com/house/race/481976"),
+  p39:L("CalMatters: Prop 39 money","https://laist.com/news/politics/why-are-out-of-state-billionaires-funding-a-california-voter-id-measure"),
+  p42:L("LAist: Newsom backs 42","https://laist.com/news/climate-environment/gavin-newsom-backs-prop-42"),
+  lav:L("lavote.gov","https://lavote.gov"),
+  cjp:L("Judicial Performance Commission","https://cjp.ca.gov/pub_discipline_and_decisions/"),
+  scotus:L("LAist: Supreme Court","https://laist.com/news/politics/voter-guides/2026-election-california-general-state-supreme-court-evans-groban"),
+  lacd2:L("LA Times: LACCD Seat 2","https://occasionaldigest.com/l-a-community-college-board-of-trustees-seat-2-election-guide/"),
+  lacd4:L("LA Times: LACCD Seat 4","https://occasionaldigest.com/l-a-community-college-board-of-trustees-seat-4-election-guide/"),
+  lacd6:L("LA Times: LACCD Seat 6","https://occasionaldigest.com/l-a-community-college-board-of-trustees-seat-6-election-guide/"),
+  lacdp:L("LA County Democratic Party endorsements","https://www.lacdp.org/candidates"),
+  gop:L("California Republican Party endorsements","https://cagop.org/endorsements/"),
+  laf:L("LA Forward guide","https://www.laforward.org/voterguide"),
+  cm:(slug,label)=>[label,"https://calmatters.org/california-voter-guide-2026/"+slug+"/"]
+};
+
+/* Candidate: {name, desc, end, st:[[topic,text]...]}.  Measure: {yes, no, yesWho, noWho} */
+const SECTIONS = [
+ {id:"city", label:"City of LA", note:"Pages 1 to 3."},
+ {id:"fed", label:"Congress & Assembly", note:"Page 2. Partisan seats."},
+ {id:"county", label:"County", note:"Pages 3 and 4."},
+ {id:"state", label:"State offices", note:"Page 4. Top two from June, regardless of party."},
+ {id:"props", label:"State props", note:"Pages 5 to 7. Props 40, 41 and 42 conflict: if 40 passes along with 41 or 42, whichever gets more YES votes takes effect on the conflicting parts."},
+ {id:"courts", label:"Courts", note:"Pages 3, 7 to 9. Superior Court seats are contests; appellate items are retention votes."}
+];
+
+const DEM="Los Angeles County Democratic Party";
+const C = [
+/* ================= CITY ================= */
+{sec:"city", title:"Mayor of Los Angeles", sub:"Vote for one. Nonpartisan office (party not printed on ballot). June primary: Bass 34.3%, Raman 29.0%",
+ opts:[
+  {name:"Karen Ruth Bass", party:"Democrat", desc:"Incumbent mayor; former member of Congress and California Assembly Speaker",
+   end:DEM+"; Los Angeles County Federation of Labor; Los Angeles Police Protective League (the Los Angeles Police Department officers' union); EMILY's List (national group that backs Democratic women who support abortion rights); Thrive Los Angeles (business and taxpayer-focused group, which called its endorsement \"practical, not ideological\").",
+   st:[["Homelessness","Keep her Inside Safe interim-housing program \"until the last street encampment is gone\"; credits it with a 17.5% drop in street homelessness."],
+       ["Housing","Dropped a plan to allow affordable projects in single-family neighborhoods after pushback; critics say she opposed Senate Bill 79 (state law allowing taller apartments near transit)."],
+       ["Public safety","Hired Jim McDonnell as Los Angeles Police Department chief; points to the lowest homicide count since the 1960s."],
+       ["Taxes","Supported 2024's county Measure A sales tax for homelessness; supports Measure FD (fire department sales tax) on this ballot."],
+       ["Tenants","Signed the first update to rent stabilization rules in 40 years."],
+       ["Trump / immigration","\"Resistance with a purpose\": protect residents from federal immigration enforcement while pressing for federal funds."]]},
+  {name:"Nithya Raman", party:"Democrat; member of the Democratic Socialists of America (DSA)", desc:"Los Angeles City Councilmember, District 4; urban planner",
+   end:"Democratic Socialists of America; Los Angeles City Controller Kenneth Mejia; Progressive LA; Unite Here Local 11 (hotel and restaurant workers' union).",
+   st:[["Homelessness","Tie funding to measured results, publish a real-time public dashboard, end underperforming contracts, fill shelter beds the city already pays for. Says encampments in her district fell 54%."],
+       ["Housing","Increase housing production; generally more pro-building than Bass."],
+       ["Tenants","Passed what she calls the strongest tenant protections in city history."],
+       ["Budget","Says she voted against the contracts that drove the city's billion-dollar deficit."],
+       ["Trump / immigration","Wrote Los Angeles's sanctuary city ordinance; would oppose unauthorized military deployments in the city."],
+       ["Olympics","Enforceable caps on city liability for 2028 Olympics cost overruns."]]}],
+ analysis:`<p>Both are Democrats; Raman runs to Bass's left. Bass's weak spots: the Palisades Fire (she was out of the country, later fired the fire chief, who is suing; reports she tried to soften an after-action report, which she denies) and the cost of Inside Safe. Raman's: she entered at the last minute after endorsing Bass, which Bass allies call disloyal, and questions about readiness; her Democratic Socialists of America ties cut both ways.</p>`,
+ src:[S.mayor]},
+
+{sec:"city", title:"City Attorney", sub:"Vote for one. Nonpartisan office. June primary: Roy 43.1%, McKinney 28.6%; incumbent Hydee Feldstein Soto eliminated",
+ opts:[
+  {name:"Marissa Roy", party:"Democrat (endorsed by the "+DEM+")", desc:"Deputy Attorney General, California Department of Justice",
+   end:DEM+"; U.S. Sen. Bernie Sanders (Independent, Vermont); California Attorney General Rob Bonta; Democratic Socialists of America, Los Angeles chapter; LA Forward (progressive civic group).",
+   st:[["Priority","Front-line legal fight against the federal immigration crackdown."],
+       ["Workers / renters","Use the office to enforce worker and tenant protections."],
+       ["Background","Civil rights and consumer-protection litigator; has sued the Trump administration."],
+       ["Criticism","Outgoing incumbent called some promises unrealistic; accepted support from a political action committee tied to a group whose lawyers often sue the city."]]},
+  {name:"John McKinney", party:"Democrat (stated on his West Los Angeles Democratic Club questionnaire)", desc:"Deputy District Attorney, Los Angeles County (felony prosecutor)",
+   end:"Los Angeles Police Protective League (police officers' union, which switched from the incumbent to him); local prosecutors and law enforcement groups. Heavy outside spending, including Airbnb-linked money.",
+   st:[["Crime","Crack down on repeat offenders, organized retail theft, street racing and drug sales; calls his approach \"compassionate accountability.\""],
+       ["Fiscal","Cut the city's soaring lawsuit payouts; protect taxpayer dollars."],
+       ["Office","Rebuild staff morale and community engagement."],
+       ["Criticism","Felony prosecution has little overlap with the office's mostly civil work; raised little money directly."]]}],
+ analysis:`<p>The office is mainly the city's civil lawyer (defending lawsuits, advising the City Council) plus the misdemeanor prosecutor. Both are Democrats; the split is a progressive litigator versus a public-safety-focused prosecutor.</p>`,
+ src:[S.atty]},
+
+{sec:"city", title:"City Council, District 3", sub:"Vote for one. Nonpartisan office. Woodland Hills, Tarzana, Canoga Park, Winnetka, Reseda. June: Gaspar ~49.6%, Girvan ~38.5%",
+ opts:[
+  {name:"Timothy K. Gaspar", party:"Democrat (calls himself \"a Democrat through and through\" and the most moderate candidate)", desc:"Founder of Gaspar Insurance Services (recently sold)",
+   end:"Outgoing Councilmember Bob Blumenfield; Councilmembers Monica Rodriguez, Tim McOsker and John Lee; County Supervisor Kathryn Barger (Republican); businessman Rick Caruso; Los Angeles Police Protective League; International Brotherhood of Electrical Workers (IBEW) Locals 18 and 40; La Opinión newspaper. Outside spending from Airbnb, Uber and the California Apartment Association.",
+   st:[["Police","Would have voted against the current city budget for underfunding police."],
+       ["Rent / tenants","Opposes rent control (says it \"creates slumlords\"); would have opposed some tenant protections."],
+       ["Homelessness","Wants the county to carry treatment duties so city money can hire officers; would contract outreach to groups like the Salvation Army; critic of Inside Safe."],
+       ["Housing","Community-supported projects, \"not oversized projects\"; blames state density law."],
+       ["Immigration","Opposes Immigration and Customs Enforcement (ICE) raids."]]},
+  {name:"Barri Worth Girvan", party:"Democrat (endorsed by the "+DEM+")", desc:"Former aide to County Supervisor Lindsey Horvath, State Sen. Bob Hertzberg and Mayor Antonio Villaraigosa; former Jewish Federation government affairs director",
+   end:DEM+"; County Supervisor Lindsey Horvath; County Assessor Jeff Prang; former Mayor Antonio Villaraigosa; Los Angeles County Federation of Labor; Democratic Party of the San Fernando Valley; Service Employees International Union (SEIU) Locals 721 and 2015 and SEIU United Healthcare Workers West; Sierra Club. Outside spending from the carpenters' union.",
+   st:[["Police","Grow the Los Angeles Police Department from under 9,000 to 12,000 officers."],
+       ["Homelessness","Use the city's anti-camping law (Municipal Code 41.18) near sensitive sites like schools; pull in county Public Health and Mental Health departments."],
+       ["Housing","Streamline permits so the city keeps local control rather than ceding it to the state; add housing without hurting existing residents."],
+       ["Streets","Enforce Measure HLA (\"Healthy Streets LA,\" voter-approved street-safety improvements)."],
+       ["Immigration","Calls Immigration and Customs Enforcement raids \"unconscionable.\""]]}],
+ analysis:`<p>Two moderate Democrats; essentially business versus labor backing, and outsider versus insider. Both want more police; they split on rent control and tenant rules.</p>`,
+ src:[S.cd3]},
+
+{sec:"city", title:"Los Angeles Community College District (LACCD) Board, Seat 2", sub:"Nonpartisan, at-large. Vote for one. Board runs 9 colleges including Pierce College; trustees paid $2,000/month",
+ opts:[
+  {name:"Adriana Cabrera", party:"Not found", desc:"Educator, 34. Former president, Central Alameda Neighborhood Council; co-founder of Empowering Youth in South Central",
+   end:"Not found.",
+   st:[["Priorities","Make student services easier to navigate; more aid for food, housing, child care and mental health; tie education to good-paying jobs."],
+       ["Budget","Audit spending for efficiency; new revenue such as renting underused facilities, without shifting costs to students."],
+       ["Governance","Give students, faculty, staff and labor a voice before budgets are finalized."]]},
+  {name:"Roy Payan", party:"Not found", desc:"Disabled student advocate", end:"Campaign suspended (told the Los Angeles Times), but his name remains on the ballot.", st:[]},
+  {name:"Robert Payne", party:"Not found", desc:"Researcher/writer/environmentalist, 77. Has taught at Los Angeles Mission College",
+   end:"Not found.",
+   st:[["Priorities","Make colleges \"cheaper, faster, better\": more job-specific training, cheaper online textbooks; supports ending student debt."],
+       ["Budget","Opposes cutting student opportunities."]]},
+  {name:"Kristina Irwin", party:"Not found", desc:"Parent/business owner, 50. Santa Monica College advisory board; former Palisades Charter High School trustee",
+   end:"Not found.",
+   st:[["Priorities","\"Pre-entry\" college-prep programs in every local high school; more resources for instructors."],
+       ["Budget","Find alternative revenue for classroom resources."]]},
+  {name:"Steven F. Veres", party:"Democrat (endorsed by the "+DEM+")", desc:"Incumbent trustee since 2017; former teacher; former adviser to State Sen. María Elena Durazo",
+   end:DEM+"; LA Progressive voter guide.",
+   st:[["Priorities","Affordability beyond tuition (housing, food, transportation, textbooks, child care); faster completion and transfer; more paid internships and apprenticeships with employers and organized labor."],
+       ["Budget","Grow enrollment (state funding follows students), cut duplicate spending across the nine colleges, invest in energy savings."],
+       ["Access","Simpler applications; more evening, weekend, online and hybrid classes."]]},
+  {name:"Write-in", desc:"", end:""}],
+ analysis:`<p>Context: in 2024 the district's faculty Academic Senate voted no confidence in the chancellor and board. Veres is the establishment and labor-aligned choice; the challengers are mostly first-time candidates.</p>`,
+ src:[S.lacd2, S.lacdp]},
+
+{sec:"city", title:"LACCD Board, Seat 4", sub:"Open seat (incumbent Sara Hernandez not running). Vote for one",
+ opts:[
+  {name:"Darryn Harris", party:"Democrat (endorsed by the "+DEM+")", desc:"Community college educator, 42. Government affairs officer, St. John's Community Health; teaches at Santa Monica College; former chief of staff to then-Rep. Karen Bass and aide to Rep. Sydney Kamlager-Dove",
+   end:DEM+"; LA Progressive voter guide; Thrive Los Angeles (joint endorsement with Elaine Alaniz).",
+   st:[["Housing","Build low-cost student, faculty and staff housing on district land."],
+       ["Students","Help with food, transportation and child care; better counseling, transfer support and career training with employers and labor."],
+       ["Budget","Before cutting classes, look at administration, consultants, outside contracts, open positions and construction spending."]]},
+  {name:"Nancy Pearlman", party:"Democrat (per her League of Women Voters VOTE411 profile)", desc:"Environmentalist/anthropologist/educator, 78. Trustee 2001–2017; part-time instructor at all nine colleges",
+   end:"Previously endorsed by local Democratic clubs (East Area Progressive Democrats, Pacific Palisades Democratic Club). Refuses corporate donations.",
+   st:[["Oversight","Hold the chancellor and college presidents accountable."],
+       ["Budget","Cut excess spending by comparing administrator pay with faculty and staff pay."],
+       ["Faculty","Equal pay for part-time faculty; keep construction green and on budget."]]},
+  {name:"Elaine Alaniz", party:"Not found", desc:"Healthcare workforce specialist, 45. Public affairs specialist, U.S. Small Business Administration disaster recovery office; former member, Mayor's Crisis Response Team",
+   end:"Thrive Los Angeles (joint endorsement with Darryn Harris).",
+   st:[["Workforce","Keep instruction current with artificial intelligence and other technology; expand apprenticeships and industry credentials."],
+       ["Access","Flexible and online classes for working adults; free or cheap digital course materials."],
+       ["Budget","Prove existing money produces results before asking for more; pursue state and federal grants."]]},
+  {name:"Isidro J. Armenta", party:"Not found", desc:"Fire Department employee", end:"Not found. Did not answer the Los Angeles Times questionnaire.", st:[]},
+  {name:"Jason R. Aula", party:"Not found", desc:"Business owner/journalist, 41; political campaign consultant",
+   end:"Not found.",
+   st:[["Positions","Proposes barring noncitizens from attending district colleges; cites financial-aid fraud; protect football funding; partnerships with the Navy and law enforcement."],
+       ["Note","The Los Angeles Times declined to print much of his questionnaire, citing unsubstantiated accusations involving terrorists, the Chinese Communist Party, Hamas and cannibalism."]]},
+  {name:"Adam Bruno", party:"Not found", desc:"Therapist, 42 (no ballot designation)",
+   end:"Not found.",
+   st:[["Priorities","Raise enrollment; explore student stipends; better pay and support for educators."]]},
+  {name:"Priscilla Umana", party:"Not found", desc:"American Sign Language educational interpreter, 43",
+   end:"Not found.",
+   st:[["Priorities","Affordable housing, work-study and food aid; remove language and disability barriers."],
+       ["Budget","Review low-enrollment courses; revenue from business, nonprofit and entertainment partnerships."]]},
+  {name:"Write-in", desc:"", end:""}],
+ src:[S.lacd4, S.lacdp]},
+
+{sec:"city", title:"LACCD Board, Seat 6", sub:"Vote for one",
+ opts:[
+  {name:"Randall Winston", party:"Democrat (endorsed by the "+DEM+")", desc:"Architect and attorney, 44. Los Angeles Deputy Mayor for Infrastructure and Climate Resilience under Bass; former head of the California Strategic Growth Council under Gov. Jerry Brown",
+   end:DEM+".",
+   st:[["Careers","Every college partners with labor and employers for apprenticeships and \"family-sustaining union careers\"; expand dual enrollment for high schoolers."],
+       ["Oversight","Rigorous oversight of the district's $5.3 billion bond-funded construction program."],
+       ["Budget","\"What I won't do is balance budgets on instruction\"; raise revenue via enrollment, grants and partnerships."]]},
+  {name:"Tonia Arey", party:"Not found", desc:"Realtor, 56. Ran unsuccessfully for County Supervisor, District 3, in June",
+   end:"Not found.",
+   st:[["Priorities","Campus safety, student success and career readiness, accountability."],
+       ["Budget","Cut administrative waste first; stronger competitive bidding; tighter bond oversight."],
+       ["Board","Says \"current trustees can no longer be trusted.\""]]},
+  {name:"Roberto David Lacarra", party:"Not found", desc:"Community college professor", end:"Not found. Did not answer the Los Angeles Times questionnaire.", st:[]},
+  {name:"Gabriel Buelna", party:"Not confirmed (ran on a 2022 slate with Democratic-backed trustees)", desc:"Incumbent trustee, 54. Attorney; teaches history and political science at California State University, Northridge; former head of Plaza Community Services",
+   end:"LA Progressive voter guide. (The "+DEM+" endorsed Winston instead.)",
+   st:[["Housing","Move \"aggressively\" on the district's up-to-$500 million commitment for student and staff housing."],
+       ["Students","More food aid, mental health services, career technical education and paid internships; protect immigrant and undocumented students."],
+       ["Oversight","Strong oversight of voter-approved bond money."]]},
+  {name:"Write-in", desc:"", end:""}],
+ src:[S.lacd6, S.lacdp]},
+
+{sec:"city", title:"Measure TE: Transfer-tax break for Palisades Fire victims", sub:"City ordinance. Majority to pass",
+ summary:"One-time exemption from the city's Measure ULA (\"United to House LA,\" often called the \"mansion tax\") (on property sales over roughly $5 million) for homes damaged or destroyed in the January 2025 Palisades Fire and sold within five years.",
+ m:{yes:"Owners of fire-damaged homes who sell within five years skip the ULA transfer tax (4% to 5.5% of the sale price). Sellers keep more; ULA's affordable-housing and renter-aid fund collects less from those sales.",
+    no:"Those sales pay ULA like any other high-value sale. ULA revenue unchanged; some fire victims selling lots pay six- or seven-figure tax bills.",
+    yesWho:"Councilmember Traci Park; Mayor Bass; Council President Marqueece Harris-Dawson; Western States Regional Council of Carpenters; Palisades Community Council.",
+    noWho:"None filed.",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[S.te]},
+
+{sec:"city", title:"Charter Amendment LA: Infrastructure, budget, contracting", sub:"Majority to pass",
+ summary:"Adds a capital infrastructure plan and two-year budget cycle, gives the Public Works director more power, allows eliminating or changing the Board of Public Works, lets the city run business enterprises and mortgage city property, and changes contracting rules.",
+ m:{yes:"City shifts to two-year budgets with a long-range infrastructure plan; Public Works restructured under a stronger director; city gains authority to run businesses and borrow against its property; new contracting rules take effect.",
+    no:"Annual budgets and the current Board of Public Works stay; existing bans on city-run businesses and mortgaging city property remain.",
+    yesWho:"City Controller Kenneth Mejia; Councilmembers Katy Yaroslavsky and Bob Blumenfield; former Controller Ron Galperin; Investing in Place (transportation advocacy group).",
+    noWho:"Councilmember Monica Rodriguez (District 7).",
+    parties:"Los Angeles County Democratic Party: NO."},
+ src:[S.la]},
+
+{sec:"city", title:"Charter Amendment PL: Planning Department", sub:"Majority to pass",
+ summary:"Replaces Area Planning Commissions with a Neighborhood Appeals Commission, adds City Council review, changes timelines, lets Planning handle certain quasi-judicial (hearing-style) reviews, and allows floor-area rules to change by ordinance.",
+ m:{yes:"The area commissions are replaced by one Neighborhood Appeals Commission; appeals move faster on new deadlines; the council can change floor-area (building size) rules by ordinance instead of a public vote.",
+    no:"Area Planning Commissions and current appeal timelines stay; floor-area changes keep current charter limits.",
+    yesWho:"Raymond Meza, chair, Charter Reform Commission; Roy Samaan, president, Engineers and Architects Association (city employees' union).",
+    noWho:"None filed. Some neighborhood groups prefer local area commissions.",
+    parties:"Los Angeles County Democratic Party: no position."},
+ src:[]},
+
+{sec:"city", title:"Charter Amendment EE: Ethics, elections, governance", sub:"Majority to pass",
+ summary:"Strengthens the Los Angeles Police Department Inspector General and the Fire Department Independent Assessor; five-year ban on Ethics commissioners running for certain offices; higher campaign-finance penalties; council must meet at least weekly (instead of three days a week); higher referendum signature requirements.",
+ m:{yes:"Watchdogs gain authority, campaign violations cost more, ethics commissioners can't run for office for five years. The council may meet as little as once a week, and citizens need more signatures to put a council action to a public vote (referendum).",
+    no:"Current watchdog powers and penalties stay; the council keeps its three-day-a-week minimum; referendum thresholds unchanged.",
+    yesWho:"Councilmembers Tim McOsker and Katy Yaroslavsky; Council President Marqueece Harris-Dawson.",
+    noWho:"Councilmember Monica Rodriguez (District 7).",
+    parties:"Los Angeles County Democratic Party: NO."},
+ src:[]},
+
+{sec:"city", title:"Charter Amendment PRK: Parks budget", sub:"Majority to pass",
+ summary:"Doubles the guaranteed minimum budget share for the Department of Recreation and Parks, phased in over up to 10 years, with exceptions for fiscal emergencies.",
+ m:{yes:"Parks' guaranteed slice of the city budget doubles over time: more maintenance, programs and access, especially in park-poor areas; correspondingly less flexible money for police, fire, streets and homelessness in tight years.",
+    no:"Parks' guaranteed minimum stays where it is; the council keeps current budget flexibility.",
+    yesWho:"Councilmembers Monica Rodriguez, Imelda Padilla and Ysabel Jurado; City Controller Kenneth Mejia; Father Greg Boyle (Homeboy Industries founder).",
+    noWho:"None filed.",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[S.prk]},
+
+{sec:"city", title:"Charter Amendment PRT: Airports, Harbor, Water and Power", sub:"Majority to pass",
+ summary:"Harbor Department must fund waterfront public access; workforce-impact disclosure for some Harbor leases; longer maximum terms for some leases; changes the Airport Commission's composition rules.",
+ m:{yes:"The Port of Los Angeles must set aside money for waterfront public access (mostly San Pedro and Wilmington); tenants disclose job impacts such as automation; the port can sign longer leases; Airport Commission makeup rules change.",
+    no:"Current lease limits and commission rules stay; no mandatory waterfront-access funding.",
+    yesWho:"Councilmembers Tim McOsker, Imelda Padilla and Traci Park.",
+    noWho:"None filed.",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[]},
+
+{sec:"city", title:"Measure FD: Half-cent sales tax for the Los Angeles Fire Department", sub:"Citizen initiative. Majority to pass",
+ summary:"Raises the sales tax in the city from 10.25% to 10.75% for the Fire Department, about $345 million a year, with annual audits and a citizens' oversight committee. No end date.",
+ m:{yes:"Starting as early as April 1, 2027, you pay 5 cents more per $10 purchase. Money is locked to the Fire Department: supporters say about 1,000 more firefighters, new stations, equipment and brush clearance. The city can't cut the department's regular budget to offset it. The tax lasts until voters repeal it.",
+    no:"Sales tax stays at 10.25%. Fire Department funding stays in the general budget, competing with police and other services.",
+    yesWho:"United Firefighters of Los Angeles City (firefighters' union); Fire Chief Jaime Moore; California Professional Firefighters; Mayor Bass; Councilmember Traci Park; Rick Caruso.",
+    noWho:"Howard Jarvis Taxpayers Association (anti-tax group; calls this the third sales-tax hike in two years); Los Angeles Police Protective League (police union; objects to no end date and fire-only spending).",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[S.fd]},
+
+{sec:"city", title:"Charter Amendment SC: School board campaign finance", sub:"Majority to pass",
+ summary:"Clarifies campaign-finance rules for Los Angeles Unified School District (LAUSD) Board of Education elections and allows future changes by ordinance.",
+ m:{yes:"Rules for LAUSD board races are clarified, and the City Council can adjust them later without another charter vote.",
+    no:"Current charter language stays; changes would require another ballot vote.",
+    yesWho:"Councilmember Adrin Nazarian; LAUSD board member Nick Melvoin; League of Women Voters of Greater Los Angeles; California Common Cause.",
+    noWho:"None filed.",
+    parties:"Los Angeles County Democratic Party: no position."},
+ src:[]},
+
+/* ================= FED / ASSEMBLY ================= */
+{sec:"fed", title:"State Assembly, District 46", sub:"Vote for one. June: Gabriel 66.2%, Schroeder 33.8% (rematch of 2024)",
+ opts:[
+  {name:"Jesse Gabriel", party:"Democrat", desc:"Incumbent since 2018; chairs the Assembly Budget Committee; co-chairs the California Legislative Jewish Caucus",
+   end:"California Democratic Party; "+DEM+"; California Labor Federation; California Environmental Voters; Equality California (LGBTQ rights group); California YIMBY and YIMBY Los Angeles (\"Yes In My Backyard\" pro-housing groups); SEIU California; SEIU United Healthcare Workers West; United Farm Workers; Unite Here Local 11; Western States Regional Council of Carpenters.",
+   st:[["Budget","Writes the state budget as budget chair; backs Prop 2 (bigger rainy-day fund)."],
+       ["Guns","Supports tougher gun control."],
+       ["Environment","Climate and environmental bills."],
+       ["Tech","Pushes tech companies to police online hate speech."],
+       ["Immigration","As an attorney sued the Trump administration to protect \"Dreamers\" (people brought to the U.S. as children)."],
+       ["Housing","Backed by pro-housing groups."]]},
+  {name:"Tracey Schroeder", party:"Republican", desc:"Los Angeles Unified School District elementary teacher 25+ years; third-generation San Fernando Valley resident",
+   end:"California Republican Party.",
+   st:[["Public safety","More public safety funding."],
+       ["Taxes","Opposes vehicle-mileage (per-mile driving) taxes."],
+       ["Schools","Focus on curriculum and school funding."],
+       ["Business","Reduce regulations on small businesses."]]}],
+ src:[S.asm]},
+
+{sec:"fed", title:"U.S. Representative, District 32", sub:"Vote for one. Rated Solid Democratic by the Cook Political Report",
+ opts:[
+  {name:"Larry Thompson", party:"Republican", desc:"Talent manager, film producer, entertainment attorney",
+   end:"California Republican Party (unanimous).",
+   st:[["Pitch","Calls himself the \"Sanity Man\": end partisan fighting and California's one-party rule; 32-point plan."],
+       ["Crypto","Strongly pro-cryptocurrency; accepts bitcoin donations."],
+       ["Infrastructure","Above-ground transit system; partner on the 2028 Olympics."],
+       ["Issues","Criticizes open borders and high taxes."]]},
+  {name:"Brad Sherman", party:"Democrat", desc:"In Congress since 1997; certified public accountant; former chair, State Board of Equalization",
+   end:DEM+".",
+   st:[["Crypto","One of Congress's leading cryptocurrency critics."],
+       ["Committees","Senior member of the House Financial Services and Foreign Affairs committees."],
+       ["Primary","Beat a well-funded younger Democrat, former Biden official Jake Levine, who ran on generational change."]]}],
+ src:[S.ca32, S.lacdp]},
+
+/* ================= COUNTY ================= */
+{sec:"county", title:"Sheriff", sub:"Vote for one. Nonpartisan office. June: Luna 44.2%, Villanueva 21.7%. Luna beat Villanueva ~60–40 in 2022",
+ opts:[
+  {name:"Alex Villanueva", party:"Democrat (registered when he won in 2018 and ran in 2022; not reconfirmed for 2026)", desc:"Sheriff 2018–2022; retired peace officer",
+   end:"Los Angeles Sheriff's Professional Association (deputies' group he helped found; 81.5% member vote).",
+   st:[["Deputies","Rebuild morale, cut forced overtime, restore staffing."],
+       ["Deputy gangs","Critics say he did little to curb deputy cliques; he defied subpoenas before later acknowledging \"subgroups\" exist."],
+       ["Oversight","Frequent clashes with the Board of Supervisors, the civilian oversight commission and the press; calls the criticism political."]]},
+  {name:"Robert G. Luna", party:"Democrat (endorsed by the "+DEM+")", desc:"Incumbent sheriff; former Long Beach police chief",
+   end:DEM+"; county supervisors; police chiefs; labor groups; Association for Los Angeles Deputy Sheriffs (largest deputies' union, which backed Villanueva in 2022).",
+   st:[["Crime","Points to reduced crime in patrolled areas and more transparency."],
+       ["Deputy gangs","Pledged to eliminate them."],
+       ["Jails","Asked the National Institute of Corrections to review jails after deaths rose; but State Attorney General Rob Bonta sued over jail conditions and the U.S. Department of Justice opened an investigation of Men's Central Jail on his watch."],
+       ["Relations","Repaired ties with supervisors; improved compliance with court settlements."]]}],
+ src:[S.sheriff, S.lacdp]},
+
+{sec:"county", title:"County Measure A: Binding arbitration for public safety unions", sub:"Charter amendment. Majority to pass",
+ summary:"When contract talks deadlock, a three-member panel (one county pick, one union pick, one jointly chosen) issues a binding decision for about 17,000 deputies, firefighters, lifeguards and related staff. Also bars strikes by several of these groups.",
+ m:{yes:"Takes effect 10 days after certification. The county can no longer impose its \"last, best and final offer\"; arbitrators decide pay and conditions at impasse. Construction-trade units lose the right to strike. Supervisors lose final say over about 17% of the county payroll in disputes.",
+    no:"County keeps the power to impose its final offer when talks fail. No change to strike rules.",
+    yesWho:"Los Angeles County Firefighters Local 1014 (International Association of Fire Fighters); Association for Los Angeles Deputy Sheriffs; Professional Peace Officers Association; Los Angeles County Lifeguard Association; Los Angeles/Orange Counties Building and Construction Trades Council; 4 of 5 supervisors.",
+    noWho:"No organized campaign. The county's former acting chief executive officer warned of strained reserves and credit ratings (citing Vallejo and San Luis Obispo); police-accountability advocates object to less public control.",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[S.measA]},
+
+{sec:"county", title:"County Measure E: Ethics Commission and community investment", sub:"Charter amendment. Majority to pass",
+ summary:"Writes an independent Ethics Commission, Office of Ethics Compliance and Ethics Compliance Officer into the county charter, and continues the county's set-aside for community investment and alternatives to incarceration (from 2020's Measure J).",
+ m:{yes:"The ethics watchdog gets charter-protected independence, appointment rules and duties as the county expands its board. The community-investment and alternatives-to-jail spending commitment continues uninterrupted.",
+    no:"Ethics structure stays as set by ordinance (changeable by the supervisors). This measure doesn't extend the Measure J-style set-aside.",
+    yesWho:"League of Women Voters of Los Angeles County; California Clean Money Campaign; Supervisor Lindsey Horvath; California Common Cause; AAPI Equity Alliance (Asian American and Pacific Islander advocacy group).",
+    noWho:"None filed. Law-enforcement-aligned critics have historically opposed the set-aside as limiting budget flexibility.",
+    parties:"Los Angeles County Democratic Party: YES."},
+ src:[S.measE]},
+
+/* ================= STATE OFFICES ================= */
+{sec:"state", title:"Governor", sub:"Vote for one. Latest UC Berkeley Institute of Governmental Studies poll: Becerra 55%, Hilton 37%",
+ opts:[
+  {name:"Xavier Becerra", party:"Democrat", desc:"Former U.S. Secretary of Health and Human Services, California Attorney General and congressman",
+   end:"California Democratic Party; "+DEM+"; Gov. Gavin Newsom; Tom Steyer; former Vice President Kamala Harris; labor unions.",
+   st:[["Taxes","Supports a progressive income tax and Prop 3; opposes Prop 40 (wealth tax); open to taxing corporations whose workers rely on public health care."],
+       ["Cost of living","Emergency declaration to freeze insurance and utility rates; fight price gouging; \"power hour\" free electricity for low-income families."],
+       ["Housing","Emergency funding to finish 40,000 already-approved affordable units; prevention over shelter."],
+       ["Homelessness","Treat it as a need for support; keep people housed before they become homeless."],
+       ["Immigration","Supports California's sanctuary law; sued Trump 120+ times as attorney general."],
+       ["Voter ID","Opposes Prop 39; co-leads a No campaign committee."],
+       ["Note","His former chief of staff pleaded guilty in a scheme to siphon money from his campaign account; Becerra was not accused."]]},
+  {name:"Steve Hilton", party:"Republican", desc:"Former Fox News host; former adviser to British Prime Minister David Cameron",
+   end:"President Donald Trump; California Republican Party; California Republican Assembly (conservative grassroots group).",
+   st:[["Taxes","No state income tax on the first $150,000 of earnings; flat rate above that; cut the gas tax in half; opposes Prop 40."],
+       ["Energy","$3 gas and half-price electricity by eliminating climate programs and suspending some environmental rules."],
+       ["Housing","Cap development fees, cut environmental rules and lawsuits, open natural land to single-family homes, \"10 new cities,\" first-time buyer loans."],
+       ["Homelessness","Enforce anti-camping laws, end \"Housing First\" (housing without treatment conditions), fund sober housing and treatment."],
+       ["Immigration","Called Trump's deportation campaign \"perfect\" in January; calls himself pro-immigration; dodged on repealing the sanctuary law."],
+       ["Voter ID","Supports Prop 39."],
+       ["Education","Make it easier to fire teachers; let parents petition to convert schools to charters."]]}],
+ src:[S.gov, S.govdeb, S.kqedgov]},
+
+{sec:"state", title:"Lieutenant Governor", sub:"Vote for one. Mostly ceremonial; sits on University of California, California State University and community college boards",
+ opts:[
+  {name:"Fiona Ma", party:"Democrat", desc:"Two-term State Treasurer; certified public accountant; former Assembly Speaker pro Tempore",
+   end:"California Democratic Party; "+DEM+"; California Labor Federation; California Professional Firefighters; several newspapers.",
+   st:[["Pitch","Frames the office as a check on the Trump administration."],
+       ["Housing","Chaired housing tax-credit committees; launched the Dream for All down-payment program; student-housing bonds."],
+       ["Criticism","Past controversies over spending and personnel in the Treasurer's office."]]},
+  {name:"Gloria Romero", party:"Republican (switched from Democrat in 2024)", desc:"Former Democratic State Senate Majority Leader; educator/businesswoman",
+   end:"California Republican Party; Reform California (conservative group led by Assemblymember Carl DeMaio); California Republican Assembly. Running as a joint ticket with Steve Hilton.",
+   st:[["Higher education","Transparency on University of California faculty pay and housing allowances; more student representation on the Board of Regents."],
+       ["Education","Longtime school-choice and charter school advocate."]]}],
+ src:[S.ltgov]},
+
+{sec:"state", title:"Secretary of State", sub:"Vote for one. Runs state elections",
+ opts:[
+  {name:"Shirley N. Weber", party:"Democrat", desc:"Incumbent since 2021; former Assemblymember and professor",
+   end:"California Democratic Party; "+DEM+"; labor unions; editorial boards.",
+   st:[["Voting access","Implemented permanent universal vote-by-mail; focus on turnout and first-time voters."],
+       ["Voter data","Resisted U.S. Department of Justice demands for California's voter rolls."],
+       ["Criticism","Slow ballot counts; some advocates say access still lags."]]},
+  {name:"Donald P. (Don) Wagner", party:"Republican", desc:"Orange County Supervisor; former Irvine mayor and Assemblymember",
+   end:"California Republican Party; California Republican Assembly; donors include Assemblymember Carl DeMaio and the Building Industry Association of Southern California.",
+   st:[["Voter ID","Supports Prop 39 and pledges to enforce it."],
+       ["Counting","Faults Weber for slow counts and not pushing to speed them."],
+       ["Voter data","As supervisor pushed release of voter information to the Trump Justice Department."],
+       ["Mail voting","A Democratic group says he wants to end automatic mail ballots to all voters."],
+       ["Background","Founded the Orange County chapter of the Federalist Society (conservative legal group)."]]}],
+ src:[S.sosr]},
+
+{sec:"state", title:"Controller", sub:"Vote for one. State's chief accountant and auditor",
+ opts:[
+  {name:"Herb W. Morgan", party:"Republican", desc:"Founded a San Diego investment firm later bought by Cantor Fitzgerald",
+   end:"California Republican Party; California Republican Assembly.",
+   st:[["Fraud / waste","Expose fraud and waste; scrutinize homelessness spending."],
+       ["Transparency","Real-time public spending dashboards (uses one for his own donations)."]]},
+  {name:"Malia M. Cohen", party:"Democrat", desc:"Incumbent since 2023; former San Francisco Supervisor and Board of Equalization member",
+   end:"California Democratic Party; "+DEM+"; teachers', nurses', health care workers' and building-trades unions.",
+   st:[["Budget","Urges spending restraint given deficits."],
+       ["Record","Fixed a chronically late state financial report; expanded public access to payroll and finance data."],
+       ["Criticism","CalMatters found she didn't deliver promised audits of homelessness spending, the Employment Development Department and the Department of Motor Vehicles."]]}],
+ src:[S.ctrl]},
+
+{sec:"state", title:"Treasurer", sub:"Vote for one. Manages state investments and bond sales",
+ opts:[
+  {name:"Eleni Kounalakis", party:"Democrat", desc:"Lieutenant Governor since 2019; former developer and U.S. Ambassador to Hungary",
+   end:"California Democratic Party; "+DEM+"; Gov. Newsom; both U.S. senators; Kamala Harris; Treasurer Fiona Ma; California Teachers Association.",
+   st:[["Housing","Use public finance to build affordable housing."],
+       ["Tuition","Has voted against University of California and California State University tuition increases."],
+       ["Pensions","As Treasurer would sit on the CalPERS and CalSTRS boards (California Public Employees' and State Teachers' Retirement Systems)."]]},
+  {name:"Jennifer Hawks", party:"Republican", desc:"Retired businesswoman; former private school administrator; party activist",
+   end:"California Republican Party; California Republican Assembly.",
+   st:[["Pitch","Not a career politician; independent check on Democratic spending."],
+       ["Fiscal","Thorough audits, clear reporting, financial discipline."],
+       ["Housing","Calls affordable housing the state's top priority."]]}],
+ src:[S.treas]},
+
+{sec:"state", title:"Attorney General", sub:"Vote for one. June: Bonta 56.6%, Gates 37.9%",
+ opts:[
+  {name:"Michael E. Gates", party:"Republican", desc:"Former Huntington Beach City Attorney; briefly a deputy assistant attorney general in the Trump Justice Department's Civil Rights Division",
+   end:"California Republican Party; California Republican Assembly; Huntington Beach Police Officers' Association; California Rifle and Pistol Association.",
+   st:[["Voting","Defended Huntington Beach's voter ID law against the state; at the Justice Department helped lead a case seeking California voter rolls."],
+       ["Housing / sanctuary","Fought state housing mandates and the state sanctuary law in court."],
+       ["Guns","Backed by a gun-rights group."],
+       ["Note","His Justice Department exit was disputed; he denies he was fired."]]},
+  {name:"Rob Bonta", party:"Democrat", desc:"Incumbent since 2021; former Assemblymember",
+   end:"California Democratic Party; "+DEM+"; Gov. Newsom; labor unions; newspapers.",
+   st:[["Trump","Filed or joined 50+ lawsuits against the second Trump administration."],
+       ["Housing","Enforced laws forcing reluctant cities to allow housing."],
+       ["Jails","Sued Los Angeles County over jail conditions."],
+       ["Voting","Opposes Trump administration demands for state election data."]]}],
+ src:[S.ag]},
+
+{sec:"state", title:"Insurance Commissioner", sub:"Vote for one. Both candidates are Democrats",
+ opts:[
+  {name:"Ben Allen", party:"Democrat", desc:"State Senator (Santa Monica area)",
+   end:"California Democratic Party; "+DEM+"; Senate President pro Tempore Monique Limón; Assembly Speaker Robert Rivas; State Building and Construction Trades Council; San Francisco Chronicle and Southern California News Group editorial boards.",
+   st:[["Wildfire market","Continue current reforms letting insurers price wildfire risk in exchange for writing more policies."],
+       ["Consumers","More staff for complaints; tighter oversight of the FAIR Plan (state's insurer of last resort)."],
+       ["Ethics","Ban the commissioner and staff from going straight to insurance-industry jobs."],
+       ["Auto","Opposes expanding the low-cost auto insurance program to all drivers."]]},
+  {name:"Jane Kim", party:"Democrat", desc:"Former San Francisco Supervisor; former state director of the Working Families Party (progressive minor party)",
+   end:"U.S. Sen. Bernie Sanders; progressive groups.",
+   st:[["Wildfire","State-run \"natural disaster insurance for all,\" modeled on New Zealand."],
+       ["Home coverage","Tie insurers' right to sell auto policies to writing home policies."],
+       ["Auto","Low-cost auto insurance for every driver."],
+       ["Disclosure","Insurers disclose how they spend premiums, including fossil-fuel investments."]]}],
+ src:[S.ins]},
+
+{sec:"state", title:"Board of Equalization, District 3", sub:"Vote for one. Both Democrats; covers Los Angeles County; oversees property-tax practices",
+ opts:[
+  {name:"Mike Gipson", party:"Democrat", desc:"Termed-out Assemblymember (Carson, Compton, North Long Beach)",
+   end:"California Democratic Party; "+DEM+"; established unions; Equality California.",
+   st:[["Pitch","Long public-service record; uniform property assessments and revenue collection."]]},
+  {name:"Samuel P. Sukaton", party:"Democrat", desc:"Lead organizer, American Federation of Teachers Local 1521 (Los Angeles community college faculty union); former California Environmental Voters staffer; 2020 Bernie Sanders campaign regional director",
+   end:"Center Action Fund (progressive group).",
+   st:[["Pitch","Labor-left outsider; little detailed platform published."]]}],
+ src:[S.boe]},
+
+{sec:"state", title:"Superintendent of Public Instruction", sub:"Nonpartisan office. Vote for one. June: Shaw ~25%, Barrera ~20%",
+ opts:[
+  {name:"Richard Barrera", party:"Democrat", desc:"San Diego Unified School District board president; adviser in the State Superintendent's office",
+   end:DEM+"; California Teachers Association; California Federation of Teachers; California Charter Schools Association Advocates; former Assembly Speaker Anthony Rendon.",
+   st:[["Schools","Smaller classes, bilingual programs, career pathways, staff housing."],
+       ["Trump","Fight federal school-funding cuts."],
+       ["LGBTQ","Opposes Shaw's approach on transgender students."]]},
+  {name:"Sonja Shaw", party:"Republican", desc:"Chino Valley Unified School District board president",
+   end:"California Republican Assembly; conservative and parents'-rights groups.",
+   st:[["Parental rights","Rose to prominence pushing parental notification when students change gender identity; opposes current protections for transgender students."],
+       ["Curriculum","\"Back to basics\" academics, away from what she calls \"radical ideologies.\""]]},
+  {name:"Write-in", desc:"", end:""}],
+ src:[S.spi]},
+
+/* ================= PROPS ================= */
+{sec:"props", title:"Prop 1: $11.25 billion housing bond", sub:"Placed on ballot by the Legislature",
+ summary:"State borrows $11.25 billion for affordable rentals, $1.25 billion for veterans' housing, supportive, student and farmworker housing, preservation and down-payment help.",
+ m:{yes:"State sells the bonds and funds tens of thousands of subsidized units. Repayment costs $500–$600 million a year from the general fund for about 25 years. No new tax.",
+    no:"No new housing bond; existing programs continue on current funding, and that debt-service money stays available for other uses.",
+    yesWho:"US Vets; California Federation of Teachers; Habitat for Humanity California; Gov. Newsom.",
+    noWho:"No ballot argument filed. Assemblymember David Tangipa (Republican) and Reform California oppose.",
+    parties:"Democratic Party: YES. Republican Party: neutral."},
+ src:[S.sos, S.cm("proposition-1-housing-bond","CalMatters"), S.lacdp, S.gop]},
+
+{sec:"props", title:"Prop 2: Bigger rainy-day fund", sub:"Constitutional amendment placed by the Legislature",
+ summary:"Raises the reserve cap from 10% to 20% of general fund taxes; some money may pay down the state's federal unemployment insurance debt.",
+ m:{yes:"The state can save up to twice as much for recessions. Deposits no longer count toward the Gann limit (voter-approved state spending cap), so less surplus would trigger taxpayer rebates or extra school payments.",
+    no:"Reserve cap stays at 10%; spending-limit rules unchanged.",
+    yesWho:"California Professional Firefighters; Los Angeles Area Chamber of Commerce; Gov. Newsom; Xavier Becerra; Assemblymember Jesse Gabriel; California Chamber of Commerce.",
+    noWho:"Assemblymember Joe Patterson (Republican); Reform California; Howard Jarvis Taxpayers Association.",
+    parties:"Democratic Party: YES. Republican Party: NO."},
+ src:[S.cm("proposition-2-rainy-day-fund","CalMatters")]},
+
+{sec:"props", title:"Prop 3: Make the high-earner income tax permanent", sub:"Citizen initiative, constitutional amendment",
+ summary:"Makes permanent the extra income tax brackets on income over about $371,000 a year (adjusted for inflation), first passed in 2012 and extended in 2016.",
+ m:{yes:"The higher top rates never expire. The state keeps $5–$15 billion a year, mostly for schools and health care.",
+    no:"Rates expire on schedule (the ballot says 2031); schools and health care lose that money unless it's replaced. Backers could try again before then.",
+    yesWho:"California Teachers Association; California School Nurses Organization; California State PTA (Parent Teacher Association); Planned Parenthood Affiliates of California; Xavier Becerra.",
+    noWho:"California Taxpayers Association (CalTax); Family Business Association of California; California Hispanic Chambers of Commerce; Howard Jarvis Taxpayers Association.",
+    parties:"Democratic Party: YES. Republican Party: NO."},
+ src:[S.tax, S.cm("proposition-3-high-income-tax","CalMatters")]},
+
+{sec:"props", title:"Prop 4: Allow public financing of campaigns", sub:"Placed on ballot by the Legislature",
+ summary:"Repeals the 1988 ban on public funding of candidates. Programs can't use money earmarked for education, transportation or public safety.",
+ m:{yes:"The state and any city or county may create matching-funds programs for candidates. Direct state cost a few hundred thousand dollars a year; more if programs are created.",
+    no:"The ban stays, except for the few charter cities already exempt (Los Angeles, San Francisco and others).",
+    yesWho:"League of Women Voters of California; California Nurses Association; American Civil Liberties Union (ACLU) of California; Consumer Watchdog.",
+    noWho:"California Taxpayers Association; Howard Jarvis Taxpayers Association; United Latinos Action; Reform California; California Chamber of Commerce; San Francisco Chronicle editorial board.",
+    parties:"Democratic Party: YES. Republican Party: NO."},
+ src:[S.cm("proposition-4-public-fundraising","CalMatters")]},
+
+{sec:"props", title:"Prop 5: Change how recalls work", sub:"Constitutional amendment placed by the Legislature",
+ summary:"Removes the replacement-candidate question from statewide recall ballots.",
+ m:{yes:"Voters only decide whether to remove the official. If removed, the seat is filled later by special election or appointment, so no replacement can win with a small plurality on the same ballot.",
+    no:"Recall ballots keep asking both questions at once, as in the 2003 and 2021 governor recalls.",
+    yesWho:"None filed; placed by the Democratic-majority Legislature. League of Women Voters of California supports.",
+    noWho:"Election Integrity Project California; Reform California; Howard Jarvis Taxpayers Association; San Francisco Chronicle editorial board.",
+    parties:"Democratic Party: YES. Republican Party: NO."},
+ src:[S.cm("proposition-5-recall-reform","CalMatters")]},
+
+{sec:"props", title:"Prop 37: Loans for middle-income homebuyers", sub:"Citizen initiative",
+ summary:"$25 billion in bonds for loans covering up to 17% of the price of a newly built home under about $1.5 million. California residents only, must live in the home, income limits, at least 3% down. Repaid by borrowers' mortgage payments, not the state.",
+ m:{yes:"Eligible buyers of newly built homes get a state-backed loan for a large share of their down payment. No direct state cost if borrowers repay.",
+    no:"No program; buyers rely on existing aid such as the Dream for All program.",
+    yesWho:"United Nurses Associations of California; California Conference of Carpenters; State Treasurer Fiona Ma; California Teachers Association; California Chamber of Commerce.",
+    noWho:"None filed. League of Women Voters of California opposes. Skeptics: helps only new construction and could push prices up without more supply.",
+    parties:"Democratic Party: YES. Republican Party: neutral."},
+ src:[S.cm("proposition-37-homebuyers-loan","CalMatters")]},
+
+{sec:"props", title:"Prop 38: $8.4 billion immunology research bond", sub:"Citizen initiative",
+ summary:"Half to a single University of California-affiliated nonprofit institute, half to competitive grants; at least half must go to cancer, Alzheimer's and heart disease research.",
+ m:{yes:"The state borrows $8.4 billion; repayment $500–$600 million a year for about 20 years, possibly offset by research royalties.",
+    no:"No new research bond.",
+    yesWho:"Michael J. Fox Foundation; Alzheimer's Los Angeles; Kidney Cancer Association; American Nurses Association/California.",
+    noWho:"Robert M. Kaplan, Ph.D. (filed ballot argument); Consumer Watchdog; League of Women Voters of California; Howard Jarvis Taxpayers Association. Concerns: half goes to one institute; new debt during deficits.",
+    parties:"Democratic Party: YES. Republican Party: YES."},
+ src:[S.cm("proposition-38-research-bond","CalMatters")]},
+
+{sec:"props", title:"Prop 39: Voter ID", sub:"Citizen initiative, constitutional amendment",
+ summary:"Government-issued ID required to vote in person; mail ballot envelopes must include the last four digits of a government ID number (driver's license, Social Security, etc.).",
+ m:{yes:"Mail ballots without the ID digits are rejected; in-person voters must show ID. Costs tens to low hundreds of millions of dollars a year. With about 90% of Californians voting by mail, nearly everyone must write ID digits on the envelope.",
+    no:"Identity stays verified at registration and by signature-matching on mail ballots.",
+    yesWho:"Reform California (Assemblymember Carl DeMaio, Republican); Howard Jarvis Taxpayers Association; Latino American Political Association; California Women's Leadership Association; The Transparency Foundation. Top funders: Richard Uihlein ($17 million, Illinois), Steven Bray, Cameron and Tyler Winklevoss, Nicole Shanahan. Hilton, Wagner and Gates support.",
+    noWho:"ACLU California Action; California Common Cause; League of Women Voters of California; Service Employees International Union; Federated Indians of Graton Rancheria; Becerra; U.S. Sen. Alex Padilla; Secretary of State Weber.",
+    parties:"Democratic Party: NO. Republican Party: YES."},
+ src:[S.p39, S.cm("proposition-39-voter-id","CalMatters")]},
+
+{sec:"props", title:"Prop 40: One-time billionaire wealth tax", sub:"Citizen initiative, constitutional amendment and statute",
+ summary:"One-time 5% tax on net worth over $1 billion (about 200 people), excluding real estate and retirement accounts. Mostly for health care.",
+ m:{yes:"Tens of billions over several years, mostly to Medi-Cal (California's Medicaid) to offset federal cuts; first state wealth tax in the U.S. Certain to be challenged in court. Possible ongoing loss under $1 billion a year in income tax if billionaires leave. Overridden if Prop 41 or 42 also passes with more votes.",
+    no:"No wealth tax. Health programs face federal cuts without this money.",
+    yesWho:"U.S. Sen. Bernie Sanders; SEIU United Healthcare Workers West; Courage California; ACLU of Southern California; California Nurses Association.",
+    noWho:"California Primary Care Association; California School Boards Association; California Taxpayers Association; California Chamber of Commerce; California Teachers Association; Gov. Newsom. Both Becerra and Hilton oppose.",
+    parties:"Los Angeles County Democratic Party: YES (breaking with Newsom and Becerra). Republican Party: NO."},
+ src:[S.tax, S.cm("proposition-40-billionaire-tax","CalMatters")]},
+
+{sec:"props", title:"Prop 41: New taxes count against the spending limit; audits", sub:"Citizen initiative, constitutional amendment",
+ summary:"Voids state taxes passed after Jan. 1, 2026 that exempt themselves from the Gann spending limit (this targets Prop 40). Requires State Auditor reviews of programs funded by future special taxes.",
+ m:{yes:"If it gets more votes than Prop 40, the wealth tax is voided. Going forward, every special-tax measure gets a pre-election audit with 10%-savings recommendations, plus ongoing audits.",
+    no:"No new audit requirement; Prop 40 (if it passes) isn't blocked by this measure.",
+    yesWho:"California Society of Certified Public Accountants (CalCPAs); CalAsian Chamber of Commerce; California Taxpayers Association; California Chamber of Commerce. Funded largely by about 20 wealthy Californians led by Google co-founder Sergey Brin.",
+    noWho:"U.S. Sen. Bernie Sanders; SEIU United Healthcare Workers West; League of Women Voters of California; San Francisco Chronicle editorial board.",
+    parties:"Democratic Party: NO. Republican Party: YES."},
+ src:[S.tax, S.cm("proposition-41-tax-audits","CalMatters")]},
+
+{sec:"props", title:"Prop 42: Ban personal property and retroactive taxes", sub:"Citizen initiative, constitutional amendment",
+ summary:"Permanently bans new state taxes on owning personal property (stocks, businesses, anything but real estate), which rules out wealth taxes, and bans taxes that apply retroactively. Voids conflicting taxes passed after Jan. 1, 2026.",
+ m:{yes:"The constitution bars any future wealth tax; if it gets more votes than Prop 40, the wealth tax is voided. Future taxes can't reach back to activity before they passed. Undoing this would take another statewide vote.",
+    no:"The state could still pass wealth or asset taxes in the future.",
+    yesWho:"California Professional Firefighters; State Building and Construction Trades Council of California; AMVETS (American Veterans) Department of California; Gov. Newsom; California Chamber of Commerce. Same donors as Prop 41.",
+    noWho:"U.S. Sen. Bernie Sanders; SEIU United Healthcare Workers West; League of Women Voters of California; San Francisco Chronicle editorial board.",
+    parties:"Democratic Party: NO. Republican Party: YES."},
+ src:[S.p42, S.cm("proposition-42-property-taxes","CalMatters")]},
+
+{sec:"props", title:"Prop 43: Two-thirds vote for citizen-initiated local special taxes", sub:"Constitutional amendment placed by the Legislature",
+ summary:"From Jan. 1, 2027, local special taxes put on the ballot by citizen petition need two-thirds approval, not a simple majority.",
+ m:{yes:"Future petition-driven local taxes (like Los Angeles's Measure ULA, or Measure FD on this ballot) need 66.7% to pass. Existing taxes are unaffected.",
+    no:"Citizen-initiated special taxes keep needing only 50% plus one.",
+    yesWho:"California Taxpayers Association; Family Business Association of California; California Hispanic Chambers of Commerce; California Chamber of Commerce; Howard Jarvis Taxpayers Association.",
+    noWho:"California Professional Firefighters; California Federation of Teachers; Nurse Alliance of SEIU California; California Teachers Association; League of Women Voters of California.",
+    parties:"Democratic Party: NO. Republican Party: YES."},
+ src:[S.tax, S.cm("proposition-43-tax-threshold","CalMatters")]},
+
+{sec:"props", title:"Prop 44: Clinics must spend 90% on programs", sub:"Citizen initiative",
+ summary:"Penalizes nonprofit Federally Qualified Health Centers (community clinics serving low-income areas) that spend under 90% of revenue on \"program services.\"",
+ m:{yes:"These clinics face penalties if overhead (administration, technology, billing, compliance, executive pay) exceeds 10%. State cost in the low tens of millions a year, covered by fees.",
+    no:"No new spending rule for these clinics.",
+    yesWho:"None filed (unusual for an initiative).",
+    noWho:"American Academy of Pediatrics, California; California School Nurses Organization; California Academy of Family Physicians; California Medical Association; California Chamber of Commerce.",
+    parties:"Democratic Party: NO. Republican Party: NO."},
+ src:[S.cm("proposition-44-clinic-funding","CalMatters")]},
+
+{sec:"props", title:"Prop 45: Speed up environmental review (CEQA)", sub:"Citizen initiative",
+ summary:"Sets deadlines for review under the California Environmental Quality Act (CEQA) and for resolving lawsuits against approvals, for most housing, transportation, water and health projects.",
+ m:{yes:"Covered projects get firm review and litigation deadlines, so lawsuits can't stall them for years. State and local costs in the high tens of millions, possibly over $100 million a year, partly covered by fees.",
+    no:"Current CEQA timelines stay (plus the Legislature's 2025 exemptions).",
+    yesWho:"California Children's Hospital Association; California Water Association; California Council for Affordable Housing; California Chamber of Commerce (placed it on the ballot); Howard Jarvis Taxpayers Association.",
+    noWho:"Coalition for Clean Air; California Environmental Voters; Physicians for Social Responsibility Los Angeles; National Wildlife Federation; Sierra Club California; League of Women Voters of California.",
+    parties:"Democratic Party: NO. Republican Party: YES."},
+ src:[S.cm("proposition-45-environmental-review","CalMatters")]},
+
+/* ================= COURTS ================= */
+{sec:"courts", title:"Superior Court Judge, Office 64", sub:"Nonpartisan. Vote for one. June: Ghobadi 44.1%, Haymon 42.1%",
+ opts:[
+  {name:"Maria Ghobadi", party:"Not printed; endorsed by the "+DEM, desc:"Deputy District Attorney (prosecutor) 17+ years, including gang homicide division; 85+ jury trials",
+   end:"Los Angeles County Bar Association rating: Well Qualified. "+DEM+"; 64+ sitting and retired judges; former District Attorney Steve Cooley; Association of Deputy District Attorneys; Crime Survivors political action committee; Thrive Los Angeles."},
+  {name:"Rhonda A. Haymon", party:"Not found", desc:"Deputy Public Defender",
+   end:"Los Angeles County Bar Association rating: Qualified. Often a progressive pick, but LA Forward (progressive civic group) declined to back her, citing what it called unprofessional conduct after its 2024 decision."},
+  {name:"Write-in", desc:"", end:""}],
+ analysis:`<p>Judicial candidates can't state positions on issues they might rule on, so Bar ratings, experience and endorsements are the main guide.</p>`,
+ src:[S.judges, S.lacba, S.laf]},
+{sec:"courts", title:"Superior Court Judge, Office 65", sub:"Nonpartisan. Vote for one. June: Clayton 36.7%, Reitano 29.9%",
+ opts:[
+  {name:"Anna Slotky Reitano", party:"Not found", desc:"Deputy County Counsel (supervises civil litigation); former public defender",
+   end:"Los Angeles County Bar Association rating: Qualified. Several newspapers; Democratic clubs; State Sen. Ben Allen."},
+  {name:"Justin Allen Clayton", party:"Not printed; endorsed by the "+DEM, desc:"Deputy Public Defender; heads the Inglewood branch",
+   end:"Los Angeles County Bar Association rating: Qualified. "+DEM+"; public defenders' union; La Defensa (criminal-justice reform group); California Working Families Party."},
+  {name:"Write-in", desc:"", end:""}], src:[S.judges, S.lacba, S.laf]},
+{sec:"courts", title:"Superior Court Judge, Office 87", sub:"Nonpartisan. Vote for one",
+ opts:[
+  {name:"Anthony (A.J.) Bayne", party:"Not found", desc:"Deputy Public Defender, 30 years' experience",
+   end:"Los Angeles County Bar Association rating: Well Qualified. Multiple judges; International Longshore and Warehouse Union (ILWU); Metropolitan News-Enterprise (legal newspaper); LA Forward."},
+  {name:"David DeJute", party:"Not printed; endorsed by the "+DEM, desc:"Law professor/attorney",
+   end:"Los Angeles County Bar Association rating: Qualified. "+DEM+"; Americans for Democratic Action Southern California; several Democratic clubs."},
+  {name:"Write-in", desc:"", end:""}], src:[S.judges, S.lacba, S.laf]},
+{sec:"courts", title:"Superior Court Judge, Office 131", sub:"Nonpartisan. Vote for one",
+ opts:[
+  {name:"Donna Tryfman", party:"Not found", desc:"Deputy Public Defender", end:"Los Angeles County Bar Association rating: Qualified."},
+  {name:"David Ross", party:"Not found", desc:"Deputy Alternate Public Defender", end:"Los Angeles County Bar Association rating: Qualified."},
+  {name:"Write-in", desc:"", end:""}],
+ analysis:`<p>Two defense attorneys with equal ratings; no party endorsement found. Their campaign websites list endorsements.</p>`,
+ src:[S.judges, S.lacba]},
+
+{sec:"courts", title:"Supreme Court: retain Joshua Groban?", sub:"Retention vote. No opponent",
+ m:{yes:"Groban (former senior adviser to Gov. Jerry Brown) serves a new 12-year term.",
+    no:"If NO wins a majority, he leaves the court and the governor appoints a replacement. Voters have removed justices only once (1986).",
+    yesWho:"No organized campaign found.", noWho:"No organized campaign found."},
+ src:[S.scotus]},
+{sec:"courts", title:"Supreme Court: retain Kelli M. Evans?", sub:"Retention vote. No opponent",
+ m:{yes:"Evans (appointed by Gov. Newsom; former civil rights lawyer and judge) serves a new term.",
+    no:"If NO wins, the governor appoints a replacement.",
+    yesWho:"No organized campaign found.", noWho:"No organized campaign found."},
+ src:[S.scotus]},
+{sec:"courts", title:"Court of Appeal, 2nd District: 18 retention votes", sub:"Pages 7 to 9. Each is a separate YES/NO",
+ summary:"Presiding Justices Rashida Adams (Division 3), Helen Zukin (4), Brian Hoffstadt (5), Tari Cody (6), Gonzalo Martinez (7); Associate Justices Michelle Kim and Gregory Weingart (1), Steve Goorvitch and Anne Richardson (2), Mark Hanasono (3), Nicholas Daum, Audra Mori and Armen Tamzarian (4), Kenneth Yegan (6), Natalie Stone (7), John Wiley, Matthew Scherb and Victor Viramontes (8).",
+ m:{yes:"The justice serves a new 12-year term.",
+    no:"If NO wins, the seat opens and the governor appoints a replacement. Leaving these blank is also valid.",
+    yesWho:"No organized campaigns found for or against any of these justices.", noWho:"Check the Commission on Judicial Performance's public discipline list for red flags."},
+ src:[S.cjp]}
+];
+
+/* ---------- render ---------- */
+const KEY="ballot-picks-2026-v1";
+let picks={}; try{picks=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){picks={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(picks))}catch(e){}};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const main=document.getElementById("ballot"), bar=document.getElementById("toolbar");
+const bub=(cid,n,title)=>`<button type="button" class="oval" aria-pressed="${picks[cid]===n}" aria-label="Mark ${esc(n)} for ${esc(title)}" data-c="${cid}" data-n="${esc(n)}"></button>`;
+
+SECTIONS.forEach(sec=>{
+  const list=C.map((c,i)=>({...c,i})).filter(c=>c.sec===sec.id);
+  bar.insertAdjacentHTML("beforeend",`<a href="#sec-${sec.id}">${esc(sec.label)} <span class="count">${list.length}</span></a>`);
+  let h=`<div class="secbar" id="sec-${sec.id}">${esc(sec.label)}</div><p class="secnote">${esc(sec.note)}</p>`;
+  list.forEach(c=>{
+    const cid="c"+c.i;
+    h+=`<article class="contest" id="${cid}"><div class="ctitle"><h2>${esc(c.title)}</h2><div class="sub">${esc(c.sub)}</div></div>`;
+    if(c.summary) h+=`<p class="summary">${esc(c.summary)}</p>`;
+    if(c.m){
+      h+=`<div class="effects">
+        <div class="eff y"><h3>${bub(cid,"YES",c.title)} If YES wins</h3>${esc(c.m.yes)}<div class="who"><span class="lbl">Supporters:</span> ${esc(c.m.yesWho)}</div></div>
+        <div class="eff n"><h3>${bub(cid,"NO",c.title)} If NO wins</h3>${esc(c.m.no)}<div class="who"><span class="lbl">Opponents:</span> ${esc(c.m.noWho)}</div></div>
+      </div>`;
+      if(c.m.parties) h+=`<div class="partyline"><span class="lbl">Party positions:</span> ${esc(c.m.parties)}</div>`;
+    }
+    if(c.opts){
+      h+=`<ul class="opts">`;
+      c.opts.forEach(o=>{
+        h+=`<li class="opt">${bub(cid,o.name,c.title)}<div><div class="oname">${esc(o.name)}</div>${o.party?`<div class="party"><span class="lbl">Party:</span> ${esc(o.party)}</div>`:""}${o.desc?`<div class="odesc">${esc(o.desc)}</div>`:""}`;
+        if(o.end) h+=`<div class="oend"><span class="lbl">Endorsed by:</span> ${esc(o.end)}</div>`;
+        if(o.st&&o.st.length) h+=`<ul class="stances">${o.st.map(s=>`<li><span class="k">${esc(s[0])}:</span> ${esc(s[1])}</li>`).join("")}</ul>`;
+        h+=`</div></li>`;
+      });
+      h+=`</ul>`;
+    }
+    if(c.analysis||(c.src&&c.src.length)){
+      h+=`<details><summary>Notes and sources</summary><div class="analysis">${c.analysis||""}`;
+      if(c.src&&c.src.length) h+=`<div class="src">Sources: ${c.src.map(s=>`<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join("")}</div>`;
+      h+=`</div></details>`;
+    }
+    h+=`</article>`;
+  });
+  main.insertAdjacentHTML("beforeend",h);
+});
+bar.insertAdjacentHTML("beforeend",`<button type="button" id="expandBtn">Expand all notes</button><button type="button" id="printBtn">Print (letter)</button>`);
+
+function renderPicks(){
+  const el=document.getElementById("picklist");
+  const rows=C.map((c,i)=>({c,p:picks["c"+i]})).filter(r=>r.p);
+  el.innerHTML=rows.length?"<ol>"+rows.map(r=>`<li><b>${esc(r.c.title)}:</b> ${esc(r.p)}</li>`).join("")+"</ol>":`<p class="empty">No picks yet.</p>`;
+}
+main.addEventListener("click",e=>{
+  const b=e.target.closest(".oval"); if(!b) return;
+  const cid=b.dataset.c,n=b.dataset.n;
+  if(picks[cid]===n) delete picks[cid]; else picks[cid]=n;
+  document.querySelectorAll(`.oval[data-c="${cid}"]`).forEach(x=>x.setAttribute("aria-pressed",String(picks[cid]===x.dataset.n)));
+  save(); renderPicks();
+});
+let expanded=false;
+document.getElementById("expandBtn").addEventListener("click",ev=>{
+  expanded=!expanded; document.querySelectorAll("details").forEach(d=>d.open=expanded);
+  ev.currentTarget.textContent=expanded?"Collapse notes":"Expand all notes";
+});
+let prevOpen=[];
+window.addEventListener("beforeprint",()=>{prevOpen=[...document.querySelectorAll("details")].map(d=>d.open);document.querySelectorAll("details").forEach(d=>d.open=true)});
+window.addEventListener("afterprint",()=>{document.querySelectorAll("details").forEach((d,i)=>d.open=prevOpen[i]||false)});
+document.getElementById("printBtn").addEventListener("click",ev=>{
+  const btn=ev.currentTarget;
+  try{window.print()}catch(e){}
+  btn.textContent="If no dialog opened: use the PDF version, or your browser's Print";
+  setTimeout(()=>btn.textContent="Print (letter)",5000);
+});
+document.getElementById("clearBtn").addEventListener("click",()=>{picks={};save();document.querySelectorAll(".oval").forEach(x=>x.setAttribute("aria-pressed","false"));renderPicks()});
+document.getElementById("copyBtn").addEventListener("click",async ev=>{
+  const txt=C.map((c,i)=>picks["c"+i]?`${c.title}: ${picks["c"+i]}`:null).filter(Boolean).join("\n")||"No picks yet.";
+  const btn=ev.currentTarget;
+  try{await navigator.clipboard.writeText(txt);btn.textContent="Copied"}catch(e){btn.textContent="Copy not allowed here"}
+  setTimeout(()=>btn.textContent="Copy my picks",1800);
+});
+renderPicks();
+</script>
+</body>
+</html>

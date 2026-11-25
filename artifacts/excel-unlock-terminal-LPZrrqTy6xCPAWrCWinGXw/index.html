@@ -1,0 +1,281 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Excel Unlock Terminal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: a dark Matrix terminal — digital-rain canvas behind a centered
+     console; a row of 3D extruded buttons drives a live command readout. */
+  :root{
+    --void:#000700;            /* deep black-green ground */
+    --panel:#02140a;           /* console fill */
+    --grid:#073b1f;            /* hairline borders */
+    --phos:#39ff6a;            /* phosphor green (primary) */
+    --phos-dim:#1c8f3d;        /* dim green */
+    --phos-deep:#0a3b1c;       /* button underside */
+    --amber:#ffd13b;           /* warning accent (encrypted) */
+    --danger:#ff4d4d;          /* critical accent */
+    --ink:#bfffcf;            /* readable body text */
+    color-scheme: dark;
+    --disp:"VT323","Share Tech Mono",ui-monospace,monospace;
+    --mono:"Share Tech Mono",ui-monospace,"Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--void);color:var(--ink);
+    font-family:var(--mono);overflow-x:hidden;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-block:clamp(18px,5vw,48px);
+    min-height:100%;
+  }
+  #rain{position:fixed;inset:0;z-index:0;opacity:.45;pointer-events:none}
+  /* scanline veil */
+  body::after{
+    content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:repeating-linear-gradient(0deg,
+      rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,20,8,.35) 3px,rgba(0,0,0,0) 4px);
+    mix-blend-mode:overlay;
+  }
+  .wrap{position:relative;z-index:2;max-width:860px;margin:0 auto}
+
+  header{text-align:center;margin-bottom:clamp(20px,4vw,34px)}
+  .glyphs{font-family:var(--disp);font-size:.9rem;letter-spacing:.5em;
+    color:var(--phos-dim);text-shadow:0 0 8px rgba(57,255,106,.5);margin-bottom:.4em}
+  h1{
+    font-family:var(--disp);margin:.1em 0;line-height:.95;
+    font-size:clamp(2.4rem,9vw,4.4rem);font-weight:400;letter-spacing:.04em;
+    color:var(--phos);text-wrap:balance;
+    text-shadow:0 0 6px rgba(57,255,106,.9),0 0 22px rgba(57,255,106,.55),0 0 40px rgba(57,255,106,.3);
+  }
+  .sub{color:var(--phos-dim);font-size:1rem;letter-spacing:.14em;text-transform:uppercase}
+  .cursor{display:inline-block;width:.6ch;height:1.1em;background:var(--phos);
+    margin-left:.15em;transform:translateY(.18em);animation:blink 1s steps(1) infinite;
+    box-shadow:0 0 10px var(--phos)}
+  @keyframes blink{50%{opacity:0}}
+
+  /* console */
+  .console{
+    background:linear-gradient(180deg,rgba(2,24,12,.92),rgba(1,10,5,.94));
+    border:1px solid var(--grid);border-radius:10px;
+    padding:clamp(16px,3.5vw,28px);
+    box-shadow:0 0 0 1px rgba(57,255,106,.08),0 24px 60px rgba(0,0,0,.7),
+      inset 0 0 60px rgba(7,59,31,.35);
+    backdrop-filter:blur(2px);
+  }
+  .label{display:block;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--phos-dim);margin:0 0 .5em}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+  .fields .full{grid-column:1/-1}
+  @media(max-width:560px){.fields{grid-template-columns:1fr}}
+  input{
+    width:100%;min-width:0;background:#010c06;color:var(--ink);
+    border:1px solid var(--grid);border-radius:6px;font-family:var(--mono);
+    font-size:1rem;padding:11px 13px;
+    box-shadow:inset 0 2px 10px rgba(0,0,0,.7);
+  }
+  input::placeholder{color:#2e6b42}
+  input:focus{outline:none;border-color:var(--phos);
+    box-shadow:inset 0 2px 10px rgba(0,0,0,.7),0 0 0 1px var(--phos),0 0 16px rgba(57,255,106,.4)}
+
+  /* 3D button grid */
+  .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:6px 0 4px}
+  .op{
+    position:relative;cursor:pointer;border:none;text-align:left;
+    font-family:var(--disp);font-size:1.5rem;letter-spacing:.03em;
+    color:var(--void);background:linear-gradient(180deg,var(--phos),var(--phos-dim));
+    padding:16px 16px 18px;border-radius:9px;
+    transition:transform .07s ease,box-shadow .07s ease,filter .15s ease;
+    box-shadow:
+      0 6px 0 var(--phos-deep),
+      0 10px 0 #041a0c,
+      0 16px 24px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.55),
+      inset 0 -3px 8px rgba(0,30,12,.5);
+    text-shadow:0 1px 0 rgba(180,255,200,.6);
+  }
+  .op .tag{display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;
+    text-transform:uppercase;color:#063317;margin-top:4px;opacity:.85}
+  .op:hover{filter:brightness(1.08) saturate(1.1)}
+  .op:active{transform:translateY(8px);
+    box-shadow:0 2px 0 var(--phos-deep),0 3px 0 #041a0c,0 6px 12px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.4)}
+  .op:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  .op.sel{filter:brightness(1.12);box-shadow:0 6px 0 var(--phos-deep),0 10px 0 #041a0c,
+      0 0 22px rgba(57,255,106,.6),inset 0 1px 0 rgba(255,255,255,.6)}
+  /* accent variants */
+  .op.warn{background:linear-gradient(180deg,var(--amber),#b8860b)}
+  .op.warn .tag{color:#4a3800}
+  .op.warn:active{box-shadow:0 2px 0 #5c4300,0 3px 0 #2e2200,0 6px 12px rgba(0,0,0,.6)}
+  .op.warn{box-shadow:0 6px 0 #6b4f00,0 10px 0 #2e2200,0 16px 24px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.5)}
+
+  /* output readout */
+  .readout{margin-top:22px;border-top:1px dashed var(--grid);padding-top:18px}
+  .rhead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .rtitle{font-family:var(--disp);font-size:1.5rem;color:var(--phos);
+    text-shadow:0 0 10px rgba(57,255,106,.5)}
+  .pill{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+    border:1px solid currentColor;border-radius:999px;padding:3px 9px}
+  .pill.easy{color:var(--phos)}
+  .pill.hard{color:var(--amber)}
+  .desc{color:var(--ink);font-size:.98rem;line-height:1.55;margin:0 0 14px;max-width:62ch}
+  .desc b{color:var(--phos)}
+  .cmdbox{position:relative;background:#010c06;border:1px solid var(--grid);
+    border-radius:7px;padding:14px 46px 14px 14px;overflow-x:auto}
+  .cmdbox code{font-family:var(--mono);font-size:.95rem;color:var(--phos);white-space:pre;
+    text-shadow:0 0 8px rgba(57,255,106,.35)}
+  .prompt{color:var(--phos-dim);user-select:none}
+  .copy{position:absolute;top:8px;right:8px;background:var(--phos-deep);
+    color:var(--phos);border:1px solid var(--phos-dim);border-radius:5px;
+    font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;padding:6px 9px;cursor:pointer}
+  .copy:hover{background:#0e5a2b}
+  .copy:active{transform:translateY(1px)}
+  .note{margin-top:12px;font-size:.84rem;color:var(--phos-dim);line-height:1.5}
+  .note::before{content:"› ";color:var(--phos)}
+  .hint-empty{color:var(--amber)}
+
+  footer{text-align:center;margin-top:26px;color:var(--phos-dim);font-size:.78rem;
+    letter-spacing:.12em}
+  @media(prefers-reduced-motion:reduce){.cursor{animation:none}#rain{display:none}}
+</style>
+
+<canvas id="rain" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="glyphs">エクセル・アンロック</div>
+    <h1>EXCEL UNLOCK<span class="cursor"></span></h1>
+    <div class="sub">// password recovery terminal</div>
+  </header>
+
+  <main class="console">
+    <label class="label" for="fname">Target file</label>
+    <div class="fields">
+      <input id="fname" class="full" type="text" value="YourFile.xlsx"
+             placeholder="YourFile.xlsx" aria-label="File name">
+      <input id="hints" type="text" placeholder="hints: Acme,Smith,Fluffy,2019" aria-label="Hints">
+      <input id="out" type="text" placeholder="output: (auto)" aria-label="Output name">
+    </div>
+
+    <span class="label">Select operation</span>
+    <div class="ops" id="ops">
+      <button class="op sel" data-op="diagnose">DIAGNOSE<span class="tag">identify the lock</span></button>
+      <button class="op" data-op="strip">UNLOCK<span class="tag">remove edit lock</span></button>
+      <button class="op warn" data-op="recover">CRACK<span class="tag">guess open pw</span></button>
+      <button class="op" data-op="open">DECRYPT<span class="tag">pw known</span></button>
+      <button class="op warn" data-op="hash">EXPORT<span class="tag">hash → GPU</span></button>
+    </div>
+
+    <section class="readout" aria-live="polite">
+      <div class="rhead">
+        <span class="rtitle" id="rtitle">DIAGNOSE</span>
+        <span class="pill easy" id="pill">step 1 · always start here</span>
+      </div>
+      <p class="desc" id="desc"></p>
+      <div class="cmdbox">
+        <button class="copy" id="copy">COPY</button>
+        <code><span class="prompt">$ </span><span id="cmd"></span></code>
+      </div>
+      <p class="note" id="note"></p>
+    </section>
+  </main>
+
+  <footer>AUTHORIZED RECOVERY ONLY · WAKE UP, NEO…</footer>
+</div>
+
+<script>
+(function(){
+  // ---- Matrix digital rain ----
+  var cv=document.getElementById('rain'),ctx=cv.getContext('2d'),cols,drops,fs=16;
+  var glyphs="アイウエオカキクケコサシスセソタチツテトナニヌネノﾊﾋﾌﾍﾎ0123456789ABCDEF$#@".split("");
+  function size(){cv.width=innerWidth;cv.height=innerHeight;cols=Math.floor(cv.width/fs);
+    drops=new Array(cols).fill(1).map(function(){return Math.random()*-50;});}
+  size();addEventListener('resize',size);
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function draw(){
+    ctx.fillStyle="rgba(0,7,0,0.08)";ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.font=fs+"px monospace";
+    for(var i=0;i<cols;i++){
+      var ch=glyphs[Math.floor(Math.random()*glyphs.length)];
+      var x=i*fs,y=drops[i]*fs;
+      ctx.fillStyle= Math.random()>0.975 ? "#bfffcf":"#39ff6a";
+      ctx.fillText(ch,x,y);
+      if(y>cv.height&&Math.random()>0.975)drops[i]=0;
+      drops[i]++;
+    }
+  }
+  if(!reduce){setInterval(draw,55);}
+
+  // ---- command generator ----
+  var F=document.getElementById('fname'),H=document.getElementById('hints'),O=document.getElementById('out');
+  var cmdEl=document.getElementById('cmd'),descEl=document.getElementById('desc'),
+      titleEl=document.getElementById('rtitle'),pillEl=document.getElementById('pill'),
+      noteEl=document.getElementById('note');
+  var PY='python3 excel_unlock.py';
+  function q(s){return /[^A-Za-z0-9_.\-\/]/.test(s)||s===''?'"'+s.replace(/"/g,'\\"')+'"':s;}
+  function base(f){return (f||'YourFile.xlsx').replace(/\.(xlsx|xlsm|xls)$/i,'');}
+
+  var OPS={
+    diagnose:{title:'DIAGNOSE',pill:'step 1 · always start here',cls:'easy',
+      desc:'Reads the file signature and reports which lock it has: <b>PROTECTED</b> (editing lock, data visible — removable with no password) or <b>ENCRYPTED</b> (whole file locked — needs the password). Run this first; it decides every other step.',
+      cmd:function(f){return PY+' diagnose '+q(f);},
+      note:'No password and no risk — it only reads.'},
+    strip:{title:'UNLOCK',pill:'protected files · instant',cls:'easy',
+      desc:'Strips <b>sheet / workbook protection</b> — the editing lock. The data was never encrypted, so this deletes the lock flags and writes a clean copy in seconds. No password required.',
+      cmd:function(f,h,o){return PY+' strip '+q(f)+' -o '+q(o||base(f)+'-unlocked.xlsx');},
+      note:'Only works on PROTECTED files. If DIAGNOSE says ENCRYPTED, use CRACK.'},
+    recover:{title:'CRACK',pill:'encrypted files · minutes→hours',cls:'hard',
+      desc:'Attempts to recover the <b>open-password</b> by trying your hints with every capitalization, leet-swap (a→@, o→0) and common suffix (123, !, 2025…), then the wordlist. Feed it every clue about the owner: names, company, pets, years, reused passwords.',
+      cmd:function(f,h){var c=PY+' recover '+q(f);
+        if(h&&h.trim())c+=' --hints '+q(h.trim());
+        c+=' --wordlist wordlists/common.txt';return c;},
+      note:'HINTS'},
+    open:{title:'DECRYPT',pill:'password known',cls:'easy',
+      desc:'Once CRACK finds the password (or you remember it), this writes a fully <b>decrypted copy</b> you can open normally. Replace FOUND_PW with the real password.',
+      cmd:function(f,h,o){return PY+' open '+q(f)+' --password FOUND_PW -o '+q(o||base(f)+'-decrypted.xlsx');},
+      note:'Swap FOUND_PW for the recovered password before running.'},
+    hash:{title:'EXPORT',pill:'strong password · GPU',cls:'hard',
+      desc:'If CRACK is too slow for a long password, export the encryption <b>hash</b> and brute-force it on a GPU with hashcat or John the Ripper — thousands of times faster than Python.',
+      cmd:function(f){return PY+' hash '+q(f);},
+      note:'Then: office2john.py '+'<file> > hash.txt  →  hashcat -m 9600 hash.txt wordlist.txt'}
+  };
+
+  var current='diagnose';
+  function render(){
+    var op=OPS[current],f=F.value,h=H.value,o=O.value;
+    titleEl.textContent=op.title;
+    pillEl.textContent=op.pill;
+    pillEl.className='pill '+op.cls;
+    descEl.innerHTML=op.desc;
+    cmdEl.textContent=op.cmd(f,h,o);
+    if(op.note==='HINTS'){
+      if(h&&h.trim()){noteEl.innerHTML='Highest-value input is HINTS. Press Ctrl-C anytime to stop.';}
+      else{noteEl.innerHTML='<span class="hint-empty">Add hints above for real odds</span> — names, company, years. Without them it only tries the generic wordlist.';}
+    } else {
+      noteEl.textContent=op.note;
+    }
+  }
+  document.getElementById('ops').addEventListener('click',function(e){
+    var b=e.target.closest('.op');if(!b)return;
+    current=b.dataset.op;
+    [].forEach.call(this.querySelectorAll('.op'),function(x){x.classList.toggle('sel',x===b);});
+    render();
+  });
+  [F,H,O].forEach(function(el){el.addEventListener('input',render);});
+
+  // copy
+  document.getElementById('copy').addEventListener('click',function(){
+    var txt=cmdEl.textContent,btn=this;
+    function ok(){btn.textContent='COPIED';setTimeout(function(){btn.textContent='COPY';},1400);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(ok,sel);
+    } else sel();
+    function sel(){var r=document.createRange();r.selectNodeContents(cmdEl);
+      var s=getSelection();s.removeAllRanges();s.addRange(r);ok();}
+  });
+
+  render();
+})();
+</script>
+
+</body></html>

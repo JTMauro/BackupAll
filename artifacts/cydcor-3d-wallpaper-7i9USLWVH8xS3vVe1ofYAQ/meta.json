@@ -1,0 +1,168 @@
+{
+ "title": "Cydcor 3D Wallpaper",
+ "url": "https://claude.ai/artifact/7i9USLWVH8xS3vVe1ofYAQ",
+ "type": "web page",
+ "updated": "2026-10-24",
+ "files": [
+  {
+   "path": "Cydcor-3D-Wallpaper-Left.html",
+   "bytes": 554578,
+   "sha256": "c1f56b23a28299e63c787cc64c6f964262643eda07457a753c4a2cd1df0ab50c"
+  },
+  {
+   "path": "Cydcor-3D-Wallpaper-Right.html",
+   "bytes": 554580,
+   "sha256": "cc1e9b12445f4ae75235a33780a11bd96dea937f4e4389fbe345265d8ae68c90"
+  },
+  {
+   "path": "Cydcor-Left-Android-1440x3120.jpg",
+   "bytes": 318654,
+   "sha256": "becef4db4bb11193b1d6d6ad458cc425dd4cfc6bd1fd111cf87c483c656ce7d3"
+  },
+  {
+   "path": "Cydcor-Left-Desktop-1080p.mp4",
+   "bytes": 4005431,
+   "sha256": "ed123f17e865234f510773387eceb68f8bebc5bb1a3147d0646cc26d58bb11bc"
+  },
+  {
+   "path": "Cydcor-Left-Mac-5K-5120x2880.jpg",
+   "bytes": 820374,
+   "sha256": "27a41bd87a30bb687aa6b5f84ea3339d509efc74ccb401fb58fdc7d0238a4940"
+  },
+  {
+   "path": "Cydcor-Left-Mac-MacBookPro14-3024x1964.jpg",
+   "bytes": 412143,
+   "sha256": "8b979a68b8b2fe1c9a97cd072fb584fe1169053ef3039425a1da5c368f523dd9"
+  },
+  {
+   "path": "Cydcor-Left-Mac-MacBookPro16-3456x2234.jpg",
+   "bytes": 504357,
+   "sha256": "0d037a68f18b286028f33034c14649a344e2120fc98e7a6909fdfc332abcc0e9"
+  },
+  {
+   "path": "Cydcor-Left-Phone-15s.mp4",
+   "bytes": 3288741,
+   "sha256": "110f04fbecbaf7eb7480dc07dea3ebc0eb9f2cabcb56c79f7e8dad3197fe8113"
+  },
+  {
+   "path": "Cydcor-Left-Windows-1920x1080.jpg",
+   "bytes": 175463,
+   "sha256": "be2800ee26f4b418a6f60682013a4714228ed3269ee184e58dace967c48dc4c0"
+  },
+  {
+   "path": "Cydcor-Left-Windows-2560x1440.jpg",
+   "bytes": 275397,
+   "sha256": "de40604746543e1b736aa5c6a9d859a3226f1d1b8f237ff563990c0ea140e4c5"
+  },
+  {
+   "path": "Cydcor-Left-Windows-4K-3840x2160.jpg",
+   "bytes": 520938,
+   "sha256": "e8f7604b4f40200f80016382c29aebd8d53d1b72391ea8f0f42d972e7f54f6a5"
+  },
+  {
+   "path": "Cydcor-Left-Windows-Surface-2880x1920.jpg",
+   "bytes": 391612,
+   "sha256": "40f20febade2feac683cf35be73d6521db8152f3bb7e49d8efe696c94a87a632"
+  },
+  {
+   "path": "Cydcor-Left-iPhone-1290x2796.jpg",
+   "bytes": 269536,
+   "sha256": "8ed9be848798c97699c3140ab946aca5c66e7887fd60a627a7f48d49cda75ae8"
+  },
+  {
+   "path": "Cydcor-Right-Android-1440x3120.jpg",
+   "bytes": 322542,
+   "sha256": "5de1173149feb41041903f360b6100bda3d35629ae5d992604474e5b91bcc03f"
+  },
+  {
+   "path": "Cydcor-Right-Desktop-1080p.mp4",
+   "bytes": 3952730,
+   "sha256": "f6b2a1d8bebdb91c779b868c1ecbdcaef5cf4d8ce6bbd28d0a61cb93be28d520"
+  },
+  {
+   "path": "Cydcor-Right-Mac-5K-5120x2880.jpg",
+   "bytes": 830181,
+   "sha256": "b230f71c735dec83a9723daaa920cf5b10d6bf9a2bbb44a7bc8078b896bf935c"
+  },
+  {
+   "path": "Cydcor-Right-Mac-MacBookPro14-3024x1964.jpg",
+   "bytes": 415807,
+   "sha256": "76da1a066dbb6577433d53a2e7c9734170699b747cc9b44b5a13fcfc2b4cf846"
+  },
+  {
+   "path": "Cydcor-Right-Mac-MacBookPro16-3456x2234.jpg",
+   "bytes": 510359,
+   "sha256": "a95158a51ef483d2490138bbe29a538230e76350d771c8e3b07c883fef01b8d2"
+  },
+  {
+   "path": "Cydcor-Right-Phone-15s.mp4",
+   "bytes": 3225336,
+   "sha256": "724b72302b1dbed1c6603dab3a8281d2eb2a24835657dd2641fcdcf5c9217de6"
+  },
+  {
+   "path": "Cydcor-Right-Windows-1920x1080.jpg",
+   "bytes": 176475,
+   "sha256": "fc1f11344e21666ffecf92be04433f0d2e31d89ef6de7af844e63804a2348d62"
+  },
+  {
+   "path": "Cydcor-Right-Windows-2560x1440.jpg",
+   "bytes": 277433,
+   "sha256": "6a07757f55888660fa337baa3606f4c5f82e5042a648c9b7a2bf28ae88192ee6"
+  },
+  {
+   "path": "Cydcor-Right-Windows-4K-3840x2160.jpg",
+   "bytes": 526730,
+   "sha256": "277d4e25bae306e577e82f2b5dcf0b50dab3aa3c5fdccb6b170e55218b527d9a"
+  },
+  {
+   "path": "Cydcor-Right-Windows-Surface-2880x1920.jpg",
+   "bytes": 396778,
+   "sha256": "c79d51020df0bcfbc879ed9cfc53630d85bbe78556b83c61f48b0ebce1f48d83"
+  },
+  {
+   "path": "Cydcor-Right-iPhone-1290x2796.jpg",
+   "bytes": 272818,
+   "sha256": "2f2affe0351c2fc0ffe68c77d66c694ef663c6107a4cde89496514b726952685"
+  },
+  {
+   "path": "README.md",
+   "bytes": 4312,
+   "sha256": "28bb78b4a857af34c4ba42a02a779d2347391b826fd0752f05a3a71bc717ec64"
+  },
+  {
+   "path": "index.html",
+   "bytes": 17777,
+   "sha256": "7125f62b3411ec20e3c56d4b37be8aa36ece3295d2722b298ded4b8779c8c4d2"
+  },
+  {
+   "path": "lively-left/LivelyInfo.json",
+   "bytes": 275,
+   "sha256": "e9c26129a5118d49aeb55b6f833ce95e901f143011f0857214cff13a36e804ea"
+  },
+  {
+   "path": "lively-left/LivelyProperties.json",
+   "bytes": 474,
+   "sha256": "a8a152e31bac25fcd4c3d06b6f1f3bd3ba1c655a3b831c752b7333a078c18d92"
+  },
+  {
+   "path": "lively-left/index.html",
+   "bytes": 554607,
+   "sha256": "c03f0001b225f45f7ed5112fc092120aabbf5f4cb6b47cdecaf96a291a0e4171"
+  },
+  {
+   "path": "lively-right/LivelyInfo.json",
+   "bytes": 276,
+   "sha256": "2b21d06f45823f2f58c8ed96ef913ec318ac2ef0769d57aa976aaff5d15072a4"
+  },
+  {
+   "path": "lively-right/LivelyProperties.json",
+   "bytes": 474,
+   "sha256": "9b81f55072c0f49d60d0adf6cd885a1de4fb70440217ecaeba5091b7261b6dff"
+  },
+  {
+   "path": "lively-right/index.html",
+   "bytes": 554609,
+   "sha256": "d1d248e8e80160c5f63ce95829416558fbace3eef5d87c44793675a11a102ad1"
+  }
+ ]
+}

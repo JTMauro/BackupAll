@@ -1,0 +1,108 @@
+{
+ "title": "Live Wallpaper Pack",
+ "url": "https://claude.ai/artifact/CjFvjYJr6PkLnsgKQZgGM7",
+ "type": "web page",
+ "updated": "2026-10-23",
+ "files": [
+  {
+   "path": "aurora.html",
+   "bytes": 7369,
+   "sha256": "0fd472f33bcec375698745ba1105ab5dab86a57170875be9fa203b7e6cad5469"
+  },
+  {
+   "path": "black-hole.html",
+   "bytes": 7620,
+   "sha256": "67ff0d1b793882f6218c8b1b26d1db3001e5fb74740c7538827c5f1a784700e1"
+  },
+  {
+   "path": "deep-sea.html",
+   "bytes": 7828,
+   "sha256": "0f1504937fe7e1b4cd87ed7ceee044b8ee2d9bb98dc940676082e1ee6964ac52"
+  },
+  {
+   "path": "drone-city.html",
+   "bytes": 14341,
+   "sha256": "c4927246988e00d211ee92ddeb47cd34585cf875ea6770e8dff5fe206bd9f8a7"
+  },
+  {
+   "path": "drone-show.html",
+   "bytes": 11324,
+   "sha256": "213dd3c0e4213d5e67221e7b809596903c57de383e6b71d69fbe9195dcce9864"
+  },
+  {
+   "path": "drone-video.html",
+   "bytes": 9165,
+   "sha256": "5282c9bc10e4b9de8447a1ec710ee7c12fab239dfeb3e3b4f7233dbeecfeaff1"
+  },
+  {
+   "path": "fireflies.html",
+   "bytes": 6415,
+   "sha256": "0b19809ad502368f0f6ac1e6b0f2b31ed76472cca55eba634012074c47bdbb75"
+  },
+  {
+   "path": "fireworks.html",
+   "bytes": 9295,
+   "sha256": "4297358060af09e12bdb6eed0f74c2f74a6e4c28eee57e5d993a3f97f3ff61bc"
+  },
+  {
+   "path": "hyperspace.html",
+   "bytes": 3387,
+   "sha256": "c62fb700b586dd75a816fd01e9cc08027aa4c1675f8a2797c6bb893ae4ea3b5c"
+  },
+  {
+   "path": "index.html",
+   "bytes": 14755,
+   "sha256": "d4afca5b1a09777a508fa096040a4cf6ce8bbe1136c8cde357f0b72a28f527c1"
+  },
+  {
+   "path": "koi-pond.html",
+   "bytes": 10930,
+   "sha256": "3fb01f1eb7e531b7bce7014b911aa89e84b2479c443d913913fc3a8b11056c03"
+  },
+  {
+   "path": "matrix.html",
+   "bytes": 4161,
+   "sha256": "19e250b0cdc82bcf146632e708697e915cdea8234ffc6f34ddb6684f9f9e1970"
+  },
+  {
+   "path": "moonlit-ocean.html",
+   "bytes": 8241,
+   "sha256": "7df3366e75279770c8030d7da55a47d669305ce19885514f50e8b6722b17bb11"
+  },
+  {
+   "path": "neon-tunnel.html",
+   "bytes": 4601,
+   "sha256": "db2cad4eb00898a620e1502404011da3b6825b7f20c9f8b47d5dd0f82ee91d57"
+  },
+  {
+   "path": "plexus.html",
+   "bytes": 4237,
+   "sha256": "940300b760611edae5f8a6e6e4d3161190f3ba6bc1ebd6c893403b8e684832ef"
+  },
+  {
+   "path": "rain-window.html",
+   "bytes": 8439,
+   "sha256": "25a2689f0b34e5101be1fcea2eb544bb843b0353cd8b4331b0147ef3d95bc0b7"
+  },
+  {
+   "path": "silk-flow.html",
+   "bytes": 4284,
+   "sha256": "2dd12a30a6cb75c3059e19bdae07c46b9b8ba5653fac0a95c165678a8169bdd2"
+  },
+  {
+   "path": "snow-cabin.html",
+   "bytes": 8372,
+   "sha256": "7ee68fdbc244d6e5553e3207e477f55b9f70a2d8972b82bc011ac97e3c61b95e"
+  },
+  {
+   "path": "synthwave.html",
+   "bytes": 6126,
+   "sha256": "ea4ac523f36073ff55da3cd279a7fa85776f0a6cd6a1081a14d7af7c0d71e97f"
+  },
+  {
+   "path": "thunderstorm.html",
+   "bytes": 8162,
+   "sha256": "c1c1e641f5ffa9db8285e0b102522c169429f4ad79841d23d8d264db681f70f7"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "title": "Voice Studio",
+ "url": "https://claude.ai/artifact/P3r4cRrroL7qsGVF7JnYp8",
+ "type": "web page",
+ "updated": "2026-11-05",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 199696,
+   "sha256": "45c77abaad928236881d9cb3b45d12a5af582ab336cb839c0b8662cff060e040"
+  }
+ ]
+}

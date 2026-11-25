@@ -1,0 +1,68 @@
+{
+ "title": "Hunter Preview",
+ "url": "https://claude.ai/artifact/Qu6anWBfWoJK5nGHezDUQC",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 46496,
+   "sha256": "eaba5defa7ddd32f597112f649e80bef5b1b9bdf312d7986274d9551ab733d16"
+  },
+  {
+   "path": "sample-seo-report.html",
+   "bytes": 82603,
+   "sha256": "5f9d62bedd9cad8d9dade39a329f1b9a4f9edc2c645cff4e1e47bc48271e7d27"
+  },
+  {
+   "path": "shots/01-home.png",
+   "bytes": 487412,
+   "sha256": "1c89267fcaf6b4389f8113ef32fde08aa4d734a8cd6160a81fc6de4dd6615cd6"
+  },
+  {
+   "path": "shots/02-seo-audit.png",
+   "bytes": 625766,
+   "sha256": "19961d001dace9c48534a43d3368e05bcd4a6c09a9603a0933c3a65af6db670b"
+  },
+  {
+   "path": "shots/03-seo-report.png",
+   "bytes": 350637,
+   "sha256": "a6e8fe0f3a33e0c7d5e0002883bf6bffac3e737f4633e34386acd709c154d95e"
+  },
+  {
+   "path": "shots/04-my-info.png",
+   "bytes": 648027,
+   "sha256": "23051ba6964050156f5e897b0013510eea1ede7d6431a8779d094daf8f84bdd1"
+  },
+  {
+   "path": "shots/05-breaches.png",
+   "bytes": 1034950,
+   "sha256": "cef19087c9a4d67e414e5ea677454959aba8560f4dc2bc00b36f0c9c78aaa666"
+  },
+  {
+   "path": "shots/06-find-dark-web.png",
+   "bytes": 807546,
+   "sha256": "588567ed9e2edbb41d7d4551095301022a9cfc6421c7971f8e89d291d8700a84"
+  },
+  {
+   "path": "shots/07-fix-plan.png",
+   "bytes": 763874,
+   "sha256": "bbece35710d27e222991105012cc04de152bc51ae2b4758d5ef2c7625ca63609"
+  },
+  {
+   "path": "shots/08-remove-letters.png",
+   "bytes": 480033,
+   "sha256": "339385c1b52bb4f78b4f8a603e5be222ddacaa672ed56319ef9803d9c38033f8"
+  },
+  {
+   "path": "shots/09-company-admin.png",
+   "bytes": 488506,
+   "sha256": "ce010a0062de6b9910b88c16b8c72d72c034f9d417685b0fe84452769cf0c786"
+  },
+  {
+   "path": "shots/10-photo-name.png",
+   "bytes": 713323,
+   "sha256": "bf9615d3e364318324cec99ffc6b76bbc765bdd680830fd0620ecc33f2f22070"
+  }
+ ]
+}

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drone City</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#02030a}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. drone-city.html?drones=2&pan=0.5 =====
+const CFG = {
+  fps: 60,
+  pace: 0.4,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  drones: 1,      // how often drones spawn (2 = twice as many)
+  pan: 1,         // camera pan speed across the skyline (0 = still)
+  speed: 1,       // drone flight speed
+  beams: 1,       // 1 = searchlights on, 0 = off
+  size: 1,        // drone size multiplier
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const rand = (a, b) => a + Math.random() * (b - a);
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+let W, H, DPR, bg, layers = [], drones = [], twinkles = [], t = 0, spawnT = 0, glow = {};
+
+const LAYERS = [
+  { speed: 5,  minH: .14, maxH: .36, minW: 28, maxW: 80,  color: '#161b38', win: ['#7a6aa0', '#5a7ab0', '#a08a7a'], winP: .22, ws: 2, haze: [70, 50, 130, .45] },
+  { speed: 14, minH: .2,  maxH: .52, minW: 50, maxW: 130, color: '#0c1024', win: ['#ffd27a', '#9fd3ff', '#ffb35c', '#e8f0ff'], winP: .28, ws: 3, haze: [40, 30, 90, .25] },
+  { speed: 36, minH: .26, maxH: .7,  minW: 90, maxW: 210, color: '#04060d', win: ['#ffcf6e', '#a8dcff', '#ff9e4a', '#ffffff', '#ff5fa2', '#6effd8'], winP: .2, ws: 4, haze: null },
+];
+
+function makeGlow(rgb) {
+  const s = 64, cv = document.createElement('canvas'); cv.width = cv.height = s;
+  const g = cv.getContext('2d'), gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.12, `rgba(${rgb},1)`);
+  gr.addColorStop(.35, `rgba(${rgb},.35)`); gr.addColorStop(1, `rgba(${rgb},0)`);
+  g.fillStyle = gr; g.fillRect(0, 0, s, s); return cv;
+}
+
+function buildBackground() {
+  bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+  const g = bg.getContext('2d');
+  const gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#02030a'); gr.addColorStop(.45, '#0d0f2e'); gr.addColorStop(.75, '#2a1a4a'); gr.addColorStop(1, '#5a2a44');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // stars
+  for (let i = 0; i < W * H / 4000; i++) {
+    const sy = Math.pow(Math.random(), 1.6) * H * .6;
+    g.fillStyle = `rgba(255,255,255,${rand(.2, .8) * (1 - sy / (H * .6))})`;
+    g.fillRect(Math.random() * W, sy, DPR * rand(.6, 1.4), DPR * rand(.6, 1.4));
+  }
+  twinkles = Array.from({ length: 60 }, () => ({ x: Math.random() * W, y: Math.pow(Math.random(), 1.5) * H * .45, ph: Math.random() * 6, sp: rand(1, 3) }));
+  // moon
+  const mx = W * .8, my = H * .16, mr = Math.min(W, H) * .045;
+  const mg = g.createRadialGradient(mx, my, mr * .5, mx, my, mr * 6);
+  mg.addColorStop(0, 'rgba(200,210,255,.25)'); mg.addColorStop(1, 'rgba(200,210,255,0)');
+  g.fillStyle = mg; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#e9ecff'; g.beginPath(); g.arc(mx, my, mr, 0, 7); g.fill();
+  g.fillStyle = 'rgba(160,170,210,.35)';
+  [[-.3, -.2, .22], [.25, .15, .16], [-.05, .4, .12], [.35, -.35, .1]].forEach(([a, b, r]) => { g.beginPath(); g.arc(mx + a * mr, my + b * mr, r * mr, 0, 7); g.fill(); });
+  // low cloud bands
+  for (let i = 0; i < 6; i++) {
+    const cy = H * rand(.25, .55), cw = W * rand(.3, .7), cxp = Math.random() * W;
+    const cg = g.createRadialGradient(cxp, cy, 0, cxp, cy, cw / 2);
+    cg.addColorStop(0, 'rgba(90,60,130,.12)'); cg.addColorStop(1, 'rgba(90,60,130,0)');
+    g.save(); g.translate(cxp, cy); g.scale(1, .12); g.translate(-cxp, -cy); g.fillStyle = cg; g.fillRect(cxp - cw, cy - cw, cw * 2, cw * 2); g.restore();
+  }
+}
+
+function drawBuilding(L, bx, bw, bh, seed, dup) {
+  const r = mulberry(seed), d = L.def, g = L.g, top = H - bh;
+  g.fillStyle = d.color; g.fillRect(bx, top, bw, bh);
+  const type = r();
+  if (type < .25) {
+    g.fillRect(bx + bw * .12, top - bh * .05, bw * .76, bh * .05 + 1);
+    g.fillRect(bx + bw * .3, top - bh * .1, bw * .4, bh * .05 + 1);
+  } else if (type < .45) {
+    g.fillRect(bx + bw * .5 - DPR, top - bh * .18, 2 * DPR, bh * .18);
+    if (!dup) L.beacons.push({ x: bx + bw * .5, y: top - bh * .18, ph: r() * 6 }); else r();
+  } else if (type < .55) {
+    g.beginPath(); g.moveTo(bx + bw * .2, top + 1); g.lineTo(bx + bw * .5, top - bh * .22); g.lineTo(bx + bw * .8, top + 1); g.fill();
+    if (!dup) L.beacons.push({ x: bx + bw * .5, y: top - bh * .22, ph: r() * 6 }); else r();
+  }
+  const ws = d.ws * DPR, gx = ws * 1.9, gy = ws * 2.3, dense = r() < .5;
+  const litBias = r() * .8 + .4;
+  for (let wy = top + ws * 2; wy < H - ws; wy += gy) {
+    const rowOn = r() < .85;
+    for (let wx = bx + ws * 1.5; wx < bx + bw - ws * 1.5; wx += dense ? gx : gx * 1.6) {
+      const on = rowOn && r() < d.winP * litBias, col = d.win[(r() * d.win.length) | 0], a = .5 + r() * .5, pick = r() < .12;
+      if (on) { g.globalAlpha = a; g.fillStyle = col; g.fillRect(wx, wy, ws, ws * 1.3); g.globalAlpha = 1; }
+      if (pick && !dup) L.wins.push({ x: wx, y: wy, w: ws, h: ws * 1.3, on, col });
+    }
+  }
+}
+
+function buildLayer(def, li) {
+  const TW = Math.ceil(Math.max(W, 1400 * DPR) * 1.7);
+  const cv = document.createElement('canvas'); cv.width = TW; cv.height = H;
+  const L = { def, cv, g: cv.getContext('2d'), TW, off: Math.random() * TW, wins: [], beacons: [] };
+  let bx = 0, n = 0;
+  while (bx < TW) {
+    const bw = rand(def.minW, def.maxW) * DPR, bh = rand(def.minH, def.maxH) * H * (Math.random() < .12 ? 1.3 : 1), seed = li * 10000 + n++;
+    drawBuilding(L, bx, bw, bh, seed, false);
+    if (bx + bw > TW) drawBuilding(L, bx - TW, bw, bh, seed, true);
+    bx += bw + rand(-6, 10) * DPR;
+  }
+  if (def.haze) {
+    const [r, gg, b, a] = def.haze, g = L.g;
+    g.globalCompositeOperation = 'source-atop';
+    const hg = g.createLinearGradient(0, H * .4, 0, H);
+    hg.addColorStop(0, `rgba(${r},${gg},${b},${a * .5})`); hg.addColorStop(1, `rgba(${r},${gg},${b},${a})`);
+    g.fillStyle = hg; g.fillRect(0, 0, TW, H);
+    g.globalCompositeOperation = 'source-over';
+  }
+  return L;
+}
+
+function drawLayer(L) {
+  const o = ((L.off % L.TW) + L.TW) % L.TW;
+  x.drawImage(L.cv, -o, 0); x.drawImage(L.cv, L.TW - o, 0);
+  for (const b of L.beacons) {
+    let sx = ((b.x - o) % L.TW + L.TW) % L.TW;
+    if (sx > L.TW - 30) sx -= L.TW;
+    if (sx > W + 30) continue;
+    const p = (Math.sin(t * 2.4 + b.ph) + 1) / 2, r = (3 + p * 7) * DPR;
+    x.globalAlpha = .25 + p * .75;
+    x.drawImage(glow.red, sx - r, b.y - r, r * 2, r * 2);
+  }
+  x.globalAlpha = 1;
+}
+
+function flicker() {
+  for (const li of [1, 2]) {
+    const L = layers[li];
+    if (!L.wins.length || Math.random() > .25) continue;
+    const w = L.wins[Math.random() * L.wins.length | 0];
+    w.on = !w.on;
+    L.g.fillStyle = w.on ? w.col : L.def.color;
+    L.g.globalAlpha = w.on ? .85 : 1;
+    L.g.fillRect(w.x, w.y, w.w, w.h); L.g.globalAlpha = 1;
+  }
+}
+
+function spawn(onScreen) {
+  const roll = Math.random(), band = roll < .4 ? 0 : roll < .78 ? 1 : 2;
+  const dir = Math.random() < .5 ? 1 : -1;
+  const s = [rand(3, 5), rand(8, 14), rand(24, 42)][band] * DPR * CFG.size;
+  const y = [rand(.08, .45), rand(.12, .5), rand(.15, .55)][band] * H;
+  const v = s * rand(4, 7) * dir * CFG.speed * (band === 2 ? 1.6 : 1);
+  const count = band < 2 && Math.random() < .35 ? 3 + (Math.random() * 5 | 0) : 1;
+  const startX = onScreen ? Math.random() * W : dir > 0 ? -s * 3 : W + s * 3;
+  const spot = band > 0 && Math.random() < .45, cargo = band === 2 && Math.random() < .35;
+  for (let k = 0; k < count; k++) {
+    const rank = Math.ceil(k / 2), side = k % 2 ? 1 : -1;
+    drones.push({ band, s, vx: v, x: startX - dir * rank * s * 6, y: y + side * rank * s * 1.8, ph: Math.random() * 6, strobe: Math.random() * 2, spot: spot && k === 0, cargo, spin: Math.random() * 6 });
+  }
+}
+
+function rotor(cx, cy, s, a, d) {
+  x.fillStyle = `rgba(170,190,225,${.16 * a})`;
+  x.beginPath(); x.ellipse(cx, cy, s * .44, s * .05, 0, 0, 7); x.fill();
+  const bl = s * .44 * Math.abs(Math.cos(t * 55 + d.spin + cx));
+  x.strokeStyle = `rgba(30,36,52,${.8 * a})`; x.lineWidth = Math.max(1, s * .03);
+  x.beginPath(); x.moveTo(cx - bl, cy); x.lineTo(cx + bl, cy); x.stroke();
+}
+
+function drawDrone(d) {
+  const s = d.s, X = d.x, Y = d.y + Math.sin(t * 2.2 + d.ph) * s * .12;
+  const dir = Math.sign(d.vx);
+  if (d.spot && CFG.beams) {
+    x.globalCompositeOperation = 'lighter';
+    const len = s * 18, sway = Math.sin(t * .7 + d.ph) * s * 3;
+    const g = x.createLinearGradient(X, Y, X + sway, Y + len);
+    g.addColorStop(0, 'rgba(190,220,255,.28)'); g.addColorStop(1, 'rgba(190,220,255,0)');
+    x.fillStyle = g; x.beginPath();
+    x.moveTo(X - s * .1, Y + s * .2); x.lineTo(X + s * .1, Y + s * .2);
+    x.lineTo(X + sway + s * 3.5, Y + len); x.lineTo(X + sway - s * 3.5, Y + len); x.fill();
+    x.globalCompositeOperation = 'source-over';
+  }
+  if (s > 4 * DPR) {
+    x.save(); x.translate(X, Y); x.rotate(dir * .1);
+    const body = d.band === 2 ? '#0a0d16' : '#121829';
+    rotor(-s * .62, -s * .24, s, .7, d); rotor(s * .62, -s * .24, s, .7, d);
+    x.strokeStyle = body; x.lineCap = 'round';
+    x.lineWidth = Math.max(1, s * .08);
+    x.beginPath(); x.moveTo(-s, -s * .1); x.lineTo(s, -s * .1); x.moveTo(-s * .62, -s * .2); x.lineTo(s * .62, -s * .2); x.stroke();
+    x.fillStyle = body;
+    x.beginPath(); x.roundRect(-s * .38, -s * .22, s * .76, s * .3, s * .1); x.fill();
+    x.fillStyle = 'rgba(130,150,210,.22)'; x.fillRect(-s * .3, -s * .21, s * .6, s * .04);
+    x.fillStyle = body;
+    for (const mx of [-s, s]) x.fillRect(mx - s * .06, -s * .2, s * .12, s * .13);
+    rotor(-s, -s * .22, s, 1, d); rotor(s, -s * .22, s, 1, d);
+    x.lineWidth = Math.max(1, s * .045);
+    x.beginPath(); x.moveTo(-s * .2, s * .07); x.lineTo(-s * .32, s * .32); x.moveTo(-s * .42, s * .32); x.lineTo(-s * .18, s * .32);
+    x.moveTo(s * .2, s * .07); x.lineTo(s * .32, s * .32); x.moveTo(s * .42, s * .32); x.lineTo(s * .18, s * .32); x.stroke();
+    x.beginPath(); x.arc(dir * s * .12, s * .13, s * .08, 0, 7); x.fill();
+    if (d.cargo) {
+      x.lineWidth = Math.max(1, s * .02); x.strokeStyle = '#2a2f3e';
+      x.beginPath(); x.moveTo(0, s * .1); x.lineTo(-s * .15, s * .75); x.moveTo(0, s * .1); x.lineTo(s * .15, s * .75); x.stroke();
+      x.fillStyle = '#4a3622'; x.fillRect(-s * .22, s * .75, s * .44, s * .32);
+      x.fillStyle = '#6b5032'; x.fillRect(-s * .22, s * .75, s * .44, s * .06);
+    }
+    x.restore();
+  }
+  x.globalCompositeOperation = 'lighter';
+  const lr = Math.max(s * .45, 2.5 * DPR);
+  const tilt = dir * .1, ly = -s * .1;
+  const ax = Math.cos(tilt) * s, ay = Math.sin(tilt) * s;
+  x.drawImage(glow.red, X - ax - lr, Y + ly - ay - lr, lr * 2, lr * 2);
+  x.drawImage(glow.green, X + ax - lr, Y + ly + ay - lr, lr * 2, lr * 2);
+  if (((t + d.strobe) % 1.4) < .07) { const sr = Math.max(s * 1.6, 9 * DPR); x.drawImage(glow.white, X - sr, Y - sr, sr * 2, sr * 2); }
+  const bp = (Math.sin(t * 3 + d.ph) + 1) / 2, br = lr * (.6 + bp * .6);
+  x.globalAlpha = .4 + bp * .6; x.drawImage(glow.amber, X - br, Y + s * .05 - br, br * 2, br * 2); x.globalAlpha = 1;
+  x.globalCompositeOperation = 'source-over';
+}
+
+const searchlights = [{ bx: .18, ph: 0, sp: .21 }, { bx: .62, ph: 2, sp: .17 }, { bx: .86, ph: 4, sp: .25 }];
+function drawSearchlights() {
+  if (!CFG.beams) return;
+  x.globalCompositeOperation = 'lighter';
+  for (const s of searchlights) {
+    const a = Math.sin(t * s.sp + s.ph) * .45 - Math.PI / 2, bx = W * s.bx, by = H, len = H * 1.3, w = .035;
+    const g = x.createLinearGradient(bx, by, bx + Math.cos(a) * len, by + Math.sin(a) * len);
+    g.addColorStop(0, 'rgba(160,180,255,.16)'); g.addColorStop(1, 'rgba(160,180,255,0)');
+    x.fillStyle = g; x.beginPath(); x.moveTo(bx, by);
+    x.lineTo(bx + Math.cos(a - w) * len, by + Math.sin(a - w) * len);
+    x.lineTo(bx + Math.cos(a + w) * len, by + Math.sin(a + w) * len); x.fill();
+  }
+  x.globalCompositeOperation = 'source-over';
+}
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  glow = { red: makeGlow('255,40,50'), green: makeGlow('40,255,120'), white: makeGlow('220,235,255'), amber: makeGlow('255,170,60') };
+  buildBackground();
+  layers = LAYERS.map(buildLayer);
+  drones = []; for (let i = 0; i < 8; i++) spawn(true);
+}
+
+function frame(dt) {
+  t += dt;
+  spawnT -= dt * CFG.drones;
+  if (spawnT <= 0) { spawn(false); spawnT = rand(.6, 2); }
+  for (const L of layers) L.off += L.def.speed * DPR * dt * CFG.pan;
+  if (Math.random() < .5) flicker();
+  for (const d of drones) d.x += d.vx * dt;
+  drones = drones.filter(d => d.vx > 0 ? d.x < W + d.s * 40 : d.x > -d.s * 40);
+
+  x.drawImage(bg, 0, 0);
+  for (const s of twinkles) { x.globalAlpha = (Math.sin(t * s.sp + s.ph) + 1) / 2; x.fillStyle = '#fff'; x.fillRect(s.x, s.y, 1.6 * DPR, 1.6 * DPR); }
+  x.globalAlpha = 1;
+  drawLayer(layers[0]);
+  for (const d of drones) if (d.band === 0) drawDrone(d);
+  drawSearchlights();
+  drawLayer(layers[1]);
+  for (const d of drones) if (d.band === 1) drawDrone(d);
+  drawLayer(layers[2]);
+  const fg = x.createLinearGradient(0, H * .82, 0, H);
+  fg.addColorStop(0, 'rgba(60,30,90,0)'); fg.addColorStop(1, 'rgba(120,50,90,.35)');
+  x.fillStyle = fg; x.fillRect(0, H * .82, W, H * .18);
+  for (const d of drones) if (d.band === 2) drawDrone(d);
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

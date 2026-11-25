@@ -1,0 +1,148 @@
+{
+ "title": "CydArt Lite",
+ "url": "https://claude.ai/artifact/Rnud4dEUWhdYtrwf3sC7Yi",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "css/app.css",
+   "bytes": 36539,
+   "sha256": "13016b935f8a62f8af07d43576b43d517685a45b5aa0d0e5a1ee63d1520304c4"
+  },
+  {
+   "path": "css/lite.css",
+   "bytes": 7992,
+   "sha256": "1e6d6814937a13eb089134101468bad2c1e8d65fc6957387b48b48ffc6900595"
+  },
+  {
+   "path": "css/video.css",
+   "bytes": 14900,
+   "sha256": "9116f7d72e7e403dd4c7d27387435652edf677731a9bd32a5969663ddd55c821"
+  },
+  {
+   "path": "icons/icon-lite.svg",
+   "bytes": 1451,
+   "sha256": "8a059fea248468efc346e4468e56a80d38b1a5c00b24fb3f24ca51834cd0fb1e"
+  },
+  {
+   "path": "index.html",
+   "bytes": 7415,
+   "sha256": "e63e1e1530e1cbc91097d50f5cdfe725972593bbbc7d2246b74024f685571f24"
+  },
+  {
+   "path": "js/convert.js",
+   "bytes": 11382,
+   "sha256": "8b1206ede312dbcf7f871adfd94ed07f6468630b67faeab9607b9913f4e7c63a"
+  },
+  {
+   "path": "js/core.js",
+   "bytes": 25852,
+   "sha256": "578ed053933c1d2dae6d9cb84ece4a295978eace1c8dbf5099749d0717b6d6fe"
+  },
+  {
+   "path": "js/formats.js",
+   "bytes": 20102,
+   "sha256": "ccb5f050eadc7043dfddb54506518bbcc5d2d2bae729fdf52b7c35f1f321b9a7"
+  },
+  {
+   "path": "js/lite.js",
+   "bytes": 36333,
+   "sha256": "a9cb0f9453a1007a27d1be863dea29b1d21cf664fa69513ed1442980ee3bd89d"
+  },
+  {
+   "path": "js/media.js",
+   "bytes": 18346,
+   "sha256": "f49ca2128ec5a8ce1541c41ca0c8326f76628283fe8d7940390efe68cea4202c"
+  },
+  {
+   "path": "js/player.js",
+   "bytes": 9830,
+   "sha256": "700c6b1c73443547a638727e06a94a6df51ff85c3f2bee67e1a333ee58853cd7"
+  },
+  {
+   "path": "js/ui.js",
+   "bytes": 7754,
+   "sha256": "94ec8e997c8730c2c5985d2ae11199020f242cc9e84c95c5f15de19f8b466cf4"
+  },
+  {
+   "path": "js/version.js",
+   "bytes": 6337,
+   "sha256": "5d7f212e84e1cf1ea7a6e3ddc6b8008d7f89bfb70784d4abe4f4b42967f37725"
+  },
+  {
+   "path": "lib/ffmpeg-core.gz.wasm",
+   "bytes": 10220348,
+   "sha256": "8c77404a4ae21f9559ab2e48c109b7ec04af6dd93cfc15263c3475f26ad887a2"
+  },
+  {
+   "path": "lib/magick.gz.wasm",
+   "bytes": 5361834,
+   "sha256": "04dfd4d3a9111b9931bb9e1b2ea72d94eeaa4cf252592c465761d8ca5e5e4e74"
+  },
+  {
+   "path": "vendor/ag-psd.js",
+   "bytes": 977742,
+   "sha256": "075122c0bec86bb5d059b763f41008ed3202237b4f08dd83d04e1089c4fcefa6"
+  },
+  {
+   "path": "vendor/exifr.js",
+   "bytes": 75848,
+   "sha256": "2bd05117781c12ddd965dee846de3b3f986b5ecb4c7f6a78f2d2ec1db7c65ae7"
+  },
+  {
+   "path": "vendor/fflate.js",
+   "bytes": 32665,
+   "sha256": "c3b34f2e9f5e74d4d7d64e01cac7a0c01954c6c406414d42185c7b53d6875ddf"
+  },
+  {
+   "path": "vendor/ffmpeg/classes.js",
+   "bytes": 9747,
+   "sha256": "7a829c898bdbc3a8806652a5502d9101178ce4e988a2c50b3abc1306ce4fc919"
+  },
+  {
+   "path": "vendor/ffmpeg/const.js",
+   "bytes": 1016,
+   "sha256": "9e3bc9dd84781c81daf459e2c46eeec815edac35089832681d9a9a0f383060d0"
+  },
+  {
+   "path": "vendor/ffmpeg/errors.js",
+   "bytes": 332,
+   "sha256": "619310d7ef5fe5fefa0a31927db862b7c291713cfef4d71753fa8aafd18f4db6"
+  },
+  {
+   "path": "vendor/ffmpeg/ffmpeg-core.js",
+   "bytes": 111804,
+   "sha256": "67a48f11645f85439f3fde4f2119042c16b374b910206b7a7a24f342e28dcae3"
+  },
+  {
+   "path": "vendor/ffmpeg/index.js",
+   "bytes": 58,
+   "sha256": "cad19572420f7ead17272082d9582ebaed7f2856e19875542f83daf8d25d3b5d"
+  },
+  {
+   "path": "vendor/ffmpeg/types.js",
+   "bytes": 295,
+   "sha256": "72f80e6fd44fcd18b55c9a0deb3bc70b9bb37480cf969045ca4521f5a11300f5"
+  },
+  {
+   "path": "vendor/ffmpeg/utils.js",
+   "bytes": 138,
+   "sha256": "8c2e0e16445f8d3a0acbb812f2c60541a92c88ed0bf9ffe96c52e7fb6c8b1d72"
+  },
+  {
+   "path": "vendor/ffmpeg/worker.js",
+   "bytes": 5085,
+   "sha256": "feff0ac937ea225e997e1fae997a74f8b8d572423a526da59eb56624b1f3cde7"
+  },
+  {
+   "path": "vendor/libheif.mjs",
+   "bytes": 1461926,
+   "sha256": "8363e27add6c587b20f183fb746a583f97f28e8641f12955a1a550c38a4f9969"
+  },
+  {
+   "path": "vendor/magick-wasm.js",
+   "bytes": 420784,
+   "sha256": "7106d329c5b70dc7028f259804a4cf451e51752d20bc4d0daaa83d6712452931"
+  }
+ ]
+}

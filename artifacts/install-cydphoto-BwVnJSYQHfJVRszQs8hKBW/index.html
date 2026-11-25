@@ -1,0 +1,164 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Install CydPhoto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column; two app cards side by side, then numbered install steps with real screenshots. */
+:root {
+  --bg: #eef2f6; --panel: #ffffff; --panel2: #f4f7fa; --line: #d3dbe4; --text: #13202e; --dim: #4a5b6e;
+  --accent: #0278b8; --accent-hi: #38bdf8; --lime: #cddb28; --shot: #0b0f14;
+  --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1319; --panel: #18202a; --panel2: #1e2833; --line: #2c3644; --text: #e8eef6; --dim: #9fb0c3; --accent: #38bdf8; --accent-hi: #7fd6ff; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #0f1319; --panel: #18202a; --panel2: #1e2833; --line: #2c3644; --text: #e8eef6; --dim: #9fb0c3; --accent: #38bdf8; --accent-hi: #7fd6ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 15px/1.55 var(--body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: .02em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 5vw, 40px); }
+h2 { font-size: 22px; }
+h3 { font-size: 17px; }
+p { margin: 0; }
+.lead { color: var(--dim); max-width: 62ch; margin-top: 6px; }
+.banner { border: 1px solid color-mix(in srgb, var(--lime) 60%, var(--line)); background: color-mix(in srgb, var(--lime) 14%, var(--panel)); border-radius: 12px; padding: 12px 16px; font-size: 14px; }
+.banner b { font-weight: 600; }
+.apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.app { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.app-head { display: flex; gap: 14px; align-items: center; }
+.app-head img { width: 56px; height: 56px; border-radius: 14px; box-shadow: 0 6px 14px rgba(0,0,0,.25); }
+.ver { color: var(--dim); font-size: 13px; font-variant-numeric: tabular-nums; }
+.app ul { margin: 0; padding-left: 18px; color: var(--dim); font-size: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 10px; font-weight: 600; text-decoration: none; color: #fff;
+  background: linear-gradient(180deg, #5ccbf7, #1d93cf 55%, #12709f); border: 1px solid #063149; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 0 #063149, 0 10px 20px rgba(14,165,233,.3); transform: translateY(-2px); }
+.btn:active { transform: translateY(1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 1px 0 #063149; }
+.btn.alt { color: var(--text); background: var(--panel2); border-color: var(--line); box-shadow: 0 3px 0 var(--line); }
+.btn:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.steps { display: grid; gap: 22px; counter-reset: s; }
+.step { display: grid; grid-template-columns: 44px 1fr; gap: 14px; }
+.step::before { counter-increment: s; content: counter(s); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font: 700 18px var(--display); color: #1b2400; background: var(--lime); }
+.step > div { display: grid; gap: 10px; min-width: 0; }
+.shot { border-radius: 12px; border: 1px solid var(--line); background: var(--shot); overflow: hidden; }
+.shot img { display: block; width: 100%; height: auto; max-width: 100%; }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+figure { margin: 0; display: grid; gap: 6px; }
+figcaption { font-size: 13px; color: var(--dim); }
+.tabs { display: flex; gap: 4px; background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; width: fit-content; flex-wrap: wrap; }
+.tab { border: 0; background: transparent; color: var(--dim); font: 600 14px var(--body); padding: 8px 14px; border-radius: 9px; cursor: pointer; min-height: 40px; }
+.tab[aria-selected="true"] { background: var(--panel); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.panel ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+kbd { font: 12.5px ui-monospace, monospace; background: var(--panel2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+.note { color: var(--dim); font-size: 13.5px; }
+code { font: 13px ui-monospace, monospace; background: var(--panel2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .btn { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Install CydPhoto</h1>
+    <p class="lead">Two apps, installed separately. Each one can be your default for opening photos: HEIC, JPEG, PNG, TIFF, RAW, PSD and more.</p>
+  </header>
+
+  <div class="banner" id="preview-banner" hidden>
+    <b>Preview.</b> Installing works once these files are on your website (for example, drag the unzipped <code>CydPhoto-website.zip</code> folder onto app.netlify.com/drop). The buttons below open the preview copies for now; on your site they open the real, installable apps.
+  </div>
+
+  <section class="apps" aria-label="Apps">
+    <article class="app">
+      <div class="app-head"><img src="icons/icon-192.png" alt="" width="56" height="56"><div><h2>CydPhoto</h2><div class="ver" id="v-full"></div></div></div>
+      <p>Full photo editor, paint studio and photo library, with Cydni's intro.</p>
+      <ul><li>Photo and Draw workspaces, layers, filters, looks</li><li>Library with albums, favorites, slideshow</li><li>Opens 270+ formats, saves 20+</li></ul>
+      <div class="row"><a class="btn" id="go-full" href="">Open and install CydPhoto</a></div>
+    </article>
+    <article class="app">
+      <div class="app-head"><img src="icons/icon-lite-192.png" alt="" width="56" height="56"><div><h2>CydPhoto Lite</h2><div class="ver" id="v-lite"></div></div></div>
+      <p>Fast viewer only. The best choice for double-click viewing.</p>
+      <ul><li>Grid, full screen, zoom, rotate, slideshow</li><li>Camera info, save a copy in another format</li><li>"Edit in CydPhoto" hands a photo to the editor</li></ul>
+      <div class="row"><a class="btn" id="go-lite" href="lite/">Open and install Lite</a></div>
+    </article>
+  </section>
+
+  <section class="steps" aria-label="Steps">
+    <h2>How to install</h2>
+
+    <div class="step"><div>
+      <h3>Open the app in Chrome or Edge</h3>
+      <p>Use one of the buttons above on a Windows, Mac, Linux or ChromeOS computer.</p>
+    </div></div>
+
+    <div class="step"><div>
+      <h3>Click the install button in the top bar</h3>
+      <p>It's the download arrow to the left of the moon icon (highlighted below). You can also use the install icon at the right end of the browser's address bar.</p>
+      <div class="shots">
+        <figure><div class="shot"><img src="full-home.jpg" alt="CydPhoto home screen with the install button highlighted in the top-right corner" loading="lazy"></div><figcaption>CydPhoto</figcaption></figure>
+        <figure><div class="shot"><img src="lite-home.jpg" alt="CydPhoto Lite with the install button highlighted in the top-right corner" loading="lazy"></div><figcaption>CydPhoto Lite</figcaption></figure>
+      </div>
+      <figure><div class="shot" style="max-width:400px"><img src="full-bar.jpg" alt="Close-up of the top-right corner: folder, install arrow (highlighted), moon and info icons" loading="lazy"></div><figcaption>Close-up: the install arrow sits between the Open folder and moon icons. It appears when your browser can install the app.</figcaption></figure>
+    </div></div>
+
+    <div class="step"><div>
+      <h3>Confirm with Install</h3>
+      <p>The browser shows its own install box. The app then opens in its own window and appears in your Start menu, Dock or Launchpad. Repeat for the other app if you want both.</p>
+    </div></div>
+
+    <div class="step"><div>
+      <h3>Make it your default photo app</h3>
+      <div class="tabs" role="tablist" aria-label="Your computer">
+        <button class="tab" role="tab" id="t-win" aria-selected="true" aria-controls="p-win">Windows</button>
+        <button class="tab" role="tab" id="t-mac" aria-selected="false" aria-controls="p-mac">Mac</button>
+        <button class="tab" role="tab" id="t-other" aria-selected="false" aria-controls="p-other">ChromeOS / Linux</button>
+      </div>
+      <div class="panel" id="p-win" role="tabpanel" aria-labelledby="t-win">
+        <ol><li>Right-click any photo in File Explorer.</li><li>Choose <b>Open with</b> → <b>Choose another app</b>.</li><li>Pick <b>CydPhoto Lite</b> (for viewing) or <b>CydPhoto</b> (for editing).</li><li>Tick <b>Always use this app</b>, then OK. Repeat for HEIC, PNG and any other types you use.</li></ol>
+      </div>
+      <div class="panel" id="p-mac" role="tabpanel" aria-labelledby="t-mac" hidden>
+        <ol><li>In Finder, select a photo and press <kbd>⌘</kbd> <kbd>I</kbd>.</li><li>Under <b>Open with</b>, choose CydPhoto Lite or CydPhoto.</li><li>Click <b>Change All…</b> to use it for every file of that type.</li></ol>
+      </div>
+      <div class="panel" id="p-other" role="tabpanel" aria-labelledby="t-other" hidden>
+        <ol><li>Right-click a photo in your file manager.</li><li>Choose <b>Open with</b> and pick the app.</li><li>Set it as the default for that file type.</li></ol>
+      </div>
+      <p class="note">The first time an installed app opens a file type, the browser asks for permission. Choose <b>Allow</b> and tick "Remember".</p>
+      <figure><div class="shot" style="max-width:560px"><img src="full-help.jpg" alt="CydPhoto's built-in help box: Make CydPhoto your default photo app" loading="lazy"></div><figcaption>The same steps are inside each app: About menu → Install / set as default.</figcaption></figure>
+    </div></div>
+  </section>
+
+  <section>
+    <h2>Good to know</h2>
+    <p class="note" style="margin-top:8px">A common setup: CydPhoto Lite opens photos on double-click, and CydPhoto sits under "Open with" for editing. iPhone and iPad can add either app to the Home Screen (Safari → Share → Add to Home Screen), but iOS doesn't let web apps become the default photo app. Photos never leave your device.</p>
+  </section>
+</div>
+
+<script src="js/version.js"></script>
+<script>
+(function () {
+  var preview = !!(window.claude && window.claude.use) || /claude|usercontent/.test(location.hostname);
+  if (preview) {
+    document.getElementById('preview-banner').hidden = false;
+    var f = document.getElementById('go-full'), l = document.getElementById('go-lite');
+    f.href = 'https://claude.ai/artifact/BuAG28eVyFs4ERLRL4FNF8'; f.textContent = 'Open CydPhoto (preview)'; f.target = '_blank'; f.rel = 'noopener';
+    l.href = 'https://claude.ai/artifact/Rnud4dEUWhdYtrwf3sC7Yi'; l.textContent = 'Open Lite (preview)'; l.target = '_blank'; l.rel = 'noopener';
+  }
+  var V = window.CP || {};
+  document.getElementById('v-full').textContent = V.VERSION ? 'Version ' + V.VERSION : '';
+  document.getElementById('v-lite').textContent = V.LITE_VERSION ? 'Version ' + V.LITE_VERSION : '';
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function pick(t) { tabs.forEach(function (x) { var on = x === t; x.setAttribute('aria-selected', on); document.getElementById(x.getAttribute('aria-controls')).hidden = !on; }); }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { pick(t); });
+    t.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); pick(n); } });
+  });
+  var mac = /Mac/.test(navigator.platform || ''), cros = /CrOS|Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
+  if (mac) pick(document.getElementById('t-mac')); else if (cros && !/Win/.test(navigator.platform)) pick(document.getElementById('t-other'));
+})();
+</script>
+
+</body></html>

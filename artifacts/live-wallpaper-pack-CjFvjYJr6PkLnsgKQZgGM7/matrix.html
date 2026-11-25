@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matrix Rain</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. matrix.html?color=%23ff0066&size=22 =====
+const CFG = {
+  fps: 30,            // frame cap (30 keeps CPU low)
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  color: '#00ff41',   // trail color
+  head: '#eaffea',    // leading glyph color
+  size: 18,           // glyph size in px
+  speed: 1,           // fall speed multiplier
+  fade: 0.07,         // trail fade per frame (lower = longer trails)
+  message: 'WAKE UP NEO', // occasionally spelled down a column ('' to disable)
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const GLYPHS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789Z:.=*+-<>¦｜';
+let W, H, fs, cols, drops;
+
+function newDrop(init) {
+  return { y: init ? -Math.random() * (H / fs) * 1.5 : -Math.random() * 25, v: (0.35 + Math.random() * 0.65) * CFG.speed, cell: -999, ch: '', msg: null };
+}
+function resize() {
+  const d = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * d);
+  H = c.height = Math.floor(innerHeight * d);
+  fs = Math.round(CFG.size * d);
+  cols = Math.ceil(W / fs);
+  drops = Array.from({ length: cols }, () => newDrop(true));
+  x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+  x.font = `${fs}px "MS Gothic","Yu Gothic","Hiragino Sans",monospace`;
+  x.textAlign = 'center'; x.textBaseline = 'top';
+}
+
+function frame(dt) {
+  const steps = dt * 30;
+  x.fillStyle = `rgba(0,0,0,${1 - Math.pow(1 - CFG.fade, steps)})`;
+  x.fillRect(0, 0, W, H);
+
+  for (let i = 0; i < cols; i++) {
+    const d = drops[i];
+    d.y += d.v * steps;
+    const cell = Math.floor(d.y);
+    if (cell === d.cell) continue;
+    const px = i * fs + fs / 2;
+    // repaint previous head in trail color
+    if (d.cell >= 0) {
+      x.fillStyle = '#000'; x.fillRect(i * fs, d.cell * fs, fs, fs);
+      x.fillStyle = d.msg ? '#b6ffb6' : CFG.color;
+      x.fillText(d.ch, px, d.cell * fs);
+    }
+    d.cell = cell;
+    if (cell >= 0) {
+      if (d.msg) { d.ch = d.msg[cell - d.msgStart] ?? GLYPHS[Math.random() * GLYPHS.length | 0]; }
+      else d.ch = GLYPHS[Math.random() * GLYPHS.length | 0];
+      x.fillStyle = CFG.head; x.shadowColor = CFG.color; x.shadowBlur = fs * 0.7;
+      x.fillText(d.ch, px, cell * fs);
+      x.shadowBlur = 0;
+    }
+    if (cell * fs > H && Math.random() < 0.06) {
+      drops[i] = newDrop(false);
+      if (CFG.message && Math.random() < 0.004) { drops[i].msg = CFG.message.replace(/ /g, ''); drops[i].msgStart = 3 + (Math.random() * 6 | 0); drops[i].v = 0.4; }
+    }
+  }
+  // shimmer: randomly swap glyphs already in the trail
+  for (let k = 0; k < cols / 6; k++) {
+    const i = Math.random() * cols | 0, d = drops[i];
+    if (d.cell < 2) continue;
+    const r = Math.floor(Math.random() * Math.min(d.cell, 25));
+    const cy = (d.cell - 1 - r) * fs;
+    x.fillStyle = '#000'; x.fillRect(i * fs, cy, fs, fs);
+    x.globalAlpha = 0.5 * (1 - r / 25);
+    x.fillStyle = CFG.color; x.fillText(GLYPHS[Math.random() * GLYPHS.length | 0], i * fs + fs / 2, cy);
+    x.globalAlpha = 1;
+  }
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 150); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

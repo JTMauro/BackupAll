@@ -1,0 +1,78 @@
+{
+ "title": "CydVerse Documents",
+ "url": "https://claude.ai/artifact/R52cUDonc5GBCk1gfsB8QK",
+ "type": "web page",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "CydLink-1.0.zip.b64.txt",
+   "bytes": 12932,
+   "sha256": "9777c988eab8efec1708d31fc9534b9fd3490ecbf34958d1ad749eee83d34a0c"
+  },
+  {
+   "path": "CydVerse-Administrator-Manual.docx.b64.txt",
+   "bytes": 3933188,
+   "sha256": "ef098d56e1c1b3e3677bb09b1ddaa46222157c9387b6ae87be489feea3633cc7"
+  },
+  {
+   "path": "CydVerse-Concept.docx.b64.txt",
+   "bytes": 4136500,
+   "sha256": "654c2af2119dce5c681f0e201e8910903e8faf88abab85d880bcf3b603316a62"
+  },
+  {
+   "path": "CydVerse-Concept.pptx.b64.txt",
+   "bytes": 4399764,
+   "sha256": "80e58107a120bc285ed36396751d328c67d307a2b28bc54b2f2e6c02758a1f19"
+  },
+  {
+   "path": "arch.png",
+   "bytes": 446634,
+   "sha256": "146ad2fa46672b9cb4761ec09e23a97eb403cbb5dcbd748d6d83bd7698c344ba"
+  },
+  {
+   "path": "control.png",
+   "bytes": 223176,
+   "sha256": "daad73cf51f481403f7ce7980ae020c12d15de2f6478c13f56d07f7ffc1949ef"
+  },
+  {
+   "path": "ha.png",
+   "bytes": 426321,
+   "sha256": "ffdcb6a09f720b6a6b8bf6d9443bd1c7cc0efc0030c76f03f99d4b1a0f128a72"
+  },
+  {
+   "path": "index.html",
+   "bytes": 16457,
+   "sha256": "38476363878acbc212f451a69fe74b8cde885276d2a1c027cc5e43666ad73e92"
+  },
+  {
+   "path": "journey.png",
+   "bytes": 215834,
+   "sha256": "f3ebe6e250e854c8c878733d3315e5ee027a346ef32eb255c799f939fe51994d"
+  },
+  {
+   "path": "migrate.png",
+   "bytes": 416127,
+   "sha256": "33d2be8d88906c047ad0e97551f2e95d3dbabe03ce49cafa6165f20820accb4c"
+  },
+  {
+   "path": "mission.png",
+   "bytes": 399311,
+   "sha256": "4b43991f87daee094973ab5f783c38978bd502e941a60e797a74c48d7d4dd62e"
+  },
+  {
+   "path": "net.png",
+   "bytes": 341994,
+   "sha256": "188d5ede8e772d828423c9a2a70813cf6884b06d24394e4b31cc87b579e29a87"
+  },
+  {
+   "path": "servers.png",
+   "bytes": 378767,
+   "sha256": "d28dedcaa05c27ad0cd26fc6684d2258ce782dd84b4d8bc982a3bcf5b0692ae0"
+  },
+  {
+   "path": "sites.png",
+   "bytes": 434337,
+   "sha256": "8c4677cbd56567f4838cc7c65e2e24b7056ebe2ebf9af64cab3bf11fde308efa"
+  }
+ ]
+}

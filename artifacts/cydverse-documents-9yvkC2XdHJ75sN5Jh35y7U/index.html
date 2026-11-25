@@ -1,0 +1,237 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydVerse Documents</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: CydFTP drive-bay look; a hero, a row of download "drive bays", what's new, then the diagrams. Single dark look on purpose, matching CydFTP. */
+:root{
+  --chassis:#0f1319; --panel:#18202a; --panel-hi:#232d3a; --rule:#2c3644;
+  --text:#e8eef6; --dim:#9fb0c3; --led:#38bdf8; --led-deep:#0c6aa0; --ok:#3fb950; --warn:#e3b341;
+  --orbit:#38bdf8; --starport:#a08cf0; --launch:#3fc1ae; --vault:#e3b341;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:radial-gradient(ellipse 90% 60% at 80% 0%,#1c2633 0%,var(--chassis) 70%);background-color:var(--chassis);color:var(--text);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 64px;display:grid;gap:40px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:.02em;text-wrap:balance}
+h1{font-size:clamp(2.2rem,5.5vw,3.4rem);line-height:1.05}
+h2{font-size:1.4rem}
+h3{font-size:1.1rem}
+p{margin:0}
+.eyebrow{font:500 .78rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--led);display:flex;gap:10px;align-items:center}
+.led{width:9px;height:9px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px var(--warn)}
+.hero{display:grid;gap:14px;max-width:760px}
+.lede{color:var(--dim);font-size:1.08rem}
+.bays{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bay{background:linear-gradient(180deg,var(--panel-hi),var(--panel) 30%,#121821);border:1px solid #06080b;border-top-color:#4a586a;border-radius:14px;box-shadow:0 14px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.file{display:flex;gap:12px;align-items:center}
+.ficon{width:44px;height:52px;flex:none;border-radius:6px;background:linear-gradient(180deg,#3a4656,#222a35);border:1px solid #06080b;display:grid;place-items:center;font:600 .68rem var(--mono);color:var(--led)}
+.fname{font-weight:600;line-height:1.25}
+.fmeta{color:var(--dim);font-size:.85rem}
+.bay p{color:var(--dim);font-size:.9rem}
+.btn{appearance:none;cursor:pointer;width:100%;font:600 1rem var(--body);color:#fff;padding:11px 14px;border-radius:10px;background:linear-gradient(180deg,#5ccbf7,#1d93cf 50%,#12709f);border:1px solid #063149;border-top-color:#9be3ff;box-shadow:0 6px 16px rgba(14,165,233,.3),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid #e0f6ff;outline-offset:3px}
+.btn[disabled]{cursor:default;filter:grayscale(.6) brightness(.7)}
+.status{font-size:.85rem;color:var(--dim);min-height:1.3em}
+.status.ok{color:var(--ok)}.status.warn{color:var(--warn)}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px;display:grid;gap:14px}
+.news{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.news .panel h3{color:var(--led)}
+.news ul{margin:0;padding-left:1.1em;color:var(--dim);display:grid;gap:4px}
+.modules{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .82rem var(--body);padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:#111820}
+.chip b{font-weight:700}
+.figs{display:grid;gap:22px}
+figure{margin:0;display:grid;gap:8px}
+figure img{width:100%;height:auto;border-radius:12px;background:#fff;border:1px solid #06080b;box-shadow:0 18px 40px rgba(0,0,0,.5);display:block}
+figcaption{color:var(--dim);font-size:.9rem}
+code{font-family:var(--mono);font-size:.86em;color:#7ee787}
+.note{color:var(--dim);font-size:.88rem;border-top:1px solid var(--rule);padding-top:12px}
+@media (max-width:900px){.bays{grid-template-columns:repeat(2,minmax(0,1fr))}.news{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.bays{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow"><span class="led" aria-hidden="true"></span>Concept · not built yet · November 12, 2026</div>
+    <h1>CydVerse Documents</h1>
+    <p class="lede">The concept deck, the concept write-up and the full administrator manual for CydVerse, plus CydLink, the Windows tool for junction links. This version adds many FTP servers in one install, sync mode so servers cover for each other, Control Panel, multiple sites, auto-configure, the Cydni Assistant powered by Claude, and linked folders.</p>
+    <div class="modules" aria-label="CydVerse modules">
+      <span class="chip" style="color:var(--orbit)"><b>Orbit</b> internal file share</span>
+      <span class="chip" style="color:var(--starport)"><b>Starport</b> external drop and client portal</span>
+      <span class="chip" style="color:var(--launch)"><b>Launchpad</b> FTP and SFTP</span>
+      <span class="chip" style="color:var(--vault)"><b>Vault</b> secure storage and archive</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="dl-h" style="display:grid;gap:16px">
+    <h2 id="dl-h">Downloads</h2>
+    <div class="bays">
+      <div class="bay">
+        <div class="file"><div class="ficon" aria-hidden="true">PPTX</div><div><div class="fname">Concept deck</div><div class="fmeta">21 slides · 3.1 MB</div></div></div>
+        <p>What CydVerse is, many FTP servers, sync mode, sites, Control Panel, security, the assistant, junctions and phases.</p>
+        <button class="btn" type="button" data-file="CydVerse-Concept.pptx" id="dl-deck">Download .pptx</button>
+        <div class="status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="bay">
+        <div class="file"><div class="ficon" aria-hidden="true">DOCX</div><div><div class="fname">Concept document</div><div class="fmeta">21 pages · 2.9 MB</div></div></div>
+        <p>The same concept in full prose, with all nine diagrams.</p>
+        <button class="btn" type="button" data-file="CydVerse-Concept.docx" id="dl-concept">Download .docx</button>
+        <div class="status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="bay">
+        <div class="file"><div class="ficon" aria-hidden="true">DOCX</div><div><div class="fname">Administrator Manual</div><div class="fmeta">62 pages · 2.8 MB</div></div></div>
+        <p>Installation with a checkbox per component, every Control Panel screen, agents and keys, Launchpad servers, sync mode, troubleshooting file locations.</p>
+        <button class="btn" type="button" data-file="CydVerse-Administrator-Manual.docx" id="dl-manual">Download .docx</button>
+        <div class="status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="bay">
+        <div class="file"><div class="ficon" aria-hidden="true">ZIP</div><div><div class="fname">CydLink 1.0</div><div class="fmeta">Windows app · 10 KB</div></div></div>
+        <p>Right-click and drag-and-drop junction links for any PC or server. Unzip, double-click <code>Install.cmd</code>.</p>
+        <button class="btn" type="button" data-file="CydLink-1.0.zip" id="dl-cydlink">Download .zip</button>
+        <div class="status" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+    <p class="note">The manual's Windows Server 2025 commands are real. CydVerse's installer, commands and screens are the planned design. CydLink is written but not yet run on Windows; try it on a test machine first.</p>
+  </section>
+
+  <section class="news" aria-label="What's new in this version">
+    <div class="panel">
+      <h3>Migrate users, profiles and data</h3>
+      <ul>
+        <li>Move users, groups, folders or a whole Launchpad server to any server, sync group or site</li>
+        <li>Bring in FileZilla Server, IIS FTP and CSV users with their data and keys</li>
+        <li>Dry run, verified copy, switch-over in seconds, 14-day roll back</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>One console, an agent on every server</h3>
+      <ul>
+        <li>The CydVerse Control Panel is the only admin console; file servers have no admin port</li>
+        <li>Each server's agent has its own RSA 2048 key, made and kept in the TPM, and a certificate from the Control Panel</li>
+        <li>Agents connect out over mutual TLS and check every command's signature; revoke in one click</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Many FTP servers in one install</h3>
+      <ul>
+        <li>Launchpad servers: each with its own address, ports, host key, logins and root folders</li>
+        <li>One person can have logins on several servers; My servers shows each server, login and root folder</li>
+        <li>A login on one server can never reach another server's folders</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Sync mode: servers that cover for each other</h3>
+      <ul>
+        <li>Install on two or more servers; each keeps a full copy of settings and files</li>
+        <li>Uploads confirmed only after a second server has them; nothing lost in an outage</li>
+        <li>Switch-over in seconds; a returning server catches up by itself (Phase 3)</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Control Panel</h3>
+      <ul>
+        <li>A separate app: one panel for CydVerse, FTP servers, Windows shares, SharePoint, OneDrive, Google Drive and Azure</li>
+        <li>Opens with the CydVerse Black Hole animation, then Cydni shrinks into the corner</li>
+        <li>One inventory, search and audit; offboard a person everywhere</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Security at a glance</h3>
+      <ul>
+        <li>MFA, modern encryption, private-only Admin Console, Defender scanning</li>
+        <li>Mutual TLS between servers, one-time join tokens, TPM-protected keys</li>
+        <li>Proven by code scanning, Windows checks and an outside penetration test before partners go live</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Many servers, many sites</h3>
+      <ul>
+        <li>Several nodes per site behind a load balancer; a node can fail or update without downtime</li>
+        <li>Several sites under one global name; users reach the nearest healthy one</li>
+        <li>Folders have a home site, with optional copies elsewhere and data residency pins</li>
+        <li>One Admin Console with an All sites view (Phase 5)</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Auto-configure and the Cydni Assistant</h3>
+      <ul>
+        <li>Built-in checks with Fix buttons, working offline (Phase 1)</li>
+        <li>Ask in plain words, powered by Claude Opus 5.5: search problems, explain, prepare changes</li>
+        <li>Nothing changes without Approve; never sends file contents</li>
+        <li>Guides and troubleshooting tips when it can't fix something</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Linked folders and junctions</h3>
+      <ul>
+        <li>Installer option on the server; create links from the console</li>
+        <li>Links are followed only into approved locations</li>
+        <li>Scans existing junctions carried over from old FTP servers</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>CydLink for Windows</h3>
+      <ul>
+        <li>Right-click: Pick as link source, then Drop as junction here</li>
+        <li>Drag-and-drop window from the Start menu</li>
+        <li>Remove link never touches the files it points to</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="fig-h" class="figs">
+    <h2 id="fig-h">Diagrams</h2>
+    <figure><img src="arch.png" alt="How CydVerse fits together: people, four doors, the security gate, the four modules, shared services, storage, Windows features and outside services including Claude" loading="lazy"><figcaption>How CydVerse fits together.</figcaption></figure>
+    <figure><img src="servers.png" alt="Three Launchpad FTP servers in one install, each with its own address, logins and root folders, and a My servers view for one person with two logins" loading="lazy"><figcaption>One install, many FTP servers, each with its own logins and root folders.</figcaption></figure>
+    <figure><img src="ha.png" alt="Two servers in sync mode with full copies, a witness, and the four failover steps" loading="lazy"><figcaption>Two or more servers that stay in sync and cover for each other.</figcaption></figure>
+    <figure><img src="migrate.png" alt="Migration from other CydVerse servers, FileZilla Server, IIS FTP and others to any server, site or package in five steps" loading="lazy"><figcaption>Migrate users, profiles and data to any server.</figcaption></figure>
+    <figure><img src="mission.png" alt="Control Panel connected to CydVerse, FTP servers, Windows shares, SharePoint and OneDrive, Google Drive and Azure Storage" loading="lazy"><figcaption>CydVerse Control Panel: one panel for every file-sharing system.</figcaption></figure>
+    <figure><img src="sites.png" alt="Three sites: head office primary with two nodes, branch office with one node, Azure region with two nodes, linked by encrypted site links" loading="lazy"><figcaption>Many servers, many sites, one CydVerse.</figcaption></figure>
+    <figure><img src="net.png" alt="Internet users through the firewall to Windows Server 2025; admins reach the console only from the private network" loading="lazy"><figcaption>Where it runs and what talks to it.</figcaption></figure>
+    <figure><img src="journey.png" alt="A file's eight-step journey from a Starport drop to destruction, with infected files quarantined" loading="lazy"><figcaption>A file's journey through all four modules.</figcaption></figure>
+    <figure><img src="control.png" alt="Admin Console, command line, REST API and Windows tools all go through one policy engine" loading="lazy"><figcaption>How CydVerse is controlled.</figcaption></figure>
+  </section>
+</main>
+
+<script>
+(function () {
+  var downloadsP = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  document.querySelectorAll('.btn[data-file]').forEach(function (btn) {
+    var status = btn.nextElementSibling;
+    function say(msg, cls) { status.textContent = msg; status.className = 'status' + (cls ? ' ' + cls : ''); }
+    btn.addEventListener('click', async function () {
+      var name = btn.getAttribute('data-file');
+      btn.disabled = true; say('Preparing the file…');
+      try {
+        var downloads = await downloadsP;
+        if (!downloads) { say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn'); btn.disabled = false; return; }
+        var res = await fetch(name + '.b64.txt');
+        if (!res.ok) throw { code: 'fetch' };
+        var bin = atob((await res.text()).trim());
+        var bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        var blob = new Blob([bytes]);
+        say('Confirm the download in the prompt.');
+        await downloads.save({ filename: name, data: blob });
+        say('Saved ' + name + '.', 'ok');
+      } catch (e) {
+        var c = e && e.code;
+        if (c === 'declined') say('Download cancelled.');
+        else if (c === 'rate_limited') say('Another download prompt is open. Finish that one first.', 'warn');
+        else if (c === 'fetch') say('The file couldn’t be loaded. Reload the page and try again.', 'warn');
+        else say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn');
+      }
+      btn.disabled = false;
+    });
+  });
+})();
+</script>
+
+</body></html>

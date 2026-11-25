@@ -1,0 +1,38 @@
+{
+ "title": "CydArt Download",
+ "url": "https://claude.ai/artifact/CokuoeLxAZE8WdZy4Exo33",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "cydart-source.b64.0.txt",
+   "bytes": 13000000,
+   "sha256": "06438effb49c1eb7cb7af74aa15f8c64be06a1b9f2b6356f6b237fc5b5028acd"
+  },
+  {
+   "path": "cydart-source.b64.1.txt",
+   "bytes": 10772028,
+   "sha256": "697147b5f7425c21f7b1d8ef25e5ddcbbcbec9d216649f2c6bac67c8979e5366"
+  },
+  {
+   "path": "editor.jpg",
+   "bytes": 117991,
+   "sha256": "4579bf6b485eabebb17879282bc9bbf9f99965f7c24acc5bcb94fe3c5fbe70fa"
+  },
+  {
+   "path": "home.jpg",
+   "bytes": 115677,
+   "sha256": "7db590ffa1ec29aeea9ba372208b279a4d9a4a24b9aa0f1230bcb55bfff8b6f8"
+  },
+  {
+   "path": "index.html",
+   "bytes": 13149,
+   "sha256": "a0a0fbffd231167c2659abfc286dae13b94f0dee90b32f9d29cea598ec966868"
+  },
+  {
+   "path": "lite.jpg",
+   "bytes": 29013,
+   "sha256": "80e94ce2f7a250a460a12c049486bddbb7e8f1430998abf983ed4e7f2b6ed5a0"
+  }
+ ]
+}

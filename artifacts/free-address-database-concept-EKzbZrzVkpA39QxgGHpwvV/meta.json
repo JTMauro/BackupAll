@@ -1,0 +1,18 @@
+{
+ "title": "Free Address Database Concept",
+ "url": "https://claude.ai/artifact/EKzbZrzVkpA39QxgGHpwvV",
+ "type": "Docs",
+ "updated": "2026-11-06",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "1ce907d22ea83ea3543fc320458beb7f87a326f8e7b79fd10c2bd192ac117a1f"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 7781,
+   "sha256": "8959b32a9e3e95322ed002b20502b78d896b0f08fee415d2a981f688c76c5360"
+  }
+ ]
+}

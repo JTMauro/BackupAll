@@ -1,0 +1,616 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Hunter Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky product bar, animated Hunter hero, screen picker rail on the left, one large browser-framed screenshot with its notes. Stacks on phones.
+   Hunter's cyber look is deliberately single-theme dark: dark grid, neon cyan + violet, lifted buttons. */
+:root {
+  --bg: #070b14; --surface: #0e1524; --surface-2: #121c2f; --ink: #e6f1ff; --muted: #8a9bb8; --line: #1f2c44;
+  --accent: #2ee6ff; --accent-ink: #04121a; --accent-edge: #0e86a3; --accent-soft: rgba(46,230,255,.10);
+  --violet: #9b6bff; --violet-edge: #4b2aa8;
+  --good: #3ee08f; --good-soft: rgba(62,224,143,.12); --warn: #ffb547; --warn-soft: rgba(255,181,71,.12);
+  --frame: #0a101c;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --display: "Archivo Black", "Arial Black", Impact, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background-color: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans);
+  background-image: radial-gradient(1100px 480px at 75% -8%, rgba(155,107,255,.16), transparent 60%), radial-gradient(800px 380px at 0% 0%, rgba(46,230,255,.10), transparent 60%),
+    linear-gradient(rgba(46,230,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(46,230,255,.05) 1px, transparent 1px);
+  background-size: auto, auto, 34px 34px, 34px 34px; }
+.brand-slot { flex: none; width: 176px; height: 86px; }
+@media (max-width: 560px) { .brand-slot { width: 128px; height: 64px; } }
+.hunter-fly { cursor: pointer; border-radius: 10px; }
+html.hunter-intro main, html.hunter-intro .bar p, html.hunter-intro .tag { opacity: 0; }
+main, .bar p, .tag { transition: opacity .8s ease .35s; }
+h1, .brand3d { font-family: var(--display); letter-spacing: .02em; text-shadow: 1px 1px 0 #0d5f7a, 2px 2px 0 #0b4f66, 3px 3px 0 #083e52, 4px 5px 8px rgba(0,0,0,.6), 0 0 14px rgba(46,230,255,.35); }
+.brand3d { color: var(--accent); font-size: 20px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; min-height: 86px; display: flex; align-items: center; background: rgba(7,11,20,.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0; }
+.bar-in { width: 100%; max-width: 1240px; margin: 0 auto; display: flex; gap: 12px 20px; align-items: center; flex-wrap: wrap; }
+.mark { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: .01em; }
+.mark svg { flex: none; }
+.tag { font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--warn); background: var(--warn-soft); border: 1px solid rgba(255,181,71,.35); padding: 5px 8px; border-radius: 99px; }
+.bar p { margin: 0; color: var(--muted); font-size: 13px; flex: 1 1 280px; min-width: 0; }
+
+main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 48px; }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .wrap { grid-template-columns: minmax(0, 1fr); } }
+
+nav.screens { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 104px); display: flex; flex-direction: column; gap: 14px; }
+@media (max-width: 860px) { nav.screens { position: static; } }
+.group h2 { margin: 0 0 8px; font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.group ul { list-style: none; margin: 0; padding: 0 0 4px; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 860px) { .group ul { flex-direction: row; flex-wrap: wrap; gap: 6px; } }
+.group button { width: 100%; text-align: left; font: 600 14px/1.2 var(--sans); color: var(--ink); background: linear-gradient(180deg, #1b2740, #131d31); border: 1px solid #2a3a5a; border-radius: 9px; padding: 9px 12px; cursor: pointer;
+  box-shadow: 0 4px 0 #05080f, 0 7px 14px -4px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08); transition: transform .08s, box-shadow .08s, filter .15s; margin-bottom: 4px; }
+.group button:active { transform: translateY(3px); box-shadow: 0 1px 0 #05080f; }
+@media (max-width: 860px) { .group button { width: auto; } }
+.group button:hover { filter: brightness(1.15); }
+.group button[aria-current="true"] { background: linear-gradient(180deg, #b996ff, #9b6bff 55%, #7c4dff); color: #fff; border-color: #c7adff;
+  box-shadow: 0 4px 0 var(--violet-edge), 0 8px 18px -4px rgba(155,107,255,.55), inset 0 1px 0 rgba(255,255,255,.45); }
+
+.viewer { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; }
+.head h1 { margin: 0; font-size: 24px; line-height: 1.25; text-wrap: balance; }
+.step { font: 500 12px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.pager { display: flex; gap: 8px; }
+.pager button { font: 600 13px/1.2 var(--sans); color: var(--accent-ink); background: linear-gradient(180deg, #7ff3ff, #2ee6ff 55%, #1cc3e0); border: 1px solid #8ff6ff; border-radius: 9px; padding: 8px 14px; cursor: pointer;
+  box-shadow: 0 4px 0 var(--accent-edge), 0 8px 18px -4px rgba(46,230,255,.45), inset 0 1px 0 rgba(255,255,255,.6); transition: transform .08s, box-shadow .08s; }
+.pager button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-edge); }
+.pager button:disabled { opacity: .35; cursor: default; transform: none; }
+
+.tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.tip { position: relative; outline: none; }
+.tip-btn { display: inline-flex; align-items: center; gap: 7px; font: 600 12.5px/1 var(--sans); color: var(--ink); cursor: help;
+  background: linear-gradient(180deg, #1b2740, #131d31); border: 1px solid #2a3a5a; border-radius: 99px; padding: 7px 12px 7px 7px;
+  box-shadow: 0 3px 0 #05080f, 0 6px 12px -4px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.08); }
+.tip-btn b { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font: 700 11px/1 var(--mono); color: var(--accent-ink); background: var(--accent); box-shadow: 0 0 8px rgba(46,230,255,.6); }
+.tip:hover .tip-btn, .tip:focus-within .tip-btn { border-color: var(--accent); filter: brightness(1.15); }
+.tip-pop { position: absolute; right: 0; top: 100%; z-index: 30; width: min(400px, calc(100vw - 32px)); padding: 14px 16px; margin-top: 10px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid rgba(46,230,255,.35); border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(46,230,255,.08), 0 24px 48px -16px rgba(0,0,0,.9), 0 0 24px -8px rgba(46,230,255,.35);
+  opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s; font-size: 14px; }
+.tip-pop::before { content: ""; position: absolute; left: 0; right: 0; top: -12px; height: 12px; }   /* hover bridge so the pointer can move into the popover */
+.tip:hover .tip-pop, .tip:focus-within .tip-pop { opacity: 1; visibility: visible; transform: none; transition: opacity .15s ease, transform .15s ease; }
+.tip-pop h3 { margin: 0 0 8px; font: 600 11.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.tip-pop p { margin: 0 0 8px; }
+.tip-pop p:last-child { margin-bottom: 0; }
+.tip-pop ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 860px) { .tip-pop { right: auto; left: 0; } .tools { justify-content: flex-start; } }
+.frame { background: var(--frame); border: 1px solid rgba(46,230,255,.28); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px -30px rgba(46,230,255,.4); }
+.chrome { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.dots { display: flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+.url { flex: 1; min-width: 0; font: 12px/1 var(--mono); color: var(--muted); background: var(--surface); border-radius: 5px; padding: 6px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shot { max-height: max(320px, calc(100vh - 230px)); overflow: auto; background: var(--surface); }
+.shot img { display: block; width: 100%; height: auto; }
+
+.notes { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 700px) { .notes { grid-template-columns: minmax(0, 1fr); } }
+.notes section { background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; min-width: 0; box-shadow: 0 10px 30px -18px rgba(0,0,0,.8); }
+.notes h3 { margin: 0 0 8px; font: 600 11.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); }
+.notes p { margin: 0 0 10px; max-width: 65ch; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.try { font-family: var(--mono); font-size: 13px; background: var(--accent-soft); color: var(--accent); padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+.live { font-size: 13px; }
+.live li::marker { color: var(--good); }
+.live.later li::marker { color: var(--warn); }
+.open-report { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-weight: 600; text-decoration: none; color: var(--accent-ink); padding: 9px 14px; border-radius: 9px;
+  background: linear-gradient(180deg, #7ff3ff, #2ee6ff 55%, #1cc3e0); border: 1px solid #8ff6ff; box-shadow: 0 4px 0 var(--accent-edge), 0 8px 18px -4px rgba(46,230,255,.45), inset 0 1px 0 rgba(255,255,255,.6); }
+.open-report:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-edge); }
+
+footer { max-width: 1240px; margin: 32px auto 0; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+footer p { margin: 0 0 6px; max-width: 80ch; }
+@media (prefers-reduced-motion: no-preference) { .shot img { transition: opacity .15s; } }
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <span class="brand-slot" aria-hidden="true"></span>
+    <span class="tag">Preview build</span>
+    <p>Internal web app: an SEO auditor for our sites, and an exposure checker that helps employees find, fix and remove their own leaked personal data.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <nav class="screens" aria-label="Screens" id="nav"></nav>
+    <div class="viewer">
+      <div class="head">
+        <div>
+          <div class="step" id="step"></div>
+          <h1 id="title"></h1>
+        </div>
+        <div class="tools">
+          <div class="tip" tabindex="0"><span class="tip-btn"><b aria-hidden="true">i</b>What it does</span>
+            <div class="tip-pop" role="tooltip"><h3>What it does</h3><div id="what"></div></div></div>
+          <div class="tip" tabindex="0"><span class="tip-btn"><b aria-hidden="true">i</b>In this preview</span>
+            <div class="tip-pop" role="tooltip"><h3>In this preview</h3><div id="demo"></div></div></div>
+          <div class="tip" tabindex="0"><span class="tip-btn"><b aria-hidden="true">?</b>About</span>
+            <div class="tip-pop" role="tooltip"><h3>About these screenshots</h3>
+              <p>Screenshots come from the running build with sample data: a demo website with 33 planted SEO problems, and a sample "Jane Doe" breach record. No real person's data appears.</p>
+              <p>Not shown because the preview sandbox had no internet: live domain owner and server lookups, email-security checks, and the Tor and code-repository scan. Those run on a real server.</p></div></div>
+          <div class="pager"><button id="prev" type="button">← Previous</button><button id="next" type="button">Next →</button></div>
+        </div>
+      </div>
+      <div class="frame">
+        <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="url"></span></div>
+        <div class="shot"><img id="img" alt=""></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const SCREENS = [
+  { id: 'home', group: 'Start', name: 'Home', img: 'shots/01-home.png', url: 'hunter / ',
+    what: '<p>The page opens with CYDNI scanning the big HUNTER logo. She winks, then the logo shrinks into the top-left of the header and stays there. Below it, the top panel holds the info to look into: name, email, phone, username, location, a website and a password to test.</p><ul><li>Home fits on one screen: nothing scrolls except the results frame.</li><li>The raised buttons underneath each run a different search, or press <b>⚡ Check all</b> to run every exposure check at once: breaches, phone, password, dark &amp; deep web, web searches, people-search sites, usernames, SEO audit, site owner lookup and email protection.</li><li>Results stack in the frame below, newest on top, each with a link to the full tool.</li></ul>',
+    demo: '<p>Shown: <b>⚡ Check all</b> run on the sample Jane Doe details. It ran seven checks and put a summary on top: email, phone, password and dark web found matches; web searches, people-search sites and username links are ready.</p><ul class="live"><li>Personal details stay in the browser.</li></ul>' },
+  { id: 'seo', group: 'SEO Audit', name: 'Run an audit', img: 'shots/02-seo-audit.png', url: 'hunter / seo',
+    what: '<p>Enter a website and Hunter crawls it the way Google does: on a phone-sized screen, running JavaScript. It checks 70+ ranking factors.</p><ul><li>Audits can repeat daily, weekly or monthly.</li><li>The reports list shows the score and how it changed since last time.</li></ul>',
+    demo: '<ul class="live"><li>One finished audit of the demo site (score 62).</li><li>Real websites can be audited once Hunter runs on a server with internet.</li></ul>' },
+  { id: 'report', group: 'SEO Audit', name: 'Audit report', img: 'shots/03-seo-report.png', url: 'hunter / seo / report',
+    what: '<p>An overall score, scores per area, and a "Fix these first" list. Every issue says why it matters and exactly how to fix it, with the affected pages listed.</p>',
+    demo: '<p>This report is interactive. Filter issues, click a category, sort the page table:</p><a class="open-report" href="sample-seo-report.html" target="_blank" rel="noopener">Open the sample report ↗</a>' },
+  { id: 'info', group: 'Exposure Check', name: '1 · My info', img: 'shots/04-my-info.png', url: 'hunter / exposure · my info',
+    what: '<p>The employee enters their name, emails, phones, address and usernames once. Every other tab fills itself in from this.</p>',
+    demo: '<ul class="live"><li>Saved only in the employee\'s own browser, never on the server.</li><li>"Clear all my data" wipes it.</li></ul>' },
+  { id: 'breaches', group: 'Exposure Check', name: '2 · Breaches', img: 'shots/05-breaches.png', url: 'hunter / exposure · breaches',
+    what: '<p>Checks the employee\'s email, phone and passwords against Hunter\'s own breach database. No outside breach service is used.</p><ul><li>1,643,556 known-leaked passwords, including the UK NCSC top 100k.</li><li>The password never leaves the browser.</li><li>Warns about guessable passwords, such as ones containing your name or a year.</li></ul>',
+    demo: '<p>Shown: <span class="try">jane.doe@example.com</span> matching the sample breach, and <span class="try">Liverpool1</span> flagged as leaked.</p><ul class="live later"><li>Real coverage grows as you load your own incidents and vendor breach notices.</li></ul>' },
+  { id: 'find', group: 'Exposure Check', name: '3 · Find my info', img: 'shots/06-find-dark-web.png', url: 'hunter / exposure · find',
+    what: '<p>Dark and deep web scan of Tor sites and public code repositories, plus ready-made Google, Bing and DuckDuckGo searches and a tracker for 25+ people-search sites with opt-out links.</p>',
+    demo: '<ul class="live later"><li>The Tor and code searches show "unavailable" here because the preview had no internet.</li><li>The breach-database results are real.</li></ul>' },
+  { id: 'footprint', group: 'Exposure Check', name: '4 · Photo & name', img: 'shots/10-photo-name.png', url: 'hunter / exposure · photo & name',
+    what: '<p>Start from just a <b>name</b> or a <b>photo</b>. Add any small details you know (other names, city, previous cities, age, employer, school, relatives, email, phone, usernames, street) and Hunter uses them to tell you apart from people with the same name.</p><ul><li><b>Visibility score</b> 0-100, "what a stranger can learn about you" and "fix these first".</li><li><b>Photo check</b>: GPS location, camera, owner and date hidden in the file, a one-click clean copy, reverse image search, face-search opt-outs and removal forms.</li><li><b>Automatic web search</b>: results sorted by site type, personal details flagged on each one, and a match rating. Mark each one <b>That\'s me</b> or <b>Not me</b>.</li><li><b>Social media presence</b> on 21 sites with "lock it down" privacy links, 30+ deep-dive searches on five engines, public-record databases search engines don\'t index, and a dark web scan.</li></ul>',
+    demo: '<p>Shown: <span class="try">Jane Doe</span> narrowed with Austin, TX, Acme Corp, born 1983 and relative John Doe, plus a phone photo. The photo gave away its GPS location (downtown Austin), the phone model and the owner\'s name. The people-search hit matched her phone and address.</p><ul class="live later"><li>Web results here are sample results: the preview had no internet. On a real server Hunter searches live.</li><li>Photos are checked in the browser and never uploaded by Hunter.</li></ul>' },
+  { id: 'fix', group: 'Exposure Check', name: '5 · Fix', img: 'shots/07-fix-plan.png', url: 'hunter / exposure · fix',
+    what: '<p>A personal checklist built from what was found. Here it includes Social Security steps (credit freezes, IRS IP PIN) because the sample breach exposed SSNs.</p>',
+    demo: '<ul class="live"><li>Progress is saved as steps are ticked.</li><li>Direct links to each credit bureau, carrier and government site.</li></ul>' },
+  { id: 'remove', group: 'Exposure Check', name: '6 · Remove', img: 'shots/08-remove-letters.png', url: 'hunter / exposure · remove',
+    what: '<p>Finds who runs a site showing your data (owner, host, server location, abuse contacts) and writes the removal request: CCPA, GDPR, takedown, abuse report and more.</p>',
+    demo: '<ul class="live"><li>Shown: a CCPA deletion letter to Spokeo, filled in automatically.</li><li>Site-owner lookups need internet, so they run on a real server.</li></ul>' },
+  { id: 'company', group: 'Admin', name: 'Company tab', img: 'shots/09-company-admin.png', url: 'hunter / exposure · company',
+    what: '<p>For admins: manage the breach database, import affected-people lists, refresh the password lists, and monitor every employee email with alerts to Teams or Slack.</p><ul><li>Also checks whether criminals can spoof company email, and finds lookalike phishing domains.</li></ul>',
+    demo: '<ul class="live"><li>Imported lists are stored only as scrambled codes; raw files are never saved.</li><li>"↻ Refresh lists now" updates the password lists.</li></ul>' },
+];
+
+const nav = document.getElementById('nav');
+const groups = [...new Set(SCREENS.map(s => s.group))];
+nav.innerHTML = groups.map(g => `<div class="group"><h2>${g}</h2><ul>${SCREENS.filter(s => s.group === g).map(s => `<li><button type="button" id="nav-${s.id}" data-id="${s.id}">${s.name}</button></li>`).join('')}</ul></div>`).join('');
+
+let current = 0;
+function show(i, updateHash = true) {
+  current = Math.max(0, Math.min(SCREENS.length - 1, i));
+  const s = SCREENS[current];
+  document.getElementById('step').textContent = `Screen ${current + 1} of ${SCREENS.length} · ${s.group}`;
+  document.getElementById('title').textContent = s.name.replace(/^\d · /, '');
+  document.getElementById('url').textContent = s.url;
+  const img = document.getElementById('img');
+  img.src = s.img; img.alt = `Screenshot of the ${s.name} screen`;
+  document.querySelector('.shot').scrollTop = 0;
+  document.getElementById('what').innerHTML = s.what;
+  document.getElementById('demo').innerHTML = s.demo;
+  document.querySelectorAll('[data-id]').forEach(b => b.setAttribute('aria-current', b.dataset.id === s.id ? 'true' : 'false'));
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === SCREENS.length - 1;
+  if (updateHash && location.hash.slice(1) !== s.id) history.replaceState(null, '', '#' + s.id);
+}
+nav.addEventListener('click', e => { const b = e.target.closest('[data-id]'); if (b) show(SCREENS.findIndex(s => s.id === b.dataset.id)); });
+document.getElementById('prev').onclick = () => show(current - 1);
+document.getElementById('next').onclick = () => show(current + 1);
+document.addEventListener('keydown', e => { if (e.target.closest('input,textarea')) return; if (e.key === 'ArrowRight') show(current + 1); if (e.key === 'ArrowLeft') show(current - 1); });
+function fromHash() { const i = SCREENS.findIndex(s => s.id === location.hash.slice(1)); show(i >= 0 ? i : 0, false); }
+window.addEventListener('hashchange', fromHash);
+fromHash();
+</script>
+<script>
+'use strict';
+// Hunter hero: extruded 3D "HUNTER" with a drop shadow, and the real 3D CYDNI robot (the same model as the
+// CYDNI 3D artifact) floating behind the word and leaning over it with a magnifying glass that truly
+// magnifies the letters underneath.
+//
+// Layers, back to front: CYDNI's body (WebGL) · the word (SVG) · the magnified view (SVG) · her arm + glass (WebGL).
+// The WebGL scene uses an orthographic camera in the SVG's own units, so 3D and SVG line up exactly.
+// Needs an import map for "three" and "three/addons/" on the page. Usage: HunterHero.mount(containerElement).
+(function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  const W = 980, H = 480, BASE = 405, SIZE = 168, DEPTH = 16;
+  const el = (tag, attrs = {}, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+
+  function buildWord(container) {
+    const uid = 'hh' + Math.random().toString(36).slice(2, 7);
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:relative;width:100%;aspect-ratio:${W}/${H};`;
+    container.appendChild(wrap);
+    const back = document.createElement('canvas');
+    const front = document.createElement('canvas');
+    for (const c of [back, front]) c.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Hunter, with CYDNI the robot inspecting the word through a magnifying glass' });
+    svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;overflow:visible;';
+    wrap.append(back, svg, front);
+
+    svg.innerHTML = `
+    <defs>
+      <linearGradient id="${uid}face" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#d9fdff"/><stop offset=".35" stop-color="#3ef0ff"/><stop offset="1" stop-color="#1a8fd6"/>
+      </linearGradient>
+      <linearGradient id="${uid}side" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#0d5f7a"/><stop offset="1" stop-color="#062638"/>
+      </linearGradient>
+      <filter id="${uid}drop" x="-10%" y="-10%" width="130%" height="140%">
+        <feDropShadow dx="10" dy="16" stdDeviation="10" flood-color="#000000" flood-opacity=".6"/>
+        <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#2ee6ff" flood-opacity=".35"/>
+      </filter>
+      <filter id="${uid}soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+      <clipPath id="${uid}lensClip"><circle id="${uid}lensClipC" cx="-999" cy="-999" r="40"/></clipPath>
+    </defs>
+    <ellipse cx="${W / 2 - 30}" cy="${BASE + 36}" rx="400" ry="24" fill="#000" opacity=".55" filter="url(#${uid}soft)"/>
+    <ellipse cx="${W / 2 - 30}" cy="${BASE + 30}" rx="330" ry="10" fill="#2ee6ff" opacity=".22" filter="url(#${uid}soft)"/>
+    <g id="${uid}word" filter="url(#${uid}drop)"></g>
+    <g clip-path="url(#${uid}lensClip)"><circle id="${uid}lensBg" cx="-999" cy="-999" r="60" fill="#070b14"/><use href="#${uid}word" id="${uid}mag"/></g>`;
+
+    const word = svg.querySelector(`#${uid}word`);
+    const letters = 'HUNTER'.split('');
+    const font = `"Archivo Black", "Arial Black", Impact, system-ui, sans-serif`;
+    const measure = el('text', { 'font-family': font, 'font-size': SIZE, x: 0, y: -999 }, svg);
+    const widths = letters.map(ch => { measure.textContent = ch; return measure.getComputedTextLength(); });
+    measure.remove();
+    const gap = SIZE * 0.035;
+    const total = widths.reduce((a, b) => a + b, 0) + gap * (letters.length - 1);
+    let x = (W - total) / 2 - DEPTH / 2;
+    const boxes = [];
+    letters.forEach((ch, i) => {
+      const g = el('g', {}, word);
+      for (let d = DEPTH; d >= 1; d--) {
+        el('text', { x: x + d * 0.9, y: BASE + d * 0.9, 'font-family': font, 'font-size': SIZE, fill: d === DEPTH ? '#03131d' : `url(#${uid}side)` }, g).textContent = ch;
+      }
+      el('text', { x, y: BASE, 'font-family': font, 'font-size': SIZE, fill: `url(#${uid}face)`, stroke: '#b8fbff', 'stroke-width': 1.4, 'paint-order': 'stroke' }, g).textContent = ch;
+      el('text', { x, y: BASE, 'font-family': font, 'font-size': SIZE, fill: '#ffffff', opacity: .18, 'clip-path': 'inset(0 0 62% 0)' }, g).textContent = ch;
+      boxes.push({ x, w: widths[i], cx: x + widths[i] / 2 });
+      x += widths[i] + gap;
+    });
+
+    // Moves the magnified view to (lx, ly) in SVG units.
+    const setLens = (lx, ly, r, k = 1.6) => {
+      const c = svg.querySelector(`#${uid}lensClipC`);
+      c.setAttribute('cx', lx); c.setAttribute('cy', ly); c.setAttribute('r', r);
+      const bg = svg.querySelector(`#${uid}lensBg`); bg.setAttribute('cx', lx); bg.setAttribute('cy', ly); bg.setAttribute('r', r + 2);
+      svg.querySelector(`#${uid}mag`).setAttribute('transform', `translate(${lx} ${ly}) scale(${k}) translate(${-lx} ${-ly})`);
+    };
+    return { wrap, back, front, svg, boxes, setLens };
+  }
+
+  // ---------------- CYDNI in 3D ----------------
+  async function addCydni(hero) {
+    const THREE = await import('three');
+    const { RoundedBoxGeometry } = await import('three/addons/geometries/RoundedBoxGeometry.js');
+    const { RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js');
+    const { SVGLoader } = await import('three/addons/loaders/SVGLoader.js');
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mk = (canvas) => {
+      const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      r.setClearColor(0x000000, 0);
+      r.setPixelRatio(Math.min(devicePixelRatio, 2));
+      r.outputColorSpace = THREE.SRGBColorSpace;
+      r.toneMapping = THREE.ACESFilmicToneMapping;
+      r.toneMappingExposure = 1.05;
+      return r;
+    };
+    const rBack = mk(hero.back), rFront = mk(hero.front);
+    const scene = new THREE.Scene();
+    // each WebGL context needs its own environment map
+    const envBack = new THREE.PMREMGenerator(rBack).fromScene(new RoomEnvironment(rBack), 0.04).texture;
+    const envFront = new THREE.PMREMGenerator(rFront).fromScene(new RoomEnvironment(rFront), 0.04).texture;
+
+    // Orthographic camera in SVG units: world x = svg x, world y = -svg y.
+    const cam = new THREE.OrthographicCamera(0, W, 0, -H, -3000, 3000);
+    cam.position.z = 1500;
+    const lights = [
+      new THREE.HemisphereLight(0xffffff, 0x9aa6b2, 0.55),
+      Object.assign(new THREE.DirectionalLight(0xffffff, 2.4), {}),
+      new THREE.DirectionalLight(0x9ff6ff, 1.6),
+      new THREE.DirectionalLight(0xffffff, 0.5),
+    ];
+    lights[1].position.set(-5, 30, 11); lights[2].position.set(10, 12, -16); lights[3].position.set(14, 6, 10);
+    lights.forEach(l => scene.add(l));
+
+    // Materials, as in the CYDNI 3D model
+    const M = {
+      shell: new THREE.MeshPhysicalMaterial({ color: 0xf1f2f3, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.18 }),
+      ring: new THREE.MeshPhysicalMaterial({ color: 0xc9cbcd, roughness: 0.38, clearcoat: 0.8, clearcoatRoughness: 0.25 }),
+      visor: new THREE.MeshPhysicalMaterial({ color: 0x1b1c1e, roughness: 0.12, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05 }),
+      dark: new THREE.MeshPhysicalMaterial({ color: 0x2a2b2d, roughness: 0.35, metalness: 0.2, clearcoat: 0.6 }),
+      stick: new THREE.MeshStandardMaterial({ color: 0xe6e8ea, roughness: 0.3, metalness: 0.4 }),
+      cyan: new THREE.MeshPhysicalMaterial({ color: 0x0096dc, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.12 }),
+      eye: new THREE.MeshStandardMaterial({ color: 0x00e1ff, emissive: 0x00e1ff, emissiveIntensity: 1.5, toneMapped: false }),
+      logo: new THREE.MeshPhysicalMaterial({ color: 0x0a0a0a, roughness: 0.35, clearcoat: 0.7 }),
+      chrome: new THREE.MeshPhysicalMaterial({ color: 0xd9dde3, roughness: 0.18, metalness: 0.9, clearcoat: 1 }),
+      grip: new THREE.MeshPhysicalMaterial({ color: 0x1d1e21, roughness: 0.45, clearcoat: 0.5 }),
+      glass: new THREE.MeshPhysicalMaterial({ color: 0xbff8ff, roughness: 0.05, transparent: true, opacity: 0.14, clearcoat: 1, clearcoatRoughness: 0.02, depthWrite: false }),
+    };
+    const BACK = 1, FRONT = 2;
+    function mesh(geo, mat, parent, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; }
+    function stadiumShape(w, h) {
+      const s = new THREE.Shape(), hw = w / 2, hh = h / 2;
+      if (w >= h) { const r = hh; s.moveTo(0, -hh); s.lineTo(hw - r, -hh); s.absarc(hw - r, 0, r, -Math.PI / 2, Math.PI / 2, false); s.lineTo(-hw + r, hh); s.absarc(-hw + r, 0, r, Math.PI / 2, Math.PI * 1.5, false); s.closePath(); }
+      else { const r = hw; s.moveTo(hw, 0); s.lineTo(hw, hh - r); s.absarc(0, hh - r, r, 0, Math.PI, false); s.lineTo(-hw, -hh + r); s.absarc(0, -hh + r, r, Math.PI, Math.PI * 2, false); s.closePath(); }
+      return s;
+    }
+    function slab(w, h, depth, b, segs = 8) {
+      const g = new THREE.ExtrudeGeometry(stadiumShape(w - 2 * b, h - 2 * b), { depth: Math.max(0.001, depth - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: segs, curveSegments: 48 });
+      g.center(); g.computeVertexNormals(); return g;
+    }
+
+    // Robot (model units; origin at the bottom of the body)
+    const robot = new THREE.Group();
+    const BODY_ZS = 0.72;
+    const bodyR = y => 1.39 + (y - 0.95) / 5.7 * 1.16;
+    const prof = [];
+    for (let i = 0; i <= 16; i++) { const a = i / 16 * Math.PI / 2; prof.push(new THREE.Vector2(Math.max(0.001, 1.39 * Math.sin(a)), 0.95 - 0.95 * Math.cos(a))); }
+    for (let i = 1; i <= 12; i++) { const y = 0.95 + i / 12 * 5.7; prof.push(new THREE.Vector2(bodyR(y), y)); }
+    for (let i = 1; i <= 18; i++) { const a = i / 18 * Math.PI / 2; prof.push(new THREE.Vector2(1.45 + 1.1 * Math.cos(a), 6.65 + 1.15 * Math.sin(a))); }
+    prof.push(new THREE.Vector2(0.001, 7.8));
+    mesh(new THREE.LatheGeometry(prof, 96), M.shell, robot).scale.z = BODY_ZS;
+
+    // Cydcor swirl on the chest, bent onto the body's curve
+    const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.06 103"><path d="M51.14,17.19s3.1.02,3.1,2.52c0,2.72-3.1,2.72-3.1,2.72-16.17-.37-30.34,14.89-28.63,30.97.75,16.11,17.65,29.27,32.89,26.3,13.5-2.62,26.63-13.09,27.48-28.43,1.12,15.75-11.53,31.54-28.28,33.76-18.62,2.45-36.92-13.25-37.38-32.03-1.57-18.75,15.11-36.26,33.92-35.81Z"/><path d="M77.23,53.75s-.21,2.43-2.49,2.43-2.61-2.43-2.61-2.43c.25-11.2-10.31-21.02-21.45-19.83-11.16.52-19.22,11.89-18.23,22.79.87,9.5,8.66,18.97,19.7,19.84-11.3,1.02-23.01-7.93-24.83-20.25-1.8-13.7,9.75-27.16,23.56-27.5,13.8-1.15,26.68,11.12,26.34,24.96Z"/><path d="M63.75,45.63s1.97,2.35.33,3.76c-1.63,1.42-3.42-.67-3.42-.67-4.43-4.63-12.67-4.33-16.7.65-4.3,4.72-3.22,13.83,1.19,17.97,4.02,3.77,7.03,4.52,10.29,4.77-4.14,1.17-8.94-.38-12.8-3.11-6.91-5.3-7.76-16.45-1.75-22.76,5.63-6.66,16.85-6.93,22.86-.61Z"/></svg>`;
+    {
+      const LOGO_Y = 5.9, S = 0.0276;
+      new SVGLoader().parse(LOGO_SVG).paths.forEach(p => SVGLoader.createShapes(p).forEach(shape => {
+        const g = new THREE.ExtrudeGeometry(shape, { depth: 5, bevelEnabled: true, bevelThickness: 1, bevelSize: 0.6, bevelSegments: 3, curveSegments: 20 });
+        g.translate(-50, -52, 0); g.scale(S, -S, S);
+        const pos = g.attributes.position;
+        for (let i = 0; i < pos.count; i += 3) for (let c = 0; c < 3; c++) { const a = pos.array[(i + 1) * 3 + c]; pos.array[(i + 1) * 3 + c] = pos.array[(i + 2) * 3 + c]; pos.array[(i + 2) * 3 + c] = a; }
+        for (let i = 0; i < pos.count; i++) { const x = pos.getX(i), y = pos.getY(i), R = bodyR(LOGO_Y + y); pos.setZ(i, pos.getZ(i) + BODY_ZS * Math.sqrt(Math.max(0, R * R - x * x)) - 0.05); }
+        g.deleteAttribute('normal'); g.deleteAttribute('uv'); g.computeVertexNormals();
+        mesh(g, M.logo, robot, 0, LOGO_Y, 0);
+      }));
+    }
+
+    // Fin arms hinged at the shoulders
+    function finShape(k) {
+      const s = new THREE.Shape();
+      s.moveTo(0, 0); s.bezierCurveTo(0.62 * k, -0.08, 0.52 * k, -0.86, 0.42 * k, -1.6);
+      s.bezierCurveTo(0.22 * k, -2.85, -0.28 * k, -3.95, -0.82 * k, -4.56); s.lineTo(0, 0); return s;
+    }
+    function makeArm(side) {
+      const pivot = new THREE.Group(); pivot.position.set(2.4 * side, 7.0, -0.05); robot.add(pivot);
+      const g = new THREE.ExtrudeGeometry(finShape(side), { depth: 0.75, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.16, bevelSegments: 6, curveSegments: 32 });
+      g.translate(0, 0, -0.375); g.computeVertexNormals();
+      mesh(g, M.cyan, pivot);
+      return pivot;
+    }
+    const armL = makeArm(-1), armR = makeArm(1);
+
+    // Magnifying glass gripped at the tip of the fin on the word's side
+    const glass = new THREE.Group();
+    glass.position.set(0.82, -4.56, 0.25);
+    armL.add(glass);
+    const HANDLE = 2.1, LENS_R = 2.9;
+    mesh(new THREE.CylinderGeometry(0.26, 0.3, HANDLE, 24), M.grip, glass, 0, -HANDLE / 2 + 0.3, 0);
+    mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.35, 24), M.chrome, glass, 0, -HANDLE + 0.35, 0);
+    const lensCenter = new THREE.Group(); lensCenter.position.set(0, -HANDLE - LENS_R + 0.1, 0); glass.add(lensCenter);
+    mesh(new THREE.TorusGeometry(LENS_R, 0.32, 24, 96), M.chrome, lensCenter);
+    mesh(new THREE.TorusGeometry(LENS_R - 0.3, 0.07, 12, 96), M.dark, lensCenter, 0, 0, 0.12);
+    mesh(new THREE.CircleGeometry(LENS_R - 0.05, 64), M.glass, lensCenter, 0, 0, 0.05);
+    const glint = mesh(new THREE.TorusGeometry(LENS_R * 0.68, 0.09, 8, 48, Math.PI * 0.42), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 }), lensCenter, 0, 0, 0.2);
+    glint.rotation.z = Math.PI * 0.55;
+
+    // Neck and head
+    mesh(new THREE.CylinderGeometry(0.52, 0.56, 1.0, 32), M.dark, robot, 0, 7.98, 0);
+    const head = new THREE.Group(); head.position.set(0, 10.43, 0); robot.add(head);
+    mesh(slab(7.32, 4.5, 4.2, 0.7), M.ring, head);
+    mesh(slab(6.66, 3.84, 2.4, 0.22), M.shell, head, 0, 0, 1.11);
+    mesh(slab(5.04, 2.22, 0.5, 0.16), M.visor, head, 0, 0, 2.32);
+    for (const s of [-1, 1]) { const e = mesh(slab(2.0, 1.62, 0.8, 0.2), M.cyan, head, 3.72 * s, 0, 0); e.rotation.y = Math.PI / 2; }
+    mesh(new RoundedBoxGeometry(2.36, 0.62, 1.8, 4, 0.22), M.dark, head, 0, 2.38, 0);
+    mesh(new THREE.SphereGeometry(0.38, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), M.dark, head, 0, 2.62, 0);
+    mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.95, 16), M.stick, head, 0, 3.3, 0);
+    mesh(new THREE.SphereGeometry(0.37, 32, 24), M.cyan, head, 0, 3.94, 0);
+
+    // Eyes: normal domes, plus "happy" arcs while a letter is under the glass
+    function domeGeo() {
+      const s = new THREE.Shape();
+      s.moveTo(0.39, 0); s.absarc(0, 0, 0.39, 0, Math.PI, false);
+      s.lineTo(-0.39, -0.14); s.quadraticCurveTo(-0.39, -0.26, -0.27, -0.26);
+      s.lineTo(0.27, -0.26); s.quadraticCurveTo(0.39, -0.26, 0.39, -0.14); s.closePath();
+      const g = new THREE.ExtrudeGeometry(s, { depth: 0.05, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.025, bevelSegments: 3, curveSegments: 24 });
+      g.translate(0, -0.06, 0); return g;
+    }
+    const arcGeo = () => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-0.36, -0.16, 0), new THREE.Vector3(0, 0.42, 0), new THREE.Vector3(0.36, -0.16, 0)), 24, 0.085, 10, false);
+    const eyes = new THREE.Group(); eyes.position.set(0, 0, 2.6); head.add(eyes);
+    const faces = {};
+    for (const [name, geo] of [['normal', domeGeo], ['happy', arcGeo]]) {
+      const g = new THREE.Group();
+      for (const x of [-1.1, 1.1]) { const m = new THREE.Mesh(geo(), M.eye); m.position.x = x; g.add(m); }
+      g.visible = name === 'normal'; eyes.add(g); faces[name] = g;
+    }
+    {
+      const g = new THREE.Group();
+      const l = new THREE.Mesh(domeGeo(), M.eye); l.position.x = -1.1;
+      const r = new THREE.Mesh(arcGeo(), M.eye); r.position.x = 1.1;
+      g.add(l, r); g.visible = false; eyes.add(g); faces.wink = g;
+    }
+    let winkUntil = 0, calm = false;
+
+    // Layers: the glass arm draws in front of the word, everything else behind it
+    robot.traverse(o => o.layers.set(BACK));
+    armL.traverse(o => o.layers.set(FRONT));
+    lights.forEach(l => { l.layers.enable(BACK); l.layers.enable(FRONT); });
+    scene.add(robot);
+
+    // Placement in SVG units
+    const SCALE = 18;
+    robot.scale.setScalar(SCALE);
+    robot.rotation.order = 'YXZ';
+    robot.rotation.y = -0.38;                       // three-quarter view, turned toward the word
+    const lensWorld = new THREE.Vector3();
+    const minX = hero.boxes[2].cx, maxX = hero.boxes[4].cx;   // sweep over N · T · E
+    const lensY = BASE - SIZE * 0.36;
+
+    function pose(t, target) {
+      robot.rotation.z = 0.30 + Math.sin(t * 0.9) * 0.025;    // lean left over the word
+      armL.rotation.z = -0.62 + Math.sin(t * 1.3) * 0.06;
+      armR.rotation.z = 0.35 + Math.sin(t * 1.6) * 0.05;      // other fin resting outward
+      head.rotation.z = 0.12;
+      head.rotation.x = 0.18;                                 // looking down at the glass
+      robot.position.set(0, 0, 0);
+      robot.updateMatrixWorld(true);
+      lensCenter.getWorldPosition(lensWorld);
+      const bob = reduce ? 0 : Math.sin(t * 1.6) * 3;
+      robot.position.set(target.x - lensWorld.x, -(target.y + bob) - lensWorld.y, 0);
+      robot.updateMatrixWorld(true);
+      lensCenter.getWorldPosition(lensWorld);
+      hero.setLens(lensWorld.x, -lensWorld.y, (LENS_R - 0.32) * SCALE, 1.6);
+    }
+
+    function resize() {
+      const w = hero.wrap.clientWidth, h = hero.wrap.clientHeight;
+      if (!w || !h) return;
+      rBack.setSize(w, h, false); rFront.setSize(w, h, false);
+    }
+    new ResizeObserver(resize).observe(hero.wrap);
+    resize();
+
+    function render() {
+      scene.environment = envBack; cam.layers.set(BACK); rBack.render(scene, cam);
+      scene.environment = envFront; cam.layers.set(FRONT); rFront.render(scene, cam);
+    }
+    let blinkT = 2.5, last = performance.now(), t = 0;
+    function frame(now) {
+      const dt = Math.min((now - last) / 1000, 0.05); last = now; t += dt;
+      const p = 0.5 - 0.5 * Math.cos(t * 0.5);
+      const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      const lx = maxX + (minX - maxX) * eased;
+      pose(t, { x: lx, y: lensY });
+      const near = hero.boxes.some(b => Math.abs(b.cx - lx) < 14);
+      const winking = now < winkUntil;
+      faces.wink.visible = winking;
+      faces.happy.visible = !winking && near && !calm;
+      faces.normal.visible = !winking && !(near && !calm);
+      blinkT -= dt;
+      eyes.scale.y = !winking && blinkT < 0.14 ? Math.max(0.08, Math.abs(blinkT - 0.07) / 0.07) : 1;
+      if (blinkT <= 0) blinkT = 2.5 + Math.random() * 3;
+      render();
+      requestAnimationFrame(frame);
+    }
+    if (reduce) { pose(0, { x: hero.boxes[3].cx, y: lensY }); render(); }
+    else requestAnimationFrame(frame);
+    return { wink(ms = 700) { winkUntil = performance.now() + ms; }, calm(v) { calm = !!v; } };
+  }
+
+  // Returns a promise for CYDNI's controls ({ wink }), or null if 3D isn't available.
+  function mount(container) {
+    const go = () => {
+      const hero = buildWord(container);
+      return addCydni(hero).catch(err => { console.warn('CYDNI 3D unavailable:', err); return null; });
+    };
+    if (document.fonts && document.fonts.load) return document.fonts.load(`${SIZE}px "Archivo Black"`).then(go, go);
+    return go();
+  }
+  // Opens with the big logo centred on screen, then shrinks it into the header slot, where it stays.
+  // opts: { slot: element in the header to dock into, intro: true to play the opening, home: link target }
+  function mountHeader(opts = {}) {
+    const slot = opts.slot || document.querySelector('.brand-slot');
+    if (!slot) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const intro = !!opts.intro && !reduce;
+    const ASPECT = H / W;
+    const baseW = () => Math.min(1000, Math.max(320, innerWidth * 0.92));
+
+    const fly = document.createElement('a');
+    fly.href = opts.home || '/';
+    fly.className = 'hunter-fly';
+    fly.setAttribute('aria-label', 'Hunter home');
+    fly.style.cssText = 'position:fixed;left:0;top:0;z-index:60;transform-origin:0 0;display:block;will-change:transform;';
+    const stage = document.createElement('div');
+    fly.appendChild(stage);
+
+    let backdrop = null;
+    if (intro) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'hunter-intro-backdrop';
+      backdrop.style.cssText = 'position:fixed;inset:0;z-index:55;background-color:#070b14;' +
+        'background-image:radial-gradient(900px 500px at 50% 45%,rgba(46,230,255,.10),transparent 65%),linear-gradient(rgba(46,230,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(46,230,255,.055) 1px,transparent 1px);' +
+        'background-size:auto,34px 34px,34px 34px;transition:opacity .9s ease;';
+      document.body.appendChild(backdrop);
+      document.documentElement.classList.add('hunter-intro');
+    }
+    document.body.appendChild(fly);
+
+    let docked = !intro;
+    function place(animate) {
+      const w = baseW();
+      fly.style.width = w + 'px';
+      let tx, ty, sc;
+      if (docked) {
+        const r = slot.getBoundingClientRect();
+        sc = Math.min(r.width / w, r.height / (w * ASPECT));
+        tx = r.left + (r.width - w * sc) / 2; ty = r.top + (r.height - w * ASPECT * sc) / 2;
+      } else {
+        sc = 1; tx = (innerWidth - w) / 2; ty = Math.max(16, (innerHeight - w * ASPECT) / 2 - innerHeight * 0.04);
+      }
+      fly.style.transition = animate ? 'transform 1.15s cubic-bezier(.65,0,.25,1)' : 'none';
+      fly.style.transform = `translate(${tx}px, ${ty}px) scale(${sc})`;
+    }
+    let cy = null;   // CYDNI's controls once loaded
+    function dock() {
+      if (docked) return;
+      docked = true;
+      if (cy) cy.calm(false);
+      place(true);
+      if (backdrop) { backdrop.style.opacity = '0'; setTimeout(() => backdrop && backdrop.remove(), 950); }
+      document.documentElement.classList.remove('hunter-intro');
+      document.documentElement.classList.add('hunter-docked');
+      removeEventListener('keydown', skip); removeEventListener('pointerdown', skip, true); removeEventListener('wheel', skip);
+    }
+    function skip(e) {
+      if (docked) return;
+      if (e && e.type === 'pointerdown') { e.preventDefault(); e.stopPropagation(); }
+      clearTimeout(timer); dock();
+    }
+    place(false);
+    if (!intro) document.documentElement.classList.add('hunter-docked');
+    // Keep the docked logo glued to its slot (the header is sticky, so this only matters on resize/layout changes).
+    addEventListener('resize', () => place(false));
+    new ResizeObserver(() => { if (docked) place(false); }).observe(slot);
+    let timer = 0;
+    if (intro) {
+      fly.addEventListener('click', e => { if (!docked) e.preventDefault(); });
+      addEventListener('keydown', skip); addEventListener('pointerdown', skip, true); addEventListener('wheel', skip, { passive: true });
+      timer = setTimeout(dock, 9000);   // safety net if 3D takes too long to load
+    }
+    mount(stage).then(cydni => {
+      if (!intro || docked) return;
+      // Timing starts once CYDNI is on screen: a quick wink, then the logo shrinks into the corner.
+      clearTimeout(timer);
+      document.documentElement.dataset.hunterReady = String(Math.round(performance.now()));
+      if (cydni) { cy = cydni; cydni.calm(true); setTimeout(() => { if (!docked) cydni.wink(opts.winkFor || 750); }, opts.winkAt || 1100); }
+      timer = setTimeout(dock, opts.hold || 3200);
+    });
+  }
+
+  window.HunterHero = { mount, mountHeader };
+})();
+
+HunterHero.mountHeader({ intro: true, home: "#home" });
+</script>
+
+</body></html>

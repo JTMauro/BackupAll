@@ -1,0 +1,246 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Carnival Fun</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Rubik:wght@400;500;700&display=swap">
+<style>
+/* Layout: midway marquee header, prize-wheel picker, then four booths of ticket-stub games */
+:root{
+  --bg:#fbf6ec; --surface:#fffdf8; --ink:#231a2e; --muted:#6b5f72; --line:#e6dccb;
+  --red:#d7263d; --gold:#f4b400; --teal:#0f8b8d; --plum:#5b2a86; --orange:#e86a17;
+  --ticket:#fff1c9; --ticket-ink:#3a2a0a;
+  --display:"Bungee","Impact",system-ui,sans-serif;
+  --shade:"Bungee Shade","Bungee","Impact",system-ui,sans-serif;
+  --body:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17111f; --surface:#211830; --ink:#f6eedf; --muted:#b5a8bf; --line:#3a2d4a;
+  --red:#ff5a6e; --gold:#ffc83d; --teal:#3fc1c3; --plum:#b98cf0; --orange:#ff8c42;
+  --ticket:#3a2d14; --ticket-ink:#ffe7a6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17111f; --surface:#211830; --ink:#f6eedf; --muted:#b5a8bf; --line:#3a2d4a;
+  --red:#ff5a6e; --gold:#ffc83d; --teal:#3fc1c3; --plum:#b98cf0; --orange:#ff8c42;
+  --ticket:#3a2d14; --ticket-ink:#ffe7a6; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+
+/* Marquee */
+.marquee{position:relative;margin-block:24px 8px;padding:28px 20px 24px;border-radius:18px;background:var(--red);color:#fff;text-align:center;overflow:hidden}
+.marquee::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 36px,rgba(255,255,255,.08) 36px 72px)}
+.bulbs{position:absolute;left:12px;right:12px;height:10px;display:flex;justify-content:space-between}
+.bulbs.top{top:8px}.bulbs.bot{bottom:8px}
+.bulbs i{width:10px;height:10px;border-radius:50%;background:#ffe9a8;box-shadow:0 0 8px #ffd34d;animation:blink 1.2s infinite}
+.bulbs i:nth-child(even){animation-delay:.6s}
+@keyframes blink{50%{opacity:.35;box-shadow:none}}
+.marquee h1{position:relative;margin:0;font-family:var(--shade);font-weight:400;font-size:clamp(40px,9vw,88px);line-height:1;letter-spacing:.02em;color:#fff3c4;text-wrap:balance}
+.marquee p{position:relative;margin:10px 0 0;font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:13px}
+
+.stats{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;margin:14px 0 28px;color:var(--muted);font-size:14px}
+.stats b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* Wheel */
+.spinner{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:24px}
+.wheel-box{position:relative;width:100%;max-width:340px;aspect-ratio:1;margin:0 auto}
+#wheel{width:100%;height:100%;display:block}
+.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid var(--ink);filter:drop-shadow(0 2px 0 var(--gold))}
+.pick h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 6px;letter-spacing:.02em}
+.pick .hint{color:var(--muted);margin:0 0 16px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{font:500 14px var(--body);padding:6px 12px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.btn:focus-visible,.game:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn{font:400 18px var(--display);letter-spacing:.04em;padding:12px 26px;border-radius:12px;border:0;background:var(--gold);color:#2a1d00;cursor:pointer;box-shadow:0 4px 0 #b07f00}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b07f00}
+.btn:disabled{opacity:.6;cursor:default}
+.result{margin-top:18px;min-height:64px}
+.result .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.result .name{font-family:var(--display);font-size:clamp(22px,4vw,32px);line-height:1.15;text-wrap:balance}
+.result .cat{font-weight:500}
+
+/* Booths */
+.booths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:28px}
+.booth{background:var(--surface);border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.booth header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--c);color:#fff}
+.booth h3{margin:0;font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.03em}
+.booth header span{font-size:13px;font-weight:500;opacity:.92;font-variant-numeric:tabular-nums}
+.booth header::after{content:none}
+.awning{height:12px;background:repeating-linear-gradient(90deg,var(--c) 0 20px,var(--surface) 20px 40px);border-bottom:2px solid var(--line)}
+.games{list-style:none;margin:0;padding:16px;display:flex;flex-wrap:wrap;gap:8px}
+.game{position:relative;display:inline-flex;align-items:center;gap:8px;font:500 14px var(--body);padding:7px 14px 7px 12px;background:var(--ticket);color:var(--ticket-ink);border:0;border-radius:4px;cursor:pointer;
+  -webkit-mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+          mask:radial-gradient(circle 5px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 5px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.game .box{width:14px;height:14px;border:2px solid currentColor;border-radius:3px;flex:none;display:grid;place-items:center;font-size:11px;line-height:1}
+.game[aria-pressed="true"]{opacity:.55;text-decoration:line-through}
+.game[aria-pressed="true"] .box::after{content:"✓"}
+.game.hit{animation:pop .9s ease 2}
+@keyframes pop{50%{transform:scale(1.08);background:var(--gold);color:#2a1d00}}
+
+.foot{margin-top:24px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px}
+.link{background:none;border:0;color:var(--red);font:500 14px var(--body);cursor:pointer;text-decoration:underline;padding:0}
+
+@media (max-width:760px){
+  .spinner{grid-template-columns:1fr;padding:18px}
+  .booths{grid-template-columns:1fr}
+  .pick{text-align:center}.filters{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){.bulbs i,.game.hit{animation:none}}
+</style>
+
+<div class="wrap">
+  <section class="marquee">
+    <div class="bulbs top" aria-hidden="true"></div>
+    <h1>Carnival Fun</h1>
+    <p>Step right up · Every game on the midway</p>
+    <div class="bulbs bot" aria-hidden="true"></div>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="spinner" aria-labelledby="pickTitle">
+    <div class="wheel-box">
+      <canvas id="wheel" width="680" height="680" aria-label="Prize wheel of carnival game categories"></canvas>
+      <div class="pointer" aria-hidden="true"></div>
+    </div>
+    <div class="pick">
+      <h2 id="pickTitle">Can't decide? Spin for it.</h2>
+      <p class="hint">Pick the booths you want in the draw, then spin. Games you've marked as played are skipped.</p>
+      <div class="filters" id="filters" role="group" aria-label="Booths in the draw"></div>
+      <button class="btn" id="spin" type="button">Spin the wheel</button>
+      <div class="result" id="result" aria-live="polite">
+        <div class="label">Your next game</div>
+        <div class="name">Ring toss (bottles or pegs)</div>
+        <div class="cat" style="color:var(--red)">Throwing booth · example pick</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="booths" id="booths"></div>
+
+  <div class="foot">
+    <span>Tap a ticket to mark a game as played.</span>
+    <button class="link" id="reset" type="button">Clear all played marks</button>
+  </div>
+</div>
+
+<script>
+const BOOTHS=[
+ {name:"Throwing",color:"--red",games:["Ring toss (bottles or pegs)","Milk bottle knockdown","Balloon darts","Basketball shoot","Football toss","Baseball pitch / speed pitch","Dunk tank","Coin toss (onto plates or glass)","Ping-pong ball / goldfish bowl toss","Bean bag toss / cornhole","Can knockdown (cat rack)","Plate break","Hoop toss","Frog bog (launch a frog onto a lily pad)","Bucket toss","Wiffle ball / bushel basket"]},
+ {name:"Shooting",color:"--teal",games:["Water gun race","Shooting gallery (BB or cork guns)","Shoot out the star","Squirt the clown"]},
+ {name:"Strength / Skill",color:"--plum",games:["High striker (hammer & bell)","Rope ladder climb","Ladder ball","Pull the string / string pull","Ring the bell (strength meter)","Arm wrestling machine","Skee-Ball","Whack-a-mole","Roll-a-ball horse race (Kentucky Derby)","Pinball","Hammer the nail","Bowling / roll-down"]},
+ {name:"Chance",color:"--orange",games:["Duck pond / pick-a-duck","Wheel of fortune / spin the wheel","Guess your weight","Guess your age or birthday","Lucky number / ticket draw","Bingo","Pick-a-straw","Fishing pond","Lollipop tree","Plinko","Chuck-a-luck (dice cage)"]},
+ {name:"Redemption / Machines",color:"--gold",games:["Claw machine","Coin pusher","Stacker","Cyclone / light chaser","Big Bass Wheel"]}
+];
+const KEY="carnival-fun-played";
+let played=new Set();
+try{played=new Set(JSON.parse(localStorage.getItem(KEY)||"[]"))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify([...played]))}catch(e){}};
+const active=new Set(BOOTHS.map(b=>b.name));
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+document.querySelectorAll(".bulbs").forEach(b=>{b.innerHTML="<i></i>".repeat(18)});
+
+// Booths
+const boothsEl=document.getElementById("booths");
+BOOTHS.forEach(b=>{
+  const sec=document.createElement("section");
+  sec.className="booth";sec.style.setProperty("--c",`var(${b.color})`);
+  sec.innerHTML=`<header><h3>${b.name}</h3><span data-count></span></header><div class="awning"></div><ul class="games"></ul>`;
+  const ul=sec.querySelector("ul");
+  b.games.forEach(g=>{
+    const li=document.createElement("li");
+    const btn=document.createElement("button");
+    btn.type="button";btn.className="game";btn.dataset.game=g;
+    btn.setAttribute("aria-pressed",played.has(g));
+    btn.innerHTML=`<span class="box" aria-hidden="true"></span>`;
+    btn.append(g);
+    btn.onclick=()=>{played.has(g)?played.delete(g):played.add(g);btn.setAttribute("aria-pressed",played.has(g));save();refresh()};
+    li.append(btn);ul.append(li);
+  });
+  b.el=sec;boothsEl.append(sec);
+});
+// the yellow booth needs dark header text
+BOOTHS[4].el.querySelector("header").style.color="#2a1d00";
+
+// Filters
+const filtersEl=document.getElementById("filters");
+BOOTHS.forEach(b=>{
+  const c=document.createElement("button");
+  c.type="button";c.className="chip";c.textContent=b.name;c.setAttribute("aria-pressed","true");
+  c.onclick=()=>{
+    if(active.has(b.name)){if(active.size>1)active.delete(b.name)}else active.add(b.name);
+    c.setAttribute("aria-pressed",active.has(b.name));drawWheel(rot);
+  };
+  filtersEl.append(c);
+});
+
+function refresh(){
+  const total=BOOTHS.reduce((n,b)=>n+b.games.length,0);
+  BOOTHS.forEach(b=>{const d=b.games.filter(g=>played.has(g)).length;b.el.querySelector("[data-count]").textContent=`${d} / ${b.games.length} played`});
+  document.getElementById("stats").innerHTML=`<span><b>${total}</b> games</span><span><b>${BOOTHS.length}</b> booths</span><span><b>${played.size}</b> played</span><span><b>${total-played.size}</b> left to try</span>`;
+}
+
+// Wheel
+const cv=document.getElementById("wheel"),ctx=cv.getContext("2d");
+let rot=0;
+function drawWheel(r){
+  const segs=BOOTHS.filter(b=>active.has(b.name));
+  const W=cv.width,c=W/2,R=c-14,step=Math.PI*2/segs.length;
+  ctx.clearRect(0,0,W,W);
+  ctx.beginPath();ctx.arc(c,c,R+10,0,Math.PI*2);ctx.fillStyle=css("--ink");ctx.fill();
+  segs.forEach((b,i)=>{
+    const a0=r+i*step-Math.PI/2,a1=a0+step;
+    ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,R,a0,a1);ctx.closePath();
+    ctx.fillStyle=css(b.color);ctx.fill();
+    ctx.strokeStyle=css("--surface");ctx.lineWidth=4;ctx.stroke();
+    ctx.save();ctx.translate(c,c);ctx.rotate(a0+step/2);
+    ctx.fillStyle=b.color==="--gold"?"#2a1d00":"#ffffff";
+    ctx.font=`${segs.length>4?30:34}px Bungee, Impact, sans-serif`;ctx.textAlign="right";ctx.textBaseline="middle";
+    const label=b.name.split(" / ")[0].toUpperCase();
+    ctx.fillText(label,R-26,0);ctx.restore();
+  });
+  for(let i=0;i<24;i++){const a=i/24*Math.PI*2;ctx.beginPath();ctx.arc(c+Math.cos(a)*(R+5),c+Math.sin(a)*(R+5),4,0,Math.PI*2);ctx.fillStyle=css("--gold");ctx.fill()}
+  ctx.beginPath();ctx.arc(c,c,46,0,Math.PI*2);ctx.fillStyle=css("--surface");ctx.fill();
+  ctx.lineWidth=6;ctx.strokeStyle=css("--ink");ctx.stroke();
+  ctx.fillStyle=css("--red");ctx.font="22px Bungee, Impact, sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("SPIN",c,c+1);
+}
+
+const spinBtn=document.getElementById("spin"),resultEl=document.getElementById("result");
+spinBtn.onclick=()=>{
+  const segs=BOOTHS.filter(b=>active.has(b.name));
+  const pool=segs.filter(b=>b.games.some(g=>!played.has(g)));
+  if(!pool.length){resultEl.innerHTML=`<div class="label">Nothing left</div><div class="name">You've played every game in these booths.</div><div class="cat">Add another booth or clear your played marks.</div>`;return}
+  const booth=pool[Math.floor(Math.random()*pool.length)];
+  const left=booth.games.filter(g=>!played.has(g));
+  const game=left[Math.floor(Math.random()*left.length)];
+  const step=Math.PI*2/segs.length,idx=segs.indexOf(booth);
+  const jitter=(Math.random()-.5)*step*.7;
+  const target=-(idx*step+step/2)+jitter;
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const start=rot,base=start-(start%(Math.PI*2));
+  const end=base+Math.PI*2*(reduce?0:6)+((target%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+  const dur=reduce?1:3800,t0=performance.now();
+  spinBtn.disabled=true;
+  resultEl.innerHTML=`<div class="label">Spinning…</div>`;
+  (function frame(t){
+    const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);
+    rot=start+(end-start)*e;drawWheel(rot);
+    if(p<1)return requestAnimationFrame(frame);
+    spinBtn.disabled=false;
+    resultEl.innerHTML=`<div class="label">Your next game</div><div class="name"></div><div class="cat" style="color:var(${booth.color==="--gold"?"--orange":booth.color})">${booth.name} booth</div>`;
+    resultEl.querySelector(".name").textContent=game;
+    const el=[...document.querySelectorAll(".game")].find(x=>x.dataset.game===game);
+    if(el){el.classList.remove("hit");void el.offsetWidth;el.classList.add("hit")}
+  })(t0);
+};
+
+document.getElementById("reset").onclick=()=>{played.clear();save();document.querySelectorAll(".game").forEach(b=>b.setAttribute("aria-pressed","false"));refresh()};
+
+refresh();drawWheel(0);
+document.fonts&&document.fonts.ready.then(()=>drawWheel(rot));
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>drawWheel(rot));
+new MutationObserver(()=>drawWheel(rot)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
+
+</body></html>

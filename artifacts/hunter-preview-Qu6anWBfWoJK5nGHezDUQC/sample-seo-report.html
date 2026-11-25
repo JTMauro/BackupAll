@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&display=swap">
+<title>SEO Audit · 127.0.0.1:8088</title>
+<style>
+:root{--bg:#070b14;--card:#0e1524;--ink:#e6f1ff;--muted:#8a9bb8;--line:#1f2c44;--accent:#2ee6ff;--good:#3ee08f;--ok:#9be15d;--warn:#ffb547;--bad:#ff5c7a;--crit-bg:rgba(255,92,122,.12);--warn-bg:rgba(255,181,71,.12);--note-bg:rgba(46,230,255,.10);color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background-image:radial-gradient(1000px 400px at 80% -10%,rgba(155,107,255,.14),transparent 60%),linear-gradient(rgba(46,230,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(46,230,255,.05) 1px,transparent 1px);background-size:auto,34px 34px,34px 34px}h1{font-family:'Archivo Black',Inter,sans-serif;letter-spacing:.01em;text-shadow:1px 1px 0 #0d5f7a,2px 2px 0 #083e52,3px 4px 6px rgba(0,0,0,.55)}.card,.stat,.issue{box-shadow:0 10px 30px -18px rgba(0,0,0,.8)}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:32px 0 12px}h4{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.muted{color:var(--muted)}a{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center}
+@media(max-width:720px){.hero{grid-template-columns:1fr;justify-items:center}}
+.ring-bg{fill:none;stroke:var(--line);stroke-width:12}.ring-fg{fill:none;stroke-width:12;stroke-linecap:round}
+.ring.good .ring-fg{stroke:var(--good)}.ring.ok .ring-fg{stroke:var(--ok)}.ring.warn .ring-fg{stroke:var(--warn)}.ring.bad .ring-fg{stroke:var(--bad)}
+.ring-num{font-size:34px;font-weight:700;fill:var(--ink)}
+.grade{font-weight:600;text-align:center;margin-top:4px}
+.cats{display:grid;gap:8px;width:100%}
+.cat{display:grid;grid-template-columns:190px 1fr 36px;gap:12px;align-items:center;background:none;border:0;padding:4px 6px;border-radius:6px;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.cat:hover,.cat.active{background:var(--bg)}
+@media(max-width:520px){.cat{grid-template-columns:1fr 36px}.cat .bar{grid-column:1/-1;grid-row:2}}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.fill{display:block;height:100%}
+.fill.good{background:var(--good)}.fill.ok{background:var(--ok)}.fill.warn{background:var(--warn)}.fill.bad{background:var(--bad)}
+.cat-score{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.stat span{color:var(--muted);font-size:13px}
+.stat.crit b{color:var(--bad)}.stat.wrn b{color:var(--warn)}
+ol.top{margin:0;padding-left:20px}ol.top li{margin:6px 0}
+.sev{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:99px;min-width:72px;text-align:center}
+.sev.critical{background:var(--crit-bg);color:var(--bad)}.sev.warning{background:var(--warn-bg);color:var(--warn)}.sev.notice{background:var(--note-bg);color:var(--accent)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters button,.btn{border:1px solid #2a3a5a;background:linear-gradient(180deg,#1b2740,#131d31);color:var(--ink);border-radius:99px;padding:6px 14px;font:600 13px/1.2 inherit;cursor:pointer;box-shadow:0 4px 0 #05080f,0 7px 14px -4px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .08s,box-shadow .08s}.filters button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #05080f}
+.filters button.active{background:linear-gradient(180deg,#7ff3ff,#2ee6ff 55%,#1cc3e0);color:#04121a;border-color:#8ff6ff;box-shadow:0 4px 0 #0e86a3,0 8px 18px -4px rgba(46,230,255,.45),inset 0 1px 0 rgba(255,255,255,.6)}
+.issue{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.issue summary{display:flex;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;list-style:none}
+.issue summary::-webkit-details-marker{display:none}
+.ititle{flex:1;font-weight:600}.count{color:var(--muted);font-size:13px;white-space:nowrap}
+.ibody{padding:0 16px 16px}
+.whyfix{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+@media(max-width:720px){.whyfix{grid-template-columns:1fr}}
+.whyfix p{margin:0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--card)}
+td.u{word-break:break-all;max-width:480px}
+.tablewrap{overflow:auto;max-height:600px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+#pages th{cursor:pointer;white-space:nowrap}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+input[type=search]{flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.s2{color:var(--good)}.s3{color:var(--warn)}.s4,.s5,.s0{color:var(--bad);font-weight:600}
+@media print{.filters,.toolbar,.btn{display:none}details{page-break-inside:avoid}details:not([open]) .ibody{display:block}.tablewrap{max-height:none}}
+</style></head><body><div class="wrap">
+<header class="top">
+  <div><h1>SEO Audit: 127.0.0.1:8088</h1>
+  <div class="muted">11/10/2026, 2:53:29 AM · 16 URLs crawled in 6s · mobile crawl</div></div>
+  <div style="display:flex;gap:8px"><button class="btn" onclick="dl('issues')">Issues CSV</button><button class="btn" onclick="dl('pages')">Pages CSV</button><button class="btn" onclick="window.print()">Print / PDF</button></div>
+</header>
+
+<section class="card hero">
+  <div><svg class="ring warn" width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="Score 62 of 100">
+    <circle cx="66" cy="66" r="56" class="ring-bg"/>
+    <circle cx="66" cy="66" r="56" class="ring-fg" stroke-dasharray="218.2 351.9" transform="rotate(-90 66 66)"/>
+    <text x="50%" y="50%" dy="0.35em" text-anchor="middle" class="ring-num">62</text>
+  </svg><div class="grade">Needs work</div></div>
+  <div class="cats"><button class="cat" data-filter-cat="indexability">
+      <span class="cat-label">Crawling &amp; Indexing</span>
+      <span class="bar"><span class="fill warn" style="width:57%"></span></span>
+      <span class="cat-score">57</span>
+    </button><button class="cat" data-filter-cat="content">
+      <span class="cat-label">Content &amp; Metadata</span>
+      <span class="bar"><span class="fill warn" style="width:73%"></span></span>
+      <span class="cat-score">73</span>
+    </button><button class="cat" data-filter-cat="links">
+      <span class="cat-label">Links</span>
+      <span class="bar"><span class="fill ok" style="width:85%"></span></span>
+      <span class="cat-score">85</span>
+    </button><button class="cat" data-filter-cat="performance">
+      <span class="cat-label">Speed &amp; Core Web Vitals</span>
+      <span class="bar"><span class="fill good" style="width:96%"></span></span>
+      <span class="cat-score">96</span>
+    </button><button class="cat" data-filter-cat="mobile">
+      <span class="cat-label">Mobile &amp; Accessibility</span>
+      <span class="bar"><span class="fill ok" style="width:84%"></span></span>
+      <span class="cat-score">84</span>
+    </button><button class="cat" data-filter-cat="structured">
+      <span class="cat-label">Structured Data</span>
+      <span class="bar"><span class="fill ok" style="width:88%"></span></span>
+      <span class="cat-score">88</span>
+    </button><button class="cat" data-filter-cat="social">
+      <span class="cat-label">Social Sharing</span>
+      <span class="bar"><span class="fill good" style="width:90%"></span></span>
+      <span class="cat-score">90</span>
+    </button></div>
+</section>
+
+<div class="stats">
+  <div class="stat"><b>13</b><span>indexable pages</span></div>
+  <div class="stat crit"><b>5</b><span>critical issue types</span></div>
+  <div class="stat wrn"><b>15</b><span>warning types</span></div>
+  <div class="stat"><b>21</b><span>notices</span></div>
+  <div class="stat"><b>45ms</b><span>avg. LCP (lab)</span></div>
+  <div class="stat"><b>292</b><span>avg. words / page</span></div>
+</div>
+
+<h2>Fix these first</h2><div class="card"><ol class="top"><li><span class="sev critical">Critical</span> <b>Broken pages (4xx)</b> <span class="muted">(1)</span><br><span class="muted">Restore the page, 301-redirect it to the closest relevant live page, or update the links pointing to it.</span></li><li><span class="sev critical">Critical</span> <b>Noindex pages listed in the sitemap</b> <span class="muted">(1)</span><br><span class="muted">Either remove noindex (if the page should rank) or remove it from the sitemap.</span></li><li><span class="sev critical">Critical</span> <b>Broken internal links</b> <span class="muted">(1)</span><br><span class="muted">Update each link to a working URL, or redirect the dead URL.</span></li><li><span class="sev critical">Critical</span> <b>Missing mobile viewport tag</b> <span class="muted">(1)</span><br><span class="muted">Add &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; to the &lt;head&gt;.</span></li><li><span class="sev warning">Warning</span> <b>Duplicate titles</b> <span class="muted">(4)</span><br><span class="muted">Give every page a unique title that describes what makes it different.</span></li><li><span class="sev warning">Warning</span> <b>Duplicate meta descriptions</b> <span class="muted">(4)</span><br><span class="muted">Write a unique description per page, or remove the template default so you notice the gaps.</span></li><li><span class="sev warning">Warning</span> <b>Orphan pages (in sitemap, no internal links)</b> <span class="muted">(2)</span><br><span class="muted">Link to them from relevant pages, or remove them from the sitemap if they are obsolete.</span></li><li><span class="sev critical">Critical</span> <b>Broken structured data (invalid JSON-LD)</b> <span class="muted">(1)</span><br><span class="muted">Fix the JSON syntax (often a trailing comma or unescaped quote). Validate at search.google.com/test/rich-results.</span></li></ol></div>
+
+<h2>All issues</h2>
+<div class="filters" id="sevf">
+  <button data-sev="all" class="active">All (41)</button>
+  <button data-sev="critical">Critical (5)</button>
+  <button data-sev="warning">Warnings (15)</button>
+  <button data-sev="notice">Notices (21)</button>
+</div>
+<div id="issues">
+    <details class="issue" data-sev="critical" data-cat="indexability" open>
+      <summary>
+        <span class="sev critical">Critical</span>
+        <span class="ititle">Broken pages (4xx)</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Linked pages that return &quot;not found&quot; waste crawl budget, leak link equity and frustrate visitors.</p></div>
+          <div><h4>How to fix</h4><p>Restore the page, 301-redirect it to the closest relevant live page, or update the links pointing to it.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/missing-page" target="_blank" rel="noopener">http://127.0.0.1:8088/missing-page</a></td><td>HTTP 404 · linked from (sitemap)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="critical" data-cat="indexability" open>
+      <summary>
+        <span class="sev critical">Critical</span>
+        <span class="ititle">Noindex pages listed in the sitemap</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>The sitemap tells Google &quot;index this&quot;, the page says &quot;don&#39;t&quot;. Mixed signals waste crawl budget and Search Console will report errors.</p></div>
+          <div><h4>How to fix</h4><p>Either remove noindex (if the page should rank) or remove it from the sitemap.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/thank-you" target="_blank" rel="noopener">http://127.0.0.1:8088/thank-you</a></td><td>noindex</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="critical" data-cat="links" open>
+      <summary>
+        <span class="sev critical">Critical</span>
+        <span class="ititle">Broken internal links</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Links to missing pages hurt the user experience and waste the authority you pass between pages.</p></div>
+          <div><h4>How to fix</h4><p>Update each link to a working URL, or redirect the dead URL.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/" target="_blank" rel="noopener">http://127.0.0.1:8088/</a></td><td>→ http://127.0.0.1:8088/missing-page (HTTP 404) &quot;Financing&quot;</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="critical" data-cat="mobile" >
+      <summary>
+        <span class="sev critical">Critical</span>
+        <span class="ititle">Missing mobile viewport tag</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Without it, phones render the page at desktop width, zoomed out. Google indexes the mobile version of your site.</p></div>
+          <div><h4>How to fix</h4><p>Add &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; to the &lt;head&gt;.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="content" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Duplicate titles</span>
+        <span class="count">4 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>When pages share a title, Google can&#39;t tell them apart and they compete with each other for the same searches.</p></div>
+          <div><h4>How to fix</h4><p>Give every page a unique title that describes what makes it different.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td>shared with 1 other page(s)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="content" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Duplicate meta descriptions</span>
+        <span class="count">4 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Repeated descriptions often come from template defaults and make every result look the same.</p></div>
+          <div><h4>How to fix</h4><p>Write a unique description per page, or remove the template default so you notice the gaps.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td>shared with 1 other page(s)</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td>shared with 1 other page(s)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="indexability" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Orphan pages (in sitemap, no internal links)</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Pages with no internal links get little authority and are a sign they were forgotten.</p></div>
+          <div><h4>How to fix</h4><p>Link to them from relevant pages, or remove them from the sitemap if they are obsolete.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/orphan" target="_blank" rel="noopener">http://127.0.0.1:8088/orphan</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="critical" data-cat="structured" >
+      <summary>
+        <span class="sev critical">Critical</span>
+        <span class="ititle">Broken structured data (invalid JSON-LD)</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Search engines ignore the whole block, so the page loses rich results (stars, FAQs, breadcrumbs).</p></div>
+          <div><h4>How to fix</h4><p>Fix the JSON syntax (often a trailing comma or unescaped quote). Validate at search.google.com/test/rich-results.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td>Expected double-quoted property name in JSON at position 71 (line 1 column 72)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="content" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Missing meta description</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Without one, Google picks random page text for the search snippet, which usually lowers click-through rate.</p></div>
+          <div><h4>How to fix</h4><p>Write a unique 120–155 character summary with a clear benefit and call to action.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="content" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Thin content (under 250 words)</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Pages with little unique text rarely rank and can drag down how Google rates the whole site.</p></div>
+          <div><h4>How to fix</h4><p>Expand with genuinely useful content (answers, details, examples, FAQs), merge it into a stronger page, or noindex it.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td>31 words</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td>95 words</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="content" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Duplicate page content</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Identical pages split ranking signals, and Google picks just one of them to show.</p></div>
+          <div><h4>How to fix</h4><p>Merge them, or set a canonical from the copies to the main version.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td>identical to http://127.0.0.1:8088/blog/post-2</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td>identical to http://127.0.0.1:8088/blog/post-1</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="social" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Incomplete Open Graph tags</span>
+        <span class="count">12 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>When the page is shared on LinkedIn, Facebook, Slack or Teams, the preview will be plain text or a random image.</p></div>
+          <div><h4>How to fix</h4><p>Add og:title, og:description and og:image (1200×630px).</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/orphan" target="_blank" rel="noopener">http://127.0.0.1:8088/orphan</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td>missing og:title, og:description, og:image</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td>missing og:title, og:description, og:image</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="indexability" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Redirect chains (2+ hops)</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Each extra hop slows the page and Google may stop following after several hops.</p></div>
+          <div><h4>How to fix</h4><p>Point the first URL straight at the final destination with a single 301 redirect.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/old-page" target="_blank" rel="noopener">http://127.0.0.1:8088/old-page</a></td><td>302 → 301 → http://127.0.0.1:8088/services</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="indexability" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Content only appears after JavaScript runs</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Google renders JavaScript later and less reliably than HTML. Other search engines, link previews and AI crawlers often don&#39;t run JavaScript at all.</p></div>
+          <div><h4>How to fix</h4><p>Server-render (SSR) or pre-render the main content, title and links so they are in the initial HTML.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td>0 words in raw HTML vs 300 after rendering, title injected by JS</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="indexability" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Sitemap lists redirecting URLs</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Sitemaps should contain only final, canonical 200 URLs.</p></div>
+          <div><h4>How to fix</h4><p>Replace each entry with its final destination URL.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/old-page" target="_blank" rel="noopener">http://127.0.0.1:8088/old-page</a></td><td>→ http://127.0.0.1:8088/services</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="indexability" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Sitemap lists broken URLs</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Errors in the sitemap reduce Google&#39;s trust in it.</p></div>
+          <div><h4>How to fix</h4><p>Remove or fix these entries. Regenerate the sitemap automatically from live pages.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/missing-page" target="_blank" rel="noopener">http://127.0.0.1:8088/missing-page</a></td><td>HTTP 404</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="mobile" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Content wider than the phone screen</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Sideways scrolling on mobile is a usability failure that Google flags.</p></div>
+          <div><h4>How to fix</h4><p>Find the overflowing element (often a table, image or fixed-width box). Add max-width:100% or make it scroll inside its own container.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td>429px too wide</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td>997px too wide</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="performance" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Large images (over 200 KB)</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Oversized images are the most common cause of slow pages.</p></div>
+          <div><h4>How to fix</h4><p>Resize to the displayed size, convert to WebP/AVIF, and compress to about 70–80% quality. Use srcset for responsive sizes.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>400 KB · http://127.0.0.1:8088/img/big.png</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="mobile" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Images missing alt text</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Alt text is how screen readers and Google Images understand an image. Missing alt text is an accessibility (ADA/WCAG) risk.</p></div>
+          <div><h4>How to fix</h4><p>Describe what each image shows in a few words. Use alt=&quot;&quot; only for purely decorative images.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>1 image(s): big.png</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Missing canonical tag</span>
+        <span class="count">7 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Without a canonical, URL variants (tracking parameters, trailing slashes, http/https) can be indexed as duplicates.</p></div>
+          <div><h4>How to fix</h4><p>Add &lt;link rel=&quot;canonical&quot; href=&quot;...&quot;&gt; pointing at the preferred URL (self-referencing on most pages).</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/orphan" target="_blank" rel="noopener">http://127.0.0.1:8088/orphan</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="warning" data-cat="structured" >
+      <summary>
+        <span class="sev warning">Warning</span>
+        <span class="ititle">Structured data missing required properties</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Google only shows rich results when the required properties are present.</p></div>
+          <div><h4>How to fix</h4><p>Add the missing properties listed for each page.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td>Article: missing headline</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Indexable pages missing from the sitemap</span>
+        <span class="count">6 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Pages missing from the sitemap may be discovered and refreshed more slowly.</p></div>
+          <div><h4>How to fix</h4><p>Make sure the sitemap generator includes every indexable page.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Titles too short (under 25 characters)</span>
+        <span class="count">3 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Short titles waste space that could target more search terms and earn clicks.</p></div>
+          <div><h4>How to fix</h4><p>Expand with a descriptive keyword phrase and the brand name.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>8 chars: &quot;Services&quot;</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td>8 chars: &quot;Products&quot;</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td>9 chars: &quot;Deep page&quot;</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Pages with only one internal link pointing to them</span>
+        <span class="count">5 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Weakly linked pages get less authority and are crawled less often.</p></div>
+          <div><h4>How to fix</h4><p>Add contextual links from related pages, hubs or navigation.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Generic link text (&quot;click here&quot;, &quot;read more&quot;)</span>
+        <span class="count">4 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Anchor text tells Google what the target page is about. Generic text wastes that signal and hurts accessibility.</p></div>
+          <div><h4>How to fix</h4><p>Use descriptive text, for example &quot;see our pricing plans&quot; instead of &quot;click here&quot;.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/" target="_blank" rel="noopener">http://127.0.0.1:8088/</a></td><td>&quot;click here&quot; → http://127.0.0.1:8088/blog/post-1</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/</a></td><td>&quot;Read more&quot; → http://127.0.0.1:8088/blog/post-1</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td>&quot;Details&quot; → http://127.0.0.1:8088/services/battery/deep</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td>&quot;More&quot; → http://127.0.0.1:8088/services/battery/deep/deeper</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Meta descriptions too short (under 70 characters)</span>
+        <span class="count">2 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Short descriptions under-sell the page and Google often replaces them.</p></div>
+          <div><h4>How to fix</h4><p>Expand to 120–155 characters.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>10 chars: &quot;Short desc&quot;</td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td>8 chars: &quot;Products&quot;</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="social" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Missing Twitter/X card tag</span>
+        <span class="count">12 URLs</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Without it, shares on X show a small or plain preview.</p></div>
+          <div><h4>How to fix</h4><p>Add &lt;meta name=&quot;twitter:card&quot; content=&quot;summary_large_image&quot;&gt;.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-1" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-1</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/orphan" target="_blank" rel="noopener">http://127.0.0.1:8088/orphan</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep</a></td><td></td></tr><tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Temporary (302/307) redirects</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Temporary redirects tell Google the original URL will come back, so it may keep indexing the old one.</p></div>
+          <div><h4>How to fix</h4><p>If the move is permanent, change it to a 301 (or 308) redirect.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/old-page" target="_blank" rel="noopener">http://127.0.0.1:8088/old-page</a></td><td>→ http://127.0.0.1:8088/services</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Pages canonicalized to another URL</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>These pages ask Google to index a different URL instead. Correct for duplicates, harmful if unintentional.</p></div>
+          <div><h4>How to fix</h4><p>Confirm each canonical target is the right page. Otherwise make the canonical self-referencing.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/blog/post-2" target="_blank" rel="noopener">http://127.0.0.1:8088/blog/post-2</a></td><td>→ http://127.0.0.1:8088/blog/post-1</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Pages buried 4+ clicks from the homepage</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Pages far from the homepage are crawled less often and are treated as less important.</p></div>
+          <div><h4>How to fix</h4><p>Link to them from higher-level pages, navigation, hubs or breadcrumbs.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services/battery/deep/deeper" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery/deep/deeper</a></td><td>depth 4</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Linked URLs blocked by robots.txt</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Blocked URLs can still be indexed (without content) if linked. Blocking also stops Google from seeing noindex tags.</p></div>
+          <div><h4>How to fix</h4><p>Confirm the block is intended. To keep a page out of results, allow crawling and use noindex instead.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/private/x" target="_blank" rel="noopener">http://127.0.0.1:8088/private/x</a></td><td>linked from http://127.0.0.1:8088/</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="indexability" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Sitemap not referenced in robots.txt</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Listing the sitemap in robots.txt lets every crawler find it automatically.</p></div>
+          <div><h4>How to fix</h4><p>Add a line &quot;Sitemap: &lt;full sitemap URL&gt;&quot; to robots.txt.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/robots.txt" target="_blank" rel="noopener">http://127.0.0.1:8088/robots.txt</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Skipped heading levels</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Jumping from H2 to H4 breaks the document outline used by screen readers and parsers.</p></div>
+          <div><h4>How to fix</h4><p>Use headings in order (H1 → H2 → H3). Style them with CSS instead of picking a level for its size.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>H1 → H3 (&quot;Residential&quot;)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Missing language attribute</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>The lang attribute helps search engines serve the page to the right audience and helps screen readers pronounce it.</p></div>
+          <div><h4>How to fix</h4><p>Add lang to the &lt;html&gt; tag, for example &lt;html lang=&quot;en&quot;&gt;.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/about" target="_blank" rel="noopener">http://127.0.0.1:8088/about</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">URLs that are hard to read</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Short, lowercase, hyphenated URLs are easier to share, and they show up in search results.</p></div>
+          <div><h4>How to fix</h4><p>Use lowercase words separated by hyphens. When changing a URL, 301-redirect the old one.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/Products_List" target="_blank" rel="noopener">http://127.0.0.1:8088/Products_List</a></td><td>uppercase letters, underscores</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="content" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Multiple H1 headings</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Several H1s dilute the page&#39;s main topic and often mean the logo or other template parts are marked up as H1.</p></div>
+          <div><h4>How to fix</h4><p>Use one H1 for the main topic and H2–H3 for sections.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services/battery" target="_blank" rel="noopener">http://127.0.0.1:8088/services/battery</a></td><td>&quot;Battery storage&quot;, &quot;Second H1&quot;</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="performance" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Images without width/height attributes</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>The browser can&#39;t reserve space for these images, so the layout shifts when they load (CLS).</p></div>
+          <div><h4>How to fix</h4><p>Add width and height attributes (CSS can still make the image responsive).</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/services" target="_blank" rel="noopener">http://127.0.0.1:8088/services</a></td><td>http://127.0.0.1:8088/img/big.png</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Internal links pointing to redirects</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Every redirected internal link adds latency and wastes a little authority.</p></div>
+          <div><h4>How to fix</h4><p>Update the link to point straight at the final URL.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/" target="_blank" rel="noopener">http://127.0.0.1:8088/</a></td><td>→ http://127.0.0.1:8088/old-page</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Outbound links that could not be verified</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>These links timed out or refused the connection. They may be broken, or the site may block automated checks.</p></div>
+          <div><h4>How to fix</h4><p>Open these links manually and remove any that are dead.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/" target="_blank" rel="noopener">http://127.0.0.1:8088/</a></td><td>→ https://external.invalid/resource (ENOTFOUND)</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Dead-end pages (no internal links out)</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Visitors and crawlers have nowhere to go next.</p></div>
+          <div><h4>How to fix</h4><p>Add navigation or related-content links.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/spa" target="_blank" rel="noopener">http://127.0.0.1:8088/spa</a></td><td></td></tr>
+        </tbody></table>
+        
+      </div>
+    </details>
+    <details class="issue" data-sev="notice" data-cat="links" >
+      <summary>
+        <span class="sev notice">Notice</span>
+        <span class="ititle">Links with no text</span>
+        <span class="count">1 URL</span>
+      </summary>
+      <div class="ibody">
+        <div class="whyfix">
+          <div><h4>Why it matters</h4><p>Screen readers and search engines can&#39;t tell where an empty link goes.</p></div>
+          <div><h4>How to fix</h4><p>Add visible text, an aria-label, or alt text on the linked image.</p></div>
+        </div>
+        <table class="items"><thead><tr><th>URL</th><th>Detail</th></tr></thead><tbody>
+        <tr><td class="u"><a href="http://127.0.0.1:8088/contact" target="_blank" rel="noopener">http://127.0.0.1:8088/contact</a></td><td>→ http://127.0.0.1:8088/thank-you</td></tr>
+        </tbody></table>
+        
+      </div>
+    </details></div>
+
+<h2>All crawled URLs</h2>
+<div class="toolbar"><input type="search" id="q" placeholder="Filter by URL or title…"></div>
+<div class="tablewrap"><table id="pages"><thead><tr>
+<th data-k="url">URL</th><th data-k="status">Status</th><th data-k="indexable">Indexable</th><th data-k="titleLen">Title len</th><th data-k="descLen">Desc len</th><th data-k="words">Words</th><th data-k="inlinks">Inlinks</th><th data-k="depth">Depth</th><th data-k="lcp">LCP</th><th data-k="cls">CLS</th><th data-k="bytes">Size</th><th data-k="issues">Issues</th>
+</tr></thead><tbody></tbody></table></div>
+
+<p class="muted" style="margin-top:24px">Speed figures are lab measurements from one headless load on an emulated Pixel 7; real-user (field) data from Google Search Console may differ. Structured data checks cover Google's required properties for common types; confirm eligibility with Google's Rich Results Test.</p>
+</div>
+<script>
+const DATA = {"pages":[{"url":"http://127.0.0.1:8088/","finalUrl":"http://127.0.0.1:8088/","status":200,"depth":0,"indexable":"yes","title":"Acme Solar | Solar Panel Installation in Austin, TX","titleLen":51,"descLen":142,"h1":"Solar panel installation in Austin","words":415,"inlinks":12,"lcp":104,"cls":0,"bytes":35065,"inSitemap":true,"issues":4},{"url":"http://127.0.0.1:8088/blog/","finalUrl":"http://127.0.0.1:8088/blog/","status":200,"depth":1,"indexable":"yes","title":"Solar Energy Blog | Tips, Guides & News from Acme Solar","titleLen":55,"descLen":112,"h1":"Blog","words":266,"inlinks":12,"lcp":56,"cls":0,"bytes":2673,"inSitemap":true,"issues":3},{"url":"http://127.0.0.1:8088/services","finalUrl":"http://127.0.0.1:8088/services","status":200,"depth":1,"indexable":"yes","title":"Services","titleLen":8,"descLen":10,"h1":"Services","words":324,"inlinks":12,"lcp":48,"cls":0,"bytes":412793,"inSitemap":true,"issues":8},{"url":"http://127.0.0.1:8088/blog/post-1","finalUrl":"http://127.0.0.1:8088/blog/post-1","status":200,"depth":1,"indexable":"yes","title":"How Much Do Solar Panels Cost in Texas? (2026 Guide)","titleLen":52,"descLen":127,"h1":"Solar cost guide","words":603,"inlinks":2,"lcp":68,"cls":0,"bytes":5076,"inSitemap":true,"issues":6},{"url":"http://127.0.0.1:8088/thank-you","finalUrl":"http://127.0.0.1:8088/thank-you","status":200,"depth":1,"indexable":"no","title":"Thank you for contacting Acme Solar","titleLen":35,"descLen":6,"h1":"Thanks","words":6,"inlinks":1,"lcp":36,"cls":0,"bytes":674,"inSitemap":true,"issues":1},{"url":"http://127.0.0.1:8088/orphan","finalUrl":"http://127.0.0.1:8088/orphan","status":200,"depth":1,"indexable":"yes","title":"Orphaned landing page for a spring solar promotion","titleLen":50,"descLen":101,"h1":"Promo","words":301,"inlinks":0,"lcp":76,"cls":0,"bytes":2794,"inSitemap":true,"issues":4},{"url":"http://127.0.0.1:8088/old-page","finalUrl":"http://127.0.0.1:8088/services","status":200,"depth":1,"indexable":"yes","title":"","titleLen":0,"descLen":0,"h1":"","words":0,"inlinks":12,"lcp":0,"cls":0,"bytes":0,"inSitemap":true,"issues":11},{"url":"http://127.0.0.1:8088/missing-page","finalUrl":"http://127.0.0.1:8088/missing-page","status":404,"depth":1,"indexable":"no","title":"","titleLen":0,"descLen":0,"h1":"","words":0,"inlinks":1,"lcp":0,"cls":0,"bytes":0,"inSitemap":true,"issues":2},{"url":"http://127.0.0.1:8088/spa","finalUrl":"http://127.0.0.1:8088/spa","status":200,"depth":1,"indexable":"yes","title":"JS Rendered Page Title Here For Testing","titleLen":39,"descLen":0,"h1":"App","words":300,"inlinks":0,"lcp":28,"cls":0,"bytes":2582,"inSitemap":true,"issues":7},{"url":"http://127.0.0.1:8088/about","finalUrl":"http://127.0.0.1:8088/about","status":200,"depth":1,"indexable":"yes","title":"About Acme Solar | Austin's local solar installer since 2009","titleLen":60,"descLen":0,"h1":"About us","words":284,"inlinks":12,"lcp":32,"cls":0,"bytes":2496,"inSitemap":false,"issues":9},{"url":"http://127.0.0.1:8088/Products_List","finalUrl":"http://127.0.0.1:8088/Products_List","status":200,"depth":1,"indexable":"yes","title":"Products","titleLen":8,"descLen":8,"h1":"Products","words":31,"inlinks":1,"lcp":20,"cls":0,"bytes":799,"inSitemap":false,"issues":9},{"url":"http://127.0.0.1:8088/contact","finalUrl":"http://127.0.0.1:8088/contact","status":200,"depth":1,"indexable":"yes","title":"About Acme Solar | Austin's local solar installer since 2009","titleLen":60,"descLen":115,"h1":"Contact","words":261,"inlinks":12,"lcp":28,"cls":0,"bytes":2744,"inSitemap":false,"issues":6},{"url":"http://127.0.0.1:8088/services/battery","finalUrl":"http://127.0.0.1:8088/services/battery","status":200,"depth":2,"indexable":"yes","title":"Battery Storage Systems | Acme Solar","titleLen":36,"descLen":81,"h1":"Battery storage","words":95,"inlinks":1,"lcp":44,"cls":0,"bytes":1383,"inSitemap":false,"issues":9},{"url":"http://127.0.0.1:8088/blog/post-2","finalUrl":"http://127.0.0.1:8088/blog/post-2","status":200,"depth":2,"indexable":"canonicalized","title":"How Much Do Solar Panels Cost in Texas? (2026 Guide)","titleLen":52,"descLen":127,"h1":"Solar cost guide","words":603,"inlinks":1,"lcp":28,"cls":0,"bytes":4967,"inSitemap":false,"issues":7},{"url":"http://127.0.0.1:8088/services/battery/deep","finalUrl":"http://127.0.0.1:8088/services/battery/deep","status":200,"depth":3,"indexable":"yes","title":"Deep page","titleLen":9,"descLen":81,"h1":"Deep","words":304,"inlinks":1,"lcp":24,"cls":0,"bytes":2822,"inSitemap":false,"issues":9},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","finalUrl":"http://127.0.0.1:8088/services/battery/deep/deeper","status":200,"depth":4,"indexable":"yes","title":"Deeper page about solar battery warranty options","titleLen":48,"descLen":97,"h1":"Deeper","words":301,"inlinks":1,"lcp":36,"cls":0,"bytes":2789,"inSitemap":false,"issues":6}],"issues":[{"id":"4xx","category":"indexability","severity":"critical","title":"Broken pages (4xx)","fix":"Restore the page, 301-redirect it to the closest relevant live page, or update the links pointing to it.","items":[{"url":"http://127.0.0.1:8088/missing-page","detail":"HTTP 404 · linked from (sitemap)"}]},{"id":"noindex-in-sitemap","category":"indexability","severity":"critical","title":"Noindex pages listed in the sitemap","fix":"Either remove noindex (if the page should rank) or remove it from the sitemap.","items":[{"url":"http://127.0.0.1:8088/thank-you","detail":"noindex"}]},{"id":"broken-internal","category":"links","severity":"critical","title":"Broken internal links","fix":"Update each link to a working URL, or redirect the dead URL.","items":[{"url":"http://127.0.0.1:8088/","detail":"→ http://127.0.0.1:8088/missing-page (HTTP 404) \"Financing\""}]},{"id":"no-viewport","category":"mobile","severity":"critical","title":"Missing mobile viewport tag","fix":"Add \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"> to the \u003chead>.","items":[{"url":"http://127.0.0.1:8088/about","detail":""}]},{"id":"dup-title","category":"content","severity":"warning","title":"Duplicate titles","fix":"Give every page a unique title that describes what makes it different.","items":[{"url":"http://127.0.0.1:8088/blog/post-1","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/blog/post-2","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/about","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/contact","detail":"shared with 1 other page(s)"}]},{"id":"dup-desc","category":"content","severity":"warning","title":"Duplicate meta descriptions","fix":"Write a unique description per page, or remove the template default so you notice the gaps.","items":[{"url":"http://127.0.0.1:8088/blog/post-1","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/blog/post-2","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/services/battery","detail":"shared with 1 other page(s)"},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":"shared with 1 other page(s)"}]},{"id":"orphan","category":"indexability","severity":"warning","title":"Orphan pages (in sitemap, no internal links)","fix":"Link to them from relevant pages, or remove them from the sitemap if they are obsolete.","items":[{"url":"http://127.0.0.1:8088/orphan","detail":""},{"url":"http://127.0.0.1:8088/spa","detail":""}]},{"id":"jsonld-invalid","category":"structured","severity":"critical","title":"Broken structured data (invalid JSON-LD)","fix":"Fix the JSON syntax (often a trailing comma or unescaped quote). Validate at search.google.com/test/rich-results.","items":[{"url":"http://127.0.0.1:8088/contact","detail":"Expected double-quoted property name in JSON at position 71 (line 1 column 72)"}]},{"id":"no-desc","category":"content","severity":"warning","title":"Missing meta description","fix":"Write a unique 120–155 character summary with a clear benefit and call to action.","items":[{"url":"http://127.0.0.1:8088/spa","detail":""},{"url":"http://127.0.0.1:8088/about","detail":""}]},{"id":"thin","category":"content","severity":"warning","title":"Thin content (under 250 words)","fix":"Expand with genuinely useful content (answers, details, examples, FAQs), merge it into a stronger page, or noindex it.","items":[{"url":"http://127.0.0.1:8088/Products_List","detail":"31 words"},{"url":"http://127.0.0.1:8088/services/battery","detail":"95 words"}]},{"id":"dup-content","category":"content","severity":"warning","title":"Duplicate page content","fix":"Merge them, or set a canonical from the copies to the main version.","items":[{"url":"http://127.0.0.1:8088/blog/post-1","detail":"identical to http://127.0.0.1:8088/blog/post-2"},{"url":"http://127.0.0.1:8088/blog/post-2","detail":"identical to http://127.0.0.1:8088/blog/post-1"}]},{"id":"og-missing","category":"social","severity":"warning","title":"Incomplete Open Graph tags","fix":"Add og:title, og:description and og:image (1200×630px).","items":[{"url":"http://127.0.0.1:8088/blog/","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/services","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/blog/post-1","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/orphan","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/spa","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/about","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/Products_List","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/contact","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/services/battery","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/blog/post-2","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":"missing og:title, og:description, og:image"},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":"missing og:title, og:description, og:image"}]},{"id":"redirect-chain","category":"indexability","severity":"warning","title":"Redirect chains (2+ hops)","fix":"Point the first URL straight at the final destination with a single 301 redirect.","items":[{"url":"http://127.0.0.1:8088/old-page","detail":"302 → 301 → http://127.0.0.1:8088/services"}]},{"id":"js-dependent","category":"indexability","severity":"warning","title":"Content only appears after JavaScript runs","fix":"Server-render (SSR) or pre-render the main content, title and links so they are in the initial HTML.","items":[{"url":"http://127.0.0.1:8088/spa","detail":"0 words in raw HTML vs 300 after rendering, title injected by JS"}]},{"id":"sitemap-redirect","category":"indexability","severity":"warning","title":"Sitemap lists redirecting URLs","fix":"Replace each entry with its final destination URL.","items":[{"url":"http://127.0.0.1:8088/old-page","detail":"→ http://127.0.0.1:8088/services"}]},{"id":"sitemap-broken","category":"indexability","severity":"warning","title":"Sitemap lists broken URLs","fix":"Remove or fix these entries. Regenerate the sitemap automatically from live pages.","items":[{"url":"http://127.0.0.1:8088/missing-page","detail":"HTTP 404"}]},{"id":"h-overflow","category":"mobile","severity":"warning","title":"Content wider than the phone screen","fix":"Find the overflowing element (often a table, image or fixed-width box). Add max-width:100% or make it scroll inside its own container.","items":[{"url":"http://127.0.0.1:8088/about","detail":"429px too wide"},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":"997px too wide"}]},{"id":"big-image","category":"performance","severity":"warning","title":"Large images (over 200 KB)","fix":"Resize to the displayed size, convert to WebP/AVIF, and compress to about 70–80% quality. Use srcset for responsive sizes.","items":[{"url":"http://127.0.0.1:8088/services","detail":"400 KB · http://127.0.0.1:8088/img/big.png"}]},{"id":"img-no-alt","category":"mobile","severity":"warning","title":"Images missing alt text","fix":"Describe what each image shows in a few words. Use alt=\"\" only for purely decorative images.","items":[{"url":"http://127.0.0.1:8088/services","detail":"1 image(s): big.png"}]},{"id":"no-canonical","category":"indexability","severity":"notice","title":"Missing canonical tag","fix":"Add \u003clink rel=\"canonical\" href=\"...\"> pointing at the preferred URL (self-referencing on most pages).","items":[{"url":"http://127.0.0.1:8088/orphan","detail":""},{"url":"http://127.0.0.1:8088/spa","detail":""},{"url":"http://127.0.0.1:8088/about","detail":""},{"url":"http://127.0.0.1:8088/Products_List","detail":""},{"url":"http://127.0.0.1:8088/services/battery","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":""}]},{"id":"schema-missing-props","category":"structured","severity":"warning","title":"Structured data missing required properties","fix":"Add the missing properties listed for each page.","items":[{"url":"http://127.0.0.1:8088/blog/post-1","detail":"Article: missing headline"}]},{"id":"not-in-sitemap","category":"indexability","severity":"notice","title":"Indexable pages missing from the sitemap","fix":"Make sure the sitemap generator includes every indexable page.","items":[{"url":"http://127.0.0.1:8088/about","detail":""},{"url":"http://127.0.0.1:8088/Products_List","detail":""},{"url":"http://127.0.0.1:8088/contact","detail":""},{"url":"http://127.0.0.1:8088/services/battery","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":""}]},{"id":"title-short","category":"content","severity":"notice","title":"Titles too short (under 25 characters)","fix":"Expand with a descriptive keyword phrase and the brand name.","items":[{"url":"http://127.0.0.1:8088/services","detail":"8 chars: \"Services\""},{"url":"http://127.0.0.1:8088/Products_List","detail":"8 chars: \"Products\""},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":"9 chars: \"Deep page\""}]},{"id":"few-inlinks","category":"links","severity":"notice","title":"Pages with only one internal link pointing to them","fix":"Add contextual links from related pages, hubs or navigation.","items":[{"url":"http://127.0.0.1:8088/Products_List","detail":""},{"url":"http://127.0.0.1:8088/services/battery","detail":""},{"url":"http://127.0.0.1:8088/blog/post-2","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":""}]},{"id":"generic-anchor","category":"links","severity":"notice","title":"Generic link text (\"click here\", \"read more\")","fix":"Use descriptive text, for example \"see our pricing plans\" instead of \"click here\".","items":[{"url":"http://127.0.0.1:8088/","detail":"\"click here\" → http://127.0.0.1:8088/blog/post-1"},{"url":"http://127.0.0.1:8088/blog/","detail":"\"Read more\" → http://127.0.0.1:8088/blog/post-1"},{"url":"http://127.0.0.1:8088/services/battery","detail":"\"Details\" → http://127.0.0.1:8088/services/battery/deep"},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":"\"More\" → http://127.0.0.1:8088/services/battery/deep/deeper"}]},{"id":"desc-short","category":"content","severity":"notice","title":"Meta descriptions too short (under 70 characters)","fix":"Expand to 120–155 characters.","items":[{"url":"http://127.0.0.1:8088/services","detail":"10 chars: \"Short desc\""},{"url":"http://127.0.0.1:8088/Products_List","detail":"8 chars: \"Products\""}]},{"id":"no-twitter-card","category":"social","severity":"notice","title":"Missing Twitter/X card tag","fix":"Add \u003cmeta name=\"twitter:card\" content=\"summary_large_image\">.","items":[{"url":"http://127.0.0.1:8088/blog/","detail":""},{"url":"http://127.0.0.1:8088/services","detail":""},{"url":"http://127.0.0.1:8088/blog/post-1","detail":""},{"url":"http://127.0.0.1:8088/orphan","detail":""},{"url":"http://127.0.0.1:8088/spa","detail":""},{"url":"http://127.0.0.1:8088/about","detail":""},{"url":"http://127.0.0.1:8088/Products_List","detail":""},{"url":"http://127.0.0.1:8088/contact","detail":""},{"url":"http://127.0.0.1:8088/services/battery","detail":""},{"url":"http://127.0.0.1:8088/blog/post-2","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep","detail":""},{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":""}]},{"id":"temp-redirect","category":"indexability","severity":"notice","title":"Temporary (302/307) redirects","fix":"If the move is permanent, change it to a 301 (or 308) redirect.","items":[{"url":"http://127.0.0.1:8088/old-page","detail":"→ http://127.0.0.1:8088/services"}]},{"id":"canonicalized","category":"indexability","severity":"notice","title":"Pages canonicalized to another URL","fix":"Confirm each canonical target is the right page. Otherwise make the canonical self-referencing.","items":[{"url":"http://127.0.0.1:8088/blog/post-2","detail":"→ http://127.0.0.1:8088/blog/post-1"}]},{"id":"deep-page","category":"indexability","severity":"notice","title":"Pages buried 4+ clicks from the homepage","fix":"Link to them from higher-level pages, navigation, hubs or breadcrumbs.","items":[{"url":"http://127.0.0.1:8088/services/battery/deep/deeper","detail":"depth 4"}]},{"id":"robots-blocked","category":"indexability","severity":"notice","title":"Linked URLs blocked by robots.txt","fix":"Confirm the block is intended. To keep a page out of results, allow crawling and use noindex instead.","items":[{"url":"http://127.0.0.1:8088/private/x","detail":"linked from http://127.0.0.1:8088/"}]},{"id":"sitemap-not-in-robots","category":"indexability","severity":"notice","title":"Sitemap not referenced in robots.txt","fix":"Add a line \"Sitemap: \u003cfull sitemap URL>\" to robots.txt.","items":[{"url":"http://127.0.0.1:8088/robots.txt","detail":""}]},{"id":"heading-skip","category":"content","severity":"notice","title":"Skipped heading levels","fix":"Use headings in order (H1 → H2 → H3). Style them with CSS instead of picking a level for its size.","items":[{"url":"http://127.0.0.1:8088/services","detail":"H1 → H3 (\"Residential\")"}]},{"id":"no-lang","category":"content","severity":"notice","title":"Missing language attribute","fix":"Add lang to the \u003chtml> tag, for example \u003chtml lang=\"en\">.","items":[{"url":"http://127.0.0.1:8088/about","detail":""}]},{"id":"url-format","category":"content","severity":"notice","title":"URLs that are hard to read","fix":"Use lowercase words separated by hyphens. When changing a URL, 301-redirect the old one.","items":[{"url":"http://127.0.0.1:8088/Products_List","detail":"uppercase letters, underscores"}]},{"id":"multi-h1","category":"content","severity":"notice","title":"Multiple H1 headings","fix":"Use one H1 for the main topic and H2–H3 for sections.","items":[{"url":"http://127.0.0.1:8088/services/battery","detail":"\"Battery storage\", \"Second H1\""}]},{"id":"img-no-dims","category":"performance","severity":"notice","title":"Images without width/height attributes","fix":"Add width and height attributes (CSS can still make the image responsive).","items":[{"url":"http://127.0.0.1:8088/services","detail":"http://127.0.0.1:8088/img/big.png"}]},{"id":"link-to-redirect","category":"links","severity":"notice","title":"Internal links pointing to redirects","fix":"Update the link to point straight at the final URL.","items":[{"url":"http://127.0.0.1:8088/","detail":"→ http://127.0.0.1:8088/old-page"}]},{"id":"unverified-external","category":"links","severity":"notice","title":"Outbound links that could not be verified","fix":"Open these links manually and remove any that are dead.","items":[{"url":"http://127.0.0.1:8088/","detail":"→ https://external.invalid/resource (ENOTFOUND)"}]},{"id":"dead-end","category":"links","severity":"notice","title":"Dead-end pages (no internal links out)","fix":"Add navigation or related-content links.","items":[{"url":"http://127.0.0.1:8088/spa","detail":""}]},{"id":"empty-anchor","category":"links","severity":"notice","title":"Links with no text","fix":"Add visible text, an aria-label, or alt text on the linked image.","items":[{"url":"http://127.0.0.1:8088/contact","detail":"→ http://127.0.0.1:8088/thank-you"}]}]};
+const fmtB = n => !n ? '' : n < 1048576 ? Math.round(n/1024)+' KB' : (n/1048576).toFixed(1)+' MB';
+let sevSel='all', catSel=null;
+function applyIssueFilter(){document.querySelectorAll('.issue').forEach(d=>{d.style.display=((sevSel==='all'||d.dataset.sev===sevSel)&&(!catSel||d.dataset.cat===catSel))?'':'none'})}
+document.querySelectorAll('#sevf button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#sevf button').forEach(x=>x.classList.remove('active'));b.classList.add('active');sevSel=b.dataset.sev;applyIssueFilter()});
+document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{const k=b.dataset.filterCat;catSel=catSel===k?null:k;document.querySelectorAll('.cat').forEach(x=>x.classList.toggle('active',x.dataset.filterCat===catSel));applyIssueFilter();document.getElementById('issues').scrollIntoView({behavior:'smooth'})});
+let sortK='issues',sortDir=-1;
+function renderPages(){const q=document.getElementById('q').value.toLowerCase();
+const rows=DATA.pages.filter(p=>!q||p.url.toLowerCase().includes(q)||(p.title||'').toLowerCase().includes(q)).sort((a,b)=>(a[sortK]>b[sortK]?1:a[sortK]<b[sortK]?-1:0)*sortDir);
+document.querySelector('#pages tbody').innerHTML=rows.slice(0,2000).map(p=>'<tr><td class="u"><a target="_blank" rel="noopener" href="'+encodeURI(p.url)+'">'+p.url.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</a></td><td class="s'+String(p.status)[0]+'">'+(p.status||'ERR')+'</td><td>'+p.indexable+'</td><td>'+(p.titleLen||'')+'</td><td>'+(p.descLen||'')+'</td><td>'+(p.words||'')+'</td><td>'+p.inlinks+'</td><td>'+p.depth+'</td><td>'+(p.lcp?(p.lcp/1000).toFixed(1)+'s':'')+'</td><td>'+(p.cls||'')+'</td><td>'+fmtB(p.bytes)+'</td><td>'+p.issues+'</td></tr>').join('');}
+document.getElementById('q').oninput=renderPages;
+document.querySelectorAll('#pages th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortDir=sortK===k?-sortDir:-1;sortK=k;renderPages()});
+renderPages();
+function csv(rows){return rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n')}
+function dl(kind){let text;if(kind==='pages'){const keys=Object.keys(DATA.pages[0]||{});text=csv([keys,...DATA.pages.map(p=>keys.map(k=>p[k]))])}
+else{text=csv([['severity','category','issue','url','detail','fix'],...DATA.issues.flatMap(i=>i.items.map(it=>[i.severity,i.category,i.title,it.url,it.detail,i.fix]))])}
+const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'}));a.download='seo-'+kind+'-127.0.0.1:8088.csv';a.click()}
+</script></body></html>

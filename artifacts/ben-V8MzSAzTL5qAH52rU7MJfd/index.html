@@ -1,0 +1,114 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ben</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a reading-room page for Ben. Warm parchment light or lamp-lit dark; his living portrait first, then one card per expression with where the chat uses it. */
+:root{
+  --bg:#f5efe4; --surface:#fffaf1; --rule:#e2d5bf; --ink:#2b2117; --dim:#6f5f4c; --gold:#9a6b1f; --gold-soft:#f1e3c4; --leather:#5a3a22;
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15100b;--surface:#1f1811;--rule:#3a2d20;--ink:#f1e7d6;--dim:#bba98f;--gold:#e0b25c;--gold-soft:#33261a;--leather:#c79a6a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15100b;--surface:#1f1811;--rule:#3a2d20;--ink:#f1e7d6;--dim:#bba98f;--gold:#e0b25c;--gold-soft:#33261a;--leather:#c79a6a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px;display:grid;gap:40px}
+h1,h2,h3{font-family:var(--display);margin:0;font-weight:700;text-wrap:balance}
+h1{font-size:clamp(2.6rem,7vw,4.4rem);line-height:.95;letter-spacing:.01em}
+h2{font-size:2rem}h3{font-size:1.45rem;line-height:1.1}
+p{margin:0}.dim{color:var(--dim)}
+.kicker{font:600 .78rem/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.hero{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:32px;align-items:center}
+.portrait{width:100%;max-width:340px;aspect-ratio:1;border-radius:50%;object-fit:cover;display:block;border:3px solid var(--gold);box-shadow:0 0 0 8px var(--gold-soft),0 24px 50px rgba(40,20,5,.35)}
+.hero .copy{display:grid;gap:14px;max-width:56ch}
+.chatline{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:6px 16px 6px 6px;width:max-content;max-width:100%}
+.chatline img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none}
+.chatline span{font-size:.95rem;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:16px;overflow:hidden;display:grid;align-content:start;min-width:0}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#2a1d12}
+.card .body{padding:14px 16px 16px;display:grid;gap:8px}
+.card .when{font-size:.9rem;color:var(--dim)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{appearance:none;cursor:pointer;font:600 .88rem var(--body);border-radius:9px;padding:7px 12px;border:1px solid var(--rule);background:var(--bg);color:var(--ink)}
+button.go{background:var(--leather);border-color:var(--leather);color:var(--bg)}
+button:hover{filter:brightness(1.06)}button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}button[disabled]{opacity:.6;cursor:default}
+.status{font-size:.8rem;color:var(--dim);min-height:1.1em}
+video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:14px;background:#000;display:block}
+.note{background:var(--gold-soft);border-radius:12px;padding:14px 16px;display:grid;gap:6px}
+@media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.portrait{max-width:260px;margin:0 auto}}
+</style>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <img class="portrait" src="Ben-idle.webp" alt="Ben, an old sage in a brown hood with a long white beard, blinking and breathing as he holds a glowing book">
+    <div class="copy">
+      <div class="kicker">CydVerse · AI Chat</div>
+      <h1 id="h1">Ben</h1>
+      <p class="dim">Ben is the face of the CydVerse AI Chat: the keeper of the book. Each expression below loops, so the chat can show what Ben is doing: waiting, thinking, answering, pleased, or struck by an idea.</p>
+      <div class="chatline"><img src="Ben-respond.webp" alt=""><span><b>Ben</b> · Found it. Your share link to Acme ends on Friday.</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="ex-h" style="display:grid;gap:16px">
+    <h2 id="ex-h">Expressions</h2>
+    <div class="grid">
+      <div class="card"><img src="Ben-idle.webp" alt="Ben idle: blinking and breathing, the book glowing softly" loading="lazy"><div class="body"><h3>Idle</h3><p class="when">The chat is open and waiting. Blinks and breathes; the book glows.</p>
+        <div class="btns"><button class="go" type="button" data-file="Ben-idle.gif">GIF</button><button type="button" data-file="Ben-idle.webp">WebP</button></div><div class="status" role="status" aria-live="polite"></div></div></div>
+      <div class="card"><img src="Ben-thinking.webp" alt="Ben thinking: eyes closed, face lifted, the book glowing brighter" loading="lazy"><div class="body"><h3>Thinking</h3><p class="when">While Ben works on an answer. Real closed eyes from your second photo.</p>
+        <div class="btns"><button class="go" type="button" data-file="Ben-thinking.gif">GIF</button><button type="button" data-file="Ben-thinking.webp">WebP</button></div><div class="status" role="status" aria-live="polite"></div></div></div>
+      <div class="card"><img src="Ben-respond.webp" alt="Ben responding: a warm look and two small nods" loading="lazy"><div class="body"><h3>Responding</h3><p class="when">When an answer arrives. A warm look and two small nods.</p>
+        <div class="btns"><button class="go" type="button" data-file="Ben-respond.gif">GIF</button><button type="button" data-file="Ben-respond.webp">WebP</button></div><div class="status" role="status" aria-live="polite"></div></div></div>
+      <div class="card"><img src="Ben-smile.webp" alt="Ben smiling: cheeks lift and eyes crinkle" loading="lazy"><div class="body"><h3>Smile</h3><p class="when">Greetings, thanks and good news. Cheeks lift, eyes crinkle.</p>
+        <div class="btns"><button class="go" type="button" data-file="Ben-smile.gif">GIF</button><button type="button" data-file="Ben-smile.webp">WebP</button></div><div class="status" role="status" aria-live="polite"></div></div></div>
+      <div class="card"><img src="Ben-aha.webp" alt="Ben's aha moment: eyebrows rise, a small star twinkles, then he smiles" loading="lazy"><div class="body"><h3>Aha</h3><p class="when">When he finds the cause of a problem. Brows rise, a star twinkles, then a smile.</p>
+        <div class="btns"><button class="go" type="button" data-file="Ben-aha.gif">GIF</button><button type="button" data-file="Ben-aha.webp">WebP</button></div><div class="status" role="status" aria-live="polite"></div></div></div>
+    </div>
+    <p class="dim" style="font-size:.9rem">GIF: 320 × 320, works everywhere. WebP: 480 × 480, sharper and about the same size; supported by current browsers, Teams and most chat tools.</p>
+  </section>
+
+  <section aria-labelledby="dm-h" style="display:grid;gap:12px">
+    <h2 id="dm-h">All expressions in one clip</h2>
+    <video src="Ben-expressions.mp4" poster="poster.jpg" controls playsinline preload="metadata" aria-label="Ben's five expressions in sequence: idle, smile, thinking, responding and aha"></video>
+    <div class="btns"><button class="go" type="button" data-file="Ben-expressions.mp4">Download MP4</button><button type="button" data-file="ben-still.png">Still photo</button></div><div class="status" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="note" aria-labelledby="nx-h">
+    <h3 id="nx-h">Next for Ben</h3>
+    <p>Pointing with his left hand needs a picture of that pose: a photo can only be animated where it already shows something. Send a photo of Ben pointing (and one with a raised finger for an even stronger "aha"), made the same way as these, and I will animate it the same way. Talking comes later, by moving the moustache and beard in time with his voice.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var downloadsP = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  var types = { gif: 'image/gif', webp: 'image/webp', mp4: 'video/mp4', png: 'image/png' };
+  document.querySelectorAll('button[data-file]').forEach(function (btn) {
+    var status = btn.closest('.body, section').querySelector('.status');
+    function say(m, c) { if (status) { status.textContent = m; status.style.color = c === 'warn' ? 'var(--gold)' : ''; } }
+    btn.addEventListener('click', async function () {
+      var name = btn.getAttribute('data-file');
+      btn.disabled = true; say('Preparing ' + name + '…');
+      try {
+        var downloads = await downloadsP;
+        if (!downloads) { say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn'); btn.disabled = false; return; }
+        var r = await fetch(name); if (!r.ok) throw { code: 'fetch' };
+        var blob = new Blob([await r.arrayBuffer()], { type: types[name.split('.').pop()] || 'application/octet-stream' });
+        say('Confirm the download in the prompt.');
+        await downloads.save({ filename: name, data: blob });
+        say('Saved ' + name + '.');
+      } catch (e) {
+        var c = e && e.code;
+        if (c === 'declined') say('Download cancelled.');
+        else if (c === 'rate_limited') say('Another download prompt is open. Finish that one first.', 'warn');
+        else if (c === 'fetch') say('The file couldn’t be loaded. Reload the page and try again.', 'warn');
+        else say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn');
+      }
+      btn.disabled = false;
+    });
+  });
+})();
+</script>
+
+</body></html>

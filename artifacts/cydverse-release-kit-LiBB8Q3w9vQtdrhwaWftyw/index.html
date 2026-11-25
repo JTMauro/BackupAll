@@ -1,0 +1,407 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydVerse Release Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a release desk. Video first, then one shelf per module (Vault and Starport built, Launchpad designed), the infrastructure shelf, the workbook, diagrams, proof and screens. */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --sunk:#eef1f5; --rule:#d7dee6; --ink:#16212c; --dim:#566474;
+  --orbit:#0f6fb3; --orbit-soft:#e2f2fc; --star:#6b4fd8; --star-soft:#efeafd; --vault:#9a6608; --vault-soft:#fbf1dc; --infra:#0b6aa2; --infra-soft:#e3f1fa; --launch:#0e7c72; --launch-soft:#e3f4f1; --relay:#b4361a; --relay-soft:#fbe9e3; --navy:#0f2a3d;
+  --ok:#1a7f37; --okbg:#e5f6ea; --warn:#8a5a00; --warnbg:#fbf2d9;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1218; --surface:#151d27; --sunk:#111821; --rule:#283545; --ink:#e7edf5; --dim:#9cadc0;
+  --orbit:#5cc8f5; --orbit-soft:#0f2738; --star:#a996f4; --star-soft:#211c3a; --vault:#e6b450; --vault-soft:#2c2412; --infra:#5fb7ea; --infra-soft:#10283a; --launch:#3fc1ae; --launch-soft:#11302c; --relay:#fb8a63; --relay-soft:#35180f; --navy:#cfe3f3;
+  --ok:#4cc46a; --okbg:#10291a; --warn:#e3b341; --warnbg:#2b2410; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1218; --surface:#151d27; --sunk:#111821; --rule:#283545; --ink:#e7edf5; --dim:#9cadc0;
+  --orbit:#5cc8f5; --orbit-soft:#0f2738; --star:#a996f4; --star-soft:#211c3a; --vault:#e6b450; --vault-soft:#2c2412; --infra:#5fb7ea; --infra-soft:#10283a; --launch:#3fc1ae; --launch-soft:#11302c; --relay:#fb8a63; --relay-soft:#35180f; --navy:#cfe3f3;
+  --ok:#4cc46a; --okbg:#10291a; --warn:#e3b341; --warnbg:#2b2410; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px;display:grid;gap:44px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:.01em;text-wrap:balance;color:var(--navy)}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.05}
+h2{font-size:1.45rem}
+h3{font-size:1.08rem}
+p{margin:0}
+.muted{color:var(--dim)}
+.eyebrow{font:500 .76rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px;align-items:center}
+.hero .lede{font-size:1.06rem;color:var(--dim);max-width:52ch}
+.hero .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tag{font:600 .8rem var(--body);padding:4px 10px;border-radius:999px;border:1px solid var(--rule);background:var(--surface)}
+.tag.orbit{color:var(--orbit);border-color:var(--orbit)}.tag.star{color:var(--star);border-color:var(--star)}.tag.vault{color:var(--vault);border-color:var(--vault)}.tag.launch{color:var(--launch);border-color:var(--launch)}.tag.relay{color:var(--relay);border-color:var(--relay)}
+video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:12px;background:#000;display:block;box-shadow:0 18px 44px rgba(10,20,30,.28)}
+.vidbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:10px}
+.shelf{display:grid;gap:16px}
+.shelfhead{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--rule);padding-bottom:10px}
+.shelf.orbit .shelfhead{border-color:var(--orbit)}.shelf.star .shelfhead{border-color:var(--star)}.shelf.vault .shelfhead{border-color:var(--vault)}.shelf.infra .shelfhead{border-color:var(--infra)}.shelf.launch .shelfhead{border-color:var(--launch)}.shelf.relay .shelfhead{border-color:var(--relay)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.item{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.item .top{display:flex;gap:12px;align-items:flex-start}
+.ext{flex:none;width:46px;height:54px;border-radius:7px;display:grid;place-items:center;font:500 .66rem var(--mono);letter-spacing:.04em;background:var(--sunk);border:1px solid var(--rule);color:var(--dim)}
+.orbit .ext{color:var(--orbit);background:var(--orbit-soft);border-color:transparent}
+.star .ext{color:var(--star);background:var(--star-soft);border-color:transparent}
+.launch .ext{color:var(--launch);background:var(--launch-soft);border-color:transparent}
+.relay .ext{color:var(--relay);background:var(--relay-soft);border-color:transparent}
+.vault .ext{color:var(--vault);background:var(--vault-soft);border-color:transparent}
+.infra .ext{color:var(--infra);background:var(--infra-soft);border-color:transparent}
+.name{font-weight:600;line-height:1.3}
+.meta{font-size:.84rem;color:var(--dim)}
+.item p{font-size:.9rem;color:var(--dim)}
+button{appearance:none;cursor:pointer;font:600 .95rem var(--body);border-radius:9px;padding:9px 14px;border:1px solid var(--rule);background:var(--surface);color:var(--ink)}
+button.go{background:var(--navy);color:var(--bg);border-color:var(--navy)}
+.orbit button.go{background:var(--orbit);border-color:var(--orbit);color:#fff}
+.star button.go{background:var(--star);border-color:var(--star);color:#fff}
+.launch button.go{background:var(--launch);border-color:var(--launch);color:#fff}
+.relay button.go{background:var(--relay);border-color:var(--relay);color:#fff}
+.vault button.go{background:var(--vault);border-color:var(--vault);color:#fff}
+.infra button.go{background:var(--infra);border-color:var(--infra);color:#fff}
+button:hover{filter:brightness(1.06)}button:focus-visible{outline:2px solid var(--star);outline-offset:2px}button[disabled]{opacity:.6;cursor:default}
+.status{font-size:.82rem;color:var(--dim);min-height:1.2em}.status.ok{color:var(--ok)}.status.warn{color:var(--warn)}
+.hash{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--sunk);border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+.hash code{font:500 .8rem var(--mono);word-break:break-all;min-width:0;flex:1 1 300px}
+.note{background:var(--warnbg);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.9rem}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+figure{margin:0;display:grid;gap:6px}
+figure img{width:100%;height:auto;border-radius:10px;border:1px solid var(--rule);background:#fff;display:block}
+figcaption{font-size:.86rem;color:var(--dim)}
+.proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.stat b{display:block;font:700 1.9rem/1.1 var(--display);color:var(--vault);font-variant-numeric:tabular-nums}
+.stat span{font-size:.86rem;color:var(--dim)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{background:var(--sunk);color:var(--dim);font-weight:600}
+tr:last-child td{border-bottom:0}
+.pass{color:var(--ok);font-weight:600}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{color:var(--star);font-weight:600}
+@media (max-width:860px){.hero,.two{grid-template-columns:minmax(0,1fr)}.proof{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<main class="wrap">
+  <section class="hero" aria-labelledby="h1">
+    <div style="display:grid;gap:14px">
+      <div class="eyebrow">CydVerse · release kit · November 16, 2026 · update 3</div>
+      <h1 id="h1">Vault, Orbit and Starport are built. Everything is here.</h1>
+      <p class="lede"><b>New: Relay 0.3,</b> the company chat and emergency Alert system that works <b>outside company email</b>: its own Azure server, everything encrypted at rest, Alerts texted to every phone, and people imported from Excel or CSV with one-time setup links. Orbit's admin console now shows Relay Alerts. <b>Also new: lockdown and travel.</b> Every server can now refuse everything except approved locations, the way an FTP server can be limited to listed addresses. A blocked company laptop offers a request form, pre-filled with the profile name, username, public IPv4 and IPv6 addresses and the date; travel requests add the countries and dates and set up the company cell phone. Everything is set once in <b>Starbase</b>, the new name of the CydVerse control panel. <b>Orbit 0.1</b>, the internal file server. It has shares with NTFS-style permissions, groups, drive letters assigned from the admin console, a File Explorer tab for admins, access requests and a file activity log. People reach it from anywhere without a VPN, through the same CydVerse Agent that serves Vault, each person's private drive. Starport 0.1 is the secure external drop and client portal. Launchpad is documented as a design. Everything below can be downloaded.</p>
+      <div class="facts"><span class="tag orbit">Orbit 0.1: built and tested</span><span class="tag vault">Vault 0.1: built and tested</span><span class="tag star">Starport 0.1: built and tested</span><span class="tag relay">Relay 0.3: built and tested</span><span class="tag launch">Launchpad: design</span><span class="tag">109 automated tests pass</span><span class="tag">0 known vulnerabilities</span></div>
+    </div>
+    <div>
+      <video id="vid" src="CydVerse-Trailer.mp4" poster="img/poster-v7.jpg" controls playsinline preload="metadata" aria-label="CydVerse trailer, 1 minute 54 seconds"></video>
+      <div class="vidbar">
+        <span class="meta">CydVerse trailer v8 · 1:54 · now with Relay · 1280×720 · 14.1 MB</span>
+        <div style="display:grid;gap:2px;justify-items:end"><button type="button" data-file="CydVerse-Trailer.mp4" data-raw="1" data-type="video/mp4">Download video</button><div class="status" role="status" aria-live="polite"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sb-h" style="display:grid;gap:14px">
+    <h2 id="sb-h">Starbase: the CydVerse control panel</h2>
+    <p class="muted">One console for every server and site. It is designed, not built yet. Orbit, Vault and Starport already expose its API, so it can manage them on day one.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Part</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><b>Console</b></td><td>The only admin console for every module and site, on the admin network, with MFA and the five roles.</td></tr>
+        <tr><td><b>Server agents</b></td><td>One on each CydVerse server, with a TPM key. They connect out to Starbase and accept only signed commands, so file servers have no admin port.</td></tr>
+        <tr><td><b>Device control</b></td><td>Every laptop's CydVerse Agent in one list. Kill one lost laptop in every module at once.</td></tr>
+        <tr><td><b>Blocking and lockdown</b></td><td>Countries, addresses, automatic blocks, and <b>lockdown</b> (no access except approved locations), pushed to Orbit, Vault and Launchpad.</td></tr>
+        <tr><td><b>Locations and travel</b></td><td>Requests sent from blocked agents and planned trips, emailed to the chosen addresses, then approved as dated travel passes that work in every module.</td></tr>
+        <tr><td><b>Company cell phones</b></td><td>Person, email, number and carrier. When someone on the list travels, the same request asks IT to set up the phone.</td></tr>
+        <tr><td><b>Alerts and reports</b></td><td>58 alert types to email, Teams or a SIEM; the bad-actor report, connections and audit across every module; a read-only token for Ben.</td></tr>
+        <tr><td><b>Health and upkeep</b></td><td>Self-heal findings, backups, certificates and updates for every server.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="two">
+      <figure><img src="img/o18-locations.jpg" alt="Approved locations and travel page: lockdown on, request recipients, pending location and travel requests with approve options, travel passes and company phones" loading="lazy"><figcaption>Locations &amp; travel (in Orbit and Vault today, in Starbase later).</figcaption></figure>
+      <figure><img src="img/o19-agent-form.jpg" alt="The agent's request form, pre-filled with profile name, username, cell number, date and public IPv4 and IPv6 addresses" loading="lazy"><figcaption>The form the agent opens when a location is not approved.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="shelf orbit" aria-labelledby="o-h">
+    <div class="shelfhead"><h2 id="o-h">Orbit · internal file server</h2><span class="meta">Version 0.1 · new · Windows Server · the same CydVerse Agent as Vault</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Orbit 0.1 for Windows</div><div class="meta">orbit.exe, cydverse-agent.exe, README, scan report · 8.3 MB</div></div></div>
+        <p>The server (a Windows service) and the CydVerse Agent, which now serves Vault and Orbit together and applies drive maps.</p>
+        <button class="go" type="button" data-file="Orbit-0.1-windows-x64.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Orbit 0.1 FIPS build</div><div class="meta">orbit-fips.exe · 4.5 MB</div></div></div>
+        <p>The same server on the FIPS 140-3 validated Go cryptographic module.</p>
+        <button class="go" type="button" data-file="Orbit-0.1-fips-windows-x64.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Installation and Migration Guide</div><div class="meta">6 pages · step by step</div></div></div>
+        <p>Entra, server, groups mapped from AD, shares, robocopy plus orbit import, cut-over, drive maps replacing logon scripts.</p>
+        <button class="go" type="button" data-file="CydVerse-Orbit-Installation-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">User and Administrator Manual</div><div class="meta">33 pages · 19 screenshots and diagrams</div></div></div>
+        <p>Shares, the Explorer tab, permissions, groups, drive maps, access requests, file activity, lockdown and travel, and the new Relay page.</p>
+        <button class="go" type="button" data-file="CydVerse-Orbit-Manual.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">Orbit deck</div><div class="meta">15 slides</div></div></div>
+        <p>What it is, the admin Explorer, drive maps, requests, activity, migrating from a Windows file server, safeguards, cost.</p>
+        <button class="go" type="button" data-file="Orbit.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">CydVerse source code</div><div class="meta">Go · Vault, Orbit, agent, protocol · 69 tests · 532 KB</div></div></div>
+        <p>The one code base for Vault, Orbit and the CydVerse Agent, with tests and security reports.</p>
+        <button class="go" type="button" data-file="CydVerse-0.1-source.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+    <div class="hash"><span class="meta">SHA-256 of orbit.exe</span><code>240CDCA539061B2075D6BBFF21FD100F67B36A69F7A74F25DD17010E9BA143BF</code><button type="button" class="copy">Copy</button></div>
+    <div class="hash"><span class="meta">SHA-256 of orbit-fips.exe</span><code>6DD31131991DC9CE888704D4A58E02C2AEDBBE873CEF77B2D9AC46F5BE8B7659</code><button type="button" class="copy">Copy</button></div>
+    <div class="hash"><span class="meta">SHA-256 of cydverse-agent.exe (Vault and Orbit)</span><code>D251457E0F66F5A512E5A6525F32245B5F8DC50BBA6702B230BB5F2B2B6D4ADE</code><button type="button" class="copy">Copy</button></div>
+    <p class="note">The Windows parts (the Orbit folder in File Explorer, drive letters, network locations, Quick Access pins, TPM keys) compile and pass static analysis but still need a pilot on Windows 10 and 11. The builds are not code-signed yet.</p>
+  </section>
+
+  <section class="shelf relay" aria-labelledby="r-h">
+    <div class="shelfhead"><h2 id="r-h">Relay · company chat and emergency Alerts</h2><span class="meta">Version 0.3 · new · its own Azure server, apart from company email · Node.js on Ubuntu</span></div>
+    <div class="two">
+      <div style="display:grid;gap:10px;align-content:start">
+        <video src="Relay-Walkthrough.mp4" poster="img/relay-poster.jpg" controls playsinline preload="none" aria-label="Relay walkthrough, 3 minutes 23 seconds"></video>
+        <div class="vidbar"><span class="meta">Relay walkthrough · 3:23 · recorded from the running app · 11.2 MB</span>
+          <div style="display:grid;gap:2px;justify-items:end"><button type="button" data-file="Relay-Walkthrough.mp4" data-raw="1" data-type="video/mp4">Download video</button><div class="status" role="status" aria-live="polite"></div></div></div>
+      </div>
+      <div style="display:grid;gap:10px;align-content:start">
+        <p>Relay keeps the company connected when email or the office network is down. <b>Global</b> is the company feed, <b>SideQuests</b> are invite-only groups that end on a date, and <b>Messages</b> are one-to-one.</p>
+        <ul style="margin:0;padding-left:1.2em;display:grid;gap:4px;color:var(--dim)">
+          <li><b style="color:var(--ink)">Separate from email:</b> its own Azure VM and its own accounts. Email is optional.</li>
+          <li><b style="color:var(--ink)">Encrypted at rest:</b> messages, files, emails, phone numbers, secrets and the audit log (AES-256-GCM). A key per conversation, destroyed when it ends; the master key in Azure Key Vault.</li>
+          <li><b style="color:var(--ink)">Alerts by text:</b> a pop-up on every screen until acknowledged, a text to every phone (Azure Communication Services or Twilio), and a pop-up in CydVerse.</li>
+          <li><b style="color:var(--ink)">Import people</b> from Excel or CSV (first name, last name, username, email, phone), with a preview and one-time setup links by text.</li>
+          <li><b style="color:var(--ink)">Admin oversight</b> with an encrypted audit log, and sign-in lockout.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Relay 0.3 source</div><div class="meta">Node.js 22 · server, web and phone app, desktop app, deploy files · 15 tests · 8.2 MB</div></div></div>
+        <p>The whole app with its install files (systemd, Caddy, Nginx, env template, backup script), the CydVerse connector and the AI-agent connector. The docs are separate downloads.</p>
+        <button class="go" type="button" data-file="Relay-0.3-source.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Installation Guide</div><div class="meta">12 pages · Azure, Key Vault, SMS</div></div></div>
+        <p>Azure layout, Ubuntu or Windows Server, the master key, SMS providers, optional email, import and setup links, backups, security notes.</p>
+        <button class="go" type="button" data-file="Relay-Installation-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">User and Administrator Manual</div><div class="meta">Screenshots throughout</div></div></div>
+        <p>Global, Alerts, SideQuests, files, looks; for admins: policy, people, import from Excel or CSV, oversight, SMS, audit log.</p>
+        <button class="go" type="button" data-file="Relay-User-and-Admin-Manual.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">Relay overview deck</div><div class="meta">15 slides</div></div></div>
+        <p>Why Relay, the three spaces, Alerts, separate and encrypted, import, oversight, CydVerse key, sizing, roadmap, decisions.</p>
+        <button class="go" type="button" data-file="Relay-Overview.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+    <figure><img src="img/relay-architecture.jpg" alt="Relay system map: browsers, phones and desktop app through an HTTPS proxy to the Relay server on its own Azure VM; Key Vault holds the master key; Alert texts go to an SMS provider; a signed webhook and a key API connect to CydVerse" loading="lazy"><figcaption>Relay runs apart from company email; the master key stays in Key Vault.</figcaption></figure>
+    <p class="note">Tested against a live, encrypted Relay: Orbit's Relay page and CydVerse alerts flowing into Relay. Azure Communication Services texting is built to Microsoft's published signing rules but hasn't been tried on a real Azure resource yet; texting was tested end to end against a stand-in for Twilio.</p>
+  </section>
+
+  <section class="shelf vault" aria-labelledby="v-h">
+    <div class="shelfhead"><h2 id="v-h">Vault · personal drive for every person</h2><span class="meta">Version 0.1 · Windows Server · CydVerse Agent for Windows 10/11</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Vault 0.1 for Windows</div><div class="meta">vault.exe, cydverse-agent.exe, README, scan report · 7.2 MB · rebuilt Nov 15</div></div></div>
+        <p>The server (a Windows service) and the CydVerse Agent. The source code is in the Orbit section (one code base).</p>
+        <button class="go" type="button" data-file="Vault-0.1-windows-x64.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Vault 0.1 FIPS build</div><div class="meta">vault-fips.exe · 4.3 MB</div></div></div>
+        <p>The same server built on the FIPS 140-3 validated Go cryptographic module. Use with crypto.requireFips.</p>
+        <button class="go" type="button" data-file="Vault-0.1-fips-windows-x64.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Installation Guide</div><div class="meta">6 pages · step by step</div></div></div>
+        <p>Entra app registration and roles, server, TPM-sealed master key, publishing, pilot, rollout, Control Panel tokens, backups.</p>
+        <button class="go" type="button" data-file="CydVerse-Vault-Installation-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">User and Administrator Manual</div><div class="meta">37 pages · 24 screenshots</div></div></div>
+        <p>People, helpdesk and admins: devices, recycle bin, restore, deploy, groups, policies, blocking, bad actors, reports, alerts.</p>
+        <button class="go" type="button" data-file="CydVerse-Vault-Manual.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">Vault deck</div><div class="meta">17 slides</div></div></div>
+        <p>What it is, how a device gets in, screens, roles, safeguards, test proof, both network layouts, size and cost, next steps.</p>
+        <button class="go" type="button" data-file="Vault.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+    <div class="hash"><span class="meta">SHA-256 of vault.exe</span><code>D3118F455166C66AF30266A926AE3A1155403952C962906B30840D0EEC06A5D0</code><button type="button" class="copy">Copy</button></div>
+    <div class="hash"><span class="meta">SHA-256 of cydverse-agent.exe</span><code>D251457E0F66F5A512E5A6525F32245B5F8DC50BBA6702B230BB5F2B2B6D4ADE</code><button type="button" class="copy">Copy</button></div>
+    <div class="hash"><span class="meta">SHA-256 of vault-fips.exe</span><code>D109DDADD30653F4A6C11DB76E9D65B42295D213EBD2811F4A4547452936E480</code><button type="button" class="copy">Copy</button></div>
+    <p class="note">The Windows parts of the agent (TPM key, the Vault folder in File Explorer, starting at sign-in) compile and pass static analysis but still need a pilot on Windows 10 and 11. The builds are not code-signed yet.</p>
+  </section>
+
+  <section class="shelf star" aria-labelledby="sp-h">
+    <div class="shelfhead"><h2 id="sp-h">Starport · external drop and client portal</h2><span class="meta">Version 0.1 · Windows Server</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Starport 0.1 for Windows</div><div class="meta">starport.exe, scan reports · 4.2 MB</div></div></div>
+        <p>The program. Runs as a Windows service with its own virtual account.</p>
+        <button class="go" type="button" data-file="Starport-0.1-windows-x64.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Installation Guide</div><div class="meta">7 pages · step by step</div></div></div>
+        <p>Windows prep, certificate, firewall, service, email, blocking, recovery key, tests and checklist.</p>
+        <button class="go" type="button" data-file="Starport-Installation-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">User and Administrator Manual</div><div class="meta">43 pages · 26 screenshots</div></div></div>
+        <p>Updated: password reset, email settings, blocking by country and address, and the bad-actor report.</p>
+        <button class="go" type="button" data-file="Starport-Manual.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">Starport deck</div><div class="meta">17 slides</div></div></div>
+        <p>Updated with accounts, blocking and bad actors, and the latest test results.</p>
+        <button class="go" type="button" data-file="Starport.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">ZIP</div><div><div class="name">Source code</div><div class="meta">Go · 25 tests · security reports · 129 KB</div></div></div>
+        <p>Ready to push to the GitHub repository when it exists.</p>
+        <button class="go" type="button" data-file="Starport-0.1-source.zip" data-type="application/zip">Download .zip</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+    <div class="hash"><span class="meta">SHA-256 of starport.exe</span><code>74DDB939678B112857D7C74999237590652F7E3B85CAF384FB0586CD3A1C7898</code><button type="button" class="copy">Copy</button></div>
+  </section>
+
+  <section class="shelf infra" aria-labelledby="in-h">
+    <div class="shelfhead"><h2 id="in-h">Infrastructure and overview</h2><span class="meta">What to buy, how to lay it out, how it all fits</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Infrastructure Guide</div><div class="meta">9 pages · Orbit, lockdown, Starbase, Relay</div></div></div>
+        <p>Sizing for Vault, Orbit, Starport and Relay (and Vault and Orbit on one host); equipment; Azure monthly costs; network rules; checklist.</p>
+        <button class="go" type="button" data-file="CydVerse-Infrastructure-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">CydVerse overview deck</div><div class="meta">28 slides · Starbase and lockdown added</div></div></div>
+        <p>The whole platform: modules, one agent, both secure layouts, blocking and bad actors, roles and alerts, phases.</p>
+        <button class="go" type="button" data-file="CydVerse-Overview.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PNG</div><div><div class="name">Diagram: how it all works</div><div class="meta">3200 × 1780</div></div></div>
+        <p>Devices and the agent, the Control Panel, the four modules (three built) and shared security.</p>
+        <button class="go" type="button" data-file="CydVerse-How-It-Works.png" data-type="image/png">Download .png</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PNG</div><div><div class="name">Diagram: on-premises with a DMZ</div><div class="meta">3200 × 1760</div></div></div>
+        <p>Edge firewall with IPS, DMZ with reverse proxy, internal firewall, LAN.</p>
+        <button class="go" type="button" data-file="CydVerse-Layout-OnPrem-DMZ.png" data-type="image/png">Download .png</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PNG</div><div><div class="name">Diagram: Azure with an external IPS</div><div class="meta">3200 × 1760</div></div></div>
+        <p>External IPS/WAF, hub with Azure Firewall Premium, private spokes.</p>
+        <button class="go" type="button" data-file="CydVerse-Layout-Azure-IPS.png" data-type="image/png">Download .png</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+  </section>
+
+  <section class="shelf launch" aria-labelledby="lp-h">
+    <div class="shelfhead"><h2 id="lp-h">Launchpad · FTP and SFTP server</h2><span class="meta">Design · screens are mock-ups · CydFTP is the desktop client</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">Installation Guide</div><div class="meta">7 pages · step by step</div></div></div>
+        <p>Control Panel, server prep, installer, approval, FTP servers, firewall, logins, tests, sync mode.</p>
+        <button class="go" type="button" data-file="Launchpad-Installation-Guide.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">DOCX</div><div><div class="name">User and Administrator Manual</div><div class="meta">18 pages · design · now with lockdown</div></div></div>
+        <p>Servers and logins, My servers with CydFTP, protocols and security, sync mode, sizing and costs.</p>
+        <button class="go" type="button" data-file="Launchpad-Manual.docx" data-type="application/vnd.openxmlformats-officedocument.wordprocessingml.document">Download .docx</button><div class="status" role="status" aria-live="polite"></div></div>
+      <div class="item"><div class="top"><div class="ext">PPTX</div><div><div class="name">Launchpad deck</div><div class="meta">13 slides</div></div></div>
+        <p>Four ideas, how it works, screens, secure defaults, sync mode, migration, cost, delivery plan.</p>
+        <button class="go" type="button" data-file="Launchpad.pptx" data-type="application/vnd.openxmlformats-officedocument.presentationml.presentation">Download .pptx</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+  </section>
+
+  <section class="shelf" aria-labelledby="wb-h">
+    <div class="shelfhead"><h2 id="wb-h">Planning workbook</h2><span class="meta">Your File Drop workbook, returned</span></div>
+    <div class="items">
+      <div class="item"><div class="top"><div class="ext">XLSX</div><div><div class="name">File Drop features with Starport status</div><div class="meta">194 features · 26 acceptance tests</div></div></div>
+        <p>Starport 0.1 status and how each feature is met or planned, with acceptance test results.</p>
+        <button class="go" type="button" data-file="File-Drop-Features-with-Starport-Status.xlsx" data-type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">Download .xlsx</button><div class="status" role="status" aria-live="polite"></div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="dg-h" style="display:grid;gap:16px">
+    <h2 id="dg-h">How it all works</h2>
+    <figure><img src="img/cv-howitworks.jpg" alt="CydVerse: devices with the agent, the Control Panel, Vault, Orbit and Starport built, Launchpad designed, shared security, and alerts, Ben, backups and the country database around it" loading="lazy"><figcaption>One agent on every device, one console for every server, the same security in every module.</figcaption></figure>
+    <div class="two">
+      <figure><img src="img/arch-onprem-dmz.jpg" alt="On-premises: edge firewall with IPS, DMZ with reverse proxy, Starport and Launchpad, internal firewall, and the LAN with Vault, Orbit, Control Panel, domain controllers, SIEM and backup" loading="lazy"><figcaption>Layout 1: on-premises with a DMZ.</figcaption></figure>
+      <figure><img src="img/arch-azure-ips.jpg" alt="Azure: external IPS/WAF, hub with Azure Firewall Premium and Bastion, DMZ and application spokes with no public IPs, and platform services" loading="lazy"><figcaption>Layout 2: Azure behind an external IPS/WAF.</figcaption></figure>
+      <figure><img src="img/sp-arch.jpg" alt="How Starport works: people, firewall, the service layers, encrypted store, database, audit log, Windows features and outbound services" loading="lazy"><figcaption>How Starport works.</figcaption></figure>
+      <figure><img src="img/sp-pipeline.jpg" alt="Six checks on every uploaded file: name, type rules, quarantine, real content, virus scan, encryption" loading="lazy"><figcaption>Six checks before anyone can download a file.</figcaption></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="pf-h" style="display:grid;gap:16px">
+    <h2 id="pf-h">Tested, not just designed</h2>
+    <div class="proof">
+      <div class="stat"><b>109</b><span>automated tests pass (Orbit 38, Vault 30, Starport 25, Relay 15, agent 1)</span></div>
+      <div class="stat"><b>0</b><span>known vulnerabilities (govulncheck, Go 1.26.11)</span></div>
+      <div class="stat"><b>0</b><span>staticcheck findings</span></div>
+      <div class="stat"><b>TLS 1.3</b><span>only, by default; FIPS 140-3 build available</span></div>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Check</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Two real agents syncing through the real server</td><td class="pass">Edits, renames, deletes, conflicts and restores all arrive</td></tr>
+        <tr><td>Stolen token, replayed request, altered upload, forged Microsoft token</td><td class="pass">All refused</td></tr>
+        <tr><td>One person reaching another's files; roles overstepping</td><td class="pass">All refused</td></tr>
+        <tr><td>Orbit permissions: deny beats allow, explicit allow beats inherited deny, stop inheriting</td><td class="pass">Same results as NTFS</td></tr>
+        <tr><td>Orbit hidden folders, revoked access, read-only person saving, checked-out files</td><td class="pass">Hidden stays hidden; revoked folders leave the device; saves refused and logged</td></tr>
+        <tr><td>Drive maps by group; a person without access</td><td class="pass">Letters applied; maps to folders they cannot open are skipped</td></tr>
+        <tr><td>Lockdown: outside address, signed request, approval, expiry</td><td class="pass">Refused; request emailed with IPv4/IPv6 and phone; pass works only where and when approved</td></tr>
+        <tr><td>A real agent blocked by lockdown</td><td class="pass">Form filled in, trip sent, approved, back in step</td></tr>
+        <tr><td>Ransomware-style changes from a device</td><td class="pass">Device frozen; vault restored to the minute before</td></tr>
+        <tr><td>Mass deletion on a device</td><td class="pass">Held back until a person confirms</td></tr>
+        <tr><td>3 failed sign-ins, password spraying, impossible travel, blocked country</td><td class="pass">Detected, alerted, auto-blocked</td></tr>
+        <tr><td>Lost laptop revoked with erase</td><td class="pass">Local copy erased; later attempts logged and alerted</td></tr>
+        <tr><td>Self-service password reset</td><td class="pass">Single-use link; authenticator code required with two-step; no account enumeration</td></tr>
+        <tr><td>Starport workbook acceptance tests</td><td class="pass">11 of 11 that apply pass</td></tr>
+        <tr><td>Relay: database copied off the server</td><td class="pass">Messages, files, emails, phones and audit details unreadable without the master key</td></tr>
+        <tr><td>Relay: SideQuest ended</td><td class="pass">Its key destroyed; its messages and files can no longer be read</td></tr>
+        <tr><td>Relay: wrong passwords, from one person and one address</td><td class="pass">Locked for 15 minutes; others through the same proxy unaffected</td></tr>
+        <tr><td>Relay: import from Excel and CSV, setup link reused</td><td class="pass">Bad rows skipped with reasons; link works once</td></tr>
+        <tr><td>Orbit's Relay page against a live Relay</td><td class="pass">Alerts, acknowledgments and activity shown; key never reaches the browser</td></tr>
+        <tr><td>Independent penetration test</td><td>To do before go-live</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="sc-h" style="display:grid;gap:16px">
+    <h2 id="sc-h">Screens</h2>
+    <div class="two">
+      <figure><img src="img/o03-explorer.jpg" alt="Orbit admin Explorer tab: Finance share, Payroll selected, its permissions with a deny, and effective access for one person" loading="lazy"><figcaption>Orbit: the File Explorer tab in the admin console.</figcaption></figure>
+      <figure><img src="img/o09-drive-maps.jpg" alt="Orbit drive maps: F, H, S and P drive letters, a network location and Quick Access pins assigned to groups" loading="lazy"><figcaption>Orbit: drive maps assigned to groups.</figcaption></figure>
+      <figure><img src="img/o12-portal.jpg" alt="Orbit portal for a person: their shares and rights, their drives, and the access request form" loading="lazy"><figcaption>Orbit: what a person sees.</figcaption></figure>
+      <figure><img src="img/o11-activity.jpg" alt="Orbit file activity log with reads, writes, deletes, a permission change, a refused attempt and a blocked file" loading="lazy"><figcaption>Orbit: who did what to which file.</figcaption></figure>
+      <figure><img src="img/v03-home.jpg" alt="Vault: a person's vault page with storage, devices and restore to an earlier time" loading="lazy"><figcaption>Vault: each person's page.</figcaption></figure>
+      <figure><img src="img/v10-dashboard.jpg" alt="Vault admin dashboard with a frozen device, a device waiting for approval and alerts" loading="lazy"><figcaption>Vault: the admin dashboard.</figcaption></figure>
+      <figure><img src="img/v19-bad-actors.jpg" alt="Vault bad-actor report: worst offenders with country, score, events and Block buttons" loading="lazy"><figcaption>The bad-actor report.</figcaption></figure>
+      <figure><img src="img/v18-blocking.jpg" alt="Vault blocking page: blocked addresses, countries and automatic blocking" loading="lazy"><figcaption>Blocking by country and address.</figcaption></figure>
+      <figure><img src="img/v17-policies.jpg" alt="Vault security policies: default and stricter group policies" loading="lazy"><figcaption>Policies: a default and stricter groups.</figcaption></figure>
+      <figure><img src="img/v14-deploy.jpg" alt="Vault deploy agents: invites, managed rollout and push script" loading="lazy"><figcaption>Deploying the agent to every laptop.</figcaption></figure>
+      <figure><img src="img/05-share-created.jpg" alt="Starport share page with its link, protection and files" loading="lazy"><figcaption>Starport: a new share with its link.</figcaption></figure>
+      <figure><img src="img/12-receipt.jpg" alt="Starport receipt with two accepted files and one refused .exe" loading="lazy"><figcaption>Starport: a sender's receipt, with a refused file.</figcaption></figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="mo-h" style="display:grid;gap:10px">
+    <h2 id="mo-h">More CydVerse pages</h2>
+    <div class="links">
+      <a href="https://claude.ai/artifact/86b9aFy2gZYvssGgM71AeL" target="_blank" rel="noopener">CydVerse trailer page</a>
+      <a href="https://claude.ai/artifact/R52cUDonc5GBCk1gfsB8QK" target="_blank" rel="noopener">CydVerse documents</a>
+      <a href="https://claude.ai/artifact/Vgi8DP34X451mhSAKr536j" target="_blank" rel="noopener">CydVerse animation</a>
+      <a href="https://claude.ai/artifact/Kk3zaJxzKp1p1wJG9hHHHh" target="_blank" rel="noopener">CydVerse Black Hole start-up</a>
+      <a href="https://claude.ai/artifact/U3CtuTJwajYUDUHhgUP5a5" target="_blank" rel="noopener">Ben Bot</a>
+    </div>
+    <p class="muted" style="font-size:.88rem">Costs in the documents are estimates from late-2026 list prices; confirm them before buying. IP geolocation in Vault, Orbit and Starport by DB-IP (CC BY 4.0).</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  var downloadsP = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  document.querySelectorAll('button[data-file]').forEach(function (btn) {
+    var status = btn.nextElementSibling;
+    if (!status || !status.classList.contains('status')) status = btn.parentElement.querySelector('.status');
+    function say(msg, cls) { status.textContent = msg; status.className = 'status' + (cls ? ' ' + cls : ''); }
+    btn.addEventListener('click', async function () {
+      var name = btn.getAttribute('data-file'), type = btn.getAttribute('data-type') || 'application/octet-stream';
+      btn.disabled = true; say('Preparing the file…');
+      try {
+        var downloads = await downloadsP;
+        if (!downloads) { say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn'); btn.disabled = false; return; }
+        var blob;
+        if (btn.getAttribute('data-raw')) {
+          var r = await fetch(name); if (!r.ok) throw { code: 'fetch' }; blob = await r.blob();
+        } else {
+          var res = await fetch(name + '.b64.txt'); if (!res.ok) throw { code: 'fetch' };
+          var bin = atob((await res.text()).trim()), bytes = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          blob = new Blob([bytes], { type: type });
+        }
+        say('Confirm the download in the prompt.');
+        await downloads.save({ filename: name, data: blob });
+        say('Saved ' + name + '.', 'ok');
+      } catch (e) {
+        var c = e && e.code;
+        if (c === 'declined') say('Download cancelled.');
+        else if (c === 'rate_limited') say('Another download prompt is open. Finish that one first.', 'warn');
+        else if (c === 'fetch') say('The file couldn’t be loaded. Reload the page and try again.', 'warn');
+        else say('Downloads aren’t available in this view. Open this page on claude.ai.', 'warn');
+      }
+      btn.disabled = false;
+    });
+  });
+  document.querySelectorAll('button.copy').forEach(function (copy) {
+    var sha = copy.parentElement.querySelector('code');
+    copy.addEventListener('click', function () {
+      var done = function () { copy.textContent = 'Copied'; setTimeout(function () { copy.textContent = 'Copy'; }, 1600); };
+      var select = function () { var r = document.createRange(); r.selectNodeContents(sha); var s = getSelection(); s.removeAllRanges(); s.addRange(r); copy.textContent = 'Selected'; };
+      try { navigator.clipboard.writeText(sha.textContent).then(done, select); } catch (e) { select(); }
+    });
+  });
+})();
+</script>
+
+</body></html>

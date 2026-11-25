@@ -1,0 +1,28 @@
+{
+ "title": "IT Holiday Patio Party",
+ "url": "https://claude.ai/artifact/2oePcz2eoW854NWXFhtaxC",
+ "type": "web page",
+ "updated": "2026-11-04",
+ "files": [
+  {
+   "path": "cydni-toast.png",
+   "bytes": 42587,
+   "sha256": "c196efac559899fafb2a8ef08afc6f6a808190375b4b19c83904cbbcd4fbeeea"
+  },
+  {
+   "path": "index.html",
+   "bytes": 36309,
+   "sha256": "99966c28a8a3dbaf7b8f16163cd4e53c6d1973e353dc58758d4aa9cdaa27d11f"
+  },
+  {
+   "path": "logo-white.png",
+   "bytes": 132739,
+   "sha256": "b9126908eff45afbf5631921e4bd5d0f3ae53ffaae4fa22abecde406901b2f74"
+  },
+  {
+   "path": "patio.jpg",
+   "bytes": 146422,
+   "sha256": "07bf3f589fbe091166bb987fc0c301487ee4028916833188d08aaeb37cd10f18"
+  }
+ ]
+}

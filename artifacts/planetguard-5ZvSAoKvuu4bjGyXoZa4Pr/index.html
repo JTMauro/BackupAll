@@ -1,0 +1,2234 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Planetguard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: full-bleed WebGL plateau, HUD pinned to the safe-area edges, left-aligned briefing panel over the live attract scene */
+:root{
+  --void:#03060c; --ink:#e6f0ff; --dim:#8094ae; --cyan:#5ef2ff; --amber:#ffb347; --alert:#ff4d6d;
+  --line:rgba(94,242,255,.28); --scrim:rgba(3,6,12,.82); --glass:rgba(4,11,20,.55);
+  --c-lander:#3be35a; --c-mutant:#ff3df0; --c-bomber:#7a6bff; --c-pod:#b04dff; --c-swarmer:#ff5a2a; --c-baiter:#c4ff3a; --c-colonist:#ff8a3d;
+  --display:'Audiowide','Trebuchet MS',system-ui,sans-serif;
+  --ui:'Chakra Petch','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--ink);font-family:var(--ui);font-size:15px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+
+.hud-top{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:16px;pointer-events:none}
+.label{font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;font-weight:600}
+.big{font-family:var(--display);font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.status{display:flex;align-items:center;gap:10px;margin-top:8px}
+.pill{font-size:10px;font-weight:700;letter-spacing:.18em;padding:3px 7px;border:1px solid var(--cyan);color:var(--cyan);border-radius:2px;box-shadow:0 0 8px rgba(94,242,255,.35)}
+.pill.off{color:var(--dim);border-color:rgba(128,148,174,.4);box-shadow:none;text-decoration:line-through}
+.hullwrap{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--dim)}
+.hull{display:flex;gap:3px}
+.hull i{width:14px;height:7px;background:#5effa8;box-shadow:0 0 6px rgba(94,255,168,.5)}
+.hull.warn i{background:var(--amber);box-shadow:0 0 6px rgba(255,179,71,.5)}
+.hull.crit i{background:var(--alert);box-shadow:0 0 6px rgba(255,77,109,.6)}
+.hull i.off{background:rgba(255,77,109,.18);box-shadow:none}
+.aboard{margin-top:6px;font-size:12px;font-weight:600;letter-spacing:.16em;color:#5effa8;min-height:15px}
+#score{color:var(--amber);text-shadow:0 0 14px rgba(255,179,71,.5)}
+#wave{color:var(--ink)}
+.hud-r{text-align:right;justify-self:end}
+.center{display:grid;gap:6px;justify-items:center;min-width:0}
+.quest{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--glass);border:1px solid var(--line);padding:4px 10px;border-radius:3px;max-width:100%;text-align:center}
+.quest b{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
+.quest.done{color:#5effa8;border-color:rgba(94,255,168,.5)}
+.quest .clock{font-size:15px;margin-left:4px}
+.quest .clock.low{color:var(--alert);animation:blink 1s steps(2) infinite}
+.quest.void{color:var(--dim);border-color:rgba(128,148,174,.4)}
+.quest.failed{color:var(--alert);border-color:rgba(255,77,109,.45);text-decoration:line-through}
+.bossbar{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--c-mutant);width:min(46vw,560px)}
+.bb{flex:1;height:8px;border:1px solid rgba(255,61,240,.5);background:rgba(255,61,240,.08)}
+.bb i{display:block;height:100%;width:100%;background:var(--c-mutant);box-shadow:0 0 10px var(--c-mutant);transition:width .15s}
+#scanner{width:min(46vw,560px);height:68px;display:block;border:1px solid var(--line);background:var(--glass);border-radius:3px}
+.icons{display:flex;gap:7px;margin-top:7px;min-height:12px}
+.hud-r .icons{justify-content:flex-end}
+.shipsLbl{font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--dim);margin-right:2px}
+.shipsN{font-family:var(--display);font-weight:400;font-size:14px;color:var(--ink);margin-left:2px;line-height:1}
+#lives{align-items:center}
+.life{width:22px;height:11px;background:var(--ink);clip-path:polygon(0 15%,62% 35%,100% 50%,62% 65%,0 85%,14% 50%)}
+.bomb{width:9px;height:9px;margin:1px;background:var(--alert);transform:rotate(45deg);box-shadow:0 0 6px var(--alert)}
+@media (max-width:700px){
+  .hud-top{grid-template-columns:1fr 1fr;gap:8px 16px}
+  .center{grid-column:1/-1;grid-row:2;width:100%}
+  #scanner{width:100%;height:52px}
+  .big{font-size:20px}
+}
+
+#alt{position:fixed;left:max(16px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-38%);height:min(36vh,280px);width:30px;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+#alt .bar{position:relative;flex:1;width:6px;border:1px solid var(--line);background:repeating-linear-gradient(to top,rgba(94,242,255,.35) 0 1px,transparent 1px 10%)}
+#altMark{position:absolute;left:-10px;width:26px;height:4px;background:var(--amber);box-shadow:0 0 10px var(--amber);bottom:50%}
+#alt b{font-family:var(--display);font-size:12px;color:var(--dim);font-weight:400}
+
+#msg{position:fixed;top:30%;left:16px;right:16px;text-align:center;font-family:var(--display);font-size:clamp(20px,3.6vw,38px);letter-spacing:.1em;text-shadow:0 0 18px rgba(94,242,255,.6);pointer-events:none;opacity:0;transition:opacity .35s;text-wrap:balance}
+#msg.on{opacity:1}
+#msg small{display:block;margin-top:8px;font-family:var(--ui);font-size:15px;letter-spacing:.22em;color:var(--amber);text-shadow:none}
+#pops{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.pop{position:absolute;transform:translate(-50%,-50%);font-family:var(--display);font-size:14px;letter-spacing:.06em;animation:rise 1s ease-out forwards;text-shadow:0 0 8px currentColor}
+@keyframes rise{to{transform:translate(-50%,-260%);opacity:0}}
+#mute{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 12px);font-size:11px;letter-spacing:.2em;color:var(--dim);pointer-events:none}
+
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding-block:calc(env(safe-area-inset-top,0px) + 24px) calc(env(safe-area-inset-bottom,0px) + 24px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(3,6,12,.45),var(--scrim));overflow-y:auto;touch-action:pan-y}
+.panel{max-width:780px;width:100%;display:grid;gap:22px;margin:auto}
+.eyebrow{margin:0;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);font-weight:600}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,9.5vw,104px);line-height:.92;margin:0;letter-spacing:.03em;text-shadow:0 0 26px rgba(94,242,255,.3)}
+h1 .accent{color:var(--amber);text-shadow:0 0 30px rgba(255,179,71,.45)}
+.lede{margin:0;max-width:60ch;font-size:17px;line-height:1.5;color:var(--ink)}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:28px}
+.cols>section{min-width:0}
+h2{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin:0 0 12px;font-weight:600}
+dl.keys{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:0;align-items:center}
+dl.keys dd{margin:0}
+kbd{font-family:var(--ui);font-size:12px;border:1px solid rgba(230,240,255,.35);border-bottom-width:2px;border-radius:4px;padding:2px 7px;min-width:12px;display:inline-block;text-align:center;margin-right:4px;background:rgba(255,255,255,.04)}
+ul.score{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+ul.score li{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center}
+ul.score i{width:10px;height:10px;background:var(--c);box-shadow:0 0 8px var(--c);border-radius:2px}
+ul.score b{font-variant-numeric:tabular-nums;color:var(--amber);font-weight:600}
+.go{display:flex;align-items:center;gap:18px;flex-wrap:wrap;color:var(--dim)}
+.go b{color:var(--ink);font-variant-numeric:tabular-nums}
+.btn{font-family:var(--display);font-size:18px;letter-spacing:.14em;color:var(--void);background:var(--amber);border:0;padding:14px 36px;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);transition:filter .15s}
+.btn:hover{filter:brightness(1.12)}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
+.rotate{display:none;margin:0;color:var(--cyan);font-size:13px;letter-spacing:.08em}
+@media (orientation:portrait) and (pointer:coarse){.rotate{display:block}}
+@media (max-width:640px){.cols{grid-template-columns:1fr}.lede{font-size:15px}}
+.final{font-family:var(--display);font-size:clamp(30px,6vw,56px);color:var(--amber);font-variant-numeric:tabular-nums;margin:0}
+
+#touch{position:fixed;left:0;right:0;bottom:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
+.pad{display:grid;grid-template-columns:repeat(3,54px);grid-template-rows:repeat(3,54px);gap:4px}
+.tb{pointer-events:auto;border:1px solid rgba(94,242,255,.4);background:rgba(5,14,24,.42);color:var(--ink);font-family:var(--ui);font-weight:700;font-size:12px;letter-spacing:.1em;border-radius:10px;touch-action:none;padding:0}
+.tb.on{background:rgba(94,242,255,.28)}
+#t-up{grid-column:2;grid-row:1}#t-left{grid-column:1;grid-row:2}#t-right{grid-column:3;grid-row:2}#t-down{grid-column:2;grid-row:3}
+.acts{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;gap:10px;align-items:end;justify-items:end}
+#t-fire{grid-column:2;grid-row:1/3;width:86px;height:86px;border-radius:50%;border-color:var(--amber);font-size:14px}
+#t-bomb,#t-hyper{width:64px;height:40px}
+.ghost{font-family:var(--ui);font-size:14px;font-weight:600;letter-spacing:.08em;color:var(--ink);background:transparent;border:1px solid var(--line);padding:12px 20px;cursor:pointer;border-radius:3px}
+.ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+.ghost:focus-visible,.keybtn:focus-visible,.hudbtn:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.hudbtn{pointer-events:auto;margin-top:8px;font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.18em;color:var(--dim);background:var(--glass);border:1px solid var(--line);border-radius:3px;padding:5px 9px;cursor:pointer}
+.hudbtn:hover{color:var(--ink);border-color:var(--cyan)}
+#menu{z-index:20}
+.menu-panel{max-width:620px;gap:18px}
+.mh{font-family:var(--display);font-weight:400;font-size:clamp(30px,5vw,44px);letter-spacing:.04em;color:var(--ink);text-transform:none;margin:0}
+.hint{margin:0;color:var(--dim);line-height:1.5;max-width:60ch}
+.binds{display:grid;grid-template-columns:1fr auto auto;gap:6px 14px;align-items:center}
+.binds .act{font-weight:500}
+.binds .alt{color:var(--dim);font-size:13px;min-width:70px}
+.keybtn{font-family:var(--ui);font-size:14px;font-weight:700;min-width:96px;color:var(--amber);background:rgba(255,179,71,.06);border:1px solid rgba(255,179,71,.45);border-bottom-width:2px;border-radius:4px;padding:7px 12px;cursor:pointer}
+.keybtn:hover{background:rgba(255,179,71,.14)}
+.keybtn.wait{color:var(--void);background:var(--cyan);border-color:var(--cyan);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.6}}
+@media (max-width:520px){.binds{grid-template-columns:1fr auto}.binds .alt{display:none}}
+@media (prefers-reduced-motion:reduce){.keybtn.wait{animation:none}.pop{animation-duration:.01s}#msg{transition:none}}
+</style>
+
+<canvas id="gl" aria-label="Planetguard game view"></canvas>
+
+<div id="hud" hidden>
+  <div class="hud-top">
+    <div class="hud-l"><div class="label">Score</div><div id="score" class="big">000000</div><div id="lives" class="icons"></div><div class="status"><span id="shieldPill" class="pill">SHIELD</span><span class="hullwrap">HULL <span id="hull" class="hull"><i></i><i></i><i></i><i></i></span></span></div><div id="aboard" class="aboard"></div></div>
+    <div class="center"><canvas id="scanner" aria-label="Long-range scanner"></canvas><div id="quest" class="quest" hidden></div><div id="boss" class="bossbar" hidden><span>MOTHERSHIP</span><div class="bb"><i id="bossFill"></i></div><span id="bossPhase">SHIELDED</span></div></div>
+    <div class="hud-r"><div class="label">Attack wave</div><div id="wave" class="big">1</div><div id="bombs" class="icons"></div><button id="menuBtn" class="hudbtn">CONTROLS · ESC</button></div>
+  </div>
+  <div id="alt" aria-hidden="true"><b>H</b><div class="bar"><div id="altMark"></div></div><b>L</b></div>
+</div>
+<div id="msg"></div>
+<div id="pops"></div>
+<div id="mute" hidden>SOUND OFF</div>
+
+<div id="title" class="overlay">
+  <div class="panel">
+    <p class="eyebrow">Sector 7 · Colony plateau</p>
+    <h1>PLANET<span class="accent">GUARD</span></h1>
+    <p class="lede">Landers are lifting colonists off the plateau. Shoot them before they reach the top of the sky. Catch colonists as they fall, or fly low to scoop them off the ground, then drop them at a green shelter pad. You can carry five at once. Your lasers can't hurt colonists: shooting at a colonist being carried hits the lander instead. A colonist carried all the way up turns its lander into a mutant.</p>
+    <p class="lede">Your ship's shield absorbs the first hit. After that, each hit damages the hull: 25% from landers, bombers, swarmers and mines, 50% from mutants, baiters and pods. Once per wave a repair carrier flies in after you take damage. Land on its flight deck to restore the shield and hull.</p>
+    <p class="lede">Every wave comes with a quest for bonus points, and some quests add a smart bomb. Fail the quest and you lose a ship and the wave starts over. Every tenth wave a mothership attacks: knock out its four turrets to drop its shield, then destroy the core. Waves get harder through each set of ten, and each new set starts 5% harder than the last.</p>
+    <div class="cols">
+      <section>
+        <h2>Controls</h2>
+        <dl class="keys" id="titleKeys"></dl>
+      </section>
+      <section>
+        <h2>Scoring</h2>
+        <ul class="score">
+          <li><i style="--c:var(--c-lander)"></i>Lander<b>150</b></li>
+          <li><i style="--c:var(--c-mutant)"></i>Mutant<b>150</b></li>
+          <li><i style="--c:var(--c-bomber)"></i>Bomber<b>250</b></li>
+          <li><i style="--c:var(--c-pod)"></i>Pod (splits into swarmers)<b>1000</b></li>
+          <li><i style="--c:var(--c-baiter)"></i>Baiter<b>200</b></li>
+          <li><i style="--c:var(--c-colonist)"></i>Catch a falling colonist<b>500</b></li>
+          <li><i style="--c:#5effa8"></i>Drop a colonist at a shelter<b>500</b></li>
+          <li><i style="--c:var(--c-colonist)"></i>Colonist parachutes down safely<b>250</b></li>
+        </ul>
+      </section>
+    </div>
+    <div class="go"><button id="start" class="btn">LAUNCH</button><button id="titleMenu" class="ghost">Change controls</button><span>or press Enter · High score <b id="hiT">0</b> · Extra ship every 10,000</span></div>
+    <p class="rotate">Turn your phone sideways for the widest view.</p>
+  </div>
+</div>
+
+<div id="over" class="overlay" hidden>
+  <div class="panel">
+    <p class="eyebrow" id="overWhy">All ships lost</p>
+    <h1>GAME <span class="accent">OVER</span></h1>
+    <p class="final" id="finalScore">0</p>
+    <p class="lede" id="overNote"></p>
+    <div class="go"><button id="again" class="btn">FLY AGAIN</button><span>or press Enter</span></div>
+  </div>
+</div>
+
+<div id="menu" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="menuH">
+  <div class="panel menu-panel">
+    <p class="eyebrow" id="menuEyebrow">Game paused</p>
+    <h2 class="mh" id="menuH">Controls</h2>
+    <p class="hint">Click a key, then press the key you want to use instead. Press Esc to cancel a change. Your choices are saved in this browser.</p>
+    <div id="bindList" class="binds"></div>
+    <p class="hint">Gamepad: stick or D-pad to fly, A to fire, B for smart bomb, X or Y for hyperspace, Start to pause. On touch screens, use the on-screen buttons.</p>
+    <div class="go"><button id="resume" class="btn">RESUME</button><button id="resetKeys" class="ghost">Reset to defaults</button></div>
+  </div>
+</div>
+
+<div id="touch" hidden>
+  <div class="pad">
+    <button class="tb" id="t-up" data-k="up" aria-label="Climb">▲</button>
+    <button class="tb" id="t-left" data-k="left" aria-label="Thrust left">◀</button>
+    <button class="tb" id="t-right" data-k="right" aria-label="Thrust right">▶</button>
+    <button class="tb" id="t-down" data-k="down" aria-label="Dive">▼</button>
+  </div>
+  <div class="acts">
+    <button class="tb" id="t-bomb" data-k="bomb">BOMB</button>
+    <button class="tb" id="t-fire" data-k="fire">FIRE</button>
+    <button class="tb" id="t-hyper" data-k="hyper">HYPER</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+if (!window.THREE) { $('title').querySelector('.lede').textContent = 'The 3D engine could not load. Check your connection and reload the page.'; return; }
+
+// ---------- world constants
+const W = 1600, SEG = 100, NSEG = W / SEG;
+const Z_FRONT = 34, Z_BACK = -48;
+const ALT_MIN = 2.5, ALT_MAX = 44;
+const SHIP_SCALE = 1.0;
+const wrapX = x => ((x % W) + W) % W;
+const SHELTER_X = [200, 600, 1000, 1400], SHELTER_R = 8.5, CARRY_MAX = 5;
+const wrapD = d => { d = ((d % W) + W) % W; return d > W / 2 ? d - W : d; };
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const damp = (k, dt) => 1 - Math.exp(-k * dt);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- renderer
+const canvas = $('gl');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
+} catch (e) {
+  $('title').querySelector('.lede').textContent = 'This browser could not start WebGL, which the game needs. Try another browser or enable hardware acceleration.';
+  return;
+}
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+renderer.setPixelRatio(DPR);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0x02030a, 1);
+const MAX_ANISO = renderer.capabilities.getMaxAnisotropy();
+
+const scene = new THREE.Scene();
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 3000);
+const CAM_DIR = new THREE.Vector3(-0.6, 0.75, 1).normalize();
+const CAM_TARGET = new THREE.Vector3(0, 19, 0);
+const CAM_BASE = CAM_TARGET.clone().addScaledVector(CAM_DIR, 700);
+camera.position.copy(CAM_BASE);
+camera.lookAt(CAM_TARGET);
+let halfH = 36, halfW = 60;
+
+// ---------- post-processing
+const composer = new THREE.EffectComposer(renderer);
+composer.addPass(new THREE.RenderPass(scene, camera));
+const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.95, 0.55, 0.6);
+composer.addPass(bloom);
+const FinalShader = {
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uFlash: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uDanger: { value: 0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform float uTime, uFlash, uDanger; uniform vec2 uRes; varying vec2 vUv;
+    void main(){
+      vec2 c = vUv - 0.5; float r2 = dot(c, c);
+      vec2 off = c * 0.0028 * (1.0 + r2 * 5.0);
+      vec3 col = vec3(texture2D(tDiffuse, vUv + off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - off).b);
+      col *= 0.97 + 0.03 * sin(vUv.y * uRes.y * 1.5708);
+      col *= 1.0 - r2 * 1.05;
+      col = mix(col, col * vec3(1.25, 0.55, 0.6) + vec3(0.04, 0.0, 0.0), uDanger);
+      col += vec3(1.0, 0.96, 0.9) * uFlash;
+      float n = fract(sin(dot(vUv * uRes + uTime * 61.0, vec2(12.9898, 78.233))) * 43758.5453);
+      col += (n - 0.5) * 0.022;
+      gl_FragColor = vec4(col, 1.0);
+    }`
+};
+const finalPass = new THREE.ShaderPass(FinalShader);
+composer.addPass(finalPass);
+
+// ---------- textures
+function canvasTex(w, h, fn) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  fn(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = MAX_ANISO;
+  return t;
+}
+const CELL = 8;
+const groundMap = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#0a1519'; g.fillRect(0, 0, w, h);
+  const r = mulberry32(7);
+  for (let i = 0; i < 16; i++) {
+    const v = 12 + Math.floor(r() * 12);
+    g.fillStyle = `rgb(${v - 3},${v + 7},${v + 11})`;
+    g.fillRect((i % 4) * 64 + 2, Math.floor(i / 4) * 64 + 2, 60, 60);
+  }
+  g.fillStyle = '#081013';
+  for (let i = 1; i < 4; i++) { g.fillRect(i * 64 - 1, 0, 2, h); g.fillRect(0, i * 64 - 1, w, 2); }
+  g.strokeStyle = '#2a8f9a'; g.lineWidth = 4; g.strokeRect(0, 0, w, h);
+});
+const groundEmi = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#3fe8f5'; g.lineWidth = 3; g.strokeRect(0, 0, w, h);
+  g.fillStyle = '#145a62'; g.fillRect(126, 116, 4, 24); g.fillRect(116, 126, 24, 4);
+  g.fillStyle = '#ffb347'; [[0,0],[w,0],[0,h],[w,h]].forEach(([x,y]) => g.fillRect(x - 5, y - 5, 10, 10));
+});
+const wallMap = canvasTex(256, 64, (g, w, h) => {
+  g.fillStyle = '#0b1218'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#121c25'; g.fillRect(0, 8, w, 20); g.fillRect(0, 36, w, 22);
+  g.fillStyle = '#060a0e'; for (let x = 8; x < w; x += 32) g.fillRect(x, 40, 18, 14);
+  g.fillStyle = '#1b2833'; g.fillRect(0, 0, w, 3);
+});
+const wallEmi = canvasTex(256, 64, (g, w, h) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#3fe8f5'; g.fillRect(0, 0, w, 2);
+  g.fillStyle = '#ffb347'; for (let x = 20; x < w; x += 64) { g.fillRect(x, 16, 10, 4); g.fillRect(x + 30, 16, 4, 4); }
+  g.fillStyle = '#ff4d6d'; g.fillRect(250, 46, 4, 4);
+});
+const winMap = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#10141c'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#1a2130';
+  for (let c = 0; c < 8; c++) for (let r = 0; r < 8; r++) g.fillRect(c * 32 + 9, r * 32 + 8, 14, 18);
+});
+const winEmi = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+  const r = mulberry32(3);
+  for (let c = 0; c < 8; c++) for (let rr = 0; rr < 8; rr++) {
+    if (r() < 0.42) { g.fillStyle = r() < 0.72 ? '#ffae4f' : '#8ae9ff'; g.fillRect(c * 32 + 9, rr * 32 + 8, 14, 18); }
+  }
+});
+const nebulaTex = canvasTex(1024, 1024, (g, w, h) => {
+  g.fillStyle = '#020309'; g.fillRect(0, 0, w, h);
+  const r = mulberry32(11);
+  const blobs = [['40,70,170', 0.22], ['20,120,140', 0.18], ['140,40,120', 0.14], ['200,110,40', 0.06]];
+  for (let i = 0; i < 26; i++) {
+    const [rgb, a] = blobs[i % blobs.length];
+    const x = r() * w, y = r() * h, rad = 120 + r() * 320;
+    for (const ox of [-w, 0, w]) for (const oy of [-h, 0, h]) {
+      const gr = g.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, rad);
+      gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`);
+      g.fillStyle = gr; g.fillRect(x + ox - rad, y + oy - rad, rad * 2, rad * 2);
+    }
+  }
+  for (let i = 0; i < 1400; i++) { const b = 120 + r() * 135; g.fillStyle = `rgba(${b},${b},${b + 20},${0.3 + r() * 0.7})`; g.fillRect(r() * w, r() * h, r() < 0.06 ? 2 : 1, r() < 0.06 ? 2 : 1); }
+});
+
+// ---------- lights
+scene.add(new THREE.HemisphereLight(0x6a7cff, 0x1a0d10, 0.62));
+const keyLight = new THREE.DirectionalLight(0xffe2c0, 1.15);
+keyLight.position.set(8, 140, 16);
+keyLight.target.position.set(0, 0, -6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+Object.assign(keyLight.shadow.camera, { left: -135, right: 135, top: 110, bottom: -110, near: 10, far: 300 });
+keyLight.shadow.bias = -0.0006; keyLight.shadow.normalBias = 0.04;
+scene.add(keyLight, keyLight.target);
+const rimLight = new THREE.DirectionalLight(0x4a6aff, 0.55);
+rimLight.position.set(-60, 30, -90);
+scene.add(rimLight);
+const flashLights = [0, 1, 2].map(() => { const l = new THREE.PointLight(0xffffff, 0, 46, 2); scene.add(l); return { l, t: 0, wx: 0 }; });
+
+// ---------- void backdrop: nebula + parallax stars
+const nebula = new THREE.Mesh(new THREE.PlaneGeometry(2600, 2600), new THREE.MeshBasicMaterial({ map: nebulaTex, depthWrite: false }));
+nebula.rotation.x = -Math.PI / 2; nebula.position.set(0, -420, 0);
+nebulaTex.repeat.set(2, 2);
+scene.add(nebula);
+
+const pointVS = `attribute float aSize; attribute vec3 aColor; attribute float aAlpha; uniform float uScale; varying vec3 vColor; varying float vAlpha;
+  void main(){ vColor = aColor; vAlpha = aAlpha; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); gl_PointSize = aSize * uScale; }`;
+const pointFS = `varying vec3 vColor; varying float vAlpha;
+  void main(){ float d = length(gl_PointCoord - 0.5); float a = smoothstep(0.5, 0.0, d); gl_FragColor = vec4(vColor * 1.6, a * a * vAlpha); }`;
+function pointsMaterial() {
+  return new THREE.ShaderMaterial({ uniforms: { uScale: { value: 10 } }, vertexShader: pointVS, fragmentShader: pointFS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+}
+const STAR_N = 1600, STAR_SPAN = 760;
+const starGeo = new THREE.BufferGeometry();
+const starPos = new Float32Array(STAR_N * 3), starCol = new Float32Array(STAR_N * 3), starSize = new Float32Array(STAR_N), starAlpha = new Float32Array(STAR_N);
+const starX = new Float32Array(STAR_N), starF = new Float32Array(STAR_N);
+{
+  const r = mulberry32(42);
+  for (let i = 0; i < STAR_N; i++) {
+    starX[i] = r() * STAR_SPAN;
+    const depth = r();
+    starF[i] = 0.12 + depth * 0.5;
+    starPos[i * 3 + 1] = -20 - (1 - depth) * 260;
+    starPos[i * 3 + 2] = r() < 0.5 ? -60 - r() * 260 : 40 + r() * 260;
+    const tint = r();
+    const c = tint < 0.15 ? [1, 0.8, 0.55] : tint < 0.4 ? [0.6, 0.8, 1] : [0.9, 0.92, 1];
+    starCol.set(c, i * 3);
+    starSize[i] = 0.15 + depth * depth * 0.55;
+    starAlpha[i] = 0.35 + r() * 0.65;
+  }
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+starGeo.setAttribute('aColor', new THREE.BufferAttribute(starCol, 3));
+starGeo.setAttribute('aSize', new THREE.BufferAttribute(starSize, 1));
+starGeo.setAttribute('aAlpha', new THREE.BufferAttribute(starAlpha, 1));
+const starMat = pointsMaterial(); starMat.blending = THREE.AdditiveBlending;
+const stars = new THREE.Points(starGeo, starMat); stars.frustumCulled = false; scene.add(stars);
+
+// ---------- the plateau (follows the camera; textures scroll with world x)
+const SLAB_W = 420, SLAB_D = Z_FRONT - Z_BACK;
+groundMap.repeat.set(SLAB_W / CELL, SLAB_D / CELL); groundEmi.repeat.copy(groundMap.repeat);
+const groundMat = new THREE.MeshStandardMaterial({ map: groundMap, emissiveMap: groundEmi, emissive: 0x2fd6e6, emissiveIntensity: 0.55, roughness: 0.82, metalness: 0.25 });
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(SLAB_W, SLAB_D), groundMat);
+ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, (Z_FRONT + Z_BACK) / 2); ground.receiveShadow = true;
+scene.add(ground);
+wallMap.repeat.set(SLAB_W / 16, 1); wallEmi.repeat.copy(wallMap.repeat);
+const wallMat = new THREE.MeshStandardMaterial({ map: wallMap, emissiveMap: wallEmi, emissive: 0xffffff, emissiveIntensity: 0.9, roughness: 0.7, metalness: 0.4 });
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(SLAB_W, 9), wallMat);
+wall.position.set(0, -4.5, Z_FRONT); scene.add(wall);
+const edgeGlow = new THREE.Mesh(new THREE.BoxGeometry(SLAB_W, 0.22, 0.22), new THREE.MeshBasicMaterial({ color: 0x7ff6ff }));
+edgeGlow.position.set(0, 0.02, Z_FRONT); scene.add(edgeGlow);
+
+// ---------- terrain segments: mountains, city blocks, colony domes, beacon towers
+function ridge(x) {
+  const k = 2 * Math.PI / W;
+  return 8 + 4.5 * Math.sin(k * 3 * x + 1) + 3 * Math.sin(k * 7 * x + 2.3) + 2.2 * Math.sin(k * 13 * x + 0.7) + 1.3 * Math.sin(k * 29 * x + 4) + 0.8 * Math.sin(k * 61 * x + 1.9);
+}
+function mountH(x, z) {
+  const t = z + 42;
+  const prof = t > 0 ? Math.max(0, 1 - t / 12) : Math.max(0, 1 + t / 8);
+  const p = prof * prof * (3 - 2 * prof);
+  const det = Math.sin(2 * Math.PI * 231 * x / W + z * 1.7) * Math.sin(2 * Math.PI * 97 * x / W - z * 0.9);
+  return Math.max(0, ridge(x) * p + det * p * 1.3) - 0.3;
+}
+const mountMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.92, metalness: 0.05 });
+const crestMat = new THREE.MeshBasicMaterial({ color: 0xff8a2a, side: THREE.DoubleSide });
+const bldgMat = new THREE.MeshStandardMaterial({ map: winMap, emissiveMap: winEmi, emissive: 0xffffff, emissiveIntensity: 0.95, roughness: 0.55, metalness: 0.35 });
+const roofGlowMats = [new THREE.LineBasicMaterial({ color: 0x5ef2ff }), new THREE.LineBasicMaterial({ color: 0xffb347 })];
+const towerMat = new THREE.MeshStandardMaterial({ color: 0x2a3340, roughness: 0.5, metalness: 0.7 });
+const beaconMat = new THREE.MeshBasicMaterial({ color: 0xff3040 });
+const domeMat = new THREE.MeshStandardMaterial({ color: 0x113844, emissive: 0x1a8fa0, emissiveIntensity: 0.55, transparent: true, opacity: 0.78, roughness: 0.15, metalness: 0.4 });
+const domeBaseMat = new THREE.MeshStandardMaterial({ color: 0x39424f, roughness: 0.5, metalness: 0.6 });
+const LOW = new THREE.Color(0x120d18), HIGH = new THREE.Color(0x5e3024), PEAK = new THREE.Color(0xb8642e);
+
+function buildMountains(x0) {
+  const NX = 41, NZ = 12, z0 = -50, z1 = -30;
+  const pos = [], col = [], idx = [];
+  const c = new THREE.Color();
+  for (let iz = 0; iz < NZ; iz++) {
+    const z = z0 + (z1 - z0) * iz / (NZ - 1);
+    for (let ix = 0; ix < NX; ix++) {
+      const lx = SEG * ix / (NX - 1);
+      const y = mountH(x0 + lx, z);
+      pos.push(lx, y, z);
+      const t = clamp(y / 16, 0, 1);
+      c.copy(LOW).lerp(HIGH, t); if (t > 0.8) c.lerp(PEAK, (t - 0.8) * 3);
+      col.push(c.r, c.g, c.b);
+    }
+  }
+  for (let iz = 0; iz < NZ - 1; iz++) for (let ix = 0; ix < NX - 1; ix++) {
+    const a = iz * NX + ix, b = a + 1, d = a + NX, e = d + 1;
+    idx.push(a, d, b, b, d, e);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  geo.setIndex(idx); geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, mountMat); m.castShadow = true; m.receiveShadow = true;
+  // glowing crest ribbon, a nod to the orange mountain line on the original scanner
+  const cp = [], ci = [];
+  const CN = 81;
+  for (let i = 0; i < CN; i++) {
+    const lx = SEG * i / (CN - 1);
+    let best = 0, bz = -42;
+    for (let z = -46; z <= -38; z += 1) { const h = mountH(x0 + lx, z); if (h > best) { best = h; bz = z; } }
+    cp.push(lx, best + 0.02, bz + 0.15, lx, best + 0.34, bz + 0.15);
+    if (i < CN - 1) { const k = i * 2; ci.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  }
+  const cg = new THREE.BufferGeometry();
+  cg.setAttribute('position', new THREE.Float32BufferAttribute(cp, 3)); cg.setIndex(ci);
+  return [m, new THREE.Mesh(cg, crestMat)];
+}
+function boxUV(geo, w, h, d, r) {
+  const uv = geo.attributes.uv;
+  const ou = Math.floor(r() * 8) / 8, ov = 0;
+  for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) {
+    const i = f * 4 + k;
+    let u = uv.getX(i), v = uv.getY(i);
+    if (f === 2 || f === 3) { u *= 0.001; v *= 0.001; }
+    else if (f < 2) { u = u * d / CELL + ou; v = v * h / CELL + ov; }
+    else { u = u * w / CELL + ou; v = v * h / CELL + ov; }
+    uv.setXY(i, u, v);
+  }
+}
+const beaconMeshes = [];
+const segments = [];
+for (let s = 0; s < NSEG; s++) {
+  const x0 = s * SEG;
+  const g = new THREE.Group();
+  buildMountains(x0).forEach(m => g.add(m));
+  const r = mulberry32(1000 + s * 17);
+  const place = (zMin, zMax, n) => {
+    for (let i = 0; i < n; i++) {
+      const w = 3 + r() * 5, d = 3 + r() * 5, h = 2 + Math.pow(r(), 1.6) * 13;
+      const geo = new THREE.BoxGeometry(w, h, d); boxUV(geo, w, h, d, r);
+      const b = new THREE.Mesh(geo, bldgMat);
+      b.position.set(4 + r() * (SEG - 8), h / 2, zMin + r() * (zMax - zMin));
+      if (SHELTER_X.some(sx => Math.abs(wrapD(x0 + b.position.x - sx)) < 17)) continue;
+      b.castShadow = true; b.receiveShadow = true; g.add(b);
+      if (r() < 0.45) {
+        const strip = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w + 0.06, 0.3, d + 0.06)), roofGlowMats[r() < 0.6 ? 0 : 1]);
+        strip.position.set(b.position.x, h - 0.1, b.position.z); g.add(strip);
+      }
+      if (r() < 0.25) {
+        const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3, 5), towerMat);
+        ant.position.set(b.position.x, h + 1.5, b.position.z); g.add(ant);
+      }
+    }
+  };
+  place(-30, -9, 9);
+  place(9, 27, 7);
+  for (let i = 0; i < 2; i++) {
+    const rad = 2.5 + r() * 2.5;
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(rad, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), domeMat);
+    const dx = 8 + r() * (SEG - 16), dz = r() < 0.5 ? 6 + r() * 3 : -6 - r() * 3;
+    if (SHELTER_X.some(sx => Math.abs(wrapD(x0 + dx - sx)) < 14)) continue;
+    dome.position.set(dx, 0.4, dz);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(rad + 0.3, rad + 0.5, 0.5, 20), domeBaseMat);
+    base.position.set(dx, 0.25, dz); base.receiveShadow = true;
+    dome.castShadow = true; g.add(base, dome);
+  }
+  for (let i = 0; i < 2; i++) {
+    const h = 9 + r() * 9;
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.6, h, 6), towerMat);
+    const tx = r() * SEG, tz = -12 - r() * 14;
+    t.position.set(tx, h / 2, tz); t.castShadow = true;
+    const bcn = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 6), beaconMat);
+    bcn.position.set(tx, h + 0.3, tz);
+    g.add(t, bcn);
+  }
+  scene.add(g);
+  segments.push({ x0, g });
+}
+
+// ---------- model builders
+const std = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.4, metalness: 0.5 }, o));
+const basic = (c, o) => new THREE.MeshBasicMaterial(Object.assign({ color: c }, o || {}));
+const additive = (c, op = 1) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false });
+function shadowAll(o) { o.traverse(m => { if (m.isMesh && !(m.material.blending === THREE.AdditiveBlending)) { m.castShadow = true; } }); return o; }
+
+function buildShip() {
+  const outer = new THREE.Group(), inner = new THREE.Group(); outer.add(inner);
+  const hull = std({ color: 0xdfe6ee, metalness: 0.7, roughness: 0.28 });
+  const red = std({ color: 0xd8243a, metalness: 0.5, roughness: 0.35, emissive: 0x3a0008 });
+  const dark = std({ color: 0x1c2230, metalness: 0.8, roughness: 0.4 });
+  const glass = std({ color: 0x103040, emissive: 0x35d8ff, emissiveIntensity: 0.9, metalness: 0.2, roughness: 0.1 });
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.75, 3.6, 12), hull); nose.rotation.z = -Math.PI / 2; nose.position.x = 2.0;
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.95, 3.2, 12), hull); body.rotation.z = -Math.PI / 2; body.position.x = -1.4;
+  const stripe = new THREE.Mesh(new THREE.CylinderGeometry(0.77, 0.8, 0.5, 12), red); stripe.rotation.z = -Math.PI / 2; stripe.position.x = 0.1;
+  const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.62, 0.7, 12), dark); nozzle.rotation.z = -Math.PI / 2; nozzle.position.x = -3.3;
+  const glow = new THREE.Mesh(new THREE.CircleGeometry(0.56, 16), basic(0xffc070)); glow.rotation.y = -Math.PI / 2; glow.position.x = -3.66;
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 12, 1, true), additive(0xff8a30, 0.9)); flame.rotation.z = Math.PI / 2; flame.position.x = -4.2;
+  const flameCore = new THREE.Mesh(new THREE.ConeGeometry(0.26, 1, 10, 1, true), additive(0xfff0c0, 1)); flameCore.rotation.z = Math.PI / 2; flameCore.position.x = -4.0;
+  const ws = new THREE.Shape(); ws.moveTo(0.9, 0); ws.lineTo(-2.4, 3.4); ws.lineTo(-3.3, 3.4); ws.lineTo(-2.8, 0); ws.closePath();
+  const wg = new THREE.ExtrudeGeometry(ws, { depth: 0.18, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 1 });
+  wg.rotateX(Math.PI / 2);
+  const wingR = new THREE.Mesh(wg, red); wingR.position.y = 0.05;
+  const wingL = new THREE.Mesh(wg, red); wingL.scale.z = -1; wingL.position.y = 0.05;
+  const fs = new THREE.Shape(); fs.moveTo(-1.4, 0); fs.lineTo(-3.0, 1.9); fs.lineTo(-3.5, 1.9); fs.lineTo(-3.2, 0); fs.closePath();
+  const fg = new THREE.ExtrudeGeometry(fs, { depth: 0.14, bevelEnabled: false }); fg.translate(0, 0.45, -0.07);
+  const fin = new THREE.Mesh(fg, hull);
+  const cockpit = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 10), glass); cockpit.scale.set(1.7, 0.75, 0.85); cockpit.position.set(0.7, 0.5, 0);
+  const tipR = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), basic(0x40ff80)); tipR.position.set(-2.85, 0.1, 3.4);
+  const tipL = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), basic(0xff3040)); tipL.position.set(-2.85, 0.1, -3.4);
+  const gun = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.6, 6), dark); gun.rotation.z = -Math.PI / 2; gun.position.set(1.0, -0.45, 0);
+  inner.add(nose, body, stripe, nozzle, glow, flame, flameCore, wingR, wingL, fin, cockpit, tipR, tipL, gun);
+  shadowAll(inner);
+  outer.scale.setScalar(SHIP_SCALE);
+  return { outer, inner, flame, flameCore, glow };
+}
+
+const ENEMY_COLOR = { lander: 0x3be35a, mutant: 0xff3df0, bomber: 0x7a6bff, pod: 0xb04dff, swarmer: 0xff5a2a, baiter: 0xc4ff3a };
+const ENEMY_SCORE = { lander: 150, mutant: 150, bomber: 250, pod: 1000, swarmer: 150, baiter: 200 };
+const ENEMY_R = { lander: 1.8, mutant: 1.7, bomber: 1.5, pod: 1.7, swarmer: 1.0, baiter: 2.3 };
+const mutantMat = std({ color: 0x5a0a50, emissive: 0xff2ae0, emissiveIntensity: 0.7, metalness: 0.3, roughness: 0.3 });
+const templates = {};
+{
+  // lander
+  const g = new THREE.Group();
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(1.3, 18, 9, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: 0x2bd14a, emissive: 0x0b5a1a, metalness: 0.3, roughness: 0.35 }));
+  dome.position.y = 0.1;
+  const ringM = std({ color: 0xffd23a, emissive: 0x6a4400, metalness: 0.6, roughness: 0.3 });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.65, 1.0, 0.5, 18), ringM); base.position.y = -0.15;
+  const band = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.11, 6, 32), basic(0xb6ff5a)); band.rotation.x = Math.PI / 2; band.position.y = 0.08;
+  g.add(dome, base, band);
+  for (let i = 0; i < 3; i++) {
+    const a = i / 3 * Math.PI * 2;
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.4, 5), ringM);
+    leg.position.set(Math.cos(a) * 0.9, -0.85, Math.sin(a) * 0.9); leg.rotation.set(Math.sin(a) * 0.45, 0, -Math.cos(a) * 0.45);
+    const foot = new THREE.Mesh(new THREE.SphereGeometry(0.16, 6, 4), basic(0xb6ff5a)); foot.position.set(Math.cos(a) * 1.2, -1.5, Math.sin(a) * 1.2);
+    g.add(leg, foot);
+  }
+  const ant = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 6), basic(0xff4040)); ant.position.y = 1.55; g.add(ant);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1.1, 2.8, 14, 1, true), additive(0x7dff6a, 0.32)); beam.position.y = -1.6; beam.name = 'beam'; beam.visible = false;
+  g.add(beam);
+  templates.lander = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1.25, 0), mutantMat));
+  const spikeM = std({ color: 0x40ff60, emissive: 0x20c040, emissiveIntensity: 0.8 });
+  const ico = new THREE.IcosahedronGeometry(1, 0).attributes.position;
+  const seen = new Set();
+  for (let i = 0; i < ico.count; i++) {
+    const v = new THREE.Vector3().fromBufferAttribute(ico, i).normalize();
+    const key = v.toArray().map(n => n.toFixed(2)).join();
+    if (seen.has(key)) continue; seen.add(key);
+    const sp = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.0, 5), spikeM);
+    sp.position.copy(v).multiplyScalar(1.35); sp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v);
+    g.add(sp);
+  }
+  templates.mutant = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  const bx = new THREE.BoxGeometry(1.9, 1.9, 1.9);
+  g.add(new THREE.Mesh(bx, std({ color: 0x2a1fd0, emissive: 0x150a70, metalness: 0.6, roughness: 0.25 })));
+  g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.0, 2.0, 2.0)), new THREE.LineBasicMaterial({ color: 0xb0a6ff })));
+  const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.75), basic(0xff60ff)); core.name = 'core';
+  g.add(core);
+  templates.bomber = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.DodecahedronGeometry(1.35), std({ color: 0x6a1aa0, emissive: 0x40107a, metalness: 0.4, roughness: 0.3 })));
+  const dotM = basic(0xff4060);
+  [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].forEach(p => { const d = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), dotM); d.position.set(p[0]*1.45, p[1]*1.45, p[2]*1.45); g.add(d); });
+  templates.pod = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.TetrahedronGeometry(1.0), std({ color: 0xff4a1a, emissive: 0xa02000, metalness: 0.3, roughness: 0.3 })));
+  const c = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), basic(0xffe080)); g.add(c);
+  templates.swarmer = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.CylinderGeometry(2.3, 2.8, 0.55, 24), std({ color: 0x5aa020, emissive: 0x2a5a00, metalness: 0.6, roughness: 0.3 })));
+  const top = new THREE.Mesh(new THREE.SphereGeometry(1.0, 14, 7, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: 0x223010, emissive: 0x9aff30, emissiveIntensity: 0.5 })); top.position.y = 0.25;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(2.6, 0.1, 6, 40), basic(0xd8ff50)); rim.rotation.x = Math.PI / 2;
+  g.add(top, rim);
+  templates.baiter = shadowAll(g);
+}
+{
+  const g = new THREE.Group();
+  const suit = std({ color: 0xff7a2a, emissive: 0x501c00, metalness: 0.2, roughness: 0.5 });
+  const suitDark = std({ color: 0x8a3a12, metalness: 0.2, roughness: 0.6 });
+  const helm = std({ color: 0xf4f4f4, metalness: 0.3, roughness: 0.25 });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.36, 0.9, 10), suit); body.position.y = 1.05;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.33, 12, 10), helm); head.position.y = 1.78;
+  const visor = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.15, 0.12), basic(0x60e8ff)); visor.position.set(0, 1.8, 0.27);
+  const mk = (name, x, y, z, len, mat) => { const p = new THREE.Group(); const m = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, len, 6), mat); m.position.y = -len / 2; p.add(m); p.position.set(x, y, z); p.name = name; return p; };
+  g.add(body, head, visor, mk('legL', 0, 0.62, 0.14, 0.62, suitDark), mk('legR', 0, 0.62, -0.14, 0.62, suitDark), mk('armL', 0, 1.42, 0.38, 0.55, suit), mk('armR', 0, 1.42, -0.38, 0.55, suit));
+  shadowAll(g);
+  const beacon = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 28), additive(0x5ef2ff, 0.7)); beacon.rotation.x = -Math.PI / 2; beacon.position.y = 0.06; beacon.name = 'beacon';
+  g.add(beacon);
+  g.scale.setScalar(1.3);
+  // parachute: hidden until a falling colonist pulls the cord; pivots at the shoulders so it unfurls upward
+  const chute = new THREE.Group(); chute.name = 'chute'; chute.position.y = 1.5; chute.visible = false;
+  const stripes = canvasTex(256, 32, (c, w, hh) => { for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#d9d4c8' : '#e2501a'; c.fillRect(i * w / 8, 0, w / 8, hh); } });
+  const canopy = new THREE.Mesh(new THREE.SphereGeometry(1.6, 24, 8, 0, Math.PI * 2, 0, Math.PI / 2.4), std({ map: stripes, color: 0x8a8a8a, roughness: 1, metalness: 0, side: THREE.DoubleSide }));
+  canopy.scale.y = 0.6; canopy.position.y = 1.5; canopy.castShadow = true;
+  const lp = [];
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; lp.push(Math.cos(a) * 1.55, 1.75, Math.sin(a) * 1.55, 0, 0, 0); }
+  const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
+  chute.add(canopy, new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0xd8dde6 })));
+  g.add(chute);
+  templates.human = g;
+}
+const bulletGeo = new THREE.SphereGeometry(0.42, 10, 8), bulletHaloGeo = new THREE.SphereGeometry(0.95, 10, 8);
+const bulletMat = basic(0xfff1a0), bulletHaloMat = additive(0xff9a40, 0.35);
+const bulletStrongMat = basic(0xffc0e0), bulletStrongHaloMat = additive(0xff2a6a, 0.45);
+const mineGeo = new THREE.OctahedronGeometry(0.65), mineMat = basic(0xffe040);
+
+// ---------- particles
+const PN = 5000;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pSize = new Float32Array(PN), pAlpha = new Float32Array(PN);
+const pVel = new Float32Array(PN * 3), pLife = new Float32Array(PN), pMax = new Float32Array(PN), pWX = new Float32Array(PN), pBase = new Float32Array(PN), pDrag = new Float32Array(PN), pGrav = new Float32Array(PN);
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aColor', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize, 1));
+pGeo.setAttribute('aAlpha', new THREE.BufferAttribute(pAlpha, 1));
+const pMat = pointsMaterial();
+const particles = new THREE.Points(pGeo, pMat); particles.frustumCulled = false; particles.renderOrder = 5; scene.add(particles);
+let pHead = 0;
+function emit(x, y, z, vx, vy, vz, r, g, b, size, life, drag = 2, grav = 0) {
+  const i = pHead; pHead = (pHead + 1) % PN;
+  pWX[i] = x; pPos[i * 3 + 1] = y; pPos[i * 3 + 2] = z;
+  pVel[i * 3] = vx; pVel[i * 3 + 1] = vy; pVel[i * 3 + 2] = vz;
+  pCol[i * 3] = r; pCol[i * 3 + 1] = g; pCol[i * 3 + 2] = b;
+  pBase[i] = size; pLife[i] = life; pMax[i] = life; pDrag[i] = drag; pGrav[i] = grav;
+}
+function updateParticles(dt) {
+  for (let i = 0; i < PN; i++) {
+    if (pLife[i] <= 0) { if (pSize[i] !== 0) { pSize[i] = 0; pAlpha[i] = 0; } continue; }
+    pLife[i] -= dt;
+    const k = Math.exp(-pDrag[i] * dt), j = i * 3;
+    pVel[j] *= k; pVel[j + 1] = pVel[j + 1] * k - pGrav[i] * dt; pVel[j + 2] *= k;
+    pWX[i] += pVel[j] * dt; pPos[j + 1] += pVel[j + 1] * dt; pPos[j + 2] += pVel[j + 2] * dt;
+    pPos[j] = wrapD(pWX[i] - camX);
+    const t = Math.max(0, pLife[i] / pMax[i]);
+    pSize[i] = pBase[i] * (0.35 + 0.65 * t); pAlpha[i] = t;
+  }
+  pGeo.attributes.position.needsUpdate = true; pGeo.attributes.aColor.needsUpdate = true;
+  pGeo.attributes.aSize.needsUpdate = true; pGeo.attributes.aAlpha.needsUpdate = true;
+}
+
+// debris, shock rings
+const debrisGeo = new THREE.TetrahedronGeometry(0.38);
+const debrisMats = new Map();
+const debris = [];
+for (let i = 0; i < 120; i++) { const m = new THREE.Mesh(debrisGeo, null); m.visible = false; m.castShadow = true; scene.add(m); debris.push({ m, life: 0 }); }
+let debrisHead = 0;
+const ringGeo = new THREE.RingGeometry(0.86, 1, 48);
+const rings = [];
+for (let i = 0; i < 14; i++) { const m = new THREE.Mesh(ringGeo, additive(0xffffff, 0)); m.visible = false; scene.add(m); rings.push({ m, life: 0 }); }
+let ringHead = 0;
+const _c = new THREE.Color(), _w = new THREE.Color(1, 1, 1), _o = new THREE.Color(1, 0.55, 0.15);
+let shake = 0, flashAmt = 0;
+
+function explode(x, y, z, color, s = 1, quiet) {
+  const c = new THREE.Color(color);
+  const n = Math.floor(80 * s);
+  for (let i = 0; i < n; i++) {
+    const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, q = Math.sqrt(1 - u * u);
+    const sp = rand(6, 34) * Math.sqrt(s);
+    const roll = Math.random();
+    _c.copy(roll < 0.3 ? _w : roll < 0.7 ? c : _o);
+    emit(x, y, z, q * Math.cos(th) * sp, u * sp, q * Math.sin(th) * sp, _c.r, _c.g, _c.b, rand(0.5, 1.7) * Math.sqrt(s), rand(0.45, 1.15), 2.4, 6);
+  }
+  for (let i = 0; i < 24 * s; i++) {
+    const a = Math.random() * Math.PI * 2, b = rand(-1, 1), sp = rand(45, 85);
+    emit(x, y, z, Math.cos(a) * sp, b * sp * 0.8, Math.sin(a) * sp, 1, 0.85, 0.6, 0.32, rand(0.3, 0.7), 3.5, 20);
+  }
+  emit(x, y, z, 0, 0, 0, c.r, c.g, c.b, 9 * s, 0.22, 0);
+  emit(x, y, z, 0, 0, 0, 1, 1, 1, 5 * s, 0.14, 0);
+  let mat = debrisMats.get(color);
+  if (!mat) { mat = std({ color, emissive: color, emissiveIntensity: 0.6, metalness: 0.4, roughness: 0.4 }); debrisMats.set(color, mat); }
+  for (let i = 0; i < Math.ceil(7 * s); i++) {
+    const d = debris[debrisHead]; debrisHead = (debrisHead + 1) % debris.length;
+    d.m.material = mat; d.m.visible = true; d.wx = x; d.y = y; d.z = z;
+    d.vx = rand(-22, 22); d.vy = rand(4, 26); d.vz = rand(-14, 14);
+    d.rx = rand(-12, 12); d.ry = rand(-12, 12); d.life = rand(1.4, 2.4); d.max = d.life;
+  }
+  const rg = rings[ringHead]; ringHead = (ringHead + 1) % rings.length;
+  rg.wx = x; rg.y = y; rg.z = z; rg.life = 0.55; rg.max = 0.55; rg.s = 13 * s; rg.m.material.color.set(color); rg.m.visible = true;
+  const fl = flashLights.reduce((a, b) => a.t < b.t ? a : b);
+  fl.l.color.set(color); fl.t = 1; fl.s = 4 * s; fl.wx = x; fl.l.position.y = y; fl.l.position.z = z + 2;
+  shake = Math.min(1.6, shake + 0.28 * s);
+  if (!quiet) sfx.boom(s);
+}
+function materialize(x, y, color) {
+  const c = new THREE.Color(color);
+  for (let i = 0; i < 40; i++) {
+    const a = Math.random() * Math.PI * 2, b = rand(-1, 1), r = rand(4, 8);
+    const ox = Math.cos(a) * r, oy = b * r, oz = Math.sin(a) * r * 0.6;
+    emit(x + ox, y + oy, oz, -ox / 0.55, -oy / 0.55, -oz / 0.55, c.r, c.g, c.b, rand(0.4, 0.9), 0.55, 0);
+  }
+}
+function updateFX(dt) {
+  for (const d of debris) {
+    if (d.life <= 0) continue;
+    d.life -= dt;
+    if (d.life <= 0) { d.m.visible = false; continue; }
+    d.vy -= 34 * dt;
+    d.wx += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
+    if (d.y < 0.25 && d.z < Z_FRONT && d.z > Z_BACK && d.vy < 0) { d.y = 0.25; d.vy *= -0.38; d.vx *= 0.6; d.vz *= 0.6; d.rx *= 0.5; d.ry *= 0.5; }
+    d.m.position.set(wrapD(d.wx - camX), d.y, d.z);
+    d.m.rotation.x += d.rx * dt; d.m.rotation.y += d.ry * dt;
+    d.m.scale.setScalar(Math.min(1, d.life / d.max * 3));
+  }
+  for (const r of rings) {
+    if (r.life <= 0) continue;
+    r.life -= dt;
+    if (r.life <= 0) { r.m.visible = false; continue; }
+    const t = 1 - r.life / r.max;
+    r.m.position.set(wrapD(r.wx - camX), r.y, r.z);
+    r.m.quaternion.copy(camera.quaternion);
+    r.m.scale.setScalar(0.5 + r.s * (1 - Math.pow(1 - t, 3)));
+    r.m.material.opacity = (1 - t) * 0.9;
+  }
+  for (const f of flashLights) {
+    f.t = Math.max(0, f.t - dt * 3.2);
+    f.l.intensity = f.t * f.t * (f.s || 0);
+    f.l.position.x = wrapD(f.wx - camX);
+  }
+  updateParticles(dt);
+}
+
+// ---------- audio (synthesised)
+let actx = null, master = null, noiseBuf = null, thrustGain = null, muted = false;
+function initAudio() {
+  if (actx) { if (actx.state === 'suspended') actx.resume(); return; }
+  try {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = actx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6;
+    master = actx.createGain(); master.gain.value = muted ? 0 : 0.55;
+    master.connect(comp); comp.connect(actx.destination);
+    noiseBuf = actx.createBuffer(1, actx.sampleRate * 2, actx.sampleRate);
+    const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = actx.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
+    const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520;
+    thrustGain = actx.createGain(); thrustGain.gain.value = 0;
+    src.connect(lp); lp.connect(thrustGain); thrustGain.connect(master); src.start();
+  } catch (e) { actx = null; }
+}
+function tone(type, f0, f1, dur, vol, delay = 0) {
+  if (!actx) return;
+  const t = actx.currentTime + delay;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+}
+function noise(dur, vol, f0, f1, delay = 0) {
+  if (!actx) return;
+  const t = actx.currentTime + delay;
+  const s = actx.createBufferSource(); s.buffer = noiseBuf;
+  const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+  const g = actx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.02);
+}
+let lastBoom = 0;
+const sfx = {
+  laser() { tone('square', 2300, 360, 0.12, 0.045); tone('sawtooth', 1500, 190, 0.1, 0.02); },
+  boom(s = 1) { if (!actx || actx.currentTime - lastBoom < 0.03) return; lastBoom = actx.currentTime; noise(0.35 + 0.35 * s, 0.32 * Math.min(1.5, s), 3200, 90); tone('sine', 150, 32, 0.3 + 0.25 * s, 0.28); },
+  bomb() { noise(1.8, 0.7, 6000, 50); tone('sine', 95, 18, 1.4, 0.55); tone('sawtooth', 300, 40, 1.0, 0.12); },
+  death() { noise(2.4, 0.7, 4500, 40); tone('sawtooth', 700, 35, 2.0, 0.2); tone('sine', 80, 20, 2.2, 0.5); },
+  catch() { [660, 880, 1320].forEach((f, i) => tone('triangle', f, f * 1.01, 0.14, 0.12, i * 0.07)); },
+  land() { [523, 659, 784, 1047, 1319].forEach((f, i) => tone('triangle', f, f, 0.16, 0.11, i * 0.06)); },
+  abduct() { tone('triangle', 260, 980, 0.6, 0.09); tone('triangle', 520, 1960, 0.6, 0.04, 0.08); },
+  scream() { tone('sine', 1400, 300, 0.7, 0.06); },
+  mutant() { tone('sawtooth', 180, 1400, 0.4, 0.08); tone('square', 90, 700, 0.4, 0.05); },
+  spawn() { tone('sine', 140, 1000, 0.45, 0.04); },
+  hyper() { tone('sine', 200, 2600, 0.35, 0.12); tone('sine', 2600, 180, 0.4, 0.1, 0.35); },
+  shot() { tone('square', 920, 520, 0.07, 0.022); },
+  wave() { [392, 523, 659, 784].forEach((f, i) => tone('square', f, f, 0.18, 0.05, i * 0.12)); },
+  life() { [784, 988, 1175, 1568].forEach((f, i) => tone('square', f, f, 0.1, 0.06, i * 0.08)); },
+  mine() { tone('sine', 1200, 1100, 0.05, 0.02); },
+  shieldBreak() { noise(0.5, 0.3, 9000, 1500); tone('sine', 1800, 220, 0.5, 0.12); tone('triangle', 900, 120, 0.6, 0.08); },
+  hit() { noise(0.25, 0.35, 2500, 200); tone('square', 220, 60, 0.25, 0.12); },
+  repair() { [440, 554, 659, 880, 1109, 1319].forEach((f, i) => tone('triangle', f, f, 0.18, 0.09, i * 0.08)); tone('sine', 300, 1200, 0.6, 0.06); },
+  hangar() { tone('sawtooth', 110, 110, 0.5, 0.07); tone('sawtooth', 165, 165, 0.5, 0.05, 0.25); tone('sine', 220, 440, 0.7, 0.06, 0.5); },
+  dock() { tone('sine', 520, 520, 0.08, 0.05); },
+  alarm() { for (let i = 0; i < 4; i++) { tone('square', 880, 440, 0.28, 0.06, i * 0.34); tone('square', 660, 330, 0.28, 0.04, i * 0.34 + 0.14); } }
+};
+
+// ---------- game state
+const state = { hangarT: 40, mode: 'title', score: 0, hi: 0, lives: 3, bombs: 3, wave: 1, nextLife: 10000, waveTime: 0, pending: 0, batchT: 0, baiterT: 0, dieT: 0, endT: 0, invuln: 0, planetLost: false, paused: false, msgT: 0 };
+try { state.hi = +localStorage.getItem('planetguard.hi') || 0; } catch (e) {}
+$('hiT').textContent = state.hi.toLocaleString();
+const ship = { shield: true, hull: 100, x: 0, y: 20, vx: 0, vy: 0, facing: 1, yaw: 0, fireT: 0, alive: false, thrust: 0, roll: 0 };
+let camX = 0, camU = 0;
+const enemies = [], humans = [], bullets = [], mines = [], lasers = [];
+
+const shipModel = buildShip();
+scene.add(shipModel.outer);
+const shieldMat = new THREE.ShaderMaterial({
+  uniforms: { uOpacity: { value: 1 }, uColor: { value: new THREE.Color(0x5ef2ff) }, uTime: { value: 0 } },
+  vertexShader: 'varying vec3 vN; varying vec3 vP; void main(){ vN = normalize(normalMatrix * normal); vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: 'uniform float uOpacity, uTime; uniform vec3 uColor; varying vec3 vN; varying vec3 vP; void main(){ float f = pow(1.0 - abs(vN.z), 2.2); float hex = 0.5 + 0.5 * sin(vP.x * 6.0 + uTime * 3.0) * sin(vP.y * 7.0 - uTime * 2.0); gl_FragColor = vec4(uColor * (0.6 + 0.6 * hex), (f * 0.9 + 0.06) * uOpacity); }',
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide
+});
+const shieldMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16), shieldMat);
+shieldMesh.scale.set(5.2, 2.6, 4.6);
+shipModel.outer.add(shieldMesh);
+let shieldPop = 1, shieldShow = 0;
+
+// repair carrier: a flying aircraft carrier held up by ducted drone rotors; land on the deck to repair
+function buildHangar() {
+  const g = new THREE.Group();
+  const greyM = std({ color: 0x7d8792, metalness: 0.65, roughness: 0.4 });
+  const lightM = std({ color: 0xb9c2cc, metalness: 0.6, roughness: 0.35 });
+  const darkM = std({ color: 0x232a33, metalness: 0.75, roughness: 0.45 });
+  const glowM = basic(0x5effa8), warmM = basic(0xffd08a);
+  const L = 38, D = 11;
+  // hull: side profile with a raked bow, extruded across the beam
+  const hs = new THREE.Shape();
+  hs.moveTo(-17, 0); hs.lineTo(L / 2, 0); hs.lineTo(15, -3.8); hs.lineTo(-14.5, -3.8); hs.lineTo(-17, -1.6); hs.closePath();
+  const hg = new THREE.ExtrudeGeometry(hs, { depth: 8, bevelEnabled: true, bevelThickness: 0.3, bevelSize: 0.3, bevelSegments: 1 }); hg.translate(0, -0.25, -4);
+  const hull = new THREE.Mesh(hg, greyM);
+  const keelGlow = new THREE.Mesh(new THREE.BoxGeometry(26, 0.15, 0.2), basic(0x7fd6ff)); keelGlow.position.set(0, -2.2, 4.35);
+  // flight deck with painted markings
+  const deckTex = canvasTex(512, 148, (c, w, h) => {
+    c.fillStyle = '#2a3038'; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#323943'; for (let x = 0; x < w; x += 32) c.fillRect(x, 0, 1, h);
+    c.fillStyle = '#e8d24a'; c.fillRect(0, 6, w, 3); c.fillRect(0, h - 9, w, 3);
+    c.fillStyle = '#e6eef8'; for (let x = 20; x < w - 20; x += 40) c.fillRect(x, h / 2 - 2, 22, 4);
+    c.strokeStyle = '#5effa8'; c.lineWidth = 4; c.strokeRect(w * 0.3, 26, w * 0.4, h - 52);
+    c.fillStyle = '#5effa8'; c.font = 'bold 30px "Chakra Petch", "Segoe UI", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText('REPAIR', w / 2, h / 2 - 22); c.fillText('LAND HERE', w / 2, h / 2 + 24);
+  });
+  deckTex.wrapS = deckTex.wrapT = THREE.ClampToEdgeWrapping;
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(L, 0.55, D), darkM); deck.position.y = 0;
+  const deckTop = new THREE.Mesh(new THREE.PlaneGeometry(L - 0.4, D - 0.4), std({ map: deckTex, emissiveMap: deckTex, emissive: 0x555555, roughness: 0.8, metalness: 0.2 }));
+  deckTop.rotation.x = -Math.PI / 2; deckTop.position.y = 0.29;
+  const zone = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.4, D - 2.2), additive(0x5effa8, 0.25)); zone.rotation.x = -Math.PI / 2; zone.position.y = 0.33;
+  const edgeF = new THREE.Mesh(new THREE.BoxGeometry(L, 0.12, 0.12), glowM); edgeF.position.set(0, 0.32, D / 2);
+  // island superstructure on the far edge
+  const island = new THREE.Mesh(new THREE.BoxGeometry(6, 4.2, 2.6), lightM); island.position.set(-6, 2.4, -D / 2 + 1.3);
+  const bridgeTop = new THREE.Mesh(new THREE.BoxGeometry(7, 1.2, 3.2), greyM); bridgeTop.position.set(-6, 4.9, -D / 2 + 1.4);
+  const windows = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.45, 0.1), warmM); windows.position.set(-6, 4.95, -D / 2 + 3.05);
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 4, 6), darkM); mast.position.set(-7.5, 7.5, -D / 2 + 1.3);
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), basic(0xff3040)); tip.position.set(-7.5, 9.6, -D / 2 + 1.3);
+  const radar = new THREE.Group(); radar.position.set(-4.5, 6.1, -D / 2 + 1.3);
+  const dish = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.7, 0.15), lightM); dish.position.y = 0.3; radar.add(dish);
+  g.add(hull, keelGlow, deck, deckTop, zone, edgeF, island, bridgeTop, windows, mast, tip, radar);
+  // drone rotors on outrigger arms all around the deck
+  const rotors = [];
+  const bladeM = std({ color: 0x11161c, metalness: 0.4, roughness: 0.6 });
+  const blurM = additive(0x9fdcff, 0.12);
+  const ductM = std({ color: 0x3a434e, metalness: 0.7, roughness: 0.35, emissive: 0x061a12 });
+  for (const rx of [-15, -5, 5, 15]) for (const rz of [-1, 1]) {
+    const cz = rz * (D / 2 + 3.2);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.4, 3.4), darkM); arm.position.set(rx, 0, rz * (D / 2 + 1.5));
+    const duct = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.28, 8, 32), ductM); duct.rotation.x = Math.PI / 2; duct.position.set(rx, 0.15, cz);
+    const ductGlow = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.06, 6, 40), basic(0x5effa8)); ductGlow.rotation.x = Math.PI / 2; ductGlow.position.set(rx, 0.47, cz);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 0.8, 10), darkM); hub.position.set(rx, 0.1, cz);
+    const spin = new THREE.Group(); spin.position.set(rx, 0.42, cz);
+    for (let k = 0; k < 3; k++) { const bl = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.06, 0.38), bladeM); bl.rotation.y = k * Math.PI / 3; spin.add(bl); }
+    const blur = new THREE.Mesh(new THREE.CircleGeometry(2.3, 32), blurM); blur.rotation.x = -Math.PI / 2; blur.position.set(rx, 0.44, cz);
+    g.add(arm, duct, ductGlow, hub, spin, blur);
+    rotors.push({ spin, x: rx, z: cz, dir: (rx > 0) === (rz > 0) ? 1 : -1 });
+  }
+  // running lights
+  const bow = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 6), basic(0x40ff80)); bow.position.set(L / 2, 0.5, D / 2);
+  const bow2 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 6), basic(0xff3040)); bow2.position.set(L / 2, 0.5, -D / 2);
+  g.add(bow, bow2);
+  g.traverse(m => { if (m.isMesh && m.material.blending !== THREE.AdditiveBlending && m.material.type !== 'MeshBasicMaterial') { m.castShadow = true; m.receiveShadow = true; } });
+  return { g, dockRing: zone, tip, rotors, radar };
+}
+const hangarModel = buildHangar();
+hangarModel.g.visible = false;
+scene.add(hangarModel.g);
+const hangar = { active: false, x: 0, y: 28, vx: 0, t: 0, phase: 'off', progress: 0, scale: 0 };
+const STRONG = new Set(['mutant', 'baiter', 'pod']);
+// difficulty: ramps through each set of ten waves; each new set starts 5% above the previous one
+const tierOf = w => Math.floor((w - 1) / 10), stageOf = w => (w - 1) % 10;
+const tierScale = w => 1 + 0.05 * tierOf(w);
+const diff = () => (1 + stageOf(state.wave) * 0.75) * tierScale(state.wave);
+const isBossWave = w => w % 10 === 0;
+shipModel.outer.visible = false;
+const reticle = new THREE.Group();
+{
+  const r = new THREE.Mesh(new THREE.RingGeometry(1.6, 1.9, 32), additive(0x5ef2ff, 0.55)); r.rotation.x = -Math.PI / 2;
+  reticle.add(r);
+  for (let i = 0; i < 4; i++) { const t = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.18), additive(0x5ef2ff, 0.7)); t.rotation.x = -Math.PI / 2; const a = i * Math.PI / 2; t.position.set(Math.cos(a) * 2.5, 0, Math.sin(a) * 2.5); t.rotation.z = -a; reticle.add(t); }
+  reticle.position.y = 0.07;
+  scene.add(reticle);
+}
+const plumb = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1, 0.08), additive(0x5ef2ff, 0.22));
+scene.add(plumb);
+
+// laser pool
+const laserGeo = new THREE.BoxGeometry(1, 0.2, 0.2); laserGeo.translate(0.5, 0, 0);
+const laserGlowGeo = new THREE.BoxGeometry(1, 0.6, 0.6); laserGlowGeo.translate(0.5, 0, 0);
+for (let i = 0; i < 8; i++) {
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(laserGeo, basic(0xffffff));
+  const glow = new THREE.Mesh(laserGlowGeo, additive(0xff40ff, 0.35));
+  g.add(core, glow); g.visible = false; scene.add(g);
+  lasers.push({ g, core, glow, active: false });
+}
+
+// ---------- shelters: safe drop-off pads on the flight lane
+const SAFE = 0x5effa8;
+const shelterSign = canvasTex(256, 64, (g, w, h) => {
+  g.fillStyle = '#062016'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#5effa8'; g.lineWidth = 4; g.strokeRect(4, 4, w - 8, h - 8);
+  g.fillStyle = '#5effa8'; g.font = 'bold 34px "Chakra Petch", "Segoe UI", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('SHELTER', w / 2, h / 2 + 2);
+});
+shelterSign.wrapS = shelterSign.wrapT = THREE.ClampToEdgeWrapping;
+const padMat = std({ color: 0x1e262e, metalness: 0.7, roughness: 0.45 });
+const hutMat = std({ color: 0x8c96a3, metalness: 0.75, roughness: 0.35 });
+const lightOff = basic(0x14301f), lightOn = basic(0x7dffb8);
+const shelters = SHELTER_X.map(x => {
+  const g = new THREE.Group();
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(6, 6.5, 0.35, 6), padMat); pad.position.y = 0.17; pad.receiveShadow = true;
+  const ring = new THREE.Mesh(new THREE.RingGeometry(5.0, 5.5, 6), additive(SAFE, 0.85)); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.37;
+  const inner = new THREE.Mesh(new THREE.RingGeometry(2.0, 2.3, 32), additive(SAFE, 0.6)); inner.rotation.x = -Math.PI / 2; inner.position.set(0, 0.38, 1.2);
+  const hut = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.1, 6, 20, 1, false, 0, Math.PI), hutMat);
+  hut.rotation.z = Math.PI / 2; hut.position.set(0, 0.35, -3.2); hut.castShadow = true; hut.receiveShadow = true;
+  const door = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.5), basic(SAFE)); door.position.set(0, 1.1, -1.05);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 0.9), new THREE.MeshBasicMaterial({ map: shelterSign })); sign.position.set(0, 3.25, -3.0); sign.rotation.x = -0.2;
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1.6, 64, 18, 1, true), additive(SAFE, 0.08)); beam.position.set(0, 32, 0);
+  const lights = [];
+  for (let i = 0; i < 10; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.12), lightOff); l.position.set(-2.25 + i * 0.5, 2.05, -1.9); lights.push(l); g.add(l); }
+  g.add(pad, ring, inner, hut, door, sign, beam);
+  g.scale.setScalar(1.4);
+  scene.add(g);
+  return { x, g, ring, inner, beam, lights, count: 0 };
+});
+function setShelterLights(sh) { sh.lights.forEach((l, i) => { l.material = i < sh.count ? lightOn : lightOff; }); }
+const aboard = () => humans.filter(h => h.state === 'rescued');
+
+// ---------- mothership boss (every tenth wave)
+function buildBoss() {
+  const g = new THREE.Group();
+  const hullM = std({ color: 0x2a2238, metalness: 0.8, roughness: 0.32, emissive: 0x0a0614 });
+  const plateM = std({ color: 0x4a3f60, metalness: 0.75, roughness: 0.38 });
+  const pts = [[0, -3.2], [4, -3], [9, -1.6], [13, -0.4], [13.4, 0.2], [11, 1.2], [7, 2.2], [3.5, 3.0], [0, 3.2]].map(p => new THREE.Vector2(p[0], p[1]));
+  const body = new THREE.Mesh(new THREE.LatheGeometry(pts, 56), hullM);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(13.15, 0.2, 8, 96), basic(0xffb347)); rim.rotation.x = Math.PI / 2; rim.position.y = 0.05;
+  const deck = new THREE.Mesh(new THREE.CylinderGeometry(8.5, 10.5, 0.7, 48), plateM); deck.position.y = 1.7;
+  const under = new THREE.Mesh(new THREE.CircleGeometry(5, 40), additive(0xff3df0, 0.55)); under.rotation.x = Math.PI / 2; under.position.y = -3.15;
+  const coreMat = std({ color: 0x400010, emissive: 0xff2050, emissiveIntensity: 1, metalness: 0.3, roughness: 0.2 });
+  const core = new THREE.Mesh(new THREE.SphereGeometry(2.6, 28, 18), coreMat); core.position.y = 3.2;
+  const cage = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(3.4, 1)), new THREE.LineBasicMaterial({ color: 0x9a8aff }));
+  cage.position.y = 3.2;
+  const lights = new THREE.Group();
+  for (let i = 0; i < 20; i++) { const a = i / 20 * Math.PI * 2; const m = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6), basic(i % 2 ? 0xff3df0 : 0x5ef2ff)); m.position.set(Math.cos(a) * 10.6, 1.0, Math.sin(a) * 10.6); lights.add(m); }
+  g.add(body, rim, deck, under, core, cage, lights);
+  const turretM = std({ color: 0x5a1a50, emissive: 0x6a0a50, metalness: 0.6, roughness: 0.3 });
+  const turrets = [];
+  for (const ox of [-9.5, -4, 4, 9.5]) {
+    const t = new THREE.Group();
+    const oz = Math.sqrt(11.5 * 11.5 - ox * ox) * 0.8;
+    t.position.set(ox, 0.9, oz);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 0.6, 14), plateM);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(1.0, 16, 12), turretM); ball.position.y = 0.7;
+    const barrel = new THREE.Group(); barrel.position.y = 0.7;
+    const bm = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 2.2, 8), plateM); bm.rotation.z = -Math.PI / 2; bm.position.x = 1.2; barrel.add(bm);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 6), basic(0xff3df0)); eye.position.set(0, 0.75, 0.5);
+    t.add(base, ball, barrel, eye); g.add(t);
+    turrets.push({ g: t, barrel, ox, oy: 0.9 + 0.7, oz, hp: 0, max: 0, alive: true });
+  }
+  g.traverse(m => { if (m.isMesh && m.material.type !== 'MeshBasicMaterial') m.castShadow = true; });
+  return { g, core, coreMat, cage, lights, turrets };
+}
+const bossModel = buildBoss();
+bossModel.g.visible = false;
+scene.add(bossModel.g);
+const boss = { active: false, defeated: false, dying: 0, x: 0, y: 30, vx: 0, t: 0, face: 1, hp: 0, max: 0, fireT: 2, spawnT: 8, burstT: 3, hitFlash: 0, turrets: bossModel.turrets };
+function spawnBoss() {
+  const sc = tierScale(state.wave);
+  Object.assign(boss, { active: true, defeated: false, dying: 0, t: 0, fireT: 3, spawnT: 10, burstT: 4, hitFlash: 0 });
+  boss.x = wrapX(ship.x + ship.facing * 170); boss.y = 31; boss.vx = 0;
+  boss.max = boss.hp = Math.round(40 * sc);
+  boss.turrets.forEach(t => { t.max = t.hp = Math.round(8 * sc); t.alive = true; t.g.visible = true; });
+  bossModel.g.scale.setScalar(0.01);
+  showMsg(`WARNING<small>Mothership approaching · wave ${state.wave}</small>`, 3.2);
+  sfx.alarm();
+}
+function bossShoot(x, y, vx, vy, strong) {
+  const m = new THREE.Group(); m.add(new THREE.Mesh(bulletGeo, strong ? bulletStrongMat : bulletMat), new THREE.Mesh(bulletHaloGeo, strong ? bulletStrongHaloMat : bulletHaloMat));
+  if (strong) m.scale.setScalar(1.3);
+  scene.add(m);
+  bullets.push({ x, y, vx, vy, life: 4, mesh: m, dmg: strong ? 50 : 25, base: strong ? 1.3 : 1 });
+}
+function bossDamage(part, amount) {
+  if (!boss.active || boss.dying) return;
+  if (part === 'hull' || (part === null && boss.turrets.some(t => t.alive))) {
+    if (part === 'hull') for (let i = 0; i < 6; i++) emit(boss.x - 13 * Math.sign(wrapD(boss.x - ship.x) || 1), boss.y + rand(-1, 1), rand(-1, 1), rand(-12, 12), rand(-8, 8), rand(-8, 8), 0.7, 0.6, 1, 0.4, 0.25, 4);
+    if (part === null) boss.turrets.forEach(t => { if (t.alive) bossDamage(t, amount); });
+    return;
+  }
+  if (part && part !== 'core') {
+    part.hp -= amount;
+    const px = boss.x + part.ox * boss.face;
+    for (let i = 0; i < 10; i++) emit(px, boss.y + part.oy, part.oz, rand(-14, 14), rand(-6, 14), rand(-10, 10), 1, 0.4, 0.9, 0.5, 0.35, 3);
+    sfx.hit();
+    if (part.hp <= 0) {
+      part.alive = false; part.g.visible = false;
+      explode(px, boss.y + part.oy, part.oz, 0xff3df0, 1.4);
+      addScore(1000, px, boss.y + 4, '#ff3df0');
+      if (boss.turrets.every(t => !t.alive)) { showMsg('SHIELD DOWN<small>Hit the mothership core</small>', 2.2); sfx.shieldBreak(); }
+    }
+    return;
+  }
+  boss.hp -= amount; boss.hitFlash = 1;
+  for (let i = 0; i < 12; i++) emit(boss.x, boss.y + 3.2, 0, rand(-16, 16), rand(-4, 16), rand(-10, 10), 1, 0.3, 0.4, 0.6, 0.4, 3);
+  sfx.hit();
+  if (boss.hp <= 0) { boss.hp = 0; boss.dying = 2.6; sfx.death(); bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0; }
+}
+function updateBoss(dt) {
+  if (!boss.active) return;
+  boss.t += dt;
+  if (boss.dying > 0) {
+    boss.dying -= dt;
+    if (Math.random() < dt * 14) explode(boss.x + rand(-12, 12), boss.y + rand(-2, 4), rand(-6, 6), Math.random() < 0.5 ? 0xff3df0 : 0xffb347, rand(0.8, 1.6), Math.random() < 0.6);
+    boss.y -= dt * 2;
+    if (boss.dying <= 0) {
+      explode(boss.x, boss.y, 0, 0xffffff, 4); flashAmt = reduceMotion ? 0.3 : 0.8; shake = 2.4;
+      const pts = 10000 * (tierOf(state.wave) + 1);
+      addScore(pts, boss.x, boss.y + 6, '#ff3df0');
+      boss.active = false; boss.defeated = true; bossModel.g.visible = false;
+      questEvent('boss');
+    }
+    return;
+  }
+  const exposed = boss.turrets.every(t => !t.alive);
+  const rage = exposed ? 1.5 : 1;
+  const dxs = wrapD(ship.x - boss.x);
+  const target = ship.alive ? wrapD(ship.x + ship.facing * 45 - boss.x) : 0;
+  boss.vx = lerp(boss.vx, clamp(target * 0.35, -11 * rage, 11 * rage), damp(1.2, dt));
+  boss.x = wrapX(boss.x + boss.vx * dt);
+  boss.y = 31 + 3.5 * Math.sin(boss.t * 0.55);
+  if (!ship.alive) return;
+  const near = Math.abs(dxs) < halfW * 1.3;
+  boss.fireT -= dt * fireMul();
+  if (near && boss.fireT <= 0) {
+    boss.fireT = exposed ? 1.4 : 2.0;
+    const live = exposed ? [{ ox: 0, oy: 3.2 }] : boss.turrets.filter(t => t.alive);
+    for (const t of live) {
+      const sx = boss.x + t.ox * boss.face, sy = boss.y + t.oy;
+      const ang = Math.atan2(ship.y - sy, wrapD(ship.x - sx));
+      for (const off of [-0.16, 0, 0.16]) bossShoot(sx, sy, Math.cos(ang + off) * 28, Math.sin(ang + off) * 28, exposed);
+    }
+    sfx.shot();
+  }
+  if (exposed) {
+    boss.burstT -= dt * fireMul();
+    if (near && boss.burstT <= 0) {
+      boss.burstT = 2.6;
+      for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2 + boss.t; bossShoot(boss.x, boss.y + 3.2, Math.cos(a) * 22, Math.sin(a) * 22, true); }
+    }
+  }
+  boss.spawnT -= dt;
+  if (boss.spawnT <= 0) {
+    boss.spawnT = 14;
+    if (enemies.filter(e => e.type === 'lander').length < 6) for (let i = 0; i < 2; i++) { const e = spawnEnemy('lander', boss.x + rand(-6, 6), boss.y - 4); if (state.planetLost) becomeMutant(e); }
+  }
+  if (state.invuln <= 0) {
+    const dy = ship.y - boss.y;
+    if (Math.abs(dxs) < 13 && dy > -3.6 && dy < 4) { damagePlayer(50, 'Rammed the mothership'); ship.vx = Math.sign(dxs || 1) * 70; }
+  }
+}
+function syncBoss(dt) {
+  const B = bossModel;
+  B.g.visible = boss.active;
+  if (!boss.active) return;
+  const s = Math.min(1, B.g.scale.x + dt * 0.8);
+  B.g.scale.setScalar(Math.max(0.01, s));
+  B.g.position.set(wrapD(boss.x - camX), boss.y, 0);
+  B.lights.rotation.y += dt * 0.8;
+  B.cage.visible = boss.turrets.some(t => t.alive);
+  B.cage.rotation.y += dt * 0.6; B.cage.rotation.x += dt * 0.3;
+  boss.hitFlash = Math.max(0, boss.hitFlash - dt * 4);
+  B.coreMat.emissiveIntensity = 0.7 + 0.3 * Math.sin(time * 5) + boss.hitFlash * 2;
+  for (const t of boss.turrets) {
+    if (!t.alive) continue;
+    const ang = Math.atan2(ship.y - (boss.y + t.oy), wrapD(ship.x - (boss.x + t.ox)));
+    t.barrel.rotation.z = ang;
+  }
+}
+
+// ---------- quests: one per wave
+let quest = null, lastQuestId = '';
+const QUESTS = [
+  { id: 'shelter', ok: () => groundColonists() >= 3, make: st => { const n = Math.min(2 + Math.floor(st / 2), 5, groundColonists() - 1); return { text: `Shelter ${n} colonists`, target: n, ev: 'shelter' }; } },
+  { id: 'catch', ok: () => groundColonists() >= 3 && !state.planetLost, make: st => { const n = st >= 6 ? 2 : 1; return { text: `Catch ${n} falling colonist${n > 1 ? 's' : ''} in mid-air`, target: n, ev: 'catch' }; } },
+  { id: 'landers', make: st => { const n = Math.min(6 + st, state.pending); return { text: `Destroy ${n} ${state.planetLost ? 'mutants' : 'landers or mutants'}`, target: n, ev: 'killLander' }; } },
+  { id: 'bombers', ok: () => state.bombersSpawned >= 2, make: () => ({ text: `Destroy all ${state.bombersSpawned} bombers`, target: state.bombersSpawned, ev: 'killBomber' }) },
+  { id: 'swarm', ok: () => state.podsSpawned >= 1, make: st => { const n = Math.min(4 + st, state.podsSpawned * 3); return { text: `Destroy ${n} swarmers`, target: n, ev: 'killSwarmer' }; } },
+  { id: 'nolose', ok: () => humans.length >= 3 && !state.planetLost, make: () => ({ text: 'Lose no colonists this wave', mode: 'keep', ev: 'colonistDied', bomb: true }) },
+  { id: 'shield', make: () => ({ text: 'Keep your shield all wave', mode: 'keep', ev: 'shieldLost', bomb: true }) },
+  { id: 'combo', ok: () => state.bombs > 0, make: st => { const n = 3 + Math.floor(st / 4); return { text: `Destroy ${n} enemies with one smart bomb`, target: n, ev: 'bombKills', mode: 'single' }; } },
+  { id: 'speed', make: () => { const t = Math.round((80 + state.pending * 6) / 10) * 10; return { text: `Clear the wave before time runs out (${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')})`, mode: 'time', limit: t, bomb: true }; } }
+];
+function pickQuest(n) {
+  const st = stageOf(n), sc = tierScale(n);
+  let q;
+  if (isBossWave(n)) q = { id: 'boss', text: 'Destroy the mothership', target: 1, ev: 'boss', bomb: true };
+  else {
+    const pool = QUESTS.filter(d => d.id !== lastQuestId && (!d.ok || d.ok()));
+    const d = pool[Math.floor(Math.random() * pool.length)];
+    q = Object.assign({ id: d.id }, d.make(st));
+  }
+  lastQuestId = q.id;
+  quest = Object.assign({ mode: 'count', progress: 0, status: 'active', points: Math.round((1500 + 250 * st) * sc / 50) * 50 }, q);
+  setTimeout(() => { if (quest === questRef && state.mode === 'playing' && !isBossWave(n)) showMsg(`QUEST<small>${quest.text} · fail and the wave restarts</small>`, 3); }, 2700);
+  const questRef = quest;
+  hudCache = '';
+}
+function groundColonists() { return humans.filter(h => h.state === 'ground').length; }
+function reachableColonists() { return humans.filter(h => h.state !== 'sheltered').length; }
+const questOpen = () => quest && quest.status === 'active' && quest.ev !== 'boss' && (quest.mode === 'count' || quest.mode === 'single');
+function voidQuest(why) {
+  quest.status = 'void'; hudCache = '';
+  showMsg(`QUEST CALLED OFF<small>${why} · no penalty</small>`, 2.6);
+}
+// keeps every open quest possible: trims colonist targets to who is left, and sends the enemies a kill quest still needs
+function supportQuest(dt, waveDone) {
+  if (!questOpen() || (state.mode !== 'playing' && state.mode !== 'dying')) return;
+  const q = quest, need = q.target - q.progress;
+  if (q.ev === 'shelter') {
+    const avail = reachableColonists();
+    if (avail < need) {
+      if (q.progress > 0 && avail === 0) { q.target = q.progress; completeQuest(); return; }
+      if (avail === 0) return voidQuest('No colonists left to shelter');
+      q.target = q.progress + avail; q.text = `Shelter ${q.target} colonists`; hudCache = '';
+    }
+    return;
+  }
+  if (q.ev === 'catch') {
+    const inPlay = humans.some(h => h.state === 'carried' || h.state === 'falling');
+    if (!inPlay && groundColonists() === 0) return voidQuest('No colonists left to rescue');
+    if (state.planetLost) return voidQuest('Landers have all turned mutant');
+  }
+  state.reinforceT = (state.reinforceT || 0) - dt;
+  if (q.ev === 'bombKills' && state.bombs === 0 && state.reinforceT <= 0) {
+    state.bombs = 1; hudCache = ''; state.reinforceT = 6;
+    showMsg('SUPPLY DROP<small>+1 smart bomb for your quest</small>', 2.2); sfx.life();
+    return;
+  }
+  if (!waveDone || state.reinforceT > 0) return;
+  state.reinforceT = 7;
+  const near = () => ship.x + (Math.random() < 0.5 ? -1 : 1) * rand(110, 260);
+  const count = t => enemies.filter(e => e.type === t).length;
+  let note = 'Reinforcements inbound';
+  if (q.ev === 'killLander') { for (let i = 0; i < Math.min(5, need); i++) { const e = spawnEnemy('lander', near(), rand(24, 36)); if (state.planetLost) becomeMutant(e); } }
+  else if (q.ev === 'killBomber') { for (let i = count('bomber'); i < need; i++) spawnEnemy('bomber', near(), rand(14, 34)); }
+  else if (q.ev === 'killSwarmer') { if (!count('pod') && count('swarmer') < need) spawnEnemy('pod', near(), rand(16, 34)); }
+  else if (q.ev === 'catch') { if (!count('lander')) { const e = spawnEnemy('lander', near(), 28); note = 'A lander is coming for a colonist'; } }
+  else if (q.ev === 'bombKills') { const sx = ship.x + ship.facing * 45; for (let i = 0; i < q.target + 1; i++) spawnEnemy('swarmer', sx + rand(-12, 12), rand(12, 36)); note = 'A swarm is closing in · use a smart bomb'; }
+  sfx.spawn();
+  showMsg(`QUEST NOT DONE<small>${note} · finish the quest to end the wave</small>`, 2.4);
+}
+function questEvent(ev, n = 1) {
+  if (!quest || quest.status !== 'active' || !ev || ev !== quest.ev) return;
+  if (state.mode !== 'playing' && state.mode !== 'dying') return;
+  if (quest.mode === 'keep') return failQuest();
+  if (quest.mode === 'single') { quest.progress = Math.max(quest.progress, n); if (n >= quest.target) completeQuest(); hudCache = ''; return; }
+  quest.progress += n; hudCache = '';
+  if (quest.progress >= quest.target) completeQuest();
+}
+function completeQuest(silent) {
+  quest.status = 'done'; hudCache = '';
+  addScore(quest.points);
+  let extra = '';
+  if (quest.bomb) { state.bombs = Math.min(state.bombs + 1, 6); extra = ' + smart bomb'; }
+  sfx.life();
+  const line = `Quest complete: +${quest.points.toLocaleString()}${extra}`;
+  if (!silent) showMsg(`QUEST COMPLETE<small>${quest.text} · +${quest.points.toLocaleString()}${extra}</small>`, 2.6);
+  return line;
+}
+function failQuest() {
+  quest.status = 'failed'; hudCache = '';
+  showMsg(`QUEST FAILED<small>${quest.text} · ship lost, wave ${state.wave} restarts</small>`, 3);
+  tone('sawtooth', 300, 120, 0.4, 0.07);
+  state.restartWave = true;
+  if (ship.alive) { state.invuln = 0; killPlayer('Quest failed: ' + quest.text); }
+}
+function restartWave() {
+  state.restartWave = false;
+  enemies.forEach(e => scene.remove(e.mesh)); enemies.length = 0;
+  bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+  mines.forEach(m => scene.remove(m.mesh)); mines.length = 0;
+  boss.active = false; boss.defeated = false; bossModel.g.visible = false;
+  humans.forEach(h => {
+    if (h.state === 'sheltered' && h.shelter) h.x = wrapX(h.shelter.x + rand(-4, 4));
+    if (h.state !== 'ground') { h.carrier = null; h.state = 'ground'; h.y = 0; h.vy = 0; }
+    h.targetedBy = null;
+  });
+  startWave(state.wave);
+  showMsg(`RESTARTING WAVE ${state.wave}<small>New quest: ${quest.text}</small>`, 3);
+}
+
+// ---------- entities
+function spawnEnemy(type, x, y, quiet) {
+  const e = { type, x: wrapX(x), y, vx: 0, vy: 0, t: Math.random() * 10, fireT: rand(1.2, 3), alive: true, r: ENEMY_R[type], dir: Math.random() < 0.5 ? -1 : 1, spawnT: 0.6, state: 'wander', baseY: y };
+  e.mesh = templates[type].clone();
+  if (type === 'lander') e.beam = e.mesh.getObjectByName('beam');
+  if (type === 'bomber') e.core = e.mesh.getObjectByName('core');
+  e.mesh.scale.setScalar(0.01);
+  scene.add(e.mesh); enemies.push(e);
+  if (!quiet) materialize(e.x, e.y, ENEMY_COLOR[type]);
+  return e;
+}
+function spawnHuman(x) {
+  const h = { x: wrapX(x), y: 0, vx: rand(0.6, 1.3) * (Math.random() < 0.5 ? -1 : 1), vy: 0, state: 'ground', t: Math.random() * 10, dead: false, carrier: null, targetedBy: null, fallFrom: 0 };
+  h.mesh = templates.human.clone();
+  h.chute = h.mesh.getObjectByName('chute'); h.fallT = 0;
+  h.legL = h.mesh.getObjectByName('legL'); h.legR = h.mesh.getObjectByName('legR');
+  h.armL = h.mesh.getObjectByName('armL'); h.armR = h.mesh.getObjectByName('armR');
+  h.beacon = h.mesh.getObjectByName('beacon');
+  scene.add(h.mesh); humans.push(h);
+  return h;
+}
+function removeHuman(h) { h.dead = true; scene.remove(h.mesh); if (h.carrier) { h.carrier.target = null; h.carrier.state = 'wander'; } if (h.targetedBy) h.targetedBy.target = null; }
+function killHuman(h) {
+  questEvent('colonistDied');
+  explode(h.x, Math.max(1, h.y), 0, 0xff8a3d, 0.6);
+  sfx.scream();
+  removeHuman(h);
+}
+function clearWorld() {
+  enemies.forEach(e => scene.remove(e.mesh)); enemies.length = 0;
+  bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+  mines.forEach(m => scene.remove(m.mesh)); mines.length = 0;
+  humans.forEach(h => scene.remove(h.mesh)); humans.length = 0;
+  shelters.forEach(sh => { sh.count = 0; setShelterLights(sh); });
+  lasers.forEach(l => { l.active = false; l.g.visible = false; });
+  boss.active = false; boss.defeated = false; bossModel.g.visible = false; quest = null;
+}
+function spawnColonists(n = 10) {
+  for (let i = 0; i < n; i++) spawnHuman(i * W / n + rand(-30, 30));
+}
+
+function fireLaser() {
+  const l = lasers.find(l => !l.active);
+  if (!l) return;
+  l.active = true; l.x0 = ship.x + ship.facing * 3.2; l.y = ship.y - 0.35; l.dir = ship.facing; l.head = 0; l.tail = 0; l.t = 0; l.hue = Math.random();
+  l.g.visible = true;
+  sfx.laser();
+  const nx = l.x0, c = new THREE.Color().setHSL(l.hue, 1, 0.65);
+  for (let i = 0; i < 6; i++) emit(nx, l.y, 0, l.dir * rand(10, 30) + ship.vx, rand(-6, 6), rand(-6, 6), c.r, c.g, c.b, 0.5, 0.18, 4);
+}
+function enemyShoot(e, speed = 30) {
+  if (!ship.alive) return;
+  const dx = wrapD(ship.x - e.x), dy = ship.y - e.y;
+  if (Math.abs(dx) > halfW * 1.1 || Math.abs(dx) < 4) return;
+  const tEst = Math.hypot(dx, dy) / speed;
+  const ax = dx + ship.vx * tEst * 0.6, ay = dy + ship.vy * tEst * 0.4;
+  const len = Math.hypot(ax, ay) || 1;
+  const strong = STRONG.has(e.type);
+  const m = new THREE.Group(); m.add(new THREE.Mesh(bulletGeo, strong ? bulletStrongMat : bulletMat), new THREE.Mesh(bulletHaloGeo, strong ? bulletStrongHaloMat : bulletHaloMat));
+  if (strong) m.scale.setScalar(1.3);
+  scene.add(m);
+  bullets.push({ x: e.x, y: e.y, vx: ax / len * speed, vy: ay / len * speed, life: 3.2, mesh: m, dmg: strong ? 50 : 25, base: strong ? 1.3 : 1 });
+  sfx.shot();
+}
+function addScore(v, x, y, color = '#ffb347') {
+  if (state.mode === 'title' || state.mode === 'gameover') return;
+  state.score += v;
+  if (x !== undefined) popup(String(v), x, y, color);
+  while (state.score >= state.nextLife) { state.nextLife += 10000; state.lives++; sfx.life(); showMsg('EXTRA SHIP', 1.4); }
+}
+function killEnemy(e, viaBomb) {
+  if (!e.alive) return;
+  e.alive = false; scene.remove(e.mesh);
+  questEvent({ lander: 'killLander', mutant: 'killLander', bomber: 'killBomber', swarmer: 'killSwarmer' }[e.type]);
+  addScore(ENEMY_SCORE[e.type], e.x, e.y + 2, '#' + new THREE.Color(ENEMY_COLOR[e.type]).getHexString());
+  explode(e.x, e.y, 0, ENEMY_COLOR[e.type], e.type === 'pod' || e.type === 'baiter' ? 1.4 : e.type === 'swarmer' ? 0.6 : 1, viaBomb);
+  if (e.type === 'lander' && e.target) {
+    const h = e.target;
+    if (h.carrier === e) { h.carrier = null; h.state = 'falling'; h.vy = 0; h.fallFrom = h.y; }
+    if (h.targetedBy === e) h.targetedBy = null;
+    e.target = null;
+  }
+  if (e.type === 'pod') {
+    const n = Math.min(3 + Math.floor(diff() / 2), 6);
+    for (let i = 0; i < n; i++) { const s = spawnEnemy('swarmer', e.x + rand(-2, 2), e.y + rand(-2, 2), true); s.vx = rand(-30, 30); s.vy = rand(-20, 20); s.spawnT = 0.15; }
+  }
+}
+function becomeMutant(e) {
+  scene.remove(e.mesh);
+  e.type = 'mutant'; e.r = ENEMY_R.mutant; e.state = 'hunt';
+  e.mesh = templates.mutant.clone(); scene.add(e.mesh);
+  e.target = null; e.beam = null;
+  materialize(e.x, e.y, ENEMY_COLOR.mutant);
+  sfx.mutant();
+}
+
+function damagePlayer(amount, reason) {
+  if (!ship.alive || state.invuln > 0) return;
+  if (ship.shield) {
+    questEvent('shieldLost');
+    ship.shield = false; state.invuln = 1.0; shieldShow = 0.45; shieldPop = 1;
+    for (let i = 0; i < 90; i++) { const a = Math.random() * Math.PI * 2, b = rand(-1, 1), sp = rand(14, 30); emit(ship.x, ship.y, 0, Math.cos(a) * sp, b * sp * 0.6, Math.sin(a) * sp, 0.4, 0.95, 1, rand(0.4, 0.9), rand(0.4, 0.8), 2.5); }
+    const rg = rings[ringHead]; ringHead = (ringHead + 1) % rings.length;
+    Object.assign(rg, { wx: ship.x, y: ship.y, z: 0, life: 0.5, max: 0.5, s: 9 }); rg.m.material.color.set(0x5ef2ff); rg.m.visible = true;
+    shake = Math.min(1.6, shake + 0.5); flashAmt = Math.max(flashAmt, 0.18);
+    sfx.shieldBreak();
+    showMsg(state.hangarCame ? 'SHIELD DOWN<small>Repair carrier already used this wave</small>' : 'SHIELD DOWN<small>A repair carrier is on its way</small>', 2.2);
+    if (!hangar.active) state.hangarT = Math.min(state.hangarT, 10);
+    return;
+  }
+  ship.hull = Math.max(0, ship.hull - amount);
+  state.invuln = 0.9;
+  explode(ship.x + ship.facing * 0.5, ship.y, 0.5, 0xffa040, amount >= 50 ? 0.7 : 0.45, true);
+  sfx.hit(); shake = Math.min(1.8, shake + (amount >= 50 ? 0.9 : 0.5)); flashAmt = Math.max(flashAmt, amount >= 50 ? 0.25 : 0.12);
+  if (ship.hull <= 0) { killPlayer(reason === 'Collision' ? 'Hull destroyed in a collision' : 'Hull destroyed'); return; }
+  popup(`HULL ${ship.hull}%`, ship.x, ship.y + 3, ship.hull <= 25 ? '#ff4d6d' : '#ffb347');
+  if (!hangar.active) state.hangarT = Math.min(state.hangarT, 10);
+}
+function arriveHangar() {
+  hangar.active = true; hangar.phase = 'arrive'; hangar.t = 0; hangar.progress = 0; hangar.scale = 0;
+  hangar.x = wrapX(ship.x + ship.facing * halfW * 0.55 / 0.857);
+  hangar.y = ship.y > 24 ? 12 : 26;
+  hangar.vx = ship.facing * 5;
+  for (let i = 0; i < 80; i++) emit(hangar.x + rand(-15, 15), hangar.y + rand(-4, 4), rand(-4, 4), rand(-6, 6), rand(-6, 6), rand(-6, 6), 0.5, 1, 0.7, rand(0.5, 1.2), rand(0.4, 1), 1.5);
+  showMsg('REPAIR CARRIER ARRIVED<small>Land on its flight deck · once per wave</small>', 2.8);
+  state.hangarCame = true;
+  sfx.hangar();
+}
+function updateHangar(dt) {
+  const inPlay = state.mode === 'playing' || state.mode === 'waveEnd' || state.mode === 'dying';
+  if (!inPlay) { hangar.active = false; return; }
+  if (!hangar.active) {
+    if (!state.hangarCame && ship.alive && (!ship.shield || ship.hull < 100)) { state.hangarT -= dt; if (state.hangarT <= 0) arriveHangar(); }
+    return;
+  }
+  hangar.t += dt;
+  if (hangar.phase === 'arrive') { hangar.scale = Math.min(1, hangar.t / 0.9); if (hangar.t > 0.9) { hangar.phase = 'station'; hangar.t = 0; } }
+  else if (hangar.phase === 'station') {
+    if (hangar.t > 38 || (ship.shield && ship.hull >= 100 && hangar.progress === 0 && hangar.t > 6)) { hangar.phase = 'depart'; hangar.t = 0; }
+  } else if (hangar.phase === 'depart') {
+    hangar.vx += Math.sign(hangar.vx || 1) * 40 * dt; hangar.y += 6 * dt;
+    hangar.scale = Math.max(0, 1 - Math.max(0, hangar.t - 1.6) / 0.6);
+    if (hangar.t > 2.2) { hangar.active = false; return; }
+  }
+  hangar.x = wrapX(hangar.x + hangar.vx * dt);
+  const bobY = hangar.y + Math.sin(time * 0.8) * 0.6;
+  hangar.bobY = bobY;
+  if (hangar.phase === 'station' && ship.alive) {
+    const dx = wrapD(ship.x - hangar.x), dy = ship.y - bobY;
+    if (Math.abs(dx) < 15 && dy > -1 && dy < 4.5) {
+      const was = hangar.progress;
+      hangar.progress = Math.min(1, hangar.progress + dt / 1.8);
+      ship.vx = lerp(ship.vx, hangar.vx, damp(3, dt));
+      ship.y = lerp(ship.y, bobY + 1.4, damp(3, dt));
+      if (Math.floor(was * 6) !== Math.floor(hangar.progress * 6)) sfx.dock();
+      showMsg(`LANDED ON DECK<small>Repairing ${Math.round(hangar.progress * 100)}%</small>`, 0.3);
+      for (let i = 0; i < 2; i++) emit(ship.x + rand(-3, 3), ship.y + rand(-1.5, 1.5), rand(-1.5, 1.5), 0, rand(1, 4), 0, 0.4, 1, 0.7, 0.5, 0.5, 1);
+      if (hangar.progress >= 1) {
+        ship.shield = true; ship.hull = 100; shieldPop = 0; shieldShow = 1.0;
+        sfx.repair(); showMsg('SHIELD RESTORED<small>Hull repaired to 100%</small>', 2);
+        hangar.phase = 'depart'; hangar.t = 0; hangar.progress = 0;
+        state.invuln = Math.max(state.invuln, 0.6);
+      }
+    } else hangar.progress = Math.max(0, hangar.progress - dt * 0.5);
+  }
+}
+function killPlayer(reason) {
+  if (!ship.alive) return;
+  ship.alive = false; shipModel.outer.visible = false;
+  explode(ship.x, ship.y, 0, 0xffffff, 2.2, true);
+  setTimeout(() => explode(ship.x + rand(-3, 3), ship.y + rand(-2, 2), 0, 0xff8a2a, 1.4, true), 120);
+  setTimeout(() => explode(ship.x + rand(-3, 3), ship.y + rand(-2, 2), 0, 0x5ef2ff, 1.2, true), 260);
+  sfx.death();
+  flashAmt = 0.6;
+  bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+  humans.forEach(h => { if (h.state === 'rescued') { h.state = 'falling'; h.vy = 0; h.fallFrom = h.y; } });
+  state.lives--;
+  state.mode = 'dying'; state.dieT = 2.8; state.deathReason = reason;
+}
+function respawn() {
+  // push nearby enemies out of the arrival zone
+  enemies.forEach(e => { if (Math.abs(wrapD(e.x - ship.x)) < 110 && e.type !== 'lander') e.x = wrapX(ship.x + (Math.random() < 0.5 ? -1 : 1) * rand(220, 600)); });
+  ship.alive = true; ship.vx = 0; ship.vy = 0; ship.y = 22; state.invuln = 2.5; ship.shield = true; ship.hull = 100; shieldPop = 0;
+  shipModel.outer.visible = true; state.mode = 'playing';
+  materialize(ship.x, ship.y, 0x5ef2ff);
+  const left = `${state.lives} ship${state.lives === 1 ? '' : 's'} left`;
+  if (state.restartWave) { restartWave(); showMsg(`RESTARTING WAVE ${state.wave}<small>${left} · new quest: ${quest.text}</small>`, 3.2); }
+  else showMsg(`SHIP LOST<small>${left}</small>`, 1.8);
+}
+function smartBomb() {
+  if (state.bombs <= 0 || !ship.alive) return;
+  state.bombs--;
+  flashAmt = reduceMotion ? 0.35 : 0.9; shake = Math.min(2, shake + 1.2);
+  sfx.bomb();
+  const range = halfW * 1.25 / 0.857;
+  let kills = 0;
+  enemies.slice().forEach(e => { if (Math.abs(wrapD(e.x - camX)) < range) { killEnemy(e, true); kills++; } });
+  questEvent('bombKills', kills);
+  if (boss.active && !boss.dying && Math.abs(wrapD(boss.x - camX)) < range) bossDamage(null, 3);
+  bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+  for (let i = mines.length - 1; i >= 0; i--) if (Math.abs(wrapD(mines[i].x - camX)) < range) { scene.remove(mines[i].mesh); mines.splice(i, 1); }
+}
+function hyperspace() {
+  if (!ship.alive) return;
+  materialize(ship.x, ship.y, 0x5ef2ff);
+  for (let i = 0; i < 60; i++) emit(ship.x, ship.y, 0, rand(-40, 40), rand(-40, 40), rand(-30, 30), 0.4, 0.95, 1, 0.8, 0.5, 2);
+  const old = ship.x;
+  ship.x = wrapX(ship.x + rand(300, W - 300)); ship.y = rand(10, 38); ship.vx = 0;
+  const jump = wrapD(ship.x + ship.facing * 30 - camX);
+  camX = wrapX(camX + jump); camU += jump;
+  sfx.hyper();
+  materialize(ship.x, ship.y, 0x5ef2ff);
+  humans.forEach(h => { if (h.state === 'rescued') { h.x = ship.x; } });
+  if (Math.random() < 0.12) setTimeout(() => { if (ship.alive) killPlayer('Lost in hyperspace'); }, 450);
+  return old;
+}
+
+// ---------- waves
+function startWave(n) {
+  state.hangarCame = false; state.hangarT = 10;
+  humans.forEach(h => { if (h.state === 'sheltered') { h.state = 'ground'; h.x = wrapX(h.shelter.x + rand(-4, 4)); h.y = 0; } });
+  shelters.forEach(sh => { sh.count = 0; setShelterLights(sh); });
+  state.wave = n; state.waveTime = 0; state.batchT = 1.2; state.baiterT = 42;
+  const E = diff(), boss = isBossWave(n);
+  state.pending = boss ? 6 : Math.min(Math.round(10 + 2 * E), 24);
+  if (n > 1 && n % 5 === 0) {
+    const alive = humans.filter(h => !h.dead).length;
+    if (alive < 10) spawnColonists(10 - alive);
+    if (state.planetLost) { state.planetLost = false; groundMat.emissive.set(0x2fd6e6); showMsg(`ATTACK WAVE ${n}<small>Colonists resettled on the plateau</small>`, 3); }
+    else if (!boss) showMsg(`ATTACK WAVE ${n}<small>${humans.length} colonists on the ground</small>`, 2.6);
+  } else if (!boss) showMsg(`ATTACK WAVE ${n}<small>${humans.length} colonists on the ground</small>`, 2.6);
+  const bombers = boss ? 2 : Math.min(1 + Math.floor(E / 2), 5);
+  state.bombersSpawned = bombers;
+  for (let i = 0; i < bombers; i++) spawnEnemy('bomber', ship.x + (Math.random() < 0.5 ? -1 : 1) * rand(200, 700), rand(14, 34));
+  const pods = boss ? 0 : E >= 1.75 ? Math.min(Math.floor(E - 0.75), 4) : 0;
+  state.podsSpawned = pods;
+  for (let i = 0; i < pods; i++) spawnEnemy('pod', ship.x + (Math.random() < 0.5 ? -1 : 1) * rand(260, 750), rand(16, 36));
+  if (boss) spawnBoss(); else sfx.wave();
+  pickQuest(n);
+  state.reinforceT = 0;
+}
+function updateWave(dt) {
+  if (state.mode !== 'playing' && state.mode !== 'dying') return;
+  state.waveTime += dt;
+  state.batchT -= dt;
+  const landers = enemies.filter(e => e.type === 'lander').length;
+  const rushed = quest && quest.mode === 'time' && quest.status === 'active';
+  if (state.pending > 0 && (state.batchT <= 0 || landers < (rushed ? 4 : 2))) {
+    const k = Math.min(5, state.pending); state.pending -= k; state.batchT = rushed ? 9 : 15;
+    for (let i = 0; i < k; i++) {
+      const e = spawnEnemy('lander', ship.x + (Math.random() < 0.5 ? -1 : 1) * rand(130, W / 2), rand(24, 36));
+      if (state.planetLost) becomeMutant(e);
+    }
+    sfx.spawn();
+  }
+  state.baiterT -= dt;
+  if (state.baiterT <= 0 && ship.alive) { state.baiterT = 16; spawnEnemy('baiter', ship.x - ship.facing * halfW * 1.3, rand(18, 38)); }
+  const hostile = enemies.some(e => e.type === 'lander' || e.type === 'mutant');
+  if (quest && quest.status === 'active' && quest.mode === 'time' && state.waveTime > quest.limit) failQuest();
+  const cleared = isBossWave(state.wave) ? boss.defeated : state.pending === 0 && !hostile;
+  supportQuest(dt, cleared);
+  if (cleared && questOpen()) return;
+  if (state.mode === 'playing' && cleared) {
+    state.mode = 'waveEnd'; state.endT = 4;
+    const alive = humans.length, safe = humans.filter(h => h.state === 'sheltered').length;
+    const m = 100 * Math.min(state.wave, 5);
+    const bonus = (alive + safe) * m;
+    let qline = '';
+    if (quest && quest.status === 'active' && (quest.mode === 'keep' || quest.mode === 'time')) qline = completeQuest(true);
+    else if (quest && quest.status === 'done') qline = 'Quest complete';
+    else if (quest && quest.status === 'failed') qline = 'Quest failed';
+    showMsg(`${isBossWave(state.wave) ? 'MOTHERSHIP DESTROYED' : `ATTACK WAVE ${state.wave} COMPLETED`}<small>${alive} alive${safe ? `, ${safe} in shelters (count double)` : ''} · Bonus ${bonus.toLocaleString()}${qline ? '<br>' + qline : ''}</small>`, 3.8);
+    addScore(bonus);
+    enemies.slice().forEach(e => killEnemy(e, true));
+    bullets.forEach(b => scene.remove(b.mesh)); bullets.length = 0;
+    mines.forEach(m => scene.remove(m.mesh)); mines.length = 0;
+    sfx.wave();
+  }
+}
+
+// ---------- updates
+function updateShip(dt, inp) {
+  if (!ship.alive) { if (thrustGain) thrustGain.gain.setTargetAtTime(0, actx.currentTime, 0.05); return; }
+  let thrust = 0;
+  if (inp.left && !inp.right) { ship.facing = -1; thrust = 1; }
+  else if (inp.right && !inp.left) { ship.facing = 1; thrust = 1; }
+  ship.thrust = lerp(ship.thrust, thrust, damp(10, dt));
+  if (thrust) ship.vx += ship.facing * 110 * dt;
+  ship.vx *= Math.exp(-(thrust ? 0.3 : 1.1) * dt);
+  ship.vx = clamp(ship.vx, -78, 78);
+  const ty = (inp.up ? 1 : 0) - (inp.down ? 1 : 0);
+  ship.vy = lerp(ship.vy, ty * 25, damp(7, dt));
+  ship.x = wrapX(ship.x + ship.vx * dt);
+  ship.y = clamp(ship.y + ship.vy * dt, ALT_MIN, ALT_MAX);
+  if (ship.y === ALT_MIN || ship.y === ALT_MAX) ship.vy = 0;
+  ship.fireT -= dt;
+  if (inp.fire && ship.fireT <= 0) { fireLaser(); ship.fireT = 0.13; }
+  if (thrustGain) thrustGain.gain.setTargetAtTime(ship.thrust * 0.16, actx.currentTime, 0.05);
+  if (ship.thrust > 0.3) {
+    const nx = ship.x - ship.facing * 3.6 * SHIP_SCALE;
+    for (let i = 0; i < 2; i++) {
+      const hot = Math.random();
+      emit(nx, ship.y + rand(-0.2, 0.2), rand(-0.2, 0.2), -ship.facing * rand(18, 40) + ship.vx * 0.6, rand(-2, 2), rand(-2, 2), 1, 0.45 + hot * 0.45, 0.15 + hot * 0.3, rand(0.5, 0.95), rand(0.22, 0.4), 3);
+    }
+  }
+  state.invuln = Math.max(0, state.invuln - dt);
+  if (ship.hull <= 50 && Math.random() < dt * (ship.hull <= 25 ? 40 : 18)) {
+    const g = rand(0.25, 0.4);
+    emit(ship.x - ship.facing * rand(0, 2), ship.y + 0.4, rand(-0.5, 0.5), -ship.facing * rand(2, 6) + ship.vx * 0.4, rand(2, 5), rand(-1, 1), g, g, g * 1.1, rand(0.7, 1.3), rand(0.5, 0.9), 1.2, -3);
+    if (ship.hull <= 25) emit(ship.x - ship.facing * 1, ship.y + 0.3, 0, ship.vx * 0.5, rand(1, 3), 0, 1, rand(0.35, 0.6), 0.1, rand(0.4, 0.7), 0.3, 2);
+  }
+}
+function updateCamera(dt) {
+  const prev = camX;
+  if (state.mode === 'title' || state.mode === 'gameover') {
+    camX = wrapX(camX + 16 * dt);
+  } else if (ship.alive) {
+    const lead = halfW * 0.4 / 0.857;
+    const moved = camX + ship.vx * dt;
+    const desired = ship.x + ship.facing * lead;
+    camX = wrapX(moved + wrapD(desired - moved) * damp(1.6, dt));
+  }
+  camU += wrapD(camX - prev);
+}
+const fireMul = () => 1 + 0.16 * (diff() - 1);
+function updateEnemies(dt) {
+  const playing = ship.alive;
+  for (const e of enemies) {
+    if (!e.alive) continue;
+    e.t += dt;
+    if (e.spawnT > 0) { e.spawnT -= dt; e.mesh.scale.setScalar(Math.max(0.01, 1 - Math.max(0, e.spawnT) / 0.6)); continue; }
+    const dxs = wrapD(ship.x - e.x), dys = ship.y - e.y;
+    const onScreen = Math.abs(wrapD(e.x - camX)) < halfW * 1.15;
+    switch (e.type) {
+      case 'lander': {
+        const sp = 9 + diff() * 1.1;
+        if (e.state === 'wander') {
+          if (e.target && (e.target.dead || e.target.state !== 'ground')) { if (e.target.targetedBy === e) e.target.targetedBy = null; e.target = null; }
+          if (!e.target && Math.random() < dt * (quest && quest.ev === 'catch' && quest.status === 'active' ? 0.9 : 0.25)) {
+            let best = null, bd = 1e9;
+            for (const h of humans) { if (h.state !== 'ground' || h.targetedBy) continue; const d = Math.abs(wrapD(h.x - e.x)); if (d < bd && d < 500) { bd = d; best = h; } }
+            if (best) { e.target = best; best.targetedBy = e; }
+          }
+          let tyy = 26 + 8 * Math.sin(e.t * 0.7 + e.dir);
+          if (e.target) {
+            const d = wrapD(e.target.x - e.x);
+            e.vx = lerp(e.vx, Math.sign(d) * Math.min(sp * 1.7, Math.abs(d) * 1.6 + 1), damp(2.5, dt));
+            if (Math.abs(d) < 18) tyy = 10;
+            if (Math.abs(d) < 0.9) { e.state = 'descend'; e.vx = 0; }
+          } else e.vx = lerp(e.vx, e.dir * sp, damp(1, dt));
+          e.y = lerp(e.y, tyy, damp(1.2, dt));
+          e.x = wrapX(e.x + e.vx * dt);
+        } else if (e.state === 'descend') {
+          const h = e.target;
+          if (!h || h.dead || h.state !== 'ground') { e.state = 'wander'; if (h && h.targetedBy === e) h.targetedBy = null; e.target = null; break; }
+          e.x = h.x; e.y -= 11 * dt;
+          if (e.y <= 4.0) { e.y = 4.0; e.state = 'ascend'; h.state = 'carried'; h.carrier = e; h.targetedBy = e; if (onScreen) sfx.abduct(); }
+        } else if (e.state === 'ascend') {
+          const h = e.target;
+          e.y += (3.6 + diff() * 0.35) * 0.8 * dt; // 20% slower so the player can intercept
+          if (h && !h.dead) { h.x = e.x; h.y = e.y - 3.1; }
+          if (e.y >= ALT_MAX + 1.5) {
+            if (h && !h.dead) { h.carrier = null; h.targetedBy = null; killHuman(h); }
+            becomeMutant(e);
+            break;
+          }
+        }
+        if (e.beam) { e.beam.visible = e.state !== 'wander'; e.beam.material.opacity = 0.22 + 0.12 * Math.sin(e.t * 20); }
+        if (playing && e.state !== 'descend') { e.fireT -= dt * fireMul(); if (e.fireT <= 0) { e.fireT = rand(1.8, 4); enemyShoot(e, 28); } }
+        e.mesh.rotation.y += dt * 1.6;
+        break;
+      }
+      case 'mutant': {
+        const sp = 30 + diff() * 3;
+        if (playing) {
+          e.vx = lerp(e.vx, Math.sign(dxs) * (Math.abs(dxs) > halfW ? sp * 1.3 : sp) + rand(-28, 28), damp(3, dt));
+          e.vy = lerp(e.vy, Math.sign(dys) * 16 + rand(-30, 30), damp(4, dt));
+          e.fireT -= dt * fireMul(); if (e.fireT <= 0) { e.fireT = rand(1.2, 2.6); enemyShoot(e, 32); }
+        } else { e.vx = lerp(e.vx, e.dir * 20 + rand(-20, 20), damp(2, dt)); e.vy = lerp(e.vy, rand(-25, 25), damp(3, dt)); }
+        e.x = wrapX(e.x + e.vx * dt); e.y += e.vy * dt;
+        e.mesh.rotation.x += dt * 3; e.mesh.rotation.y += dt * 4;
+        break;
+      }
+      case 'bomber': {
+        e.vx = e.dir * 11; e.x = wrapX(e.x + e.vx * dt);
+        e.y = e.baseY + 9 * Math.sin(e.t * 0.8);
+        e.fireT -= dt;
+        if (e.fireT <= 0 && playing) {
+          e.fireT = rand(1.3, 2.2);
+          if (Math.abs(dxs) < 260 && mines.length < 40) { const m = new THREE.Mesh(mineGeo, mineMat); scene.add(m); mines.push({ x: e.x, y: e.y, life: 9, mesh: m, t: 0 }); }
+        }
+        e.mesh.rotation.x += dt * 1.1; e.mesh.rotation.z += dt * 0.7;
+        if (e.core) e.core.rotation.y += dt * 4;
+        break;
+      }
+      case 'pod': {
+        e.vx = e.dir * 6; e.x = wrapX(e.x + e.vx * dt);
+        e.y = e.baseY + 6 * Math.sin(e.t * 0.5);
+        e.mesh.rotation.y += dt * 0.8; e.mesh.rotation.x += dt * 0.4;
+        break;
+      }
+      case 'swarmer': {
+        if (playing) {
+          e.vx = clamp(e.vx + Math.sign(dxs) * 70 * dt, -58, 58);
+          e.vy = lerp(e.vy, clamp(dys * 2, -22, 22) + 12 * Math.sin(e.t * 5), damp(3, dt));
+          e.fireT -= dt * fireMul(); if (e.fireT <= 0) { e.fireT = rand(2.5, 5); enemyShoot(e, 30); }
+        }
+        e.x = wrapX(e.x + e.vx * dt); e.y += e.vy * dt;
+        e.mesh.rotation.y += dt * 8; e.mesh.rotation.x += dt * 5;
+        break;
+      }
+      case 'baiter': {
+        if (playing) {
+          e.vx = lerp(e.vx, ship.vx + Math.sign(dxs) * 42, damp(1.6, dt));
+          e.vy = lerp(e.vy, clamp(dys * 1.5, -25, 25), damp(2, dt));
+          e.fireT -= dt * fireMul(); if (e.fireT <= 0) { e.fireT = rand(0.8, 1.6); enemyShoot(e, 36); }
+        } else e.vx = lerp(e.vx, e.dir * 30, damp(1, dt));
+        e.x = wrapX(e.x + e.vx * dt); e.y += e.vy * dt;
+        e.mesh.rotation.y += dt * 5;
+        break;
+      }
+    }
+    if (e.type !== 'lander' || e.state === 'wander') e.y = clamp(e.y, 3.5, ALT_MAX + 1);
+    // collide with ship
+    if (playing && state.invuln <= 0 && e.alive) {
+      const dx = wrapD(e.x - ship.x), dy = e.y - ship.y;
+      if (Math.abs(dx) < 2.4 + e.r * 0.6 && Math.abs(dy) < 1.1 + e.r * 0.6) { const dmg = STRONG.has(e.type) ? 50 : 25; killEnemy(e); damagePlayer(dmg, 'Collision'); }
+    }
+  }
+  for (let i = enemies.length - 1; i >= 0; i--) if (!enemies[i].alive) enemies.splice(i, 1);
+}
+function updateHumans(dt) {
+  const carried = aboard();
+  for (const h of humans) {
+    if (h.dead) continue;
+    h.t += dt;
+    let swing = 0;
+    if (h.state === 'ground') {
+      h.y = 0;
+      if (Math.random() < dt * 0.15) h.vx = -h.vx;
+      h.x = wrapX(h.x + h.vx * dt);
+      swing = Math.sin(h.t * 7) * 0.55;
+      if (ship.alive && ship.y < 6.5 && carried.length < CARRY_MAX && Math.abs(wrapD(h.x - ship.x)) < 3.2 && !SHELTER_X.some(sx => Math.abs(wrapD(h.x - sx)) < SHELTER_R)) {
+        if (h.targetedBy) { h.targetedBy.target = null; h.targetedBy = null; }
+        h.state = 'rescued'; carried.push(h);
+        popup('ABOARD', h.x, 4, '#5effa8'); sfx.catch(); pickupHint();
+      }
+    } else if (h.state === 'falling') {
+      h.fallT += dt;
+      const open = clamp((h.fallT - 0.4) / 0.45, 0, 1);
+      h.vy -= 15 * dt;
+      if (open > 0) h.vy = Math.max(h.vy, lerp(h.vy, -2.6, damp(3 + 5 * open, dt)));
+      h.y += h.vy * dt;
+      swing = open > 0.5 ? Math.sin(h.t * 2.2) * 0.3 : Math.sin(h.t * 18) * 1.1;
+      h.chute.visible = open > 0;
+      const e = 1 - Math.pow(1 - open, 3);
+      h.chute.scale.set(0.2 + 0.8 * e, Math.max(0.05, e), 0.2 + 0.8 * e);
+      h.chute.rotation.z = Math.sin(h.t * 1.4) * 0.14 * open;
+      if (ship.alive) {
+        const dx = wrapD(h.x - ship.x), dy = h.y - ship.y;
+        if (carried.length < CARRY_MAX && Math.abs(dx) < 3.4 && Math.abs(dy) < 3.4) { h.state = 'rescued'; carried.push(h); pickupHint(); addScore(500, h.x, h.y + 2, '#ff8a3d'); sfx.catch(); questEvent('catch'); }
+      }
+      if (h.state === 'falling' && h.y <= 0) {
+        h.state = 'ground'; h.y = 0; h.vy = 0; addScore(250, h.x, 3, '#ff8a3d');
+      }
+    } else if (h.state === 'rescued') {
+      const slot = Math.max(0, carried.indexOf(h));
+      h.x = wrapX(ship.x - ship.facing * (0.4 + slot * 1.3)); h.y = Math.max(0.3, ship.y - 3.0 - slot * 0.35);
+      swing = Math.sin(h.t * 3 + slot) * 0.3;
+    } else if (h.state === 'carried') {
+      swing = Math.sin(h.t * 14) * 0.9;
+    }
+    h.legL.rotation.z = swing; h.legR.rotation.z = -swing;
+    h.armL.rotation.z = h.state === 'ground' ? -swing : 2.6 + swing * 0.4; h.armR.rotation.z = h.state === 'ground' ? swing : -2.6 - swing * 0.4;
+    if (h.state !== 'falling') { h.fallT = 0; h.chute.visible = false; }
+    h.beacon.visible = h.state === 'ground';
+    h.mesh.userData.hide = h.state === 'sheltered';
+    h.beacon.material.opacity = 0.35 + 0.3 * Math.sin(time * 4 + h.t);
+  }
+  for (let i = humans.length - 1; i >= 0; i--) if (humans[i].dead) humans.splice(i, 1);
+  // drop-off: fly low over a shelter pad and everyone aboard walks inside
+  if (ship.alive && ship.y < 8 && carried.length) {
+    const sh = shelters.find(sh => Math.abs(wrapD(sh.x - ship.x)) < SHELTER_R);
+    if (sh) {
+      carried.forEach((h, i) => {
+        questEvent('shelter');
+        h.state = 'sheltered'; h.shelter = sh; sh.count++;
+        setTimeout(() => popup('SAVED 500', sh.x, 5 + i * 2.2, '#5effa8'), i * 140);
+        addScore(500);
+        for (let k = 0; k < 20; k++) emit(sh.x, 1, 0, rand(-10, 10), rand(4, 18), rand(-10, 10), 0.4, 1, 0.65, 0.6, 0.7, 2, 14);
+      });
+      setShelterLights(sh); sfx.land();
+      sh.flash = 1;
+    }
+  }
+  for (const sh of shelters) {
+    sh.flash = Math.max(0, (sh.flash || 0) - dt * 1.5);
+    const near = carried.length && ship.alive && Math.abs(wrapD(sh.x - ship.x)) < 60;
+    sh.ring.material.opacity = 0.55 + 0.35 * Math.sin(time * (near ? 9 : 3)) * 0.5 + sh.flash;
+    sh.inner.scale.setScalar(1 + ((time * (near ? 1.4 : 0.6)) % 1) * 1.2);
+    sh.inner.material.opacity = 0.6 * (1 - ((time * (near ? 1.4 : 0.6)) % 1));
+    sh.beam.material.opacity = (near ? 0.16 : 0.07) + sh.flash * 0.3;
+  }
+  if ((state.mode === 'playing' || state.mode === 'dying') && humans.length === 0 && !state.planetLost) {
+    state.planetLost = true;
+    groundMat.emissive.set(0xff3050);
+    enemies.slice().forEach(e => { if (e.type === 'lander') becomeMutant(e); });
+    showMsg('THE COLONY HAS FALLEN<small>Every lander turns mutant until wave ' + (Math.ceil((state.wave + 1) / 5) * 5) + '</small>', 3.4);
+    shake = 2;
+  }
+}
+function updateProjectiles(dt) {
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    b.life -= dt; b.x = wrapX(b.x + b.vx * dt); b.y += b.vy * dt;
+    let dead = b.life <= 0 || b.y < 0.3;
+    if (!dead && ship.alive && state.invuln <= 0) {
+      const dx = wrapD(b.x - ship.x), dy = b.y - ship.y;
+      if (Math.abs(dx) < 2.5 && Math.abs(dy) < 1.0) { dead = true; damagePlayer(b.dmg || 25, 'Shot down'); }
+    }
+    if (dead) { scene.remove(b.mesh); bullets.splice(i, 1); }
+  }
+  for (let i = mines.length - 1; i >= 0; i--) {
+    const m = mines[i];
+    m.life -= dt; m.t += dt;
+    let dead = m.life <= 0;
+    if (!dead && ship.alive && state.invuln <= 0) {
+      const dx = wrapD(m.x - ship.x), dy = m.y - ship.y;
+      if (Math.abs(dx) < 2.4 && Math.abs(dy) < 1.2) { dead = true; explode(m.x, m.y, 0, 0xffe040, 0.6); damagePlayer(25, 'Hit a mine'); }
+    }
+    if (dead) { scene.remove(m.mesh); mines.splice(i, 1); }
+  }
+  for (const l of lasers) {
+    if (!l.active) continue;
+    l.t += dt;
+    l.head += 440 * dt;
+    if (l.t > 0.06) l.tail += 330 * dt;
+    let hit = null, hd = 1e9;
+    for (const e of enemies) {
+      if (!e.alive || e.spawnT > 0) continue;
+      const d = wrapD(e.x - l.x0) * l.dir;
+      // lasers never harm colonists: a shot aimed at a carried colonist hits the lander holding them
+      const lo = e.type === 'lander' && e.state === 'ascend' ? e.y - 4.4 : e.y - e.r - 0.3;
+      if (d >= l.tail - e.r && d <= l.head + e.r && l.y > lo && l.y < e.y + e.r + 0.3 && d < hd) { hd = d; hit = e; }
+    }
+    let part = null;
+    if (boss.active && !boss.dying) {
+      const bdx = wrapD(boss.x - l.x0) * l.dir, ly = l.y - boss.y;
+      for (const t of boss.turrets) {
+        if (!t.alive) continue;
+        const d = bdx + t.ox * l.dir * boss.face;
+        if (d >= l.tail - 2 && d <= l.head + 2 && Math.abs(ly - t.oy) < 2.0 && d < hd) { hd = d; hit = null; part = t; }
+      }
+      const coreD = bdx;
+      if (boss.turrets.every(t => !t.alive) && coreD >= l.tail - 3 && coreD <= l.head + 3 && Math.abs(ly - 3.2) < 2.8 && coreD < hd) { hd = coreD; hit = null; part = 'core'; }
+      const hullD = bdx - 13;
+      if (ly > -3.4 && ly < 0.3 && hullD >= l.tail && hullD <= l.head && hullD < hd) { hd = hullD; hit = null; part = 'hull'; }
+    }
+    if (part) { bossDamage(part, 1); l.head = Math.max(l.tail + 0.1, hd); l.tail = l.head; }
+    if (hit) { killEnemy(hit); l.head = Math.max(l.tail + 0.1, hd); l.tail = l.head; }
+    if (l.head > 175 || l.tail >= l.head) { l.active = false; l.g.visible = false; }
+  }
+}
+
+// ---------- scene sync
+const _v = new THREE.Vector3();
+function syncScene(dt) {
+  const vis = rx => Math.abs(rx) < 260;
+  for (const e of enemies) { const rx = wrapD(e.x - camX); e.mesh.visible = vis(rx); e.mesh.position.set(rx, e.y, 0); }
+  for (const h of humans) { const rx = wrapD(h.x - camX); h.mesh.visible = vis(rx) && !h.mesh.userData.hide; h.mesh.position.set(rx, h.y, 0); }
+  for (const sh of shelters) { const rx = wrapD(sh.x - camX); sh.g.visible = vis(rx); sh.g.position.x = rx; }
+  for (const b of bullets) { b.mesh.position.set(wrapD(b.x - camX), b.y, 0); const s = (b.base || 1) * (1 + 0.25 * Math.sin(time * 30 + b.life * 7)); b.mesh.scale.setScalar(s); }
+  for (const m of mines) { m.mesh.position.set(wrapD(m.x - camX), m.y, 0); m.mesh.rotation.y += dt * 3; m.mesh.visible = m.life > 2 || Math.floor(m.t * 8) % 2 === 0; }
+  for (const l of lasers) {
+    if (!l.active) continue;
+    l.g.position.set(wrapD(l.x0 + l.dir * l.tail - camX), l.y, 0);
+    l.g.rotation.y = l.dir > 0 ? 0 : Math.PI;
+    l.g.scale.x = Math.max(0.01, l.head - l.tail);
+    const c = l.glow.material.color.setHSL((l.hue + time * 2.5) % 1, 1, 0.55);
+    l.core.material.color.setRGB(0.8 + c.r * 0.6, 0.8 + c.g * 0.6, 0.8 + c.b * 0.6);
+  }
+  // ship
+  const srx = wrapD(ship.x - camX);
+  const targetYaw = ship.facing > 0 ? 0 : Math.PI;
+  ship.yaw = lerp(ship.yaw, targetYaw, damp(6, dt));
+  const turning = Math.sin(Math.abs(ship.yaw - targetYaw)) ;
+  shipModel.outer.position.set(srx, ship.y, 0);
+  shipModel.outer.rotation.y = ship.yaw;
+  shipModel.inner.rotation.set(turning * 1.4 + Math.sin(time * 2) * 0.05, 0, clamp(ship.vy / 25, -1, 1) * 0.28);
+  const th = ship.thrust * (0.8 + Math.random() * 0.4);
+  shipModel.flame.scale.set(1, 0.3 + th * 2.6, 1); shipModel.flame.position.x = -3.66 - (0.15 + th * 1.3);
+  shipModel.flameCore.scale.set(1, 0.2 + th * 1.6, 1); shipModel.flameCore.position.x = -3.66 - (0.1 + th * 0.8);
+  shipModel.flame.visible = shipModel.flameCore.visible = ship.thrust > 0.05;
+  if (ship.alive) shipModel.outer.visible = state.invuln > 0 ? Math.floor(time * 14) % 2 === 0 : true;
+  reticle.visible = plumb.visible = ship.alive;
+  syncBoss(dt);
+  shieldPop = Math.min(1, shieldPop + dt * 2.5);
+  shieldShow = Math.max(0, shieldShow - dt);
+  shieldMesh.visible = ship.alive && shieldShow > 0;
+  shieldMat.uniforms.uTime.value = time;
+  shieldMat.uniforms.uOpacity.value = Math.min(1, shieldShow * 2.5) * (ship.shield ? 1.2 : 2.2);
+  shieldMesh.scale.set(5.2, 2.6, 4.6).multiplyScalar(0.6 + 0.4 * (1 - Math.pow(1 - shieldPop, 3)));
+  hangarModel.g.visible = hangar.active && hangar.scale > 0.01;
+  if (hangar.active) {
+    hangarModel.g.position.set(wrapD(hangar.x - camX), hangar.bobY !== undefined ? hangar.bobY : hangar.y, 0);
+    const hs = Math.max(0.01, hangar.scale);
+    hangarModel.g.scale.set(hangar.vx < 0 ? -hs : hs, hs, hs);
+    hangarModel.dockRing.material.opacity = hangar.progress > 0 ? 0.6 + 0.4 * Math.sin(time * 20) : 0.45 + 0.35 * Math.sin(time * 4);
+    hangarModel.dockRing.scale.setScalar(1 + 0.08 * Math.sin(time * 3));
+    for (const r of hangarModel.rotors) r.spin.rotation.y += dt * 34 * r.dir;
+    hangarModel.radar.rotation.y += dt * 1.5;
+    if (Math.random() < dt * 30) { const r = hangarModel.rotors[Math.floor(Math.random() * 8)]; const sgn = hangar.vx < 0 ? -1 : 1; emit(hangar.x + r.x * sgn * hangar.scale + rand(-1.5, 1.5), (hangar.bobY || hangar.y) - 0.5, r.z * hangar.scale + rand(-1.5, 1.5), rand(-1, 1), rand(-14, -8), rand(-1, 1), 0.55, 0.8, 1, rand(0.5, 0.9), 0.5, 1); }
+    hangarModel.tip.material.color.setRGB(Math.sin(time * 4) > 0 ? 1 : 0.15, 0.1, 0.12);
+  }
+  reticle.position.x = srx; reticle.rotation.y = time * 0.8;
+  const altT = (ship.y - ALT_MIN) / (ALT_MAX - ALT_MIN);
+  reticle.scale.setScalar(0.7 + altT * 0.6);
+  plumb.position.set(srx, ship.y / 2, 0); plumb.scale.y = Math.max(0.1, ship.y - 1);
+  // terrain
+  for (const s of segments) {
+    const c = wrapD(s.x0 + SEG / 2 - camX);
+    s.g.visible = Math.abs(c) < 230;
+    s.g.position.x = c - SEG / 2;
+  }
+  const gOff = (camX / CELL) % 1;
+  groundMap.offset.x = gOff; groundEmi.offset.x = gOff;
+  wallMap.offset.x = (camX / 16) % 1; wallEmi.offset.x = wallMap.offset.x;
+  nebulaTex.offset.x = camU * 0.00006;
+  for (let i = 0; i < STAR_N; i++) {
+    let x = (starX[i] - camU * starF[i]) % STAR_SPAN; if (x < 0) x += STAR_SPAN;
+    starPos[i * 3] = x - STAR_SPAN / 2;
+  }
+  starGeo.attributes.position.needsUpdate = true;
+  beaconMat.color.setRGB(Math.sin(time * 3) > 0.2 ? 1 : 0.15, 0.08, 0.1);
+  mutantMat.emissive.setHSL((time * 1.7) % 1, 1, 0.45);
+  // camera
+  shake *= Math.exp(-4.5 * dt);
+  const sh = (reduceMotion ? 0.25 : 1) * shake;
+  camera.position.set(CAM_BASE.x + (Math.random() - 0.5) * sh * 1.6, CAM_BASE.y + (Math.random() - 0.5) * sh * 1.6, CAM_BASE.z + (Math.random() - 0.5) * sh * 1.6);
+  flashAmt *= Math.exp(-5 * dt);
+  finalPass.uniforms.uFlash.value = flashAmt;
+  finalPass.uniforms.uTime.value = time;
+  finalPass.uniforms.uDanger.value = lerp(finalPass.uniforms.uDanger.value, state.planetLost && state.mode !== 'title' ? 0.35 : boss.active ? 0.12 : 0, damp(2, dt));
+}
+
+// ---------- HUD
+const scanner = $('scanner'), sctx = scanner.getContext('2d');
+const scanColors = Object.fromEntries(Object.entries(ENEMY_COLOR).map(([k, v]) => [k, '#' + new THREE.Color(v).getHexString()]));
+function drawScanner() {
+  const w = scanner.width, h = scanner.height;
+  if (!w) return;
+  sctx.clearRect(0, 0, w, h);
+  const cx = ship.alive ? ship.x : camX;
+  const sx = x => w / 2 + wrapD(x - cx) / W * w;
+  const sy = y => h - 5 * DPR - (y / (ALT_MAX + 4)) * (h - 10 * DPR);
+  sctx.strokeStyle = 'rgba(255,138,42,0.75)'; sctx.lineWidth = 1.2 * DPR; sctx.beginPath();
+  for (let i = 0; i <= w; i += 3) { const wx = cx + (i / w - 0.5) * W; const y = sy(Math.max(0, ridge(wx)) * 0.45); i ? sctx.lineTo(i, y) : sctx.moveTo(i, y); }
+  sctx.stroke();
+  const vw = (halfW / 0.857) / W * w;
+  const vx = sx(camX);
+  sctx.strokeStyle = 'rgba(230,240,255,0.55)'; sctx.lineWidth = DPR;
+  sctx.beginPath();
+  sctx.moveTo(vx - vw + 6 * DPR, 2 * DPR); sctx.lineTo(vx - vw, 2 * DPR); sctx.lineTo(vx - vw, h - 2 * DPR); sctx.lineTo(vx - vw + 6 * DPR, h - 2 * DPR);
+  sctx.moveTo(vx + vw - 6 * DPR, 2 * DPR); sctx.lineTo(vx + vw, 2 * DPR); sctx.lineTo(vx + vw, h - 2 * DPR); sctx.lineTo(vx + vw - 6 * DPR, h - 2 * DPR);
+  sctx.stroke();
+  const d = 2.4 * DPR;
+  sctx.fillStyle = '#ff8a3d';
+  sctx.fillStyle = '#5effa8';
+  for (const sh of shelters) { const x = sx(sh.x); sctx.fillRect(x - 3 * DPR, sy(0) - 1.5 * DPR, 6 * DPR, 3 * DPR); sctx.fillRect(x - 0.5 * DPR, sy(0) - 7 * DPR, DPR, 6 * DPR); }
+  sctx.fillStyle = '#ff8a3d';
+  for (const hm of humans) if (hm.state !== 'sheltered') sctx.fillRect(sx(hm.x) - d / 2, sy(hm.y) - d, d, d * 1.6);
+  for (const e of enemies) { sctx.fillStyle = scanColors[e.type]; sctx.fillRect(sx(e.x) - d / 2 - 0.5, sy(e.y) - d / 2, d + 1, d); }
+  if (boss.active) { sctx.fillStyle = '#ff3df0'; sctx.fillRect(sx(boss.x) - 7 * DPR, sy(boss.y) - 3 * DPR, 14 * DPR, 6 * DPR); }
+  if (hangar.active) { sctx.strokeStyle = '#5effa8'; sctx.lineWidth = 1.5 * DPR; sctx.strokeRect(sx(hangar.x) - 6 * DPR, sy(hangar.y) - 2.5 * DPR, 12 * DPR, 5 * DPR); }
+  if (ship.alive) {
+    sctx.fillStyle = '#ffffff';
+    const px = sx(ship.x), py = sy(ship.y);
+    sctx.beginPath(); sctx.moveTo(px + ship.facing * 5 * DPR, py); sctx.lineTo(px - ship.facing * 3 * DPR, py - 2.5 * DPR); sctx.lineTo(px - ship.facing * 3 * DPR, py + 2.5 * DPR); sctx.fill();
+  }
+}
+let hudCache = '';
+function pickupHint() {
+  if (state.hinted || state.mode === 'title' || state.mode === 'gameover') return;
+  state.hinted = true;
+  showMsg('COLONIST ABOARD<small>Fly low over a green shelter pad to drop them off</small>', 2.8);
+}
+function updateHUD() {
+  const nAboard = aboard().length, nSafe = humans.filter(h => h.state === 'sheltered').length;
+  const key = [state.score, state.lives, state.bombs, state.wave, nAboard, nSafe, ship.shield, ship.hull, quest && quest.status, quest && quest.progress, quest && quest.target, quest && quest.mode === 'time' ? Math.ceil(quest.limit - state.waveTime) : 0, boss.active && boss.hp, boss.turrets.map(t => t.hp).join()].join('|');
+  if (key !== hudCache) {
+    hudCache = key;
+    $('score').textContent = String(state.score).padStart(6, '0');
+    $('wave').textContent = state.wave;
+    $('lives').innerHTML = '<span class="shipsLbl">SHIPS</span>' + '<span class="life"></span>'.repeat(clamp(state.lives, 0, 6)) + `<b class="shipsN">×${state.lives}</b>`;
+    $('aboard').textContent = (nAboard ? `ABOARD ${nAboard}/${CARRY_MAX}` : '') + (nAboard && nSafe ? ' · ' : '') + (nSafe ? `SHELTERED ${nSafe}` : '');
+    $('shieldPill').classList.toggle('off', !ship.shield);
+    const qe = $('quest');
+    qe.hidden = !quest;
+    if (quest) {
+      const left = quest.mode === 'time' ? Math.max(0, Math.ceil(quest.limit - state.waveTime)) : 0;
+      const prog = quest.mode === 'count' ? ` <b>${Math.min(quest.progress, quest.target)}/${quest.target}</b>`
+        : quest.mode === 'single' ? ` <b>best ${quest.progress}</b>`
+        : quest.mode === 'time' ? ` <b class="clock${left <= 15 ? ' low' : ''}">${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}</b>` : '';
+      qe.className = 'quest' + (quest.status === 'done' ? ' done' : quest.status === 'failed' ? ' failed' : quest.status === 'void' ? ' void' : '');
+      const qtext = quest.mode === 'time' && quest.status === 'active' ? 'Clear the wave before time runs out' : quest.text;
+      qe.innerHTML = `${quest.status === 'done' ? 'Quest complete' : quest.status === 'failed' ? 'Quest failed' : quest.status === 'void' ? 'Quest called off' : 'Quest'} · ${qtext}${quest.status === 'active' ? prog : ''}`;
+    }
+    $('boss').hidden = !boss.active;
+    if (boss.active) {
+      const tHp = boss.turrets.reduce((a, t) => a + Math.max(0, t.hp), 0), tMax = boss.turrets.reduce((a, t) => a + t.max, 0);
+      const exposed = boss.turrets.every(t => !t.alive);
+      $('bossFill').style.width = (exposed ? boss.hp / boss.max * 100 : tHp / tMax * 100) + '%';
+      $('bossPhase').textContent = exposed ? 'CORE EXPOSED' : `TURRETS ${boss.turrets.filter(t => t.alive).length}/4`;
+    }
+    const hull = $('hull'), segs = Math.ceil(ship.hull / 25);
+    hull.className = 'hull' + (ship.hull <= 25 ? ' crit' : ship.hull <= 50 ? ' warn' : '');
+    [...hull.children].forEach((el, i) => el.classList.toggle('off', i >= segs));
+    $('bombs').innerHTML = '<span class="bomb"></span>'.repeat(clamp(state.bombs, 0, 8));
+  }
+  $('altMark').style.bottom = (clamp((ship.y - ALT_MIN) / (ALT_MAX - ALT_MIN), 0, 1) * 100) + '%';
+  drawScanner();
+}
+const msgEl = $('msg');
+function showMsg(html, dur) { msgEl.innerHTML = html; msgEl.classList.add('on'); state.msgT = dur; }
+function popup(text, wx, y, color) {
+  _v.set(wrapD(wx - camX), y, 0).project(camera);
+  const el = document.createElement('div'); el.className = 'pop'; el.textContent = text; el.style.color = color;
+  el.style.left = ((_v.x + 1) / 2 * innerWidth) + 'px'; el.style.top = ((1 - _v.y) / 2 * innerHeight) + 'px';
+  $('pops').appendChild(el); setTimeout(() => el.remove(), 1000);
+}
+
+// ---------- input
+const ACTIONS = [
+  ['left', 'Thrust left'], ['right', 'Thrust right'], ['up', 'Climb'], ['down', 'Dive'],
+  ['fire', 'Fire laser'], ['bomb', 'Smart bomb'], ['hyper', 'Hyperspace'], ['pause', 'Pause'], ['mute', 'Sound on/off']
+];
+const DEFAULT_BINDS = { left: ['ArrowLeft', 'KeyA'], right: ['ArrowRight', 'KeyD'], up: ['ArrowUp', 'KeyW'], down: ['ArrowDown', 'KeyS'], fire: ['Space', 'KeyJ'], bomb: ['KeyB', 'ShiftLeft'], hyper: ['KeyH'], pause: ['KeyP'], mute: ['KeyM'] };
+let binds = JSON.parse(JSON.stringify(DEFAULT_BINDS));
+try { const saved = JSON.parse(localStorage.getItem('planetguard.keys') || 'null'); if (saved) for (const [a] of ACTIONS) if (Array.isArray(saved[a]) && saved[a].length) binds[a] = saved[a].filter(c => typeof c === 'string'); } catch (e) {}
+const saveBinds = () => { try { localStorage.setItem('planetguard.keys', JSON.stringify(binds)); } catch (e) {} };
+const KEY_NAMES = { ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓', Space: 'Space', ShiftLeft: 'L Shift', ShiftRight: 'R Shift', ControlLeft: 'L Ctrl', ControlRight: 'R Ctrl', AltLeft: 'L Alt', AltRight: 'R Alt', Enter: 'Enter', Tab: 'Tab', Backspace: 'Backspace', MetaLeft: 'L Cmd', MetaRight: 'R Cmd' };
+const keyName = c => KEY_NAMES[c] || c.replace(/^Key/, '').replace(/^Digit/, '').replace(/^Numpad/, 'Num ');
+const isBound = (act, code) => binds[act].includes(code);
+const keys = {};
+const touch = { up: false, down: false, left: false, right: false, fire: false };
+let pad = { up: false, down: false, left: false, right: false, fire: false };
+const padPrev = {};
+let menuOpen = false, rebinding = null;
+addEventListener('keydown', e => {
+  if (rebinding) {
+    e.preventDefault();
+    if (e.code !== 'Escape') {
+      for (const [a] of ACTIONS) binds[a] = binds[a].filter(c => c !== e.code);
+      binds[rebinding][0] = e.code;
+      binds[rebinding] = [...new Set(binds[rebinding].filter(Boolean))];
+      saveBinds();
+    }
+    rebinding = null; renderBinds();
+    return;
+  }
+  const bound = ACTIONS.some(([a]) => isBound(a, e.code));
+  if (bound || ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) { if (!(menuOpen && (e.code === 'Space' || e.code === 'Enter'))) e.preventDefault(); }
+  if (!keys[e.code]) onPress(e.code);
+  keys[e.code] = true;
+});
+addEventListener('keyup', e => { keys[e.code] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+const inGame = () => state.mode === 'playing' || state.mode === 'waveEnd' || state.mode === 'dying';
+function onPress(code) {
+  initAudio();
+  if (menuOpen) { if (code === 'Escape') closeMenu(); return; }
+  if (state.mode === 'title' && (code === 'Enter' || isBound('fire', code))) return startGame();
+  if (state.mode === 'gameover' && code === 'Enter' && state.overT <= 0) return startGame();
+  if (code === 'Escape') { if (inGame()) openMenu(); return; }
+  for (const [a] of ACTIONS) if (isBound(a, code)) doAction(a);
+}
+function doAction(a) {
+  if (a === 'mute') { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.55; $('mute').hidden = !muted; return; }
+  if (!inGame()) return;
+  if (a === 'pause') return togglePause();
+  if (state.paused) return;
+  if (a === 'bomb') smartBomb();
+  if (a === 'hyper') hyperspace();
+}
+function renderBinds() {
+  const list = $('bindList');
+  list.innerHTML = '';
+  for (const [a, label] of ACTIONS) {
+    const name = document.createElement('span'); name.className = 'act'; name.textContent = label;
+    const btn = document.createElement('button'); btn.className = 'keybtn' + (rebinding === a ? ' wait' : ''); btn.id = 'bind-' + a;
+    btn.textContent = rebinding === a ? 'Press a key' : (binds[a][0] ? keyName(binds[a][0]) : 'Not set');
+    btn.setAttribute('aria-label', label + ': ' + btn.textContent + '. Click to change.');
+    btn.addEventListener('click', () => { rebinding = a; renderBinds(); });
+    const alt = document.createElement('span'); alt.className = 'alt'; alt.textContent = binds[a].slice(1).map(keyName).join(', ') ? 'also ' + binds[a].slice(1).map(keyName).join(', ') : '';
+    list.append(name, btn, alt);
+  }
+  const k = a => binds[a].length ? `<kbd>${keyName(binds[a][0])}</kbd>` : '<kbd>–</kbd>';
+  $('titleKeys').innerHTML =
+    `<dt>${k('left')}${k('right')}</dt><dd>Thrust and reverse</dd>` +
+    `<dt>${k('up')}${k('down')}</dt><dd>Climb and dive (watch your shadow)</dd>` +
+    `<dt>${k('fire')}</dt><dd>Fire laser</dd>` +
+    `<dt>${k('bomb')}</dt><dd>Smart bomb: clears the screen</dd>` +
+    `<dt>${k('hyper')}</dt><dd>Hyperspace: risky jump</dd>` +
+    `<dt>${k('pause')}${k('mute')}</dt><dd>Pause, sound</dd>` +
+    `<dt><kbd>Esc</kbd></dt><dd>Controls menu</dd>`;
+}
+function openMenu() {
+  if (menuOpen) return;
+  menuOpen = true; rebinding = null;
+  const game = inGame();
+  if (game) { state.paused = true; msgEl.classList.remove('on'); if (thrustGain) thrustGain.gain.value = 0; }
+  $('menuEyebrow').textContent = game ? 'Game paused' : 'Settings';
+  $('resume').textContent = game ? 'RESUME' : 'DONE';
+  $('touch').hidden = true;
+  renderBinds();
+  $('menu').hidden = false;
+  $('resume').focus();
+}
+function closeMenu() {
+  menuOpen = false; rebinding = null;
+  $('menu').hidden = true;
+  if (inGame()) { state.paused = false; state.msgT = 0; $('touch').hidden = !isTouch; }
+  for (const k in keys) keys[k] = false;
+}
+$('menuBtn').addEventListener('click', () => { initAudio(); openMenu(); });
+$('titleMenu').addEventListener('click', () => openMenu());
+$('resume').addEventListener('click', () => closeMenu());
+$('resetKeys').addEventListener('click', () => { binds = JSON.parse(JSON.stringify(DEFAULT_BINDS)); saveBinds(); rebinding = null; renderBinds(); });
+function togglePause(force) {
+  state.paused = force !== undefined ? force : !state.paused;
+  if (state.paused) showMsg(`PAUSED<small>Press ${keyName(binds.pause[0] || 'KeyP')} to resume · Esc for controls</small>`, 1e9); else { msgEl.classList.remove('on'); state.msgT = 0; }
+  if (thrustGain && state.paused) thrustGain.gain.value = 0;
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && (state.mode === 'playing' || state.mode === 'waveEnd')) togglePause(true); });
+function getInput() {
+  const held = a => binds[a].some(c => keys[c]);
+  return {
+    left: held('left') || touch.left || pad.left,
+    right: held('right') || touch.right || pad.right,
+    up: held('up') || touch.up || pad.up,
+    down: held('down') || touch.down || pad.down,
+    fire: held('fire') || touch.fire || pad.fire
+  };
+}
+function pollGamepad() {
+  const gp = navigator.getGamepads ? [...navigator.getGamepads()].find(Boolean) : null;
+  if (!gp) return;
+  const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0, b = i => !!(gp.buttons[i] && gp.buttons[i].pressed);
+  pad = { left: ax < -0.4 || b(14), right: ax > 0.4 || b(15), up: ay < -0.4 || b(12), down: ay > 0.4 || b(13), fire: b(0) || b(7) };
+  const edge = (i, fn) => { const p = b(i); if (p && !padPrev[i]) fn(); padPrev[i] = p; };
+  edge(1, () => doAction('bomb')); edge(2, () => doAction('hyper')); edge(3, () => doAction('hyper'));
+  edge(9, () => { if (menuOpen) closeMenu(); else if (inGame()) doAction('pause'); else onPress('Enter'); });
+}
+const isTouch = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+document.querySelectorAll('.tb').forEach(btn => {
+  const k = btn.dataset.k;
+  const on = e => { e.preventDefault(); initAudio(); btn.setPointerCapture && btn.setPointerCapture(e.pointerId); btn.classList.add('on');
+    if (k === 'bomb' || k === 'hyper') doAction(k); else touch[k] = true; };
+  const off = e => { btn.classList.remove('on'); if (k in touch) touch[k] = false; };
+  btn.addEventListener('pointerdown', on);
+  btn.addEventListener('pointerup', off); btn.addEventListener('pointercancel', off); btn.addEventListener('lostpointercapture', off);
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+});
+$('start').addEventListener('click', () => { initAudio(); startGame(); });
+$('again').addEventListener('click', () => { initAudio(); startGame(); });
+
+// ---------- flow
+function startGame() {
+  clearWorld();
+  Object.assign(state, { restartWave: false, mode: 'playing', score: 0, lives: 3, bombs: 3, wave: 1, nextLife: 10000, invuln: 2, planetLost: false, paused: false });
+  groundMat.emissive.set(0x2fd6e6);
+  Object.assign(ship, { x: camX, y: 22, vx: 0, vy: 0, facing: 1, yaw: 0, alive: true, thrust: 0, shield: true, hull: 100 });
+  hangar.active = false; state.hangarT = 10; state.hangarCame = false; shieldShow = 0;
+  camX = wrapX(ship.x + 30);
+  shipModel.outer.visible = true;
+  spawnColonists(10);
+  $('title').hidden = true; $('over').hidden = true; $('hud').hidden = false;
+  $('touch').hidden = !isTouch;
+  hudCache = ''; state.hinted = false;
+  resizeScanner();
+  startWave(1);
+}
+function gameOver() {
+  boss.active = false; bossModel.g.visible = false;
+  state.mode = 'gameover'; state.overT = 1.2;
+  ship.alive = false; shipModel.outer.visible = false;
+  const best = state.score > state.hi;
+  if (best) { state.hi = state.score; try { localStorage.setItem('planetguard.hi', String(state.hi)); } catch (e) {} }
+  $('hiT').textContent = state.hi.toLocaleString();
+  $('finalScore').textContent = state.score.toLocaleString();
+  $('overWhy').textContent = (state.deathReason || 'All ships lost') + ' · Wave ' + state.wave;
+  $('overNote').textContent = best ? 'New high score.' : 'High score ' + state.hi.toLocaleString() + '.';
+  $('over').hidden = false; $('touch').hidden = true;
+  if (thrustGain) thrustGain.gain.value = 0;
+}
+function attract(dt) {
+  if (humans.length < 6) spawnHuman(camX + rand(-200, 400));
+  if (enemies.filter(e => e.type === 'lander').length < 6) spawnEnemy('lander', camX + rand(60, 500) * (Math.random() < 0.5 ? -1 : 1), rand(20, 34), true);
+  if (enemies.length > 14) { const e = enemies.find(e => e.type === 'mutant'); if (e) { e.alive = false; scene.remove(e.mesh); } }
+}
+
+// ---------- resize
+function resizeScanner() {
+  const r = scanner.getBoundingClientRect();
+  scanner.width = Math.max(1, Math.round(r.width * DPR)); scanner.height = Math.max(1, Math.round(r.height * DPR));
+}
+function resize() {
+  const w = innerWidth, h = innerHeight, a = w / h;
+  halfH = a >= 1.3 ? 42 : Math.min(42 * 1.3 / a, 66);
+  halfW = halfH * a;
+  Object.assign(camera, { left: -halfW, right: halfW, top: halfH, bottom: -halfH });
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+  composer.setPixelRatio && composer.setPixelRatio(DPR);
+  composer.setSize(w, h);
+  const db = renderer.getDrawingBufferSize(new THREE.Vector2());
+  pMat.uniforms.uScale.value = starMat.uniforms.uScale.value = db.y / (2 * halfH);
+  finalPass.uniforms.uRes.value.set(db.x, db.y);
+  resizeScanner();
+}
+addEventListener('resize', resize);
+resize();
+renderBinds();
+
+// ---------- loop
+const GAME_SPEED = 0.9; // whole simulation runs at 90% speed
+let last = performance.now(), time = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  let dt = Math.min(0.033, (now - last) / 1000) * GAME_SPEED; last = now;
+  if (state.paused) dt = 0;
+  time += dt;
+  pollGamepad();
+  if (dt > 0) {
+    const inp = getInput();
+    if (state.mode === 'playing' || state.mode === 'waveEnd') updateShip(dt, inp);
+    else updateShip(dt, {});
+    updateCamera(dt);
+    if (state.mode === 'title' || state.mode === 'gameover') attract(dt);
+    updateWave(dt);
+    updateEnemies(dt);
+    updateHumans(dt);
+    updateProjectiles(dt);
+    updateHangar(dt);
+    updateBoss(dt);
+    updateFX(dt);
+    if (state.mode === 'dying') {
+      state.dieT -= dt;
+      if (state.dieT <= 0) { if (state.lives > 0) respawn(); else gameOver(); }
+    }
+    if (state.mode === 'waveEnd') { state.endT -= dt; if (state.endT <= 0) { state.mode = 'playing'; startWave(state.wave + 1); } }
+    if (state.mode === 'gameover') state.overT -= dt;
+    if (state.msgT > 0) { state.msgT -= dt; if (state.msgT <= 0) msgEl.classList.remove('on'); }
+  }
+  syncScene(dt);
+  if (state.mode !== 'title' && state.mode !== 'gameover') updateHUD();
+  composer.render(dt);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>

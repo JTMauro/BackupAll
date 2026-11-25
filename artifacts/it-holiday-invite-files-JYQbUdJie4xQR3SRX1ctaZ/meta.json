@@ -1,0 +1,28 @@
+{
+ "title": "IT Holiday Invite Files",
+ "url": "https://claude.ai/artifact/JYQbUdJie4xQR3SRX1ctaZ",
+ "type": "web page",
+ "updated": "2026-11-06",
+ "files": [
+  {
+   "path": "IT-Holiday-Event.html",
+   "bytes": 465037,
+   "sha256": "01c2066a73605f629f913bac506ef56118d621e8902eb50f1d62ebd0183ee2f8"
+  },
+  {
+   "path": "index.html",
+   "bytes": 6662,
+   "sha256": "e1342ed998da403b46cd1c8803b16f1fb002ada43c62b414672ae242f7dd82be"
+  },
+  {
+   "path": "it-holiday-event-invite.png",
+   "bytes": 2506856,
+   "sha256": "b4ab7f5e84cb742b06944db6b16a90f28d6c930123d91bead4d89ef34d8d79ed"
+  },
+  {
+   "path": "it-holiday-event.gif",
+   "bytes": 7954524,
+   "sha256": "1fff4fb9c01416a469430e9a6a8cd56f31760ac6bb1d3b89d3d1d8a6eec40fea"
+  }
+ ]
+}

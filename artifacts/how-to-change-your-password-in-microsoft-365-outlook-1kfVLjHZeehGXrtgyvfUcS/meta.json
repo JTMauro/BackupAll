@@ -1,0 +1,18 @@
+{
+ "title": "How to Change Your Password in Microsoft 365 Outlook",
+ "url": "https://claude.ai/artifact/1kfVLjHZeehGXrtgyvfUcS",
+ "type": "Docs",
+ "updated": "2026-11-21",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "69f85334ec6e0ccfd631100e54ac9ce38bf221d25723c18d7ca7ee1a2f30825f"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 1547,
+   "sha256": "c4933f6ec8a7651af2867c9c51bb3bf3e90eb4f0f72a55b030ab6c7dd6099db8"
+  }
+ ]
+}

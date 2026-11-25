@@ -1,0 +1,18 @@
+{
+ "title": "Laptop and Personal Belongings Security Reminder",
+ "url": "https://claude.ai/artifact/TmmWDjqC1nELsTMuHumJHq",
+ "type": "Docs",
+ "updated": "2026-10-30",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "fc37afde9519c45997955b22150af3b0e2c9f879c9e47b0c5bf5f41255deff27"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 1163,
+   "sha256": "2531bb984a5ee93510c1fc8a90f0c1850d7e959cbac74a257cddcd27025a4ed8"
+  }
+ ]
+}

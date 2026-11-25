@@ -1,0 +1,586 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Professor Lingua</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600&family=Figtree:wght@500;600;700&display=swap">
+<style>
+/* Layout: school corridor shell — enrollment desk, syllabus/report card, and a classroom with chalkboard + teacher dialogue + answer dock */
+:root{
+  --bg:#E9EEEA; --surface:#F7F9F7; --ink:#1C2622; --muted:#5B6B64; --line:#C9D3CD;
+  --accent:#2C6A55; --accent-ink:#FFFFFF; --chalk-yellow:#F0C64B;
+  --board:#22362E; --board-edge:#5B4632; --chalk:#ECEFE8; --chalk-dim:#A9B9B0;
+  --good:#2F7D4F; --warn:#A8650E; --bad:#B23A3A;
+  --f-chalk:"Kalam","Comic Sans MS",cursive;
+  --f-body:"Literata",Georgia,"Times New Roman",serif;
+  --f-ui:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111714; --surface:#19211D; --ink:#E3EAE6; --muted:#93A39B; --line:#2C3833;
+  --accent:#5FB496; --accent-ink:#0D1411; --board:#1B2B24; --board-edge:#4A3A2A;
+  --good:#5DBB84; --warn:#E0A54A; --bad:#E07070; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111714; --surface:#19211D; --ink:#E3EAE6; --muted:#93A39B; --line:#2C3833;
+  --accent:#5FB496; --accent-ink:#0D1411; --board:#1B2B24; --board-edge:#4A3A2A;
+  --good:#5DBB84; --warn:#E0A54A; --bad:#E07070; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;padding-block:16px 24px;display:flex;flex-direction:column;gap:18px;min-height:100%;box-sizing:border-box}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.crest{display:flex;align-items:center;gap:10px;font-family:var(--f-ui);font-weight:700;letter-spacing:.02em}
+.crest .seal{width:34px;height:34px;border-radius:50%;background:var(--board);color:var(--chalk-yellow);display:grid;place-items:center;font-family:var(--f-chalk);font-size:20px;border:2px solid var(--board-edge)}
+.crest small{display:block;font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{font-family:var(--f-ui);font-weight:600;font-size:14px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+:focus-visible{outline:3px solid var(--chalk-yellow);outline-offset:2px}
+.eyebrow{font-family:var(--f-ui);font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.2}
+h1{font-family:var(--f-chalk);font-size:clamp(30px,5vw,46px);font-weight:700}
+h2{font-size:22px;font-weight:600}
+p{margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+
+/* Enrollment */
+.enroll{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+.enroll .intro{background:var(--board);color:var(--chalk);border-radius:12px;padding:28px;border:6px solid var(--board-edge);display:flex;flex-direction:column;gap:14px}
+.enroll .intro h1{color:var(--chalk)}
+.enroll .intro p{font-family:var(--f-chalk);font-size:19px;color:var(--chalk-dim);max-width:46ch}
+.enroll .intro .yl{color:var(--chalk-yellow)}
+.form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-family:var(--f-ui);font-weight:600;font-size:14px}
+.field select,.field input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px 12px}
+.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.levels button{font-family:var(--f-ui);border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px 6px;cursor:pointer;text-align:left}
+.levels button b{display:block;font-size:14px}
+.levels button span{font-size:12px;color:var(--muted)}
+.levels button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+
+/* Syllabus */
+.syl-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.stats{display:flex;gap:22px;font-family:var(--f-ui)}
+.stats div b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stats div span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.term h3{font-family:var(--f-ui);font-size:15px;display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}
+.term h3 span{color:var(--muted);font-weight:500}
+.lesson{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 2px;cursor:pointer}
+.lesson:hover .lt{color:var(--accent)}
+.lesson .num{font-family:var(--f-ui);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lesson .lt{font-size:15px}
+.grade{font-family:var(--f-chalk);font-weight:700;font-size:18px;min-width:30px;text-align:center;border-radius:6px;padding:0 6px}
+.grade.A,.grade.B{color:var(--good)} .grade.C{color:var(--warn)} .grade.D{color:var(--bad)}
+.grade.none{font-family:var(--f-ui);font-size:12px;color:var(--muted);font-weight:500}
+.homework{border-left:4px solid var(--chalk-yellow);padding-left:14px}
+.homework p{font-family:var(--f-chalk);font-size:18px}
+
+/* Classroom */
+.room{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;flex:1;min-height:0}
+.board{background:var(--board);border:10px solid var(--board-edge);border-radius:6px;color:var(--chalk);padding:22px 24px 30px;position:relative;min-height:340px;display:flex;flex-direction:column;gap:14px;box-shadow:inset 0 0 60px rgba(0,0,0,.35)}
+.board::after{content:"";position:absolute;left:12%;right:12%;bottom:-10px;height:8px;background:var(--board-edge);border-radius:0 0 3px 3px;filter:brightness(1.2)}
+.board .date{font-family:var(--f-chalk);color:var(--chalk-dim);font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.board h2{font-family:var(--f-chalk);font-size:clamp(24px,3.2vw,34px);color:var(--chalk-yellow);font-weight:700}
+.board ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.board li button{all:unset;cursor:pointer;display:grid;grid-template-columns:1fr;gap:0;width:100%;padding:4px 6px;border-radius:4px}
+.board li button:hover,.board li button:focus-visible{background:rgba(255,255,255,.06)}
+.board .t{font-family:var(--f-chalk);font-size:clamp(20px,2.6vw,26px);line-height:1.25}
+.board .p{font-family:var(--f-ui);font-size:12px;color:var(--chalk-dim);letter-spacing:.03em}
+.board .n{font-family:var(--f-chalk);font-size:16px;color:var(--chalk-dim)}
+.board .empty{font-family:var(--f-chalk);color:var(--chalk-dim);font-size:19px}
+.phases{display:flex;gap:4px;flex-wrap:wrap;margin-top:auto}
+.phases span{font-family:var(--f-ui);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid rgba(236,239,232,.25);color:var(--chalk-dim)}
+.phases span.on{background:var(--chalk-yellow);color:#1E2A24;border-color:var(--chalk-yellow);font-weight:700}
+.phases span.past{color:var(--chalk);border-color:rgba(236,239,232,.5)}
+
+.desk{display:flex;flex-direction:column;gap:12px;min-height:0}
+.teacher{display:flex;gap:14px;align-items:center}
+.face{width:58px;height:58px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-ui);font-weight:700;font-size:20px;position:relative;flex:none}
+.face::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:3px solid var(--chalk-yellow);opacity:0;transition:opacity .2s}
+.face.speaking::after{opacity:1;animation:pulse 1.1s ease-in-out infinite}
+.face.listening::after{opacity:1;border-color:var(--bad);animation:pulse .8s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.teacher .who b{font-family:var(--f-ui);display:block}
+.teacher .who span{font-size:13px;color:var(--muted)}
+.score{margin-left:auto;font-family:var(--f-ui);text-align:right}
+.score b{font-size:20px;font-variant-numeric:tabular-nums}
+.score span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.log{flex:1;min-height:220px;max-height:46vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.msg{max-width:92%;display:flex;flex-direction:column;gap:4px}
+.msg .who{font-family:var(--f-ui);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.msg .body{padding:10px 12px;border-radius:10px;background:var(--bg);overflow-wrap:anywhere}
+.msg.me{align-self:flex-end}
+.msg.me .body{background:var(--accent);color:var(--accent-ink)}
+.msg .tl{font-weight:600}
+.msg .fb{font-family:var(--f-ui);font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line)}
+.msg .fb.ok{color:var(--good);border-color:var(--good)}
+.msg .fb.no{color:var(--warn);border-color:var(--warn)}
+.msg .replay{align-self:flex-start;font-family:var(--f-ui);font-size:12px;background:none;border:0;color:var(--accent);cursor:pointer;padding:0}
+.thinking{font-family:var(--f-chalk);color:var(--muted);font-size:17px}
+.dock{display:flex;flex-direction:column;gap:8px}
+.prompt-hint{font-family:var(--f-ui);font-size:13px;color:var(--muted);min-height:20px}
+.prompt-hint b{color:var(--ink)}
+.inrow{display:flex;gap:8px;align-items:stretch}
+.mic{width:54px;flex:none;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center}
+.mic svg{width:22px;height:22px}
+.mic.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.inrow textarea{flex:1;min-width:0;resize:none;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px;height:52px;box-sizing:border-box}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{font-family:var(--f-ui);font-size:12px;font-weight:600;border:1px solid var(--line);background:none;border-radius:999px;padding:5px 10px;cursor:pointer}
+.quick button:hover{border-color:var(--accent);color:var(--accent)}
+.notice{font-family:var(--f-ui);font-size:13px;padding:10px 12px;border-radius:8px;border:1px solid var(--warn);color:var(--warn)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar label{font-family:var(--f-ui);font-size:13px;display:flex;gap:6px;align-items:center}
+.toolbar select{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px;font-size:13px}
+
+@media (max-width:860px){
+  .enroll,.room{grid-template-columns:1fr}
+  .levels{grid-template-columns:repeat(2,1fr)}
+  .log{max-height:none}
+  .board{min-height:220px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="crest"><div class="seal">P</div><div>Professor Lingua<small id="crestSub">Language school</small></div></div>
+    <div class="toolbar" id="topbar"></div>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Data ---------- */
+const LANGS = [
+  ["English","en-US"],["Spanish","es-ES"],["French","fr-FR"],["German","de-DE"],["Italian","it-IT"],["Portuguese (Brazil)","pt-BR"],["Portuguese (Portugal)","pt-PT"],
+  ["Japanese","ja-JP"],["Mandarin Chinese","zh-CN"],["Cantonese","zh-HK"],["Korean","ko-KR"],["Arabic","ar-SA"],["Hindi","hi-IN"],["Russian","ru-RU"],
+  ["Dutch","nl-NL"],["Swedish","sv-SE"],["Norwegian","nb-NO"],["Danish","da-DK"],["Finnish","fi-FI"],["Polish","pl-PL"],["Czech","cs-CZ"],
+  ["Greek","el-GR"],["Turkish","tr-TR"],["Hebrew","he-IL"],["Ukrainian","uk-UA"],["Romanian","ro-RO"],["Hungarian","hu-HU"],["Vietnamese","vi-VN"],
+  ["Thai","th-TH"],["Indonesian","id-ID"],["Malay","ms-MY"],["Filipino (Tagalog)","fil-PH"],["Bengali","bn-IN"],["Tamil","ta-IN"],["Urdu","ur-PK"],
+  ["Persian (Farsi)","fa-IR"],["Swahili","sw-KE"],["Catalan","ca-ES"],["Irish","ga-IE"],["Welsh","cy-GB"],["Latin","la"],["Esperanto","eo"]
+];
+const LEVELS = [
+  {id:"beginner",name:"Beginner",cefr:"A1",ratio:"Explain mostly in the student's native language; introduce short target-language phrases and always translate them."},
+  {id:"elementary",name:"Elementary",cefr:"A2",ratio:"Use about half target language with simple structures; translate new words; explain grammar in the native language."},
+  {id:"intermediate",name:"Intermediate",cefr:"B1",ratio:"Teach mostly in the target language at a measured pace; use the native language only to unblock confusion."},
+  {id:"advanced",name:"Advanced",cefr:"B2",ratio:"Teach entirely in the target language at natural speed; native language only if the student explicitly asks."}
+];
+const TERMS = [
+  {name:"Term 1",lvl:"A1",lessons:[
+    ["Greetings and introductions","Say hello and goodbye, give your name, ask how someone is"],
+    ["Sounds and the writing system","Core sounds, letters or characters, and how to read them aloud"],
+    ["Numbers 0 to 20","Count, give your age and phone number"],
+    ["In the classroom","Classroom objects and instructions the teacher uses"],
+    ["My family","Family members, possessives, describing relatives"],
+    ["Days, months and dates","Weekdays, months, today's date, birthdays"],
+    ["Colors and describing things","Common colors and adjectives, agreement basics"],
+    ["Food and drink","Everyday foods, likes and dislikes, ordering politely"]]},
+  {name:"Term 2",lvl:"A2",lessons:[
+    ["Telling time and my day","Clock time and a daily routine with common verbs"],
+    ["Home and rooms","Rooms, furniture, where things are"],
+    ["Shopping and prices","Asking prices, numbers to 1000, sizes"],
+    ["Getting around town","Places, asking and giving directions"],
+    ["Weather and seasons","Talking about the weather and seasonal plans"],
+    ["Hobbies and free time","Free-time activities, frequency words"],
+    ["What I did yesterday","Past tense of common verbs, narrating simple events"],
+    ["At the restaurant","Role-play ordering, asking for the bill, complaining politely"]]},
+  {name:"Term 3",lvl:"B1",lessons:[
+    ["Travel and transport","Booking, tickets, problems on a trip"],
+    ["Health and the doctor","Body parts, symptoms, advice"],
+    ["Work and careers","Jobs, workplaces, a short interview"],
+    ["Plans and the future","Future forms, making arrangements"],
+    ["Telling a story","Sequencing words, past tenses together"],
+    ["Opinions and agreeing","Giving opinions, agreeing and disagreeing politely"]]},
+  {name:"Term 4",lvl:"B2",lessons:[
+    ["In the news","Discussing a current topic, summarizing and reacting"],
+    ["Culture and traditions","Festivals, customs, comparing cultures"],
+    ["What if…","Hypotheticals and conditional sentences"],
+    ["Formal and informal speech","Register, polite forms, writing a formal request"]]}
+];
+const PHASES = [["warmup","Warm-up"],["teach","New material"],["drill","Repeat after me"],["practice","Practice"],["conversation","Conversation"],["quiz","Quiz"],["homework","Homework"]];
+const LESSONS = []; TERMS.forEach((t,ti)=>t.lessons.forEach(([title,goal],li)=>LESSONS.push({id:`t${ti+1}l${li+1}`,term:t.name,lvl:t.lvl,title,goal,n:LESSONS.length+1})));
+
+/* ---------- State ---------- */
+let S = {profile:null, progress:{}, teachers:{}, homework:{}};
+let view = "enroll";
+let lesson = null;  // {id,title,goal,mode,turns,phase,score,asked,board,await,expected}
+let busy = false, ctl = null;
+const $ = (s,r=document)=>r.querySelector(s);
+const h = (tag,attrs={},...kids)=>{const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==="class")e.className=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else if(v!==false&&v!=null)e.setAttribute(k,v===true?"":v)}for(const k of kids.flat())if(k!=null&&k!==false)e.append(k.nodeType?k:String(k));return e};
+const langCode = name => (LANGS.find(l=>l[0]===name)||[])[1] || "";
+const key = () => S.profile ? S.profile.target : "";
+
+/* ---------- Persistence: db when available, browser storage as backup ---------- */
+let dbRef = null;
+function saveLocal(){try{localStorage.setItem("linguahall",JSON.stringify(S))}catch{}}
+function loadLocal(){try{const v=JSON.parse(localStorage.getItem("linguahall")||"null");if(v&&typeof v==="object")S=Object.assign(S,v)}catch{}}
+let saveTimer=null;
+function save(){saveLocal();if(!dbRef)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>{dbRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{})},600)}
+async function initDb(){
+  try{
+    if(!window.claude)return;
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db||!user)return;
+    const id=await user.id(); if(!id)return;
+    dbRef=db.doc("data/users/"+id+"/school");
+    const snap=await dbRef.get();
+    if(snap.exists){const d=snap.data();S=JSON.parse(JSON.stringify({...S,...d}));if(view!=="class"){view=S.profile?"syllabus":"enroll";render()}}
+    else if(S.profile){save()}
+  }catch{}
+}
+
+/* ---------- Speech out ---------- */
+const synth = window.speechSynthesis;
+let voices=[];
+function loadVoices(){try{voices=synth?synth.getVoices():[]}catch{voices=[]}}
+loadVoices(); if(synth)synth.onvoiceschanged=()=>{loadVoices();renderPrefs()};
+// Rank voices so neural / natural-sounding ones win over robotic defaults
+const VOICE_HINTS=[[/natural|neural/i,6],[/premium|enhanced|siri/i,5],[/online/i,3],[/google/i,3]];
+function voiceScore(v,code){let s=0;if(v.lang.toLowerCase().replace("_","-")===code.toLowerCase())s+=2;for(const[re,w]of VOICE_HINTS)if(re.test(v.name))s+=w;if(/compact|espeak|eloquence|novelty|bells|whisper|zarvox|bad news|good news|jester|organ|trinoids|albert|bahh|boing|bubbles|cellos|wobble|superstar|fred|junior|ralph/i.test(v.name))s-=8;return s}
+function voicesFor(code){if(!code)return[];const base=code.split("-")[0].toLowerCase();
+  return voices.filter(v=>{const l=v.lang.toLowerCase().replace("_","-");return l===base||l.startsWith(base+"-")}).sort((a,b)=>voiceScore(b,code)-voiceScore(a,code))}
+function voiceFor(code){const list=voicesFor(code);if(!list.length)return null;const want=S.prefs?.voiceNames?.[code];return list.find(v=>v.name===want)||list[0]}
+let speakToken=0;
+function stopSpeaking(){speakToken++;try{synth&&synth.cancel()}catch{}setFace("")}
+function speak(segments){
+  const tok=++speakToken;
+  if(!synth||!S.prefs?.voice)return Promise.resolve();
+  try{synth.cancel()}catch{}
+  const rate=S.prefs.rate||1;
+  return segments.reduce((p,seg)=>p.then(()=>new Promise(res=>{
+    if(tok!==speakToken||!seg.text)return res();
+    const code=seg.lang==="target"?langCode(S.profile.target):langCode(S.profile.native);
+    const u=new SpeechSynthesisUtterance(seg.text);
+    const v=voiceFor(code); if(v)u.voice=v; if(code)u.lang=code;
+    u.rate=(seg.lang==="target"?(seg.slow?0.75:0.95):1)*rate; u.pitch=1;
+    u.onstart=()=>setFace("speaking"); u.onend=u.onerror=()=>res();
+    setTimeout(res,Math.max(4000,seg.text.length*140)); // guard against a stuck engine
+    synth.speak(u);
+  })),Promise.resolve()).finally(()=>{if(tok===speakToken)setFace("")});
+}
+function setFace(c){const f=$(".face");if(f)f.className="face"+(c?" "+c:"")}
+
+/* ---------- Speech in ---------- */
+const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null, listening=false, micBlocked=!SR, dictTimer=null;
+// Device voice typing works inside claude.ai even though the page itself can't open the mic
+const DICTATE=/iPhone|iPad|Android/i.test(navigator.userAgent)?"tap the microphone on your keyboard":/Mac/i.test(navigator.platform||navigator.userAgent)?"press the Fn key twice (or 🎤 on the keyboard) to start Dictation":"press Windows key + H to start voice typing";
+function listen(){
+  if(micBlocked||listening)return;
+  const box=$("#answer");
+  try{
+    rec=new SR();
+    rec.lang=(S.prefs?.speakIn==="native")?langCode(S.profile.native):langCode(S.profile.target);
+    rec.interimResults=true; rec.continuous=false;
+    let finalText="";
+    rec.onresult=e=>{let t="";for(const r of e.results)t+=r[0].transcript;box.value=t;if(e.results[e.results.length-1].isFinal)finalText=t};
+    rec.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){micBlocked=true;renderDock()}};
+    rec.onend=()=>{listening=false;setFace("");$("#micBtn")?.classList.remove("on");if(finalText.trim()&&S.prefs?.autoSend!==false)send(finalText.trim())};
+    stopSpeaking(); rec.start(); listening=true; setFace("listening"); $("#micBtn")?.classList.add("on");
+  }catch{micBlocked=true;listening=false;renderDock()}
+}
+function stopListen(){try{rec&&rec.stop()}catch{}}
+
+/* ---------- Claude ---------- */
+let samplePromise=null;
+function getSample(){return samplePromise||(samplePromise=(window.claude?claude.use("sample"):Promise.resolve(null)).then(s=>s||apiSample()))}
+const KEY_NAME="professorlingua.apikey";
+function getKey(){try{return localStorage.getItem(KEY_NAME)||""}catch{return ""}}
+function setKey(k){try{k?localStorage.setItem(KEY_NAME,k):localStorage.removeItem(KEY_NAME)}catch{}}
+function apiSample(){
+  const call=async(input,opts={})=>{
+    const key=getKey(); if(!key)throw{code:"no_key"};
+    const msgs=[];for(const t of input){const last=msgs[msgs.length-1];if(last&&last.role===t.role)last.content+="\n\n"+t.content;else msgs.push({role:t.role,content:t.content})}
+    let res;
+    try{res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal:opts.signal,
+      headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:opts.modelTier==="default"?"claude-sonnet-5-5":"claude-haiku-5-5",max_tokens:1500,messages:msgs})})}
+    catch(e){throw{code:e&&e.name==="AbortError"?"cancelled":"upstream_error"}}
+    if(res.status===401||res.status===403)throw{code:"bad_key"};
+    if(res.status===429)throw{code:"rate_limited"};
+    if(!res.ok)throw{code:"upstream_error"};
+    const j=await res.json();return(j.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("");
+  };
+  return{api:true,json:async(input,opts)=>{const t=await call(input,opts);const m=t.match(/\{[\s\S]*\}/);if(!m)throw{code:"invalid_json"};try{return JSON.parse(m[0])}catch{throw{code:"invalid_json"}}}};
+}
+function showKeyForm(msg){
+  const log=$("#log");if(!log)return;
+  const inp=h("input",{id:"apiKey",type:"password",placeholder:"sk-ant-…",autocomplete:"off",style:"flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)"});
+  const box=h("div",{class:"notice",style:"display:flex;flex-direction:column;gap:8px;color:var(--ink)"},
+    h("span",{},msg),
+    h("div",{style:"display:flex;gap:8px"},inp,h("button",{class:"btn primary",onclick:()=>{const k=inp.value.trim();if(!k)return;setKey(k);box.remove();teacherTurn(null)}},"Save key")),
+    h("span",{style:"color:var(--muted)"},"Get a key at console.anthropic.com. It is saved only in this browser."));
+  log.append(box);box.scrollIntoView({block:"end"});inp.focus();
+}
+
+function rules(){
+  const p=S.profile, lv=LEVELS.find(l=>l.id===p.level), tname=S.teachers[p.target];
+  const isFree=lesson.mode==="free";
+  const hw=S.homework[p.target];
+  const done=LESSONS.filter(l=>S.progress[p.target]?.[l.id]?.done).map(l=>l.title);
+  return `You are ${tname?tname+",":"a"} a real, experienced ${p.target} teacher teaching a live class to one student, face to face, in a school classroom. Speak in first person as that teacher at all times. Be warm, encouraging, a little playful, and structured like a good school teacher: you lead, you ask questions, you wait for answers, you correct gently and make the student try again. Never say you are an AI or a program.${tname?"":` Pick a believable first and last name typical for a native ${p.target} teacher and introduce yourself with it (e.g. "I'm Señora Ruiz").`}
+
+Student: native language ${p.native}; level ${lv.name} (${lv.cefr}). ${lv.ratio}
+Lessons already completed: ${done.length?done.join("; "):"none yet"}.
+${hw?`Last homework given: "${hw.text}" (from "${hw.lesson}"). In the warm-up, briefly check it.`:""}
+${isFree
+? `Today is an open conversation session ("office hours"). Chat naturally about the student's life and interests at their level, slip in useful vocabulary on the board, and correct important mistakes as you go. Use phase "conversation" throughout; use "homework" only if the student wants to finish.`
+: `Today's lesson: "${lesson.title}" — goal: ${lesson.goal}. Course level for this unit: ${lesson.lvl}.
+Run the class in these phases, in order, advancing when the student is ready: warmup (greet, roll call, quick review) → teach (present 4-8 new items on the board with pronunciation help) → drill (say one item, the student repeats it aloud; check, then next) → practice (ask questions the student answers using the new material) → conversation (a short role-play or real conversation using it) → quiz (3-5 quick questions, one at a time; award points) → homework (assign one short task, praise effort, say goodbye). Then set phase "done".`}
+
+How to talk:
+- Keep each turn SHORT, like real speech in class: 1-4 sentences, then hand the floor to the student with one clear question or instruction. Never deliver a lecture.
+- The student's replies come from speech recognition or typing: ignore missing accents, punctuation and capitals; judge what they said, not how it was spelled. Romanized input is fine for non-Latin scripts.
+- When they make a mistake: say what was good, model the correct form, ask them to try again. Move on after two tries.
+- If they ask for slower, repeat, or translation, do it.
+- Put words you introduce on the board. Keep the board focused on the current topic; return the full board each time (or null to keep it unchanged).
+- In "speech", split your words into segments by language so each is pronounced by the right voice. Mark target-language words the student must imitate with "slow": true.
+- For non-Latin scripts, give a romanization in "pron".
+
+Reply with ONLY one JSON object, no other text:
+{"teacher_name": string, "speech":[{"lang":"target"|"native","text":string,"slow"?:boolean}], "board": null | {"title":string,"lines":[{"target":string,"pron":string,"native":string}]}, "awaiting":"repeat"|"answer"|"free"|"none", "expected": string|null, "feedback": null | {"correct":boolean,"note":string}, "points": 0|1, "phase":"warmup"|"teach"|"drill"|"practice"|"conversation"|"quiz"|"homework"|"done", "homework": string|null}
+"feedback" judges the student's LAST reply (null if there was nothing to judge). "points" is 1 only for a correct quiz or practice answer.`;
+}
+
+async function teacherTurn(studentText){
+  const sample=await getSample();
+  if(studentText!=null)lesson.turns.push({role:"user",content:studentText});
+  else if(lesson.turns.length&&lesson.turns[lesson.turns.length-1].role==="assistant")lesson.turns.push({role:"user",content:"[continue]"});
+  const turns=lesson.turns.slice(-30);
+  if(turns[0]?.role!=="user")turns.shift();
+  const input=[{role:"user",content:rules()+"\n\n(Class begins now. Speak first.)"},{role:"assistant",content:"Understood."},...turns.length?turns:[{role:"user",content:"[The student walks into the classroom and sits down.]"}]];
+  if(input[input.length-1].role!=="user")input.push({role:"user",content:"[continue]"});
+  busy=true; ctl=new AbortController(); renderDock();
+  const th=h("div",{class:"thinking"},(S.teachers[S.profile.target]||"The teacher")+" is thinking…");
+  $("#log").append(th); th.scrollIntoView({block:"end"});
+  try{
+    const r=await sample.json(input,{signal:ctl.signal,cache:false,modelTier:S.prefs?.depth==="thorough"?"default":"quick"});
+    th.remove();
+    if(!r||typeof r!=="object"||!Array.isArray(r.speech))throw{code:"invalid_json"};
+    if(!turns.length)lesson.turns.push({role:"user",content:"[The student walks into the classroom and sits down.]"});
+    lesson.turns.push({role:"assistant",content:JSON.stringify(r)});
+    applyTurn(r);
+  }catch(e){
+    th.remove();
+    if(studentText!=null&&lesson.turns[lesson.turns.length-1]?.content===studentText)lesson.turns.pop();
+    const c=e&&e.code;
+    if(c==="cancelled"){}
+    else if(c==="no_key")showKeyForm("To bring Professor Lingua into class, paste your Anthropic API key.");
+    else if(c==="bad_key"){setKey("");showKeyForm("That API key was refused. Paste a valid key to continue.")}
+    else if(c==="not_granted"||c==="sampling_disabled")showNotice("The teacher needs permission to use Claude on your account. Reload and choose Allow when asked.");
+    else if(c==="rate_limited")showNotice("Too many requests right now. Wait a minute, then send your answer again.");
+    else showNotice("The teacher didn't catch that. Send your answer again.");
+  }finally{busy=false;renderDock()}
+}
+
+function applyTurn(r){
+  const p=S.profile;
+  if(r.teacher_name&&!S.teachers[p.target]){S.teachers[p.target]=String(r.teacher_name).slice(0,60);save();renderTeacher()}
+  if(r.board&&Array.isArray(r.board.lines))lesson.board=r.board;
+  if(r.phase)lesson.phase=String(r.phase);
+  lesson.awaiting=r.awaiting||"answer"; lesson.expected=r.expected||null;
+  if(r.points===1)lesson.score++;
+  if(r.feedback&&typeof r.feedback.correct==="boolean"){lesson.asked++;if(r.feedback.correct)lesson.right++}
+  // annotate my last bubble with feedback
+  if(r.feedback&&r.feedback.note){const mine=[...document.querySelectorAll(".msg.me")].pop();if(mine)mine.append(h("div",{class:"fb "+(r.feedback.correct?"ok":"no")},(r.feedback.correct?"✓ ":"↻ ")+r.feedback.note))}
+  addTeacherMsg(r.speech);
+  renderBoard(); renderScore();
+  if(r.homework){S.homework[p.target]={text:String(r.homework),lesson:lesson.title};save()}
+  if(lesson.phase==="done"||lesson.phase==="homework")finishLessonRecord();
+  speak(r.speech).then(()=>{if(!lesson||busy||!["repeat","answer","free"].includes(lesson.awaiting))return;
+    if(micBlocked)$("#answer")?.focus({preventScroll:true});else if(S.prefs?.autoListen)listen()});
+}
+
+function finishLessonRecord(){
+  if(lesson.mode==="free"||lesson.recorded)return;
+  const t=S.profile.target;S.progress[t]=S.progress[t]||{};
+  const pct=lesson.asked?lesson.right/lesson.asked:1;
+  S.progress[t][lesson.id]={done:true,pct:Math.round(pct*100),points:lesson.score,date:new Date().toISOString().slice(0,10)};
+  lesson.recorded=true; save();
+}
+const gradeOf=pct=>pct>=90?"A":pct>=80?"B":pct>=65?"C":"D";
+
+/* ---------- Views ---------- */
+function render(){
+  const app=$("#app"); app.replaceChildren();
+  renderTop();
+  if(view==="enroll")app.append(enrollView());
+  else if(view==="syllabus")app.append(syllabusView());
+  else app.append(classView());
+}
+function renderTop(){
+  const t=$("#topbar"); t.replaceChildren();
+  $("#crestSub").textContent=S.profile?`${S.profile.target} · ${LEVELS.find(l=>l.id===S.profile.level).name}`:"Language school";
+  if(view==="class")t.append(h("button",{class:"btn",onclick:leaveClass},"Leave class"));
+  if(view==="syllabus")t.append(h("button",{class:"btn",onclick:()=>{view="enroll";render()}},"Change language or level"));
+}
+
+function enrollView(){
+  const p=S.profile||{target:"Spanish",native:"English",level:"beginner"};
+  let level=p.level;
+  const opts=(sel)=>LANGS.map(([n])=>h("option",{value:n,selected:n===sel},n));
+  const tgt=h("select",{id:"tgt"},opts(p.target)), nat=h("select",{id:"nat"},opts(p.native));
+  const other=h("input",{id:"tgtOther",placeholder:"Any other language, e.g. Yoruba",value:LANGS.some(l=>l[0]===p.target)?"":p.target});
+  const lv=h("div",{class:"levels",role:"group","aria-label":"Level"},LEVELS.map(l=>h("button",{type:"button","aria-pressed":String(l.id===level),onclick:e=>{level=l.id;lv.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b===e.currentTarget)))}},h("b",{},l.name),h("span",{},l.cefr))));
+  return h("section",{class:"enroll"},
+    h("div",{class:"intro"},
+      h("span",{class:"eyebrow",style:"color:var(--chalk-dim)"},"Enrollment office"),
+      h("h1",{},"Welcome to class."),
+      h("p",{},"Your teacher talks to you out loud, listens to your answers and teaches the way school does: ",h("span",{class:"yl"},"warm-up, new words on the board, repeat after me, practice, conversation, a quiz and homework.")),
+      h("p",{},"Four terms, 26 lessons, beginner to upper-intermediate. Or drop in for open conversation any time.")),
+    h("form",{class:"panel form",onsubmit:e=>{e.preventDefault();
+        const target=other.value.trim()||tgt.value;
+        S.profile={target,native:nat.value,level};S.prefs=Object.assign({voice:true,autoListen:true,autoSend:true,rate:1,speakIn:"target",depth:"fast"},S.prefs||{});
+        save();view="syllabus";render()}},
+      h("h2",{},"Your timetable"),
+      h("div",{class:"field"},h("label",{for:"tgt"},"I want to learn"),tgt),
+      h("div",{class:"field"},h("label",{for:"tgtOther"},"Not listed? Type it"),other),
+      h("div",{class:"field"},h("label",{for:"nat"},"My native language"),nat),
+      h("div",{class:"field"},h("label",{},"My level"),lv),
+      h("button",{class:"btn primary",type:"submit"},"Enroll and see the syllabus")));
+}
+
+function syllabusView(){
+  const t=S.profile.target, prog=S.progress[t]||{};
+  const done=LESSONS.filter(l=>prog[l.id]?.done);
+  const avg=done.length?Math.round(done.reduce((a,l)=>a+prog[l.id].pct,0)/done.length):null;
+  const next=LESSONS.find(l=>!prog[l.id]?.done)||LESSONS[0];
+  const hw=S.homework[t];
+  return h("section",{style:"display:flex;flex-direction:column;gap:18px"},
+    h("div",{class:"syl-head"},
+      h("div",{},h("span",{class:"eyebrow"},"Syllabus and report card"),h("h1",{},`${t} with ${S.teachers[t]||"your teacher"}`)),
+      h("div",{class:"stats"},
+        h("div",{},h("b",{},`${done.length}/${LESSONS.length}`),h("span",{},"Lessons done")),
+        h("div",{},h("b",{},avg==null?"—":gradeOf(avg)),h("span",{},"Average grade")))),
+    h("div",{class:"toolbar"},
+      h("button",{class:"btn primary",onclick:()=>startLesson(next)},`Start lesson ${next.n}: ${next.title}`),
+      h("button",{class:"btn",onclick:()=>startLesson(null)},"Open conversation")),
+    hw?h("div",{class:"homework"},h("span",{class:"eyebrow"},`Homework from “${hw.lesson}”`),h("p",{},hw.text)):null,
+    h("div",{class:"terms"},TERMS.map(term=>h("div",{class:"panel term"},
+      h("h3",{},term.name,h("span",{},term.lvl)),
+      LESSONS.filter(l=>l.term===term.name).map(l=>{const g=prog[l.id];
+        return h("button",{class:"lesson",onclick:()=>startLesson(l),title:l.goal},
+          h("span",{class:"num"},String(l.n).padStart(2,"0")),h("span",{class:"lt"},l.title),
+          g?.done?h("span",{class:"grade "+gradeOf(g.pct)},gradeOf(g.pct)):h("span",{class:"grade none"},"—"))})))));
+}
+
+function startLesson(l){
+  stopSpeaking();
+  lesson=l?{...l,mode:"lesson",turns:[],phase:"warmup",score:0,asked:0,right:0,board:null}
+          :{id:"free",title:"Open conversation",goal:"Free talk",mode:"free",turns:[],phase:"conversation",score:0,asked:0,right:0,board:null};
+  view="class"; render(); teacherTurn(null);
+}
+function leaveClass(){stopSpeaking();stopListen();ctl?.abort();lesson=null;view="syllabus";render()}
+
+function classView(){
+  const tn=S.teachers[S.profile.target];
+  return h("section",{class:"room"},
+    h("div",{class:"board",id:"board"}),
+    h("div",{class:"desk"},
+      h("div",{class:"teacher",id:"teacherRow"}),
+      h("div",{class:"log",id:"log","aria-live":"polite"}),
+      h("div",{class:"dock",id:"dock"}),
+      h("div",{class:"toolbar",id:"prefs"})));
+}
+function renderTeacher(){
+  const r=$("#teacherRow");if(!r)return;
+  const tn=S.teachers[S.profile.target];
+  const ini=tn?tn.replace(/^(Se[ñn]or[a]?|Mme\.?|M\.|Frau|Herr|Prof\.?|Sensei|Signora|Signor)\s+/i,"").split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase():"?";
+  r.replaceChildren(h("div",{class:"face"},ini),
+    h("div",{class:"who"},h("b",{},tn||"Your teacher"),h("span",{},`${S.profile.target} teacher · ${lesson.mode==="free"?"Open conversation":"Lesson "+lesson.n}`)),
+    h("div",{class:"score",id:"score"}));
+  renderScore();
+}
+function renderScore(){const s=$("#score");if(!s||!lesson)return;s.replaceChildren(h("b",{},String(lesson.score)),h("span",{},"Points"))}
+function renderBoard(){
+  const b=$("#board");if(!b||!lesson)return;
+  const d=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+  const bd=lesson.board;
+  const pi=PHASES.findIndex(p=>p[0]===lesson.phase);
+  b.replaceChildren(
+    h("div",{class:"date"},h("span",{},d),h("span",{},lesson.mode==="free"?"Office hours":`Unit ${lesson.n} · ${lesson.lvl}`)),
+    h("h2",{},bd?.title||lesson.title),
+    bd&&bd.lines?.length?h("ul",{},bd.lines.slice(0,12).map(L=>h("li",{},h("button",{onclick:()=>speak([{lang:"target",text:L.target,slow:true}]),"aria-label":"Hear "+L.target},
+      h("span",{class:"t"},L.target||""),L.pron&&L.pron!==L.target?h("span",{class:"p"},L.pron):null,L.native?h("span",{class:"n"},"= "+L.native):null))))
+      :h("p",{class:"empty"},lesson.mode==="free"?"New words from our chat will go up here.":lesson.goal),
+    lesson.mode==="free"?null:h("div",{class:"phases"},PHASES.map((p,i)=>h("span",{class:i===pi?"on":(i<pi||lesson.phase==="done")?"past":""},p[1]))));
+}
+function addTeacherMsg(speech){
+  const log=$("#log");if(!log)return;
+  const body=h("div",{class:"body"},speech.map(s=>h("span",{class:s.lang==="target"?"tl":"",lang:s.lang==="target"?langCode(S.profile.target)||null:null},s.text+" ")));
+  const m=h("div",{class:"msg"},h("span",{class:"who"},S.teachers[S.profile.target]||"Teacher"),body,
+    h("button",{class:"replay",onclick:()=>speak(speech)},"▶ Hear again"),
+    h("button",{class:"replay",onclick:()=>speak(speech.map(s=>({...s,slow:true})))},"▶ Slower"));
+  log.append(m); m.scrollIntoView({block:"end",behavior:"smooth"});
+}
+function addMyMsg(text){
+  const log=$("#log");const m=h("div",{class:"msg me"},h("span",{class:"who",style:"align-self:flex-end"},"You"),h("div",{class:"body"},text));
+  log.append(m);m.scrollIntoView({block:"end"});
+}
+function showNotice(t){const log=$("#log");if(!log)return;const n=h("div",{class:"notice"},t);log.append(n);n.scrollIntoView({block:"end"})}
+
+function send(text){
+  text=(text||"").trim(); if(!text||busy||!lesson)return;
+  stopSpeaking(); addMyMsg(text); const box=$("#answer"); if(box)box.value="";
+  teacherTurn(text);
+}
+const micSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function renderDock(){
+  const d=$("#dock");if(!d||!lesson)return;
+  const hint={repeat:"Say it back: ",answer:"Your turn to answer.",free:"Talk to your teacher.",none:"Listen…"}[lesson.awaiting||"answer"]||"";
+  const draft=$("#answer")?.value||"";
+  const box=h("textarea",{id:"answer",rows:"1",placeholder:micBlocked?"Type your answer and press Enter":"Speak with the mic, or type here",
+    onkeydown:e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send(box.value)}},
+    oninput:()=>{clearTimeout(dictTimer);if(S.prefs.dictation&&box.value.trim())dictTimer=setTimeout(()=>send(box.value),2200)}});
+  box.value=draft;
+  const mic=h("button",{class:"mic"+(listening?" on":""),id:"micBtn",type:"button","aria-label":listening?"Stop listening":"Speak your answer",disabled:micBlocked||busy,onclick:()=>listening?stopListen():listen()});
+  mic.innerHTML=micSvg;
+  const say=t=>()=>send(t);
+  d.replaceChildren(
+    h("div",{class:"prompt-hint"},busy?"":hint,lesson.awaiting==="repeat"&&lesson.expected?h("b",{},lesson.expected):null),
+    h("div",{class:"inrow"},mic,box,h("button",{class:"btn primary",disabled:busy,onclick:()=>send(box.value)},"Send")),
+    h("div",{class:"quick"},
+      h("button",{onclick:say("Could you repeat that, please?")},"Repeat that"),
+      h("button",{onclick:say("Could you say it more slowly?")},"Slower"),
+      h("button",{onclick:say("I don't understand. Can you explain in my language?")},"I don't understand"),
+      h("button",{onclick:say("How do you say this in "+S.profile.target+"? ")},"How do I say…"),
+      lesson.mode!=="free"?h("button",{onclick:say("I'm ready for the next part.")},"Next part"):null,
+      busy?h("button",{onclick:()=>ctl?.abort()},"Stop"):null),
+    micBlocked?h("div",{class:"notice",style:"border-color:var(--line)"},!SR?"This browser has no speech recognition. Open Professor Lingua in Microsoft Edge or Google Chrome to answer by voice. For now, type your answers.":window.claude?h("span",{style:"display:flex;flex-direction:column;gap:6px;color:var(--ink)"},
+      h("span",{},h("b",{},"Answer by voice: "),"click in the answer box, then ",DICTATE,". Set your device's dictation language to ",S.prefs.speakIn==="native"?S.profile.native:S.profile.target," to be understood."),
+      h("label",{style:"display:flex;gap:6px;align-items:center"},h("input",{type:"checkbox",id:"pref-dictation",checked:!!S.prefs.dictation,onchange:e=>{S.prefs.dictation=e.target.checked;save()}}),"Send my answer automatically when I stop talking")):"The microphone is blocked. Allow microphone access for this page in your browser's address bar, then reload."):null);
+  if(!busy&&micBlocked)box.focus({preventScroll:true});
+}
+function renderPrefs(){
+  const p=$("#prefs");if(!p)return;S.prefs=S.prefs||{};
+  const chk=(k,label)=>h("label",{},h("input",{type:"checkbox",id:"pref-"+k,checked:S.prefs[k]!==false,onchange:e=>{S.prefs[k]=e.target.checked;if(k==="voice"&&!e.target.checked)stopSpeaking();save()}}),label);
+  const sel=(k,label,opts)=>h("label",{},label,h("select",{id:"pref-"+k,onchange:e=>{S.prefs[k]=e.target.value;save()}},opts.map(([v,t])=>h("option",{value:v,selected:String(S.prefs[k]??opts[0][0])===v},t))));
+  const tv=voiceFor(langCode(S.profile.target));
+  const vpick=(code,label)=>{const list=voicesFor(code);if(list.length<2)return null;const cur=voiceFor(code);
+    return h("label",{},label,h("select",{id:"voice-"+code,onchange:e=>{S.prefs.voiceNames=Object.assign({},S.prefs.voiceNames,{[code]:e.target.value});save();speak([{lang:code===langCode(S.profile.target)?"target":"native",text:code===langCode(S.profile.target)?(lesson?.board?.lines?.[0]?.target||S.profile.target):"Hello, this is my voice."}])}},
+      list.map(v=>h("option",{value:v.name,selected:v===cur},v.name.replace(/^(Microsoft|Google)\s+/,"").replace(/\s*\(.*?\)\s*$/,"")+(/natural|neural|premium|enhanced/i.test(v.name)?" ★":"")))))};
+  p.replaceChildren(chk("voice","Teacher speaks"),micBlocked?null:chk("autoListen","Listen after teacher"),
+    sel("speakIn","I'm speaking",[["target",S.profile.target],["native",S.profile.native]]),
+    vpick(langCode(S.profile.target),S.profile.target+" voice"),
+    S.profile.native!==S.profile.target?vpick(langCode(S.profile.native),S.profile.native+" voice"):null,
+    sel("rate","Speed",[["1","Normal"],["0.85","Slow"],["1.15","Fast"]]),
+    sel("depth","Teacher",[["fast","Quick replies"],["thorough","Thoughtful replies"]]),
+    synth&&voices.length&&!tv?h("span",{class:"prompt-hint"},`No ${S.profile.target} voice on this device, so the text is shown instead. Microsoft Edge has natural voices for most languages.`):null);
+}
+const _cv=classView; classView=function(){const el=_cv();queueMicrotask(()=>{renderTeacher();renderBoard();renderDock();renderPrefs()});return el};
+
+/* ---------- Boot ---------- */
+loadLocal();
+S.prefs=Object.assign({voice:true,autoListen:true,autoSend:true,rate:1,speakIn:"target",depth:"fast"},S.prefs||{});S.prefs.rate=Number(S.prefs.rate)||1;
+view=S.profile?"syllabus":"enroll";
+render(); initDb();
+})();
+</script>
+
+</body></html>

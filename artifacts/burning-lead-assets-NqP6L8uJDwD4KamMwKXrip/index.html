@@ -1,0 +1,154 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Burning Lead Assets</title>
+<style>
+:root{--bg:#14110f;--panel:#1f1a17;--line:#3a302a;--text:#efe6dc;--muted:#a8978a;--accent:#ff7a2a;--accent2:#ffb347}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f4efe9;--panel:#fff;--line:#e2d6ca;--text:#2a201a;--muted:#75655a;--accent:#d2561a;--accent2:#b8751f}}
+:root[data-theme="dark"]{--bg:#14110f;--panel:#1f1a17;--line:#3a302a;--text:#efe6dc;--muted:#a8978a;--accent:#ff7a2a;--accent2:#ffb347}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:.5px}
+h1 span{color:var(--accent)}
+h2{font-size:18px;margin:36px 0 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+p.lead{color:var(--muted);margin:0 0 8px;max-width:760px}
+.grid{display:grid;gap:12px}
+.audio{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.fx{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.tex{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+button.play{width:100%;display:flex;align-items:center;gap:10px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;font:inherit;text-align:left}
+button.play:hover{border-color:var(--accent)}
+button.play.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+button.play i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#fff;font-style:normal;font-size:12px}
+button.play b{display:block;font-weight:600;font-size:14px}
+button.play small{color:var(--muted);font-size:12px}
+canvas{display:block;width:100%;border-radius:8px;background:#2b3138}
+.name{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;margin-top:8px;word-break:break-all}
+.meta{color:var(--muted);font-size:12.5px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 0}
+.row label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+a{color:var(--accent2)}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 14px;color:var(--muted);font-size:14px;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>Burning Lead <span>asset pack</span></h1>
+<p class="lead">Deep explosion booms with no high crack, weapon sounds, explosion flipbooks and tileable 1024&nbsp;px textures with normal maps. Every file below is in the pack under the same name.</p>
+
+<h2>Explosions</h2>
+<div class="grid audio" id="booms"></div>
+<h2>Weapons</h2>
+<div class="grid audio" id="weapons"></div>
+
+<h2>Squad voices <span class="meta">(4 male voices, radio or room, shouted)</span></h2>
+<div class="row"><label><input type="checkbox" id="vrand"> Play a random line from the group</label></div>
+<div id="voices" style="margin-top:12px"></div>
+
+<h2>Explosion flipbooks <span class="meta">(8&times;8 frames, 128&nbsp;px each, PNG with alpha)</span></h2>
+<div class="row"><label><input type="checkbox" id="add"> Additive blend for the fireball</label><label>Speed <input type="range" id="fps" min="10" max="60" value="30"> <span id="fpsv">30</span>&nbsp;fps</label><button id="kaboom" class="play" style="width:auto;padding:6px 12px"><i>&#9654;</i>Fire all with boom_large_1</button></div>
+<div class="grid fx" id="fx" style="margin-top:12px"></div>
+
+<h2>Textures <span class="meta">(move the pointer over a swatch to move the light)</span></h2>
+<div class="grid tex" id="tex"></div>
+
+<div class="note">Voices are neural text-to-speech (Piper; voices Joe, CC0, and Norman, John and Bryce, public domain), so they're free to use commercially. They were pitched down, compressed and saturated, and half go through a radio band-pass, the rest a short room. Every call-out was checked with speech recognition. The grunts and death sounds are spoken interjections, so they're less raw than a recorded actor.</div>
+</main>
+<script>
+const BOOMS=[['boom_small_1','Grenade',2.2],['boom_small_2','Grenade',2.5],['boom_small_3','Grenade',2.1],['boom_large_1','Fuel barrel / rocket',3.8],['boom_large_2','Fuel barrel / rocket',4.2],['boom_large_3','Fuel barrel / rocket',3.4],['boom_huge_1','Boss, layered collapse',5.9],['boom_distant_1','Distant, muffled',3.7],['boom_distant_2','Distant, muffled',4.1]];
+const WEAPONS=[['rifle_shot','Rifle',1.0],['shotgun_blast','Shotgun',1.5],['rocket_launch','Rocket launch',2.4],['reload_clicks','Reload',1.2]];
+let cur=null;
+const byGroup={};
+function playBtn(host,[id,label,d],src,extra,group){
+  const b=document.createElement('button');b.className='play';
+  b.innerHTML=`<i>&#9654;</i><span><b>${label}</b><small class="name" style="display:block;margin:0">${id}.mp3</small><small>${d.toFixed(1)} s${extra?' · '+extra:''}</small></span>`;
+  const a=new Audio(src||`audio/${id}.mp3`);a.preload='none';
+  if(group)(byGroup[group]=byGroup[group]||[]).push(b);
+  a.onended=()=>{b.classList.remove('on');b.querySelector('i').innerHTML='&#9654;'};
+  b.onclick=(ev)=>{ if(group&&ev.isTrusted&&document.getElementById('vrand').checked){const g=byGroup[group];const o=g[Math.floor(Math.random()*g.length)];if(o!==b){o.click();return}}
+    if(cur&&cur!==a){cur.pause();cur.currentTime=0;cur.onended()}
+    if(!a.paused){a.pause();a.currentTime=0;a.onended();return}
+    cur=a;a.currentTime=0;a.play();b.classList.add('on');b.querySelector('i').innerHTML='&#9632;'};
+  host.appendChild(b);
+}
+const VOICE=[["contact_0", "Contact front!", "Joe", "room", 0.85], ["contact_1", "Contact contact!", "Norman", "radio", 1.03], ["contact_2", "Tango spotted!", "John", "room", 1.17], ["contact_3", "Eyes on, twelve o'clock!", "Bryce", "radio", 1.87], ["contact_4", "Light him up!", "John", "room", 1.05], ["reload_0", "Reloading!", "Norman", "radio", 0.55], ["reload_1", "Changing mags cover me!", "Bryce", "room", 1.66], ["reload_2", "Mag out!", "John", "radio", 0.73], ["frag_0", "Frag out!", "Bryce", "room", 0.89], ["frag_1", "Frag out frag out!", "Joe", "radio", 1.42], ["frag_2", "Fire in the hole!", "Joe", "room", 0.8], ["frag_3", "Grenade out, take cover!", "Norman", "radio", 1.66], ["grenade_0", "Grenade! Get down!", "Joe", "room", 1.31], ["grenade_1", "Incoming frag!", "Bryce", "radio", 1.08], ["grenade_2", "Hit the deck!", "John", "room", 0.79], ["hit_0", "I'm hit!", "Joe", "radio", 0.51], ["hit_1", "Taking fire!", "Norman", "room", 0.76], ["hit_2", "I'm hit I'm hit!", "John", "radio", 1.07], ["down_0", "Man down!", "Bryce", "room", 0.89], ["down_1", "We lost one!", "Norman", "radio", 0.87], ["down_2", "Corpsman!", "John", "room", 0.99], ["flank_0", "Flanking left!", "Norman", "radio", 0.84], ["flank_1", "Moving up!", "Joe", "room", 0.56], ["flank_2", "Pushing the flank!", "Bryce", "radio", 1.11], ["lost_0", "Lost visual!", "Norman", "room", 0.96], ["lost_1", "Where'd he go?", "Joe", "radio", 0.65], ["lost_2", "Sweep the area!", "John", "room", 1.13], ["death_0", "Aaagh!", "Bryce", "room", 0.57], ["death_1", "Ugh.", "Joe", "room", 0.39], ["death_2", "Aaargh!", "Bryce", "room", 0.6], ["death_3", "Uhhh.", "John", "room", 0.61], ["death_4", "Argh!", "Bryce", "room", 0.5], ["death_5", "Nngh, aah.", "Joe", "room", 1.34], ["death_6", "Hugh!", "Norman", "room", 0.45], ["death_7", "Ahhh.", "John", "room", 0.56], ["pain_0", "Ugh!", "Bryce", "room", 0.39], ["pain_1", "Agh!", "Joe", "room", 0.28], ["pain_2", "Nngh!", "Norman", "room", 0.9], ["pain_3", "Oof!", "John", "room", 0.41], ["pain_4", "Hah!", "Bryce", "room", 0.4], ["pain_5", "Argh!", "Joe", "room", 0.35]];
+const GROUPS={contact:'Contact',reload:'Reload',frag:'Frag out',grenade:'Incoming grenade',hit:'Hit',down:'Man down',flank:'Flank',lost:'Lost contact',pain:'Pain grunts',death:'Death grunts'};
+for(const g in GROUPS){const items=VOICE.filter(v=>v[0].replace(/_\d+$/,'')===g);
+  const box=document.createElement('div');box.innerHTML=`<h3 style="font-size:15px;margin:16px 0 8px">${GROUPS[g]} <span class="meta">(${g}_0..${items.length-1})</span></h3>`;
+  const grid=document.createElement('div');grid.className='grid audio';box.appendChild(grid);document.getElementById('voices').appendChild(box);
+  items.forEach(([id,text,voice,fx,d])=>{playBtn(grid,[id,`${text}`,d],`voice/${id}.mp3`,`${voice} · ${fx}`,g)});}
+BOOMS.forEach(x=>playBtn(document.getElementById('booms'),x));
+WEAPONS.forEach(x=>playBtn(document.getElementById('weapons'),x));
+
+// flipbooks
+const FX=[['fx_fireball_8x8','Fireball: white-hot to orange to smoke'],['fx_smoke_8x8','Billowing smoke puff, lit from above'],['fx_sparks_8x8','Sparks and debris']];
+const books=[];let fps=30,additive=false;
+FX.forEach(([id,label])=>{
+  const c=document.createElement('div');c.className='card';
+  const cv=document.createElement('canvas');cv.width=256;cv.height=256;
+  c.appendChild(cv);c.insertAdjacentHTML('beforeend',`<div class="name">${id}.png</div><div class="meta">${label}</div>`);
+  document.getElementById('fx').appendChild(c);
+  const img=new Image();img.src=`fx/${id}.png`;
+  books.push({id,cv,ctx:cv.getContext('2d'),img,t0:performance.now()});
+});
+function bg(ctx,w,h){const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#3d4652');g.addColorStop(1,'#22272e');ctx.fillStyle=g;ctx.fillRect(0,0,w,h)}
+function drawFrame(ctx,img,k,x,y,s,comp){ctx.globalCompositeOperation=comp||'source-over';ctx.drawImage(img,(k%8)*128,Math.floor(k/8)*128,128,128,x,y,s,s);ctx.globalCompositeOperation='source-over'}
+let burst=null;
+function tick(now){
+  for(const b of books){ if(!b.img.complete||!b.img.naturalWidth)continue;
+    const {ctx,cv}=b;bg(ctx,cv.width,cv.height);
+    if(burst){const k=Math.floor((now-burst)/1000*fps);
+      if(k<64){ if(b.id==='fx_fireball_8x8'){drawFrame(ctx,books[1].img,Math.max(0,k-6),0,0,256);drawFrame(ctx,b.img,k,0,0,256,additive?'lighter':null);drawFrame(ctx,books[2].img,k,0,0,256)}
+        else drawFrame(ctx,b.img,k,0,0,256);continue}
+    }
+    const k=Math.floor((now-b.t0)/1000*fps)%72; if(k<64)drawFrame(ctx,b.img,k,0,0,256,(additive&&b.id==='fx_fireball_8x8')?'lighter':null);
+  }
+  if(burst&&(now-burst)/1000*fps>=72){burst=null;books.forEach(b=>b.t0=now)}
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+document.getElementById('fps').oninput=e=>{fps=+e.target.value;document.getElementById('fpsv').textContent=fps};
+document.getElementById('add').onchange=e=>additive=e.target.checked;
+const kab=new Audio('audio/boom_large_1.mp3');
+document.getElementById('kaboom').onclick=()=>{burst=performance.now();kab.currentTime=0;kab.play()};
+
+// textures, lit with their normal maps on a 2D canvas
+const TEX=[['concrete','Weathered concrete, formwork panels'],['brick','Brick facade with windows (+ emissive mask)'],['corrugated','Corrugated metal with rust'],['sandbag','Burlap sandbag'],['asphalt','Cracked asphalt'],['sand','Sand and dirt ground']];
+const S=256;
+function load(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function pixels(img){const c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.drawImage(img,0,0,S,S);return x.getImageData(0,0,S,S).data}
+TEX.forEach(async([id,label])=>{
+  const card=document.createElement('div');card.className='card';
+  const cv=document.createElement('canvas');cv.width=cv.height=S;card.appendChild(cv);
+  const extra=id==='brick'?' &middot; tex_brick_emissive.png':'';
+  card.insertAdjacentHTML('beforeend',`<div class="name">tex_${id}_color.jpg &middot; tex_${id}_normal.jpg${extra}</div><div class="meta">${label}</div>`);
+  document.getElementById('tex').appendChild(card);
+  const [ci,ni,ei]=await Promise.all([load(`tex/tex_${id}_color.jpg`),load(`tex/tex_${id}_normal.jpg`),id==='brick'?load('tex/tex_brick_emissive.png'):null]);
+  if(!ci||!ni)return;
+  const col=pixels(ci),nor=pixels(ni),em=ei?pixels(ei):null;
+  const ctx=cv.getContext('2d'),out=ctx.createImageData(S,S),o=out.data;
+  function shade(lx,ly){
+    for(let y=0;y<S;y++)for(let x=0;x<S;x++){const i=(y*S+x)*4;
+      let nx=nor[i]/127.5-1,ny=-(nor[i+1]/127.5-1),nz=nor[i+2]/127.5-1;
+      let dx=lx-x/S,dy=ly-y/S,dz=0.45,l=Math.hypot(dx,dy,dz);dx/=l;dy/=l;dz/=l;
+      const d=Math.max(0,nx*dx+ny*dy+nz*dz),k=0.22+1.0*d;
+      const e=em?em[i]/255:0;
+      o[i]=Math.min(255,col[i]*k+e*255);o[i+1]=Math.min(255,col[i+1]*k+e*190);o[i+2]=Math.min(255,col[i+2]*k+e*110);o[i+3]=255}
+    ctx.putImageData(out,0,0)}
+  shade(0.15,0.1);
+  let pend=null;
+  cv.addEventListener('pointermove',ev=>{const r=cv.getBoundingClientRect();const lx=(ev.clientX-r.left)/r.width,ly=(ev.clientY-r.top)/r.height;
+    if(!pend)pend=requestAnimationFrame(()=>{pend=null;shade(lx,ly)})});
+  cv.addEventListener('pointerleave',()=>shade(0.15,0.1));
+});
+</script>
+</body>
+</html>
+
+</body></html>

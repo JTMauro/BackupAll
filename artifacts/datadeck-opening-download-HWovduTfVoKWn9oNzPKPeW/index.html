@@ -1,0 +1,113 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DataDeck Opening Download</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: one centered column: the video preview, then two download cards side by side (stacked on phones). */
+:root{
+  --night:#05080D; --night-2:#0D1824; --card:#101B27; --line:rgba(120,170,210,.2);
+  --ink:#EAF2F8; --muted:#93A6B8; --cyd:#00A1E0; --cyd-deep:#0080B4; --ok:#4CC38A; --warn:#E3A33B;
+  --font:"Montserrat", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+body{margin:0;background:radial-gradient(1000px 600px at 30% -10%,var(--night-2),var(--night) 70%);color:var(--ink);font-family:var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 40px}
+.wrap{max-width:880px;margin:0 auto;display:grid;gap:20px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--cyd)}
+h1{margin:4px 0 0;font-size:clamp(24px,4vw,34px);font-weight:800;text-wrap:balance}
+.lede{margin:6px 0 0;color:var(--muted);font-weight:500;line-height:1.55;max-width:62ch}
+.player{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 50px -20px rgba(0,0,0,.9),0 0 0 1px rgba(0,161,224,.08)}
+.player video{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:10px;min-width:0;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 30px -18px rgba(0,0,0,.8)}
+.card h2{margin:0;font-size:16px;font-weight:800;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card h2 small{font-size:12px;font-weight:600;color:var(--muted)}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:500}
+.spec{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+button{font:700 14px var(--font);border-radius:9px;padding:11px 16px;cursor:pointer;border:1px solid var(--cyd-deep);color:#00131D;
+  background:linear-gradient(180deg,#2BB8EE,var(--cyd) 55%,var(--cyd-deep));box-shadow:0 2px 0 #005E85,0 8px 18px -6px rgba(0,161,224,.6)}
+button:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 #005E85}
+button:disabled{opacity:.55;cursor:default}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.status{min-height:18px;font-size:12.5px;font-weight:600}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5}
+@media (max-width:640px){.cards{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.player video{animation:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Cydcor DataDeck</span>
+    <h1>Opening sequence</h1>
+    <p class="lede">Cydni flies the Cydcor-blue helicopter across the title, turns at the right end, waves, and shrinks into the logo in the corner. Ten seconds.</p>
+  </header>
+
+  <div class="player">
+    <video id="preview" src="Cydcor-DataDeck-Opening.mp4" poster="poster.jpg" muted loop playsinline controls preload="metadata"></video>
+  </div>
+
+  <div class="cards">
+    <section class="card" aria-labelledby="gif-h">
+      <h2 id="gif-h">GIF <small>for the body of an email</small></h2>
+      <p>Plays by itself where it's placed. In Outlook: Insert → Pictures. Loops forever.</p>
+      <span class="spec">800 × 450 · 15 fps · 9.9 MB</span>
+      <button type="button" id="dl-gif" data-file="Cydcor-DataDeck-Opening.gif">Download GIF</button>
+      <span class="status" id="st-gif" role="status"></span>
+    </section>
+    <section class="card" aria-labelledby="mp4-h">
+      <h2 id="mp4-h">MP4 video <small>sharper, smaller</small></h2>
+      <p>Attach it to the email. Plays on Windows, Mac and phones.</p>
+      <span class="spec">1280 × 720 · 30 fps · 2.1 MB</span>
+      <button type="button" id="dl-mp4" data-file="Cydcor-DataDeck-Opening.mp4">Download MP4</button>
+      <span class="status" id="st-mp4" role="status"></span>
+    </section>
+  </div>
+  <p class="note" id="unavail" hidden>Downloading isn't available in this view. Open this page in claude.ai in a browser to save the files.</p>
+</div>
+
+<script>
+const video = document.getElementById("preview");
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) { video.autoplay = true; video.play?.().catch(() => {}); }
+
+let downloads = null;
+const buttons = [document.getElementById("dl-gif"), document.getElementById("dl-mp4")];
+buttons.forEach((b) => (b.disabled = true));
+(async () => {
+  try { downloads = await window.claude?.use?.("downloads"); } catch { downloads = null; }
+  if (!downloads) { document.getElementById("unavail").hidden = false; return; }
+  buttons.forEach((b) => (b.disabled = false));
+})();
+
+const MESSAGES = {
+  declined: "Download cancelled.",
+  rate_limited: "A download prompt is already open. Finish that one first.",
+  too_large: "This file is too large for this view.",
+};
+
+buttons.forEach((btn) => btn.addEventListener("click", async () => {
+  if (!downloads) return;
+  const file = btn.dataset.file;
+  const status = document.getElementById(btn.id === "dl-gif" ? "st-gif" : "st-mp4");
+  btn.disabled = true;
+  status.className = "status"; status.textContent = "Preparing…";
+  try {
+    const res = await fetch(file);
+    if (!res.ok) throw { code: "fetch" };
+    const blob = await res.blob();
+    await downloads.save({ filename: file, data: blob });
+    status.className = "status ok"; status.textContent = `Saved ${file}`;
+  } catch (err) {
+    status.className = "status warn";
+    status.textContent = err?.code === "fetch" ? "Couldn't load the file. Reload the page and try again."
+      : MESSAGES[err?.code] || "The download didn't go through. Try again.";
+  } finally {
+    btn.disabled = false;
+  }
+}));
+</script>
+
+</body></html>

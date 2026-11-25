@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rainy Window</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#05060c}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. rain-window.html?rain=2&lightning=0 =====
+const CFG = {
+  fps: 60,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  rain: 1,        // how hard it rains (0.3 drizzle – 2.5 downpour)
+  lightning: 1,   // 1 = occasional distant lightning, 0 = off
+  blur: 14,       // how out of focus the city behind the glass is
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const rand = (a, b) => a + Math.random() * (b - a);
+let W, H, DPR, scene, blurBg, sharpBg, small, sg, drops = [], streaks = [], t = 0, flash = 0, nextFlash = 8;
+
+function paintCity(g) {
+  const gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#0a0d1c'); gr.addColorStop(.5, '#151a33'); gr.addColorStop(1, '#2a1a24');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  // buildings
+  let bx = -20 * DPR;
+  while (bx < W) {
+    const bw = rand(60, 180) * DPR, bh = rand(.3, .85) * H;
+    g.fillStyle = `rgb(${rand(8, 16) | 0},${rand(10, 18) | 0},${rand(20, 32) | 0})`; g.fillRect(bx, H - bh, bw, bh);
+    for (let wy = H - bh + 10 * DPR; wy < H * .8; wy += 14 * DPR)
+      for (let wx = bx + 8 * DPR; wx < bx + bw - 8 * DPR; wx += 12 * DPR)
+        if (Math.random() < .3) { g.fillStyle = ['#ffcf80', '#ffe2b0', '#9fd0ff', '#ff9a6a'][Math.random() * 4 | 0]; g.globalAlpha = rand(.4, 1); g.fillRect(wx, wy, 6 * DPR, 8 * DPR); g.globalAlpha = 1; }
+    bx += bw + rand(0, 20) * DPR;
+  }
+  // street-level bokeh: traffic, signs, street lamps
+  const cols = ['255,190,90', '255,80,70', '255,240,210', '110,200,255', '255,90,200', '120,255,190'];
+  for (let i = 0; i < 160; i++) {
+    const y = H * (Math.random() < .7 ? rand(.72, .98) : rand(.2, .7)), r = rand(4, 22) * DPR, col = cols[Math.random() * cols.length | 0];
+    const bx2 = Math.random() * W, rg = g.createRadialGradient(bx2, y, 0, bx2, y, r);
+    rg.addColorStop(0, `rgba(${col},.9)`); rg.addColorStop(.7, `rgba(${col},.5)`); rg.addColorStop(1, `rgba(${col},0)`);
+    g.fillStyle = rg; g.fillRect(bx2 - r, y - r, r * 2, r * 2);
+  }
+  const glow = g.createLinearGradient(0, H * .6, 0, H);
+  glow.addColorStop(0, 'rgba(255,140,80,0)'); glow.addColorStop(1, 'rgba(255,120,80,.25)');
+  g.fillStyle = glow; g.fillRect(0, 0, W, H);
+}
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  scene = document.createElement('canvas'); scene.width = W; scene.height = H; paintCity(scene.getContext('2d'));
+  const mk = (b, bright) => { const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.filter = `blur(${b * DPR}px) brightness(${bright})`; g.drawImage(scene, 0, 0); return cv; };
+  blurBg = mk(CFG.blur, 1.15); sharpBg = mk(2, 1.6);
+  small = document.createElement('canvas'); small.width = W; small.height = H; sg = small.getContext('2d');
+  drops = []; streaks = Array.from({ length: 140 }, () => ({ x: Math.random() * W, y: Math.random() * H, l: rand(20, 60) * DPR, v: rand(900, 1500) * DPR }));
+  for (let i = 0; i < 2600; i++) addSmall(Math.random() * W, Math.random() * H, rand(1.2, 4.5) * DPR);
+  for (let i = 0; i < 30; i++) spawnDrop();
+}
+
+function addSmall(px, py, r) {
+  sg.save(); sg.beginPath(); sg.arc(px, py, r, 0, 7); sg.clip();
+  sg.translate(px, py); sg.scale(1, -1);
+  sg.drawImage(sharpBg, px - r * 4, py - r * 4, r * 8, r * 8, -r, -r, r * 2, r * 2);
+  sg.restore();
+  sg.fillStyle = 'rgba(0,0,0,.28)'; sg.beginPath(); sg.arc(px, py + r * .25, r, 0, Math.PI); sg.fill();
+  sg.fillStyle = 'rgba(255,255,255,.45)'; sg.beginPath(); sg.arc(px - r * .3, py - r * .35, r * .3, 0, 7); sg.fill();
+}
+
+function spawnDrop() {
+  const r = rand(7, 20) * DPR;
+  drops.push({ x: Math.random() * W, y: rand(-.1, .7) * H, r, vy: 0, stop: rand(.2, 2.5), wig: Math.random() * 6, dead: false });
+}
+
+function drawDrop(d) {
+  const rx = d.r, ry = d.r * (1.1 + Math.min(.35, d.vy / (600 * DPR)));
+  x.save(); x.beginPath(); x.ellipse(d.x, d.y, rx, ry, 0, 0, 7); x.clip();
+  x.translate(d.x, d.y); x.scale(1, -1);
+  const s = d.r * 7;
+  x.drawImage(sharpBg, d.x - s / 2, d.y - s / 2, s, s, -rx * 1.1, -ry * 1.1, rx * 2.2, ry * 2.2);
+  x.restore();
+  const rim = x.createRadialGradient(d.x, d.y - ry * .25, rx * .4, d.x, d.y, ry * 1.05);
+  rim.addColorStop(0, 'rgba(0,0,0,0)'); rim.addColorStop(1, 'rgba(0,0,10,.45)');
+  x.fillStyle = rim; x.beginPath(); x.ellipse(d.x, d.y, rx, ry, 0, 0, 7); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.ellipse(d.x - rx * .35, d.y - ry * .45, rx * .22, ry * .14, -.5, 0, 7); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.15)'; x.beginPath(); x.ellipse(d.x + rx * .2, d.y + ry * .6, rx * .45, ry * .12, 0, 0, 7); x.fill();
+}
+
+function frame(dt) {
+  t += dt;
+  // weather
+  if (Math.random() < dt * 9 * CFG.rain && drops.length < 90) spawnDrop();
+  for (let i = 0; i < 25 * CFG.rain * dt * 60 / 4; i++) addSmall(Math.random() * W, Math.random() * H, rand(1, 4.2) * DPR);
+  // slow evaporation keeps the glass from saturating
+  sg.globalCompositeOperation = 'destination-out'; sg.fillStyle = `rgba(0,0,0,${.012 * dt * 60})`; sg.fillRect(0, 0, W, H); sg.globalCompositeOperation = 'source-over';
+
+  for (const d of drops) {
+    if (d.stop > 0) { d.stop -= dt; d.vy *= .8; }
+    else {
+      d.vy = Math.min(d.vy + d.r * 40 * dt, d.r * 90);
+      if (Math.random() < dt * 1.2) d.stop = rand(.1, 1.2) * (16 * DPR / d.r);
+    }
+    const ny = d.y + d.vy * dt, nx = d.x + Math.sin(t * 3 + d.wig + d.y * .02) * d.vy * dt * .08;
+    if (d.vy > 5) {
+      sg.globalCompositeOperation = 'destination-out'; sg.lineCap = 'round'; sg.lineWidth = d.r * 1.5;
+      sg.beginPath(); sg.moveTo(d.x, d.y); sg.lineTo(nx, ny); sg.stroke(); sg.globalCompositeOperation = 'source-over';
+      if (Math.random() < dt * 14) addSmall(d.x + rand(-.3, .3) * d.r, d.y - d.r * 1.3, d.r * rand(.15, .32));
+      d.r = Math.max(4 * DPR, d.r - dt * .25 * DPR);
+    }
+    d.x = nx; d.y = ny;
+    if (d.y - d.r > H) d.dead = true;
+  }
+  for (let i = 0; i < drops.length; i++) for (let j = i + 1; j < drops.length; j++) {
+    const a = drops[i], b = drops[j]; if (a.dead || b.dead) continue;
+    const dx = a.x - b.x, dy = a.y - b.y, rr = (a.r + b.r) * .8;
+    if (dx * dx + dy * dy < rr * rr) { const [big, sm] = a.r > b.r ? [a, b] : [b, a]; big.r = Math.min(26 * DPR, Math.sqrt(big.r * big.r + sm.r * sm.r)); big.stop = 0; sm.dead = true; }
+  }
+  drops = drops.filter(d => !d.dead);
+
+  x.drawImage(blurBg, 0, 0);
+  if (CFG.lightning) {
+    nextFlash -= dt;
+    if (nextFlash < 0) { flash = 1; nextFlash = rand(10, 28); setTimeout(() => flash = .8, 180); }
+    if (flash > .01) { x.fillStyle = `rgba(200,210,255,${flash * .35})`; x.fillRect(0, 0, W, H); flash *= Math.pow(.02, dt); }
+  }
+  // rain falling outside, behind the glass
+  x.strokeStyle = 'rgba(200,210,240,.13)'; x.lineWidth = DPR;
+  x.beginPath();
+  for (const s of streaks) { s.y += s.v * dt; s.x -= s.v * dt * .08; if (s.y > H) { s.y = -s.l; s.x = Math.random() * W * 1.1; } x.moveTo(s.x, s.y); x.lineTo(s.x + s.l * .08, s.y - s.l); }
+  x.stroke();
+  x.drawImage(small, 0, 0);
+  for (const d of drops) drawDrop(d);
+  // cold glass vignette
+  const v = x.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .75);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,10,.5)');
+  x.fillStyle = v; x.fillRect(0, 0, W, H);
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

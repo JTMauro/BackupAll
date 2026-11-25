@@ -1,0 +1,23 @@
+{
+ "title": "Ben Bot",
+ "url": "https://claude.ai/artifact/U3CtuTJwajYUDUHhgUP5a5",
+ "type": "web page",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "ben-closed.jpg",
+   "bytes": 273154,
+   "sha256": "2a9ffa8fb5423365d0a6d2c14f6454960bfb3ddea987cdc2676fa92c69cc42d0"
+  },
+  {
+   "path": "ben.jpg",
+   "bytes": 300492,
+   "sha256": "fefc5572fbec28b66b5085e72cf06eff875afc31265810d38c0a6cc622cf3880"
+  },
+  {
+   "path": "index.html",
+   "bytes": 39313,
+   "sha256": "a5b36ca096a20d415be5233c37600394f375d8606090730f456732aa808417fc"
+  }
+ ]
+}

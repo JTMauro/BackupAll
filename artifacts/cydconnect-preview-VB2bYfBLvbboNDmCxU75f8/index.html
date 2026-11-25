@@ -1,0 +1,113 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydConnect Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column; a screen picker on top, the selected screenshot large, a short "what you're seeing" note under it.
+   Single dark look on purpose: it matches the app's own dark window. */
+:root{
+  --bg:#0a1018; --panel:#111a26; --line:#223247; --ink:#e6eef6; --muted:#93a7ba;
+  --cyd:#00A1E0; --cyd-soft:#0e2a3b; --ok:#4cc38a;
+  --display:"Montserrat","Segoe UI",system-ui,sans-serif; --body:"Inter","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;padding-block:24px 56px;display:grid;gap:18px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header img{width:72px;height:72px;flex:none}
+h1{margin:0;font:800 30px/1.1 var(--display);letter-spacing:.02em}
+h1 small{display:block;font:700 12px var(--display);letter-spacing:.24em;color:var(--cyd);margin-bottom:4px}
+.sub{color:var(--muted);margin:2px 0 0}
+.tag{margin-left:auto;font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.picker{display:flex;gap:8px;flex-wrap:wrap}
+.picker button{font:600 14px var(--body);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+.picker button:hover{border-color:var(--cyd);color:var(--ink)}
+.picker button[aria-pressed="true"]{background:var(--cyd-soft);border-color:var(--cyd);color:var(--ink)}
+.picker button:focus-visible{outline:2px solid var(--cyd);outline-offset:2px}
+figure{margin:0;display:grid;gap:12px}
+.shot{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;place-items:center;min-width:0}
+.shot img{display:block;max-width:100%;height:auto;border-radius:8px}
+figcaption{display:grid;gap:6px;max-width:72ch}
+figcaption b{font:700 18px var(--display);letter-spacing:.01em}
+figcaption ul{margin:0;padding-left:20px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:640px){h1{font-size:24px} header img{width:56px;height:56px} .tag{margin-left:0}}
+</style>
+
+<div class="wrap">
+  <header>
+    <img src="icon.png" alt="CydConnect app icon: Cydni holding a file">
+    <div>
+      <h1><small>CYDCOR</small>CydConnect</h1>
+      <p class="sub">Files, SSH terminal, OpenPGP, SSH keys and data in one window.</p>
+    </div>
+    <span class="tag">Version 0.2.0 · screens from the real app</span>
+  </header>
+
+  <div class="picker" role="group" aria-label="Screens">
+    <button type="button" data-s="home" aria-pressed="true">Home</button>
+    <button type="button" data-s="popouts">All three popped out</button>
+    <button type="button" data-s="ftp">FTP</button>
+    <button type="button" data-s="terminal">Terminal</button>
+    <button type="button" data-s="data_menu">DataConnect objects</button>
+    <button type="button" data-s="data_chart">DataConnect chart</button>
+    <button type="button" data-s="data_emerald">Emerald scheme</button>
+    <button type="button" data-s="ssh">SSH Keys</button>
+    <button type="button" data-s="pgp">OpenPGP Keys</button>
+  </div>
+
+  <figure>
+    <div class="shot"><img id="img" src="home.jpg" alt="" width="1640" height="900"></div>
+    <figcaption id="cap"></figcaption>
+  </figure>
+
+  <p class="note">These are screenshots of the CydConnect desktop app, taken while it ran against a real SSH server
+    on a test machine. The terminal session, the drag-and-drop upload, the pop-out windows and DataConnect shown are live, not mock-ups.</p>
+</div>
+
+<script>
+const SCREENS = {
+  home: { title: "Home: pick FTP, Terminal or DataConnect",
+    points: ["CydConnect opens here. Each tool has Open and Pop out.",
+             "The pop-out buttons beside FTP, Terminal and DataConnect in the sidebar do the same.",
+             "Shortcuts for Site Manager, FileZilla import and new keys; recent sites at the bottom."] },
+  popouts: { title: "All three in their own windows",
+    points: ["FTP, Terminal and DataConnect popped out at once, side by side or on another monitor.",
+             "Each window has Dock to put it back; closing the window docks it too."] },
+  ftp: { title: "FTP",
+    points: ["Cleaner toolbar: saved site, Connect, Disconnect, Quickconnect (a small dialog).",
+             "Open in Terminal starts an SSH shell on the same site.",
+             "Shown: three files uploaded to the partner server, all Done."] },
+  terminal: { title: "Terminal",
+    points: ["Pick a saved SFTP site and connect with the same saved password or SSH key as FTP.",
+             "Drop a file on it: it asks for the server folder and uploads it (shown: sales_west_2026-11.csv)."] },
+  data_menu: { title: "DataConnect: objects beside the editor",
+    points: ["Schemas, tables, views and columns on the left; expand a table to see its columns and types.",
+             "Right-click for actions: preview, count, script SELECT/INSERT/UPDATE/DELETE, rename, empty, drop.",
+             "Changes show the exact SQL and wait for you to confirm."] },
+  data_chart: { title: "DataConnect: results and charts",
+    points: ["Sales by region from the sample warehouse, switched to a bar chart in one click.",
+             "Export to CSV, Excel or JSON from the same bar."] },
+  data_emerald: { title: "DataConnect follows the colour scheme",
+    points: ["Pick a colour dot at the top of the window; DataConnect's tabs, buttons and background follow it (Emerald shown)."] },
+  ssh: { title: "SSH Keys",
+    points: ["Ed25519 and RSA keys in the vault, with fingerprints, .ppk export and Install on server."] },
+  pgp: { title: "OpenPGP Keys",
+    points: ["Your key and partners' keys; encrypt, decrypt and sign files, or encrypt uploads automatically."] }
+};
+const img = document.getElementById("img"), cap = document.getElementById("cap");
+const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function show(key){
+  const s = SCREENS[key] || SCREENS.home;
+  img.src = key + ".jpg"; img.width = 1640; img.height = 900; img.alt = s.title;
+  cap.innerHTML = `<b>${esc(s.title)}</b><ul>${s.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
+  document.querySelectorAll(".picker button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.s === key)));
+}
+document.querySelectorAll(".picker button").forEach(b => b.addEventListener("click", () => show(b.dataset.s)));
+show("home");
+</script>
+
+</body></html>

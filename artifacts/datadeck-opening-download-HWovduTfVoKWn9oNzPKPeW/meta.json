@@ -1,0 +1,28 @@
+{
+ "title": "DataDeck Opening Download",
+ "url": "https://claude.ai/artifact/HWovduTfVoKWn9oNzPKPeW",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "Cydcor-DataDeck-Opening.gif",
+   "bytes": 9954087,
+   "sha256": "6dda2bbb8597465a9061fb4d312faa12653af4bdbe4f5eb3de02127429dfa60f"
+  },
+  {
+   "path": "Cydcor-DataDeck-Opening.mp4",
+   "bytes": 2141529,
+   "sha256": "7f3a5642cf6256e0d9f7807f2bccb77e92225299991a5763084f622a029dbd1e"
+  },
+  {
+   "path": "index.html",
+   "bytes": 6630,
+   "sha256": "aea0dea0c6d580d2d48beb72b99d8573b5f1e6f022b6ef267349a7d7f5ad2808"
+  },
+  {
+   "path": "poster.jpg",
+   "bytes": 98411,
+   "sha256": "a4713f0cefb7701a54e4c80f336e142b885d8096c03488a369193a42bbff8fb2"
+  }
+ ]
+}

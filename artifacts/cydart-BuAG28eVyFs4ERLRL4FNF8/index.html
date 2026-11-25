@@ -1,0 +1,158 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CydArt</title>
+<meta name="description" content="CydArt: photo editor, paint studio, video editor, viewer and library. Opens and saves almost every image and video format, including HEIC.">
+<meta name="theme-color" content="#0f1319">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&family=IBM+Plex+Sans:wght@400;500;600&family=Playfair+Display:wght@700&family=Pacifico&family=Bebas+Neue&family=Permanent+Marker&family=Lobster&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/video.css">
+<script type="importmap">
+{"imports":{
+  "three":"./vendor/three/three.module.js",
+  "three/addons/":"./vendor/three/addons/"
+}}
+</script>
+</head>
+<body class="intro-running">
+
+<!-- 3D scene: the intro and the Home background share one canvas -->
+<div id="scene" aria-hidden="true">
+  <canvas id="gl"></canvas>
+  <div id="flash"></div>
+</div>
+
+<!-- Big title that shrinks into the app bar -->
+<div id="hero-title" aria-hidden="true"><span class="cyd">Cyd</span><span class="photo">Art</span></div>
+
+<header class="appbar" id="appbar">
+  <button class="brand" id="brand" type="button" aria-label="CydArt home">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-word"><span class="cyd">Cyd</span><span class="photo">Art</span></span>
+  </button>
+  <nav class="modetabs" role="tablist" aria-label="Workspace">
+    <button role="tab" class="modetab" data-mode="photo" id="tab-photo" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 1 0 0-7z"/></svg>Photo</button>
+    <button role="tab" class="modetab" data-mode="draw" id="tab-draw" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.4 2.6a2 2 0 0 1 2.8 2.8L11 15.6 8.4 13zM7 14.5c-2 0-3.5 1.6-3.5 3.5 0 1.2-.8 2-1.5 2.4 1 .4 2.3.6 3.5.6 2.4 0 4.5-1.6 4.5-4z"/></svg>Draw</button>
+    <button role="tab" class="modetab" data-mode="video" id="tab-video" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h13v12H3zM16 10l5-3v10l-5-3z"/></svg>Video</button>
+  </nav>
+  <div class="appbar-sub" id="photo-sub" hidden>
+    <button class="subtab" data-sub="library" id="sub-library">Library</button>
+    <button class="subtab" data-sub="editor" id="sub-editor">Editor</button>
+  </div>
+  <div class="appbar-sub" id="video-sub" hidden>
+    <button class="subtab" data-sub="player">Player</button>
+    <button class="subtab" data-sub="editor">Editor</button>
+  </div>
+  <div class="appbar-right">
+    <button class="icon-btn" id="btn-convert" title="Convert photos & videos" aria-label="Convert photos and videos"><svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></button>
+    <button class="icon-btn" id="btn-open" title="Open file (Ctrl+O)" aria-label="Open file"><svg viewBox="0 0 24 24"><path d="M3 6h6l2 2h10v11H3zM12 11v6M9 14l3-3 3 3"/></svg></button>
+    <button class="icon-btn" id="btn-install" title="Install CydArt" aria-label="Install CydArt" hidden><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></button>
+    <button class="icon-btn" id="btn-theme" title="Light / dark" aria-label="Toggle light or dark theme"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>
+    <button class="icon-btn" id="btn-about" title="About CydArt" aria-label="About menu" aria-haspopup="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 11v6M12 7.5v.5"/></svg></button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- HOME -->
+  <section id="home" class="view" aria-label="Home">
+    <div class="home-inner">
+      <div class="home-hero-space" aria-hidden="true"></div>
+      <div class="home-tabs" role="tablist" aria-label="Start with">
+        <button class="home-tab on" role="tab" aria-selected="true" data-start="photo" id="ht-photo">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4zM12 9.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 1 0 0-7z"/></svg>Photo</button>
+        <button class="home-tab" role="tab" aria-selected="false" data-start="draw" id="ht-draw">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.4 2.6a2 2 0 0 1 2.8 2.8L11 15.6 8.4 13zM7 14.5c-2 0-3.5 1.6-3.5 3.5 0 1.2-.8 2-1.5 2.4 1 .4 2.3.6 3.5.6 2.4 0 4.5-1.6 4.5-4z"/></svg>Draw</button>
+        <button class="home-tab" role="tab" aria-selected="false" data-start="video" id="ht-video">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h13v12H3zM16 10l5-3v10l-5-3z"/></svg>Video</button>
+      </div>
+      <div class="home-panel" id="hp-photo" role="tabpanel" aria-labelledby="ht-photo">
+        <p class="home-lead">Open, view, organize and edit your photos. HEIC, RAW, TIFF, PSD and 270+ formats.</p>
+        <div class="home-buttons">
+          <button class="big-btn raised" id="h-open-photo"><b>Open a photo</b><span>From your computer or phone</span></button>
+          <button class="big-btn raised" id="h-library"><b>My Library</b><span id="h-lib-count">Albums, favorites, slideshow</span></button>
+          <button class="big-btn raised" id="h-import"><b>Import photos</b><span>Add a batch or a whole folder</span></button>
+          <button class="big-btn raised" id="h-convert"><b>Convert</b><span>Photos and videos to any format</span></button>
+        </div>
+        <div class="home-recent" id="home-recent"></div>
+      </div>
+      <div class="home-panel" id="hp-draw" role="tabpanel" aria-labelledby="ht-draw" hidden>
+        <p class="home-lead">Start a blank canvas and paint, draw, design. Layers, brushes, shapes and text.</p>
+        <div class="home-buttons presets" id="draw-presets"></div>
+        <div class="home-buttons">
+          <button class="big-btn raised" id="h-custom"><b>Custom size…</b><span>Any width and height</span></button>
+          <button class="big-btn raised" id="h-paste"><b>From clipboard</b><span>Paste a copied image</span></button>
+          <button class="big-btn raised" id="h-open-draw"><b>Open a file</b><span>PSD layers, PNG, anything</span></button>
+        </div>
+      </div>
+      <div class="home-panel" id="hp-video" role="tabpanel" aria-labelledby="ht-video" hidden>
+        <p class="home-lead">Play any video, then cut, splice and finish it: transitions, titles, looks, slow-mo, green screen and music.</p>
+        <div class="home-buttons">
+          <button class="big-btn raised" id="h-play-video"><b>Play a video</b><span>MP4, MOV, MKV, AVI, WMV and more</span></button>
+          <button class="big-btn raised" id="h-new-video"><b>New video project</b><span>Edit clips on a timeline</span></button>
+          <button class="big-btn raised" id="h-edit-video"><b>Edit a video</b><span>Open clips straight into the editor</span></button>
+          <button class="big-btn raised" id="h-convert-video"><b>Convert</b><span>Videos and photos to any format</span></button>
+        </div>
+      </div>
+      <footer class="home-foot"><span id="home-version"></span> · <button class="linkish" id="home-about">About</button> · Drop photos or videos anywhere to open them</footer>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="library" class="view" aria-label="Photo library" hidden></section>
+
+  <!-- VIDEO -->
+  <section id="video" class="view" aria-label="Video" hidden></section>
+
+  <!-- EDITOR -->
+  <section id="editor" class="view" aria-label="Editor" hidden>
+    <div class="menubar" id="menubar" role="menubar"></div>
+    <div class="docbar" id="docbar"></div>
+    <div class="optbar" id="optbar" aria-label="Tool options"></div>
+    <div class="workspace">
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="Tools" aria-orientation="vertical"></div>
+      <div class="stage-wrap" id="stage-wrap">
+        <canvas id="stage" tabindex="0" aria-label="Canvas"></canvas>
+        <div class="stage-empty" id="stage-empty">
+          <h2>No image open</h2>
+          <p>Open a photo or start a new canvas. You can also drop or paste an image here.</p>
+          <div class="row gap"><button class="btn primary raised" id="se-open">Open…</button><button class="btn raised" id="se-new">New canvas…</button></div>
+        </div>
+        <div class="filter-bar" id="filter-bar" hidden></div>
+      </div>
+      <aside class="panels" id="panels" aria-label="Panels"></aside>
+    </div>
+    <div class="statusbar" id="statusbar"></div>
+  </section>
+</main>
+
+<div id="toasts" aria-live="polite"></div>
+<div id="drop-hint" hidden><div>Drop to open</div></div>
+
+<script src="js/version.js"></script>
+<script src="js/core.js"></script>
+<script src="js/formats.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/tools.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/library.js"></script>
+<script src="js/media.js"></script>
+<script src="js/player.js"></script>
+<script src="js/video.js"></script>
+<script src="js/convert.js"></script>
+<script src="js/app.js"></script>
+<script type="module" src="js/scene3d.js"></script>
+</body>
+</html>
+
+</body></html>

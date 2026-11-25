@@ -1,0 +1,18 @@
+{
+ "title": "Astro Herd Sounds",
+ "url": "https://claude.ai/artifact/T8UG7Ti3UywXTLaTYbBHFU",
+ "type": "web page",
+ "updated": "2026-11-21",
+ "files": [
+  {
+   "path": "astro-herd-sounds.js",
+   "bytes": 24920,
+   "sha256": "be48a91cd965ca2c76c12d9bcc0cc9d5f2a1b2f31196cb6513fe0cf989186d0e"
+  },
+  {
+   "path": "index.html",
+   "bytes": 6141,
+   "sha256": "af906c247ff7f0eb4eae90441f9a10e569b807a2cbd8e859c17048c7083d3951"
+  }
+ ]
+}

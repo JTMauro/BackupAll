@@ -1,0 +1,13 @@
+{
+ "title": "Kracken",
+ "url": "https://claude.ai/artifact/8t1qiNsWxCgvBivneakKNo",
+ "type": "web page",
+ "updated": "2026-11-05",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 123234,
+   "sha256": "192575557969eedfe6cec5aeb10f9ace67406957abb53a5cd2f8f405f327ed04"
+  }
+ ]
+}

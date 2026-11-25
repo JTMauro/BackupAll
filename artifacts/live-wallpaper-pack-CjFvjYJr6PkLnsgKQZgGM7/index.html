@@ -1,0 +1,136 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Live Wallpaper Pack</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: a dark "display shelf" of live 16:9 screens, setup steps underneath. Single dark theme by choice. */
+:root {
+  --bg: #07080f; --panel: #10121d; --line: #22263a; --fg: #e7e9f5; --muted: #9098b5; --accent: #7cf2c8;
+  --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, ui-monospace, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+header { display: grid; gap: 8px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 62ch; margin: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+.screen { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: #000; border-bottom: 1px solid var(--line); }
+.video-ph { display: grid; place-items: center; text-align: center; background: radial-gradient(circle at 50% 35%, #1b2a44, #07080f); }
+.video-ph div { display: grid; gap: 6px; padding: 16px; max-width: 30ch; }
+.video-ph strong { font-family: var(--display); font-weight: 500; font-size: 17px; }
+.video-ph span { color: var(--muted); font-size: 13px; }
+.screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+.meta { padding: 14px 16px 16px; display: grid; gap: 6px; min-width: 0; align-content: start; }
+.meta h2 { font-family: var(--display); font-weight: 500; font-size: 19px; margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.meta h2 a { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--accent); text-decoration: none; white-space: nowrap; }
+.meta h2 a:hover, .meta h2 a:focus-visible { text-decoration: underline; }
+.meta p { margin: 0; color: var(--muted); font-size: 14px; }
+code { font-family: var(--mono); font-size: 12.5px; color: var(--fg); background: #181b2a; padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.setup section { border-top: 2px solid var(--accent); padding-top: 14px; display: grid; gap: 8px; min-width: 0; }
+.setup h3 { font-family: var(--display); font-weight: 700; font-size: 18px; margin: 0; }
+.setup ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--muted); }
+.setup ol strong { color: var(--fg); font-weight: 500; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .screen iframe { display: none; } .screen::after { content: "Preview paused (reduced motion)"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-family: var(--mono); font-size: 12px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">18 animated scenes + 4K drone video · speed adjustable</div>
+    <h1>Live Wallpaper Pack</h1>
+    <p class="lede">Each scene is one self-contained HTML file with no downloads or internet needed. Load it into Lively Wallpaper or Wallpaper Engine and it runs behind your desktop icons. Every file has a settings block at the top for colors, speed and frame rate.</p>
+  </header>
+
+  <div class="grid">
+    <article class="card"><div class="screen video-ph"><div><strong>Real 4K drone footage</strong><span>Streams from Wikimedia Commons, so it can't preview here. Open it on your PC.</span></div></div>
+      <div class="meta"><h2>Drone Flights 4K <a href="drone-video.html" target="_blank" rel="noopener">Open ↗</a></h2><p>Real drone flights over Paris, Madeira, Iceland, Lake Bled, Okinawa and the Swiss Alps, slowed to half speed with slow crossfades. Run <code>download-drone-videos.bat</code> to keep copies offline.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="rain-window.html" title="Rainy Window preview"></iframe></div>
+      <div class="meta"><h2>Rainy Window <a href="rain-window.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Raindrops bead, merge and run down the glass. Each drop works like a tiny lens showing a flipped view of the blurred city lights behind it. Distant lightning now and then.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="fireworks.html" title="Harbor Fireworks preview"></iframe></div>
+      <div class="meta"><h2>Harbor Fireworks <a href="fireworks.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Peonies, willows, rings, palms, crossettes, strobes and hearts burst over a skyline, mirrored in the harbor. A grand finale barrage runs every 75 seconds.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="black-hole.html" title="Event Horizon preview"></iframe></div>
+      <div class="meta"><h2>Event Horizon <a href="black-hole.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>A spinning accretion disk bends around the shadow of a black hole. Starlight is gravitationally lensed into arcs as the starfield drifts behind it.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="deep-sea.html" title="Abyssal Jellyfish preview"></iframe></div>
+      <div class="meta"><h2>Abyssal Jellyfish <a href="deep-sea.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Bioluminescent jellyfish pulse upward through light shafts, with drifting marine snow and blinking plankton.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="silk-flow.html" title="Silk Flow preview"></iframe></div>
+      <div class="meta"><h2>Silk Flow <a href="silk-flow.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Thousands of light threads swirl through a slowly evolving current. The color palette crossfades every 35 seconds.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="koi-pond.html" title="Koi Pond preview"></iframe></div>
+      <div class="meta"><h2>Koi Pond <a href="koi-pond.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Koi glide under lily pads and lotus flowers while rain ripples the surface. Click the water to drop food and they swim over to eat.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="moonlit-ocean.html" title="Moonlit Ocean preview"></iframe></div>
+      <div class="meta"><h2>Moonlit Ocean <a href="moonlit-ocean.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Rolling waves glitter under the full moon. Clouds drift past and a lighthouse sweeps its beam from the headland.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="snow-cabin.html" title="Snowfall Cabin preview"></iframe></div>
+      <div class="meta"><h2>Snowfall Cabin <a href="snow-cabin.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Snow drifts on the wind past a cabin with flickering windows and chimney smoke, among snow-laden pines.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="thunderstorm.html" title="Thunderstorm Plains preview"></iframe></div>
+      <div class="meta"><h2>Thunderstorm Plains <a href="thunderstorm.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Branching lightning strikes the plains and lights up the storm clouds. Heavy rain falls around a lone tree.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="fireflies.html" title="Firefly Forest preview"></iframe></div>
+      <div class="meta"><h2>Firefly Forest <a href="fireflies.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Fireflies blink at dusk through layered pines and misty glades. The grass sways in the foreground.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="neon-tunnel.html" title="Neon Wormhole preview"></iframe></div>
+      <div class="meta"><h2>Neon Wormhole <a href="neon-tunnel.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>A flight through a twisting tunnel of neon rings that shift color as you go. Set the shape with <code>?sides=4</code></p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="drone-city.html" title="Drone City preview"></iframe></div>
+      <div class="meta"><h2>Drone City <a href="drone-city.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>A night skyline pans past in three parallax layers. Quadcopters fly by in V formations with nav lights, strobes, spotlights and the odd cargo crate.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="drone-show.html" title="Drone Light Show preview"></iframe></div>
+      <div class="meta"><h2>Drone Light Show <a href="drone-show.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>600 drones over a harbor form a globe, a heart, a galaxy, Saturn, a star, a waving flag, the current time and your own message. Set it with <code>?text=GO%20TEAM</code></p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="matrix.html" title="Matrix Rain preview"></iframe></div>
+      <div class="meta"><h2>Matrix Rain <a href="matrix.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Katakana code rain with glowing leaders. Now and then a column spells out a hidden message. Try <code>?color=%23ff0066</code></p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="aurora.html" title="Aurora Lake preview"></iframe></div>
+      <div class="meta"><h2>Aurora Lake <a href="aurora.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Northern lights ripple over mountains and a pine shoreline, mirrored in a still lake, with occasional shooting stars.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="synthwave.html" title="Synthwave Drive preview"></iframe></div>
+      <div class="meta"><h2>Synthwave Drive <a href="synthwave.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>An endless neon grid runs toward a striped retro sun between wireframe mountains.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="hyperspace.html" title="Hyperspace preview"></iframe></div>
+      <div class="meta"><h2>Hyperspace <a href="hyperspace.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>A calm drift through deep space, then a warp jump every few seconds that stretches the stars into streaks.</p></div></article>
+    <article class="card"><div class="screen"><iframe data-src="plexus.html" title="Plexus Network preview"></iframe></div>
+      <div class="meta"><h2>Plexus Network <a href="plexus.html" target="_blank" rel="noopener">Full screen ↗</a></h2><p>Drifting nodes link up into a slowly shifting web. When mouse input is on, the web reaches for your cursor.</p></div></article>
+  </div>
+
+  <div class="setup">
+    <section>
+      <h3>Lively Wallpaper (free)</h3>
+      <ol>
+        <li>Install <strong>Lively Wallpaper</strong> from the Microsoft Store or rocksdanister.com/lively.</li>
+        <li>Unzip <code>live-wallpapers.zip</code> into a folder you'll keep, such as <code>Documents\Wallpapers</code>.</li>
+        <li>In Lively, click <strong>+ Add Wallpaper</strong> and pick an <code>.html</code> file, or drag the file onto the Lively window.</li>
+        <li>Click the new tile to set it. With several monitors, choose which screen it goes on.</li>
+        <li>For Plexus and Koi Pond, turn on <strong>Settings → Wallpaper → Wallpaper Input → Mouse</strong>.</li>
+      </ol>
+    </section>
+    <section>
+      <h3>Wallpaper Engine (Steam)</h3>
+      <ol>
+        <li>Open Wallpaper Engine and click <strong>Wallpaper Editor</strong> at the bottom left.</li>
+        <li>Choose <strong>Create Wallpaper</strong> and select one of the <code>.html</code> files.</li>
+        <li>Give it a title, then use <strong>File → Apply wallpaper</strong>.</li>
+      </ol>
+    </section>
+    <section>
+      <h3>Tune a scene</h3>
+      <ol>
+        <li><strong>Speed:</strong> everything now runs at half speed. For a slider, drag a zip from the <code>lively</code> folder into Lively, then right-click → <strong>Customise</strong> → <strong>Animation speed</strong>.</li>
+        <li>Or open the file in Notepad and change <code>pace</code> in the <code>CFG</code> block at the top.</li>
+        <li>Lower <code>fps</code> to 30 on laptops to save battery. Event Horizon is the most demanding scene.</li>
+        <li>Both apps pause the wallpaper while a game or full-screen app is running.</li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<script>
+// run only the previews that are on screen, so 18 live scenes don't compete for the GPU
+const io = new IntersectionObserver(entries => {
+  for (const e of entries) {
+    const f = e.target;
+    if (e.isIntersecting) { if (!f.src || f.src === 'about:blank') f.src = f.dataset.src; }
+    else if (f.src && f.src !== 'about:blank') f.src = 'about:blank';
+  }
+}, { rootMargin: '150px' });
+document.querySelectorAll('iframe[data-src]').forEach(f => io.observe(f));
+</script>
+
+</body></html>

@@ -1,0 +1,18 @@
+{
+ "title": "CydConnect User Manual",
+ "url": "https://claude.ai/artifact/SpQR1D6KEM8G8QuKsfbZhm",
+ "type": "Docs",
+ "updated": "2026-11-19",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "d0f1d0b7c8358541e08f047d6c80465964ae316ff2613f6562aedf5be4fbb505"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 19620,
+   "sha256": "be6ddc353527ef0e9be943b73d66a308dc3350cc6ad085d4e651ddfefca04b76"
+  }
+ ]
+}

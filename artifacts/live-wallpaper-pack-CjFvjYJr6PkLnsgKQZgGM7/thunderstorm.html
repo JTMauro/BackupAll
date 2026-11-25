@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thunderstorm Plains</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#05070b}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. thunderstorm.html?strikes=2&rain=1.5 =====
+const CFG = {
+  fps: 50,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  rain: 1,       // rain density
+  strikes: 1,    // lightning frequency
+  clouds: 1,     // cloud drift speed
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const TAU = Math.PI * 2, rand = (a, b) => a + Math.random() * (b - a);
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let W, H, DPR, sky, cloudDark, cloudLit, TW, ground, groundLit, gY, drops = [], bolt = null, flash = 0, nextStrike = 2, cloudOff = 0, t = 0;
+
+function cloudTile(lit) {
+  const cv = document.createElement('canvas'); cv.width = TW; cv.height = H * .65;
+  const g = cv.getContext('2d'), r = mulberry(42);
+  for (let i = 0; i < 260; i++) {
+    const px = r() * TW, py = Math.pow(r(), .7) * H * .5, rx = (40 + r() * 160) * DPR, ry = rx * (.35 + r() * .3), shade = r();
+    const l = lit ? 120 + shade * 110 : 18 + shade * 30;
+    const col = lit ? `rgba(${l * .8 | 0},${l * .85 | 0},${l | 0},${.35 + r() * .3})` : `rgba(${l | 0},${l + 3 | 0},${l + 10 | 0},${.5 + r() * .4})`;
+    for (const off of [0, -TW, TW]) { g.fillStyle = col; g.beginPath(); g.ellipse(px + off, py, rx, ry, 0, 0, TAU); g.fill(); }
+  }
+  // soften once: blur the tile with itself tiled on both sides so the seam stays clean
+  const out = document.createElement('canvas'); out.width = TW; out.height = cv.height;
+  const o = out.getContext('2d'); o.filter = `blur(${14 * DPR}px)`;
+  o.drawImage(cv, -TW, 0); o.drawImage(cv, 0, 0); o.drawImage(cv, TW, 0);
+  return out;
+}
+
+function paintGround(lit) {
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const g = cv.getContext('2d'), r = mulberry(7), col = lit ? '#3a4458' : '#07090d';
+  g.fillStyle = lit ? '#262e3e' : '#0a0d14';
+  g.beginPath(); g.moveTo(0, gY); for (let xx = 0; xx <= W; xx += 10 * DPR) g.lineTo(xx, gY - H * .04 * (Math.sin(xx / W * 5 + 1) * .5 + .5) - H * .006 * r()); g.lineTo(W, H); g.lineTo(0, H); g.fill();
+  g.fillStyle = col; g.fillRect(0, gY + H * .02, W, H);
+  g.beginPath(); g.moveTo(0, gY + H * .03); for (let xx = 0; xx <= W; xx += 12 * DPR) g.lineTo(xx, gY + H * .02 - H * .012 * Math.sin(xx / W * 3)); g.lineTo(W, H); g.lineTo(0, H); g.fill();
+  // lone tree
+  const tx = W * .72, tb = gY + H * .02, th = H * .22;
+  g.strokeStyle = col; g.lineCap = 'round';
+  const branch = (bx, by, len, ang, w, d) => {
+    const ex = bx + Math.cos(ang) * len, ey = by + Math.sin(ang) * len;
+    g.lineWidth = w; g.beginPath(); g.moveTo(bx, by); g.lineTo(ex, ey); g.stroke();
+    if (d > 0) { branch(ex, ey, len * .72, ang - .45 + (r() - .5) * .3, w * .68, d - 1); branch(ex, ey, len * .72, ang + .4 + (r() - .5) * .3, w * .68, d - 1); if (r() < .4) branch(ex, ey, len * .6, ang + (r() - .5) * .4, w * .6, d - 1); }
+  };
+  branch(tx, tb, th * .4, -Math.PI / 2, 10 * DPR, 7);
+  // fence posts
+  g.fillStyle = col;
+  for (let i = 0; i < 9; i++) { const fx = W * .08 + i * W * .045; g.fillRect(fx, gY + H * .005 - i * DPR, 3 * DPR, H * .04); }
+  g.fillRect(W * .08, gY + H * .015, W * .36, 2 * DPR);
+  return cv;
+}
+
+function makeBolt() {
+  const x0 = rand(.1, .9) * W, y0 = H * rand(.18, .32), x1 = x0 + rand(-.15, .15) * W, y1 = gY + H * .01;
+  const segs = [];
+  const sub = (ax, ay, bx, by, disp, depth, w) => {
+    if (depth === 0) { segs.push([ax, ay, bx, by, w]); return; }
+    const mx = (ax + bx) / 2 + (Math.random() - .5) * disp, my = (ay + by) / 2 + (Math.random() - .5) * disp * .3;
+    sub(ax, ay, mx, my, disp / 2, depth - 1, w); sub(mx, my, bx, by, disp / 2, depth - 1, w);
+    if (depth > 3 && Math.random() < .3 * w) { const ang = Math.atan2(by - ay, bx - ax) + rand(-.9, .9), l = Math.hypot(bx - ax, by - ay) * rand(.5, 1); sub(mx, my, mx + Math.cos(ang) * l, my + Math.sin(ang) * l, disp / 2, depth - 2, w * .5); }
+  };
+  sub(x0, y0, x1, y1, W * .18, 8, 1);
+  return { segs, age: 0, x: x0, y: y0, pattern: [0, .06, .12, .2, .3].map(v => v + rand(0, .03)) };
+}
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  TW = Math.max(W, 1200 * DPR) * 1.5; gY = H * .82;
+  sky = document.createElement('canvas'); sky.width = W; sky.height = H;
+  const g = sky.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#07090f'); gr.addColorStop(.6, '#141a26'); gr.addColorStop(1, '#232a36');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  cloudDark = cloudTile(false); cloudLit = cloudTile(true);
+  ground = paintGround(false); groundLit = paintGround(true);
+  drops = Array.from({ length: Math.round(W * H / 2200 * CFG.rain) }, () => ({ x: Math.random() * W, y: Math.random() * H, z: rand(.3, 1) }));
+}
+
+function drawClouds(cv, alpha) {
+  const o = cloudOff % TW;
+  x.globalAlpha = alpha; x.drawImage(cv, -o, 0); x.drawImage(cv, TW - o, 0); x.globalAlpha = 1;
+}
+
+function frame(dt) {
+  t += dt;
+  cloudOff += 12 * DPR * dt * CFG.clouds;
+  nextStrike -= dt * CFG.strikes;
+  if (nextStrike <= 0) {
+    if (Math.random() < .7) bolt = makeBolt(); else flash = .5;
+    nextStrike = rand(2.5, 9);
+  }
+  let lit = flash;
+  if (bolt) {
+    bolt.age += dt;
+    let on = 0; for (const p of bolt.pattern) if (bolt.age > p && bolt.age < p + .045) on = 1;
+    lit = Math.max(lit, on ? 1 : Math.max(0, .5 - bolt.age));
+    if (bolt.age > .7) bolt = null;
+  }
+  flash *= Math.pow(.01, dt);
+  x.drawImage(sky, 0, 0);
+  if (lit > .02) { x.fillStyle = `rgba(150,165,210,${lit * .35})`; x.fillRect(0, 0, W, gY); }
+  drawClouds(cloudDark, 1);
+  if (lit > .02) drawClouds(cloudLit, lit * .9);
+  // ambient flicker inside the clouds
+  const amb = Math.max(0, Math.sin(t * 7) * Math.sin(t * 2.3) * Math.sin(t * .4)) * .18;
+  if (amb > .02) drawClouds(cloudLit, amb);
+  if (bolt) {
+    let on = 0; for (const p of bolt.pattern) if (bolt.age > p && bolt.age < p + .06) on = 1;
+    const fade = Math.max(0, 1 - bolt.age / .7);
+    x.globalCompositeOperation = 'lighter'; x.lineCap = 'round';
+    for (const pass of [[14, .12], [5, .35], [1.6, 1]]) {
+      x.strokeStyle = pass[1] === 1 ? `rgba(255,255,255,${(on ? 1 : .25) * fade})` : `rgba(150,170,255,${pass[1] * (on ? 1 : .3) * fade})`;
+      for (const s of bolt.segs) { x.lineWidth = pass[0] * s[4] * DPR; x.beginPath(); x.moveTo(s[0], s[1]); x.lineTo(s[2], s[3]); x.stroke(); }
+    }
+    x.globalCompositeOperation = 'source-over';
+  }
+  x.drawImage(ground, 0, 0);
+  if (lit > .02) { x.globalAlpha = lit; x.drawImage(groundLit, 0, 0); x.globalAlpha = 1; }
+  // rain
+  const wind = -.18;
+  x.lineWidth = DPR; x.strokeStyle = `rgba(170,185,210,${.18 + lit * .3})`; x.beginPath();
+  for (const d of drops) {
+    const sp = (900 + d.z * 900) * DPR, len = (14 + d.z * 26) * DPR;
+    d.y += sp * dt; d.x += sp * wind * dt;
+    if (d.y > H) { d.y = -len; d.x = Math.random() * W * 1.2; }
+    x.moveTo(d.x, d.y); x.lineTo(d.x - wind * len, d.y - len);
+  }
+  x.stroke();
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

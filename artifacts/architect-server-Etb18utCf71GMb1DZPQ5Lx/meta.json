@@ -1,0 +1,13 @@
+{
+ "title": "Architect Server",
+ "url": "https://claude.ai/artifact/Etb18utCf71GMb1DZPQ5Lx",
+ "type": "web page",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 2104309,
+   "sha256": "a2cb740d7194a26a4c3fcfda1916713428736ec0a43e23232c0368de3354b2a5"
+  }
+ ]
+}

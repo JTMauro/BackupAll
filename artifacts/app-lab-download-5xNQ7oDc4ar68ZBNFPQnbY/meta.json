@@ -1,0 +1,28 @@
+{
+ "title": "App Lab Download",
+ "url": "https://claude.ai/artifact/5xNQ7oDc4ar68ZBNFPQnbY",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "app-lab-desktop.b64.txt",
+   "bytes": 692836,
+   "sha256": "b74f8399bf37c799ca6ab4c24b952e6b1286e8ce073c84e23638430587d81977"
+  },
+  {
+   "path": "index.html",
+   "bytes": 15671,
+   "sha256": "1f0d8c66e8f7fdc1291468356734a6f3b992e3b3430bb4cdef31c40901117e0f"
+  },
+  {
+   "path": "teardown.jpg",
+   "bytes": 63869,
+   "sha256": "77f9aeea15e4c330309f78c6792be7b5da94c1271792b62a8a9a04926817015f"
+  },
+  {
+   "path": "usability.jpg",
+   "bytes": 72910,
+   "sha256": "10ee94146327fd0cd93c5728c47d989676dae9118b4512465cbcc8f52899542a"
+  }
+ ]
+}

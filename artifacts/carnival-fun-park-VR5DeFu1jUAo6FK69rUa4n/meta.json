@@ -1,0 +1,28 @@
+{
+ "title": "Carnival Fun Park",
+ "url": "https://claude.ai/artifact/VR5DeFu1jUAo6FK69rUa4n",
+ "type": "web page",
+ "updated": "2026-10-22",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 345505,
+   "sha256": "2f364e3e50c9f51ae68ac8bd2e0d606a8e877ceddd199e8ce8a3e7ebec8ce509"
+  },
+  {
+   "path": "models/anims.js",
+   "bytes": 486485,
+   "sha256": "d1a7720e8689f343edf424d065eb3955f9ca9fe9986cc491bd8d24894a0de78d"
+  },
+  {
+   "path": "models/female.js",
+   "bytes": 2751670,
+   "sha256": "e251f831406eb25d7c7b9415afccf71b0b7540805a15757e8ba61009b44abd3d"
+  },
+  {
+   "path": "models/male.js",
+   "bytes": 783088,
+   "sha256": "13c364b0b93178890371d40921e1fd07947d287952d0caee93d2e525b8984b51"
+  }
+ ]
+}

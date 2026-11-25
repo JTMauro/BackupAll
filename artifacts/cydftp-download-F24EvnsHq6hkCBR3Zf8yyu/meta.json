@@ -1,0 +1,28 @@
+{
+ "title": "CydFTP Download",
+ "url": "https://claude.ai/artifact/F24EvnsHq6hkCBR3Zf8yyu",
+ "type": "web page",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "cydftp-source.b64.txt",
+   "bytes": 7149212,
+   "sha256": "f8050efd54ecf5986f64d54b2de253d038152b2f7d9f3db4000ee83634675966"
+  },
+  {
+   "path": "files.png",
+   "bytes": 239486,
+   "sha256": "9099f61bc16921dac61d1235dc04e058bd7b103a7acc2adc06e8669fd4c62335"
+  },
+  {
+   "path": "home.png",
+   "bytes": 371754,
+   "sha256": "ae62a030f0385ea2c64ed025724895606537548fec6fcd3b01aaddf1eaf16d93"
+  },
+  {
+   "path": "index.html",
+   "bytes": 11491,
+   "sha256": "ddfbd27781fc944498dc9567685be57844850dedefb77c0e942632a2ec7ffc60"
+  }
+ ]
+}

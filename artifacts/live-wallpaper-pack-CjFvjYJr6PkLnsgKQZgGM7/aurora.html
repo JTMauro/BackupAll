@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurora Lake</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#01030c}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. aurora.html?speed=0.5 =====
+const CFG = {
+  fps: 40,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  speed: 1,      // how fast the curtains drift
+  intensity: 0.65, // aurora brightness
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const rand = (a, b) => a + Math.random() * (b - a);
+let W, H, DPR, lakeY, bg, fg, au, ag, AW, AH, curtains = [], twinkles = [], shoot = null, t = 0;
+
+function curtainSprite(stops) {
+  const cv = document.createElement('canvas'); cv.width = 1; cv.height = 256;
+  const g = cv.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  stops.forEach(([p, col]) => gr.addColorStop(p, col));
+  g.fillStyle = gr; g.fillRect(0, 0, 1, 256); return cv;
+}
+const RIBBONS = [
+  { base: .42, amp: .08, hgt: .4, f: [1.3, 2.9, 5.1], sp: [.05, -.08, .13], spr: null, stops: [[0, 'rgba(255,60,170,0)'], [.35, 'rgba(160,70,255,.22)'], [.75, 'rgba(50,255,150,.6)'], [.95, 'rgba(180,255,210,.95)'], [1, 'rgba(50,255,150,0)']] },
+  { base: .5, amp: .05, hgt: .3, f: [1.9, 3.7, 7.3], sp: [-.06, .1, -.15], spr: null, stops: [[0, 'rgba(60,140,255,0)'], [.4, 'rgba(60,200,255,.2)'], [.8, 'rgba(70,255,190,.55)'], [.96, 'rgba(210,255,230,.9)'], [1, 'rgba(70,255,190,0)']] },
+  { base: .3, amp: .06, hgt: .28,  f: [.9, 2.3, 4.4], sp: [.04, .07, -.1], spr: null, stops: [[0, 'rgba(255,40,90,0)'], [.5, 'rgba(255,60,130,.18)'], [.85, 'rgba(160,90,255,.35)'], [1, 'rgba(160,90,255,0)']] },
+];
+
+function mountains(g, base, h, rough, col, seed) {
+  g.fillStyle = col; g.beginPath(); g.moveTo(0, base);
+  let y = base - h * .5;
+  for (let xx = 0; xx <= W; xx += 6 * DPR) {
+    const u = xx / W;
+    y = base - h * (.45 + .35 * Math.sin(u * 5 + seed) + .2 * Math.sin(u * 13 + seed * 3)) - rough * Math.random();
+    g.lineTo(xx, y);
+  }
+  g.lineTo(W, base); g.closePath(); g.fill();
+}
+function trees(g, base, col) {
+  g.fillStyle = col;
+  for (let xx = 0; xx < W; xx += rand(3, 9) * DPR) {
+    const th = rand(.015, .05) * H, tw = th * .32;
+    g.beginPath(); g.moveTo(xx, base - th); g.lineTo(xx + tw, base); g.lineTo(xx - tw, base); g.fill();
+  }
+  g.fillRect(0, base - 2 * DPR, W, 2 * DPR + 1);
+}
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  lakeY = H * .76;
+  AW = Math.ceil(W / 4); AH = Math.ceil(H / 4);
+  au = document.createElement('canvas'); au.width = AW; au.height = AH; ag = au.getContext('2d');
+  RIBBONS.forEach(r => r.spr = curtainSprite(r.stops));
+  bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+  const g = bg.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, lakeY);
+  gr.addColorStop(0, '#01030c'); gr.addColorStop(.6, '#04122a'); gr.addColorStop(1, '#0b2b3c');
+  g.fillStyle = gr; g.fillRect(0, 0, W, lakeY);
+  for (let i = 0; i < W * H / 2500; i++) { g.fillStyle = `rgba(255,255,255,${rand(.1, .8)})`; const s = rand(.5, 1.5) * DPR; g.fillRect(Math.random() * W, Math.random() * lakeY, s, s); }
+  const lg = g.createLinearGradient(0, lakeY, 0, H);
+  lg.addColorStop(0, '#082030'); lg.addColorStop(1, '#010409');
+  g.fillStyle = lg; g.fillRect(0, lakeY, W, H - lakeY);
+  // mirrored stars on lake
+  g.save(); g.globalAlpha = .35; g.translate(0, lakeY * 2); g.scale(1, -1); g.drawImage(bg, 0, 0, W, lakeY, 0, 0, W, lakeY); g.restore();
+  twinkles = Array.from({ length: 70 }, () => ({ x: Math.random() * W, y: Math.random() * lakeY * .8, ph: Math.random() * 6, sp: rand(.8, 2.5) }));
+  fg = document.createElement('canvas'); fg.width = W; fg.height = H;
+  const f = fg.getContext('2d');
+  mountains(f, lakeY, H * .2, H * .006, '#071420', 1);
+  mountains(f, lakeY, H * .11, H * .004, '#040c14', 4);
+  trees(f, lakeY, '#010407');
+  // reflection of the shoreline
+  f.save(); f.globalAlpha = .55; f.translate(0, lakeY * 2); f.scale(1, -1); f.drawImage(fg, 0, 0, W, lakeY, 0, 0, W, lakeY); f.restore();
+  f.fillStyle = 'rgba(160,220,255,.05)';
+  for (let i = 0; i < 300; i++) f.fillRect(Math.random() * W, lakeY + Math.pow(Math.random(), .8) * (H - lakeY), rand(6, 40) * DPR, DPR);
+}
+
+function drawAurora() {
+  ag.globalCompositeOperation = 'source-over';
+  ag.clearRect(0, 0, AW, AH);
+  ag.globalCompositeOperation = 'lighter';
+  const T = t * CFG.speed;
+  for (const r of RIBBONS) {
+    for (let i = 0; i < AW; i++) {
+      const u = i / AW;
+      const n = Math.sin(u * r.f[0] * 6.28 + T * r.sp[0] * 6) * .55 + Math.sin(u * r.f[1] * 6.28 + T * r.sp[1] * 6) * .3 + Math.sin(u * r.f[2] * 6.28 + T * r.sp[2] * 6) * .15;
+      const yb = AH * (r.base + n * r.amp);
+      const rays = Math.sin(u * 90 + T * .8 + Math.sin(u * 7 + T * .3) * 4) * .5 + .5;
+      const band = Math.sin(u * r.f[0] * 3 + T * .2) * .5 + .5;
+      const hgt = AH * r.hgt * (.8 + .2 * rays);
+      ag.globalAlpha = Math.min(1, (.05 + .95 * Math.pow(band, 3)) * (.6 + .4 * rays) * CFG.intensity);
+      ag.drawImage(r.spr, 0, 0, 1, 256, i, yb - hgt, 1.5, hgt);
+    }
+  }
+  ag.globalAlpha = 1;
+}
+
+function frame(dt) {
+  t += dt;
+  x.drawImage(bg, 0, 0);
+  for (const s of twinkles) { x.globalAlpha = .4 + .6 * (Math.sin(t * s.sp + s.ph) + 1) / 2; x.fillStyle = '#fff'; x.fillRect(s.x, s.y, 1.6 * DPR, 1.6 * DPR); }
+  x.globalAlpha = 1;
+  if (!shoot && Math.random() < dt / 9) shoot = { x: rand(.1, .9) * W, y: rand(.05, .35) * H, vx: rand(-1, 1) * W * .6, vy: H * .25, life: 0 };
+  if (shoot) {
+    shoot.life += dt; const p = shoot.life / .9;
+    const sx = shoot.x + shoot.vx * shoot.life, sy = shoot.y + shoot.vy * shoot.life;
+    const g = x.createLinearGradient(sx, sy, sx - shoot.vx * .15, sy - shoot.vy * .15);
+    g.addColorStop(0, `rgba(255,255,255,${1 - p})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.strokeStyle = g; x.lineWidth = 1.5 * DPR; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx - shoot.vx * .15, sy - shoot.vy * .15); x.stroke();
+    if (p >= 1) shoot = null;
+  }
+  drawAurora();
+  x.globalCompositeOperation = 'lighter';
+  x.save(); x.beginPath(); x.rect(0, 0, W, lakeY); x.clip(); x.drawImage(au, 0, 0, W, H); x.restore();
+  x.save(); x.beginPath(); x.rect(0, lakeY, W, H - lakeY); x.clip();
+  x.globalAlpha = .4; x.translate(0, lakeY * 2); x.scale(1, -1); x.drawImage(au, 0, 0, W, H); x.restore();
+  x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+  x.drawImage(fg, 0, 0);
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

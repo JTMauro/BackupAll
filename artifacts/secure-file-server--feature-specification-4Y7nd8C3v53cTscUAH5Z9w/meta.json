@@ -1,0 +1,18 @@
+{
+ "title": "Secure File Server: Feature Specification",
+ "url": "https://claude.ai/artifact/4Y7nd8C3v53cTscUAH5Z9w",
+ "type": "Docs",
+ "updated": "2026-11-04",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "ae928ce26e5e10bd93c32194477c951255db3b8da39cc438d19f5dcd3b042841"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 30552,
+   "sha256": "61d6323cf8403de903d268aa51fb90f51868c50e55d3a03e2ebdbc61799608e1"
+  }
+ ]
+}

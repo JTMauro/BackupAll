@@ -1,0 +1,295 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DataTerm</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="vendor/codemirror/show-hint.css">
+<link rel="stylesheet" href="vendor/codemirror/dialog.css">
+<link rel="stylesheet" href="style.css">
+<canvas id="binary-bg" aria-hidden="true"></canvas>
+<header>
+  <h1><img class="logo" src="icon.svg" alt="">DataTerm <small id="app-version" class="muted"></small></h1>
+  <nav>
+    <button data-tab="editor" class="active">SQL Editor</button>
+    <button data-tab="catalog">Catalog</button>
+    <button data-tab="schedules">Schedules</button>
+    <button data-tab="upload">Upload</button>
+    <button data-tab="s3">S3 Browser</button>
+    <button data-tab="history">History</button>
+    <button data-tab="connections">Connections</button>
+    <button data-tab="settings" id="nav-settings" hidden>Settings</button>
+  </nav>
+  <span class="spacer"></span>
+  <span id="whoami" class="muted"></span>
+</header>
+
+<main>
+  <!-- ===================== SQL editor ===================== -->
+  <section id="tab-editor" class="tab active">
+    <aside class="explorer">
+      <label>Connection <select id="conn-select"></select></label>
+      <div class="explorer-head">
+        <input id="tree-filter" placeholder="Filter tables…">
+        <button id="schema-refresh" class="small" title="Reload schema">↻</button>
+      </div>
+      <ul id="schema-tree" class="tree"></ul>
+    </aside>
+
+    <div class="workspace">
+      <div class="editor-tabs" id="editor-tabs"></div>
+      <div class="toolbar">
+        <button id="run-btn" class="primary" title="Run the statement at the cursor, or the selection (Ctrl/⌘+Enter)">Run ▶</button>
+        <button id="run-all-btn" title="Run every statement in the script (Ctrl/⌘+Shift+Enter)">Run all ⏩</button>
+        <button id="cancel-btn" disabled>Cancel</button>
+        <button id="explain-btn" title="Show the query plan">Explain</button>
+        <button id="format-btn" title="Format SQL (Ctrl/⌘+Shift+F)">Format</button>
+        <button id="save-btn" title="Save to catalog (Ctrl/⌘+S)">Save</button>
+        <button id="versions-btn" hidden>Versions</button>
+        <span class="spacer"></span>
+        <span id="open-query" class="muted"></span>
+        <button id="ai-toggle" title="SQL assistant">✨ Assistant</button>
+      </div>
+      <textarea id="sql"></textarea>
+      <div id="status" class="status muted">Ctrl/⌘+Enter runs the statement at the cursor · Ctrl/⌘+Shift+Enter runs the whole script · Ctrl+Space completes names · ${name} adds a parameter · {{ ref('Folder/Query') }} reuses a catalog query</div>
+      <div class="results-wrap">
+        <div class="result-tabs" id="result-tabs"></div>
+        <div class="result-toolbar" id="result-toolbar" hidden>
+          <input id="grid-filter" placeholder="Filter rows…">
+          <div class="seg" id="view-seg">
+            <button data-view="grid" class="active">Grid</button>
+            <button data-view="chart">Chart</button>
+            <button data-view="profile">Profile</button>
+          </div>
+          <span class="spacer"></span>
+          <span id="result-info" class="muted"></span>
+          <button data-export="csv">CSV</button>
+          <button data-export="xlsx">Excel</button>
+          <button data-export="json">JSON</button>
+          <button id="copy-btn" title="Copy visible rows as tab-separated text">Copy</button>
+        </div>
+        <div class="chart-controls" id="chart-controls" hidden>
+          <label>Type <select id="chart-type">
+            <option value="bar">Bar</option><option value="line">Line</option><option value="area">Area</option>
+            <option value="pie">Pie</option><option value="scatter">Scatter</option></select></label>
+          <label>X <select id="chart-x"></select></label>
+          <span>Y</span> <span id="chart-y" class="chips"></span>
+        </div>
+        <div id="results" class="results"></div>
+      </div>
+    </div>
+
+    <aside class="ai-panel" id="ai-panel" hidden>
+      <div class="ai-head"><strong>SQL assistant</strong><button class="small" id="ai-close">✕</button></div>
+      <textarea id="ai-prompt" rows="4" placeholder="Describe the query you want, e.g. &quot;revenue by region for last month&quot;"></textarea>
+      <div class="row wrap">
+        <button class="primary" data-ai="generate">Write SQL</button>
+        <button data-ai="explain">Explain</button>
+        <button data-ai="optimize">Optimize</button>
+        <button data-ai="fix" id="ai-fix">Fix error</button>
+        <button data-ai="chat">Ask</button>
+      </div>
+      <div id="ai-answer" class="ai-answer muted">Uses the tables open in the explorer as context.</div>
+    </aside>
+  </section>
+
+  <!-- ===================== Catalog ===================== -->
+  <section id="tab-catalog" class="tab">
+    <div class="toolbar">
+      <input id="catalog-search" placeholder="Search name, folder, description or SQL…">
+      <span class="spacer"></span>
+      <button id="git-sync-btn" hidden title="Write shared queries to the configured git repository and commit">Sync to git</button>
+    </div>
+    <div id="catalog-list"></div>
+  </section>
+
+  <!-- ===================== Schedules ===================== -->
+  <section id="tab-schedules" class="tab">
+    <form id="schedule-form" class="card form-grid two">
+      <h2 class="full" id="schedule-form-title">New schedule</h2>
+      <input type="hidden" name="id">
+      <label class="full">Saved query <select name="saved_query_id" required></select></label>
+      <label>What to do
+        <select name="action">
+          <option value="deliver">Deliver results (file to S3 or a folder)</option>
+          <option value="publish">Publish as a table or view</option>
+          <option value="test">Data test (alert if any rows come back)</option>
+        </select></label>
+      <label>Cron (min hour day month weekday) <input name="cron" value="0 7 * * 1-5" required></label>
+      <label>Time zone <input name="timezone" value="America/Los_Angeles" required></label>
+      <label data-for="deliver test">Deliver to <input name="destination" placeholder="s3://bucket/reports/ (blank = exports folder)"></label>
+      <label data-for="deliver test">Format <select name="fmt"><option value="csv">CSV</option><option value="xlsx">Excel</option></select></label>
+      <label data-for="publish">Target <input name="target" placeholder="analytics.daily_sales"></label>
+      <label data-for="publish">Publish as <select name="publish_as"><option value="table">Table (rebuilt each run)</option><option value="view">View</option></select></label>
+      <label class="full">Parameters (one per line: name=value) <textarea name="params" rows="2" placeholder="region=West"></textarea></label>
+      <label>Email to (comma separated) <input name="notify_emails" placeholder="me@cydcor.com"></label>
+      <label>Email when <select name="notify_on"><option value="failure">It fails</option><option value="always">Every run</option><option value="never">Never</option></select></label>
+      <div class="row full"><button class="primary">Save schedule</button><button type="button" id="schedule-reset">Clear</button></div>
+    </form>
+    <table class="grid" id="schedule-table"></table>
+  </section>
+
+  <!-- ===================== Upload ===================== -->
+  <section id="tab-upload" class="tab">
+    <form id="upload-form" class="card form-grid two">
+      <h2 class="full">Upload a CSV or Excel file into a table</h2>
+      <label>Connection <select name="connection" id="upload-conn"></select></label>
+      <label>File <input type="file" name="file" accept=".csv,.tsv,.txt,.xlsx,.xlsm" required></label>
+      <label>Database / schema <select name="namespace" id="upload-ns"></select></label>
+      <label>Table name <input name="table" required pattern="[A-Za-z_][A-Za-z0-9_]*"></label>
+      <label>If the table exists <select name="mode">
+        <option value="create">Stop (create new only)</option><option value="replace">Replace it</option><option value="append">Append rows</option></select></label>
+      <div class="row full"><button type="button" id="upload-preview" class="primary">Preview</button><button id="upload-go" disabled>Load into table</button></div>
+      <div class="full muted">Athena uploads go to the connection's upload S3 folder as a new table; Redshift stages the file in S3 and runs COPY.</div>
+    </form>
+    <div id="upload-result"></div>
+  </section>
+
+  <!-- ===================== S3 ===================== -->
+  <section id="tab-s3" class="tab">
+    <div class="toolbar">
+      <select id="s3-bucket"></select>
+      <input id="s3-bucket-manual" placeholder="or type a bucket name">
+      <button id="s3-go">Open</button>
+      <span id="s3-crumbs" class="crumbs"></span>
+    </div>
+    <table class="grid" id="s3-table"></table>
+  </section>
+
+  <!-- ===================== History ===================== -->
+  <section id="tab-history" class="tab">
+    <div class="toolbar">
+      <input id="history-q" placeholder="Search SQL…">
+      <input id="history-user" placeholder="User">
+      <select id="history-status"><option value="">Any status</option><option>succeeded</option><option>failed</option><option>cancelled</option><option>running</option></select>
+      <select id="history-source"><option value="">Editor &amp; schedules</option><option value="editor">Editor</option><option value="schedule">Schedules</option></select>
+      <button id="history-refresh">Search</button>
+    </div>
+    <table class="grid" id="history-table"></table>
+  </section>
+
+  <!-- ===================== Connections ===================== -->
+  <section id="tab-connections" class="tab">
+    <form id="conn-form" class="card form-grid">
+      <h2 id="conn-form-title">New connection</h2>
+      <input type="hidden" name="id">
+      <label>Name <input name="name" required></label>
+      <label>Type
+        <select name="type" id="conn-type">
+          <optgroup label="AWS">
+            <option value="athena">Amazon Athena (S3 data lake)</option>
+            <option value="redshift">Amazon Redshift (Data API)</option>
+            <option value="rds_data">Amazon Aurora (RDS Data API)</option>
+          </optgroup>
+          <optgroup label="Any database">
+            <option value="sql">Database (RDS, SQL Server, Postgres, MySQL, Oracle, Snowflake, BigQuery, Databricks…)</option>
+          </optgroup>
+        </select>
+      </label>
+      <div id="conn-fields" class="form-grid"></div>
+      <div class="row"><button class="primary">Save connection</button><button type="button" id="conn-reset">Clear</button></div>
+    </form>
+    <table class="grid" id="conn-table"></table>
+  </section>
+
+  <!-- ===================== Settings ===================== -->
+  <section id="tab-settings" class="tab">
+    <form id="settings-form" class="card form-grid two">
+      <h2 class="full">Email (schedule alerts)</h2>
+      <label>SMTP server <input name="smtp_host" placeholder="smtp.cydcor.com"></label>
+      <label>Port <input name="smtp_port" placeholder="587"></label>
+      <label>Security <select name="smtp_security"><option value="starttls">STARTTLS</option><option value="ssl">SSL/TLS</option><option value="none">None</option></select></label>
+      <label>Username (optional) <input name="smtp_user"></label>
+      <label>From address <input name="smtp_from" placeholder="dataterm@cydcor.com"></label>
+      <label>…or Amazon SES from address <input name="ses_from" placeholder="used when no SMTP server is set"></label>
+      <p class="full muted">The SMTP password is read from the SMTP_PASSWORD environment variable on the computer or server running DataTerm. It's never stored in the app.</p>
+      <div class="row full"><input id="test-email-to" placeholder="Send a test to…"><button type="button" id="test-email-btn">Send test email</button><span id="test-email-result"></span></div>
+
+      <h2 class="full">SQL assistant (Claude)</h2>
+      <label>Provider <select name="ai_provider"><option value="bedrock">Amazon Bedrock (your AWS account)</option><option value="anthropic">Claude API (ANTHROPIC_API_KEY)</option></select></label>
+      <label>Bedrock region <input name="ai_region" placeholder="us-west-2"></label>
+      <label class="full">Model (blank = default Claude Opus 5.5) <input name="ai_model" placeholder="anthropic.claude-opus-5-5"></label>
+
+      <h2 class="full">Git sync (catalog)</h2>
+      <label>Local git clone folder <input name="git_repo_dir" placeholder="C:\repos\analytics-sql"></label>
+      <label>After committing <select name="git_push"><option value="0">Don't push</option><option value="1">Push</option></select></label>
+
+      <h2 class="full">Backups</h2>
+      <label>Backup folder (blank = default) <input name="backup_dir" placeholder="e.g. \\fileserver\Backups\DataTerm"></label>
+      <label>Keep the newest <input name="backup_keep" type="number" min="1" placeholder="30"></label>
+      <label class="full">Also copy each backup to S3 (optional) <input name="backup_s3_uri" placeholder="s3://my-bucket/dataterm-backups/"></label>
+
+      <div class="row full"><button class="primary">Save settings</button><span id="settings-result"></span></div>
+    </form>
+
+    <div class="card">
+      <h2>Backup &amp; restore</h2>
+      <p class="muted">Connections, the query catalog (with every version), schedules and settings are backed up automatically every day and when DataTerm starts. Saved database passwords stay in the computer's credential store and are not in backups.</p>
+      <div class="row wrap">
+        <button id="backup-now" class="primary">Back up now</button>
+        <a href="/api/backups/export"><button type="button">Download a backup</button></a>
+        <label class="row">Restore from a file <input type="file" id="restore-file" accept=".json"></label>
+        <span id="backup-result"></span>
+      </div>
+      <p class="muted" id="backup-where"></p>
+      <table class="grid" id="backup-table"></table>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== Dialogs ===================== -->
+<dialog id="save-dialog">
+  <form method="dialog" id="save-form" class="form-grid">
+    <h2>Save query</h2>
+    <label>Name <input name="name" required></label>
+    <label>Folder <input name="folder" value="Shared" list="folder-list"></label>
+    <datalist id="folder-list"></datalist>
+    <label>Description <textarea name="description" rows="3"></textarea></label>
+    <label>Who can see it <select name="visibility"><option value="shared">Everyone (shared catalog)</option><option value="private">Only me</option></select></label>
+    <label class="check"><input type="checkbox" name="as_new"> Save as a new copy</label>
+    <div class="row"><button value="save" class="primary">Save</button><button value="cancel" formnovalidate>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog id="params-dialog">
+  <form method="dialog" id="params-form" class="form-grid">
+    <h2>Query parameters</h2>
+    <div id="params-fields" class="form-grid"></div>
+    <div class="row"><button value="run" class="primary">Run</button><button value="cancel" formnovalidate>Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog id="versions-dialog" class="wide">
+  <div class="form-grid">
+    <h2 id="versions-title">Versions</h2>
+    <div class="versions">
+      <ul id="versions-list" class="version-list"></ul>
+      <pre id="versions-sql" class="sql-view"></pre>
+    </div>
+    <div class="row"><button id="versions-restore" class="primary" disabled>Restore this version</button><button id="versions-close">Close</button></div>
+  </div>
+</dialog>
+
+<dialog id="ddl-dialog" class="wide">
+  <div class="form-grid">
+    <h2 id="ddl-title">DDL</h2>
+    <pre id="ddl-sql" class="sql-view"></pre>
+    <div class="row"><button id="ddl-insert" class="primary">Insert into editor</button><button id="ddl-close">Close</button></div>
+  </div>
+</dialog>
+
+<script src="vendor/codemirror/codemirror.js"></script>
+<script src="vendor/codemirror/sql.js"></script>
+<script src="vendor/codemirror/show-hint.js"></script>
+<script src="vendor/codemirror/sql-hint.js"></script>
+<script src="vendor/codemirror/searchcursor.js"></script>
+<script src="vendor/codemirror/dialog.js"></script>
+<script src="vendor/codemirror/search.js"></script>
+<script src="vendor/codemirror/matchbrackets.js"></script>
+<script src="vendor/codemirror/comment.js"></script>
+<script src="vendor/chartjs/chart.umd.js"></script>
+<script src="vendor/sql-formatter/sql-formatter.min.js"></script>
+<script src="mock-api.js"></script>
+<script src="util.js"></script>
+<script src="editor.js"></script>
+<script src="pages.js"></script>
+
+</body></html>

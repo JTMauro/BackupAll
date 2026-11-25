@@ -1,0 +1,146 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydArt Download</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the CydFTP-style "spec sheet": hero with the download bay, screenshots, then build steps and what's included. Single dark look on purpose, matching the app family. */
+:root {
+  --chassis: #0f1319; --panel: #18202a; --panel-hi: #232d3a; --rule: #2c3644;
+  --text: #e8eef6; --dim: #9fb0c3; --led: #38bdf8; --led-deep: #0c6aa0; --lime: #cddb28; --ok: #3fb950; --warn: #e3b341;
+  --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", Consolas, ui-monospace, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px), radial-gradient(ellipse 90% 60% at 80% 0%, #1c2633 0%, var(--chassis) 70%); background-color: var(--chassis); color: var(--text); font: 400 16px/1.6 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 64px; display: grid; gap: 40px; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .02em; }
+h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.05; }
+h1 .p { background: linear-gradient(180deg, #bdeeff, #38bdf8 50%, #1288c4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h2 { font-size: 1.35rem; }
+p { margin: 0; }
+.eyebrow { font: 500 .78rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--led); display: flex; gap: 10px; align-items: center; }
+.led { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+.hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+.hero-copy { display: grid; gap: 16px; min-width: 0; }
+.lede { color: var(--dim); font-size: 1.08rem; max-width: 56ch; }
+.bay { background: linear-gradient(180deg, var(--panel-hi), var(--panel) 30%, #121821); border: 1px solid #06080b; border-top-color: #4a586a; border-radius: 16px; box-shadow: 0 18px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06); padding: 24px; display: grid; gap: 16px; min-width: 0; }
+.file { display: flex; gap: 14px; align-items: center; }
+.file-icon { width: 46px; height: 54px; flex: none; border-radius: 6px; background: linear-gradient(180deg, #3a4656, #222a35); border: 1px solid #06080b; display: grid; place-items: center; font: 600 .7rem var(--mono); color: var(--led); }
+.file-name { font: 500 1rem var(--mono); word-break: break-all; }
+.file-meta { color: var(--dim); font-size: .88rem; }
+.btn { appearance: none; cursor: pointer; width: 100%; font: 600 1.08rem var(--body); color: #fff; letter-spacing: .01em; padding: 15px 20px; border-radius: 11px; background: linear-gradient(180deg, #5ccbf7, #1d93cf 50%, #12709f); border: 1px solid #063149; border-top-color: #9be3ff; box-shadow: 0 6px 18px rgba(14,165,233,.35), inset 0 1px 0 rgba(255,255,255,.35); transition: transform .08s, filter .15s; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid #e0f6ff; outline-offset: 3px; }
+.btn[disabled] { cursor: default; filter: grayscale(.6) brightness(.7); }
+.status { font-size: .9rem; color: var(--dim); min-height: 1.4em; }
+.status.ok { color: var(--ok); } .status.warn { color: var(--warn); }
+.note { font-size: .86rem; color: var(--dim); border-top: 1px solid var(--rule); padding-top: 12px; }
+.shot { margin: 0; display: grid; gap: 10px; min-width: 0; }
+.shot img { width: 100%; max-width: 100%; height: auto; border-radius: 14px; border: 1px solid #06080b; box-shadow: 0 24px 50px rgba(0,0,0,.6); display: block; }
+.shot figcaption { color: var(--dim); font-size: .88rem; }
+.shots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; }
+.steps li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 .9rem var(--mono); color: var(--led); border: 1px solid var(--led-deep); background: #0b1118; }
+code, .cmd { font-family: var(--mono); font-size: .88rem; }
+.cmd { display: block; background: #06090c; border: 1px solid #000; border-bottom-color: var(--rule); border-radius: 8px; padding: 10px 12px; color: #7ee787; overflow-x: auto; white-space: pre; margin-top: 6px; }
+.specs { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 18px; }
+.specs dt { font: 500 .8rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); padding-top: 3px; }
+.specs dd { margin: 0; }
+.muted { color: var(--dim); }
+@media (max-width: 860px) { .hero, .cols { grid-template-columns: minmax(0, 1fr); } .shots { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+</style>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="led" aria-hidden="true"></span>Version 2.1.0 · Lite 2.1.0 · Ready</div>
+      <h1>Cyd<span class="p">Art</span></h1>
+      <p class="lede">Photo editor, paint studio, video editor, viewer and library, starring Cydni. Opens HEIC, RAW, PSD and 270+ image formats, plays and edits MP4, MOV, MKV, AVI, WMV and more, and installs as your default photo and video app alongside the fast CydArt Lite viewer. Formerly CydPhoto.</p>
+    </div>
+    <div class="bay" aria-labelledby="dl-title">
+      <h2 id="dl-title">Download</h2>
+      <div class="file">
+        <div class="file-icon" aria-hidden="true">ZIP</div>
+        <div>
+          <div class="file-name">cydart-source.zip</div>
+          <div class="file-meta">17.8 MB · both apps, one-click signed build, website copy</div>
+        </div>
+      </div>
+      <button class="btn" id="dl-btn" type="button">Download CydArt</button>
+      <div class="status" id="dl-status" role="status" aria-live="polite"></div>
+      <p class="note">This is the source package. On a PC with the Cydcor code-signing certificate, double-click <code>BUILD CYDART.cmd</code> to make the signed installer for everyone. The steps are below.</p>
+    </div>
+  </section>
+
+  <section class="shots" aria-label="Screenshots">
+    <figure class="shot"><img src="home.jpg" alt="CydArt Home on the Video tab: Cydni holding a clapperboard in the upper-left, Photo, Draw and Video tabs, and Play a video, New video project and Edit a video buttons" loading="eager"><figcaption>Home: after Cydni's camera-flash intro, pick Photo, Draw or Video. Cydni holds a clapperboard on Video.</figcaption></figure>
+    <figure class="shot"><img src="editor.jpg" alt="CydArt video editor with a circle-reveal transition between two clips, an animated title, and Titles, Overlay, Main and Music tracks on the timeline" loading="lazy"><figcaption>Video editor: transitions, titles, looks, green screen, music, export to MP4 and more.</figcaption></figure>
+    <figure class="shot"><img src="lite.jpg" alt="CydArt Lite playing a video full screen with player controls and a filmstrip" loading="lazy"><figcaption>CydArt Lite: the fast photo and video viewer for double-click opening.</figcaption></figure>
+  </section>
+
+  <section class="cols">
+    <div class="bay">
+      <h2>Make the signed Windows installer</h2>
+      <ol class="steps">
+        <li><div>Unzip <code>cydart-source.zip</code> on a Windows PC that has the Cydcor code-signing certificate. If the certificate is on a USB token, plug it in.</div></li>
+        <li><div>Double-click <code>BUILD CYDART.cmd</code>. The first time, it installs Python 3.13, Inno Setup and the Windows signing tools if they're missing, then builds and self-tests both apps.</div></li>
+        <li><div>Approve any Windows prompts for those installs, and enter the token PIN if asked. It signs <code>CydArt.exe</code>, <code>CydArtLite.exe</code> and the installer, then checks the signatures.</div></li>
+        <li><div>The <code>Output</code> folder opens with <code>CydArt-2.1.0-Setup.exe</code> and <code>CydArt-2.1.0-release.zip</code>: the signed installer, checksums, <code>DEPLOY.md</code> and a default-apps file for IT, ready to share.</div></li>
+      </ol>
+      <p class="muted" style="font-size:.88rem">No certificate on this PC? It still builds, names the installer <code>-UNSIGNED</code> and tells you. Prefer to run it without building? In the <code>cydart</code> folder:</p>
+      <span class="cmd">python -m venv .venv
+.venv\Scripts\pip install -r desktop\requirements.txt
+.venv\Scripts\python desktop\cydart_app.py</span>
+    </div>
+    <div class="bay">
+      <h2>What's in the package</h2>
+      <dl class="specs">
+        <dt>Apps</dt><dd>CydArt (photo, paint, video, library) and CydArt Lite (viewer). One installer with check boxes: install either or both. Replaces CydPhoto.</dd>
+        <dt>Defaults</dt><dd>Registered with Open with and Settings → Default apps for 32 photo types and 23 video types, including HEIC, RAW, MP4, MOV and MKV.</dd>
+        <dt>Opens</dt><dd>270+ formats: HEIC/HEIF, camera RAW, TIFF, layered PSD, AVIF, JPEG XL, JPEG 2000 and every web format.</dd>
+        <dt>Video</dt><dd>Plays anything (FFmpeg bundled). Timeline editor: splice, crop, transitions, titles, looks, slow-mo, green screen, music, scene export, frame screenshots. 33 export formats incl. HEVC, ProRes, GIF and audio.</dd>
+        <dt>Convert</dt><dd>Batch-convert any mix of photos, videos and music to any format, with resizing.</dd>
+        <dt>Saves</dt><dd>True HEIC, PNG, JPEG, WebP, AVIF, layered PSD, TIFF, GIF, BMP, ICO, JPEG XL, PDF, SVG and more.</dd>
+        <dt>Signing</dt><dd>SHA-256 Authenticode with RFC 3161 timestamp. Picks the Cydcor certificate automatically.</dd>
+        <dt>Offline</dt><dd>Everything bundled. Photos and the Library stay on the PC.</dd>
+        <dt>Needs</dt><dd>Windows 10/11 64-bit with Edge WebView2 (built in). Building needs Python 3.11 to 3.13.</dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var btn = document.getElementById('dl-btn'), status = document.getElementById('dl-status');
+  function say(msg, cls) { status.textContent = msg; status.className = 'status' + (cls ? ' ' + cls : ''); }
+  var downloadsP = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  btn.addEventListener('click', async function () {
+    btn.disabled = true; say('Preparing the file…');
+    try {
+      var downloads = await downloadsP;
+      if (!downloads) { say('Downloads aren’t available in this view. Open this page on claude.ai to download.', 'warn'); btn.disabled = false; return; }
+      var parts = ['cydart-source.b64.0.txt', 'cydart-source.b64.1.txt'], b64 = '';
+      for (var k = 0; k < parts.length; k++) { var res = await fetch(parts[k]); if (!res.ok) throw { code: 'fetch', message: 'HTTP ' + res.status }; b64 += (await res.text()).trim(); say('Preparing the file… ' + Math.round((k + 1) / parts.length * 100) + '%'); }
+      var bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      say('Confirm the download in the prompt.');
+      await downloads.save({ filename: 'cydart-source.zip', data: new Blob([bytes], { type: 'application/zip' }) });
+      say('Saved cydart-source.zip. Unzip it and double-click BUILD CYDART.cmd.', 'ok');
+    } catch (e) {
+      var code = e && e.code;
+      if (code === 'declined') say('Download cancelled.');
+      else if (code === 'rate_limited') say('A download prompt is already open. Finish that one first.', 'warn');
+      else if (code === 'fetch') say('The file couldn’t be loaded. Reload the page and try again.', 'warn');
+      else say('Downloads aren’t available in this view. Open this page on claude.ai to download.', 'warn');
+    }
+    btn.disabled = false;
+  });
+})();
+</script>
+
+</body></html>

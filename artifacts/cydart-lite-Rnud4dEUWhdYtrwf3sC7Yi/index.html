@@ -1,0 +1,99 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CydArt Lite</title>
+<meta name="description" content="CydArt Lite: a fast photo viewer that opens HEIC, RAW, TIFF, PSD and 270+ formats.">
+<meta name="theme-color" content="#0f1319">
+<link rel="icon" href="icons/icon-lite.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-lite-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/lite.css">
+<link rel="stylesheet" href="css/video.css">
+</head>
+<body class="lite">
+<header class="appbar lite-bar">
+  <div class="brand" aria-label="CydArt Lite">
+    <span class="brand-mark lite-mark" aria-hidden="true"></span>
+    <span class="brand-word"><span class="cyd">Cyd</span><span class="photo">Art</span> <span class="lite-tag">Lite</span></span>
+  </div>
+  <div class="lite-actions">
+    <button class="btn raised primary" id="l-open" type="button">Open</button>
+    <button class="btn raised" id="l-folder" type="button">Folder</button>
+    <label class="lite-sort"><span class="sr">Sort</span>
+      <select id="l-sort" aria-label="Sort photos">
+        <option value="name">Name</option><option value="date">Date modified</option><option value="size">File size</option><option value="type">Type</option>
+      </select></label>
+    <button class="btn raised" id="l-play" type="button">Slideshow</button>
+    <button class="btn raised" id="l-convert" type="button">Convert</button>
+  </div>
+  <div class="appbar-right">
+    <button class="icon-btn" id="btn-install" title="Install CydArt Lite" aria-label="Install CydArt Lite" hidden><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg></button>
+    <button class="icon-btn" id="btn-theme" title="Light / dark" aria-label="Toggle light or dark theme"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>
+    <button class="icon-btn" id="btn-about" title="About CydArt Lite" aria-label="About menu" aria-haspopup="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 11v6M12 7.5v.5"/></svg></button>
+  </div>
+</header>
+
+<main id="lite-main">
+  <section class="lite-empty" id="l-empty">
+    <div class="lite-drop" id="l-drop">
+      <span class="lite-hero-mark" aria-hidden="true"></span>
+      <h1>Drop photos or videos here</h1>
+      <p>Or open files or a whole folder. Photos in HEIC, RAW, TIFF, PSD, AVIF, JPEG XL and 270+ more formats, and videos in MP4, MOV, MKV, AVI, WMV and more. Nothing is uploaded; photos stay on your device.</p>
+      <div class="row gap wrap center">
+        <button class="btn primary raised lg" id="l-open2" type="button">Open files</button>
+        <button class="btn raised lg" id="l-folder2" type="button">Open folder</button>
+      </div>
+    </div>
+  </section>
+  <section class="lite-grid-wrap" id="l-gridwrap" hidden>
+    <div class="lite-gridbar"><span id="l-count"></span><label class="lite-zoom">Size <input type="range" id="l-size" min="100" max="320" value="170" aria-label="Thumbnail size"></label><button class="btn sm ghost" id="l-clear" type="button">Close all</button></div>
+    <div class="lite-grid" id="l-grid" tabindex="0" aria-label="Photos"></div>
+  </section>
+</main>
+
+<div class="lv" id="lv" role="dialog" aria-label="Photo viewer" tabindex="-1" hidden>
+  <div class="lv-top">
+    <button class="icon-btn" id="lv-back" aria-label="Back to all photos" title="All photos (Esc)"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="lv-title"><b id="lv-name"></b><span id="lv-sub"></span></div>
+    <div class="lv-tools" role="toolbar" aria-label="Viewer tools">
+      <button class="icon-btn" id="lv-zout" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 1 0 0 14 7 7 0 1 0 0-14zM21 21l-6-6M7 10h6"/></svg></button>
+      <button class="lv-zoomval" id="lv-zval" title="Fit / actual size (0 / 1)">100%</button>
+      <button class="icon-btn" id="lv-zin" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 1 0 0 14 7 7 0 1 0 0-14zM21 21l-6-6M7 10h6M10 7v6"/></svg></button>
+      <span class="lv-sep"></span>
+      <button class="icon-btn" id="lv-rotl" aria-label="Rotate left" title="Rotate left (Shift+R)"><svg viewBox="0 0 24 24"><path d="M4 4v6h6M4.5 15a8 8 0 1 0 1.9-8.3L4 10"/></svg></button>
+      <button class="icon-btn" id="lv-rotr" aria-label="Rotate right" title="Rotate right (R)"><svg viewBox="0 0 24 24"><path d="M20 4v6h-6M19.5 15a8 8 0 1 1-1.9-8.3L20 10"/></svg></button>
+      <button class="icon-btn" id="lv-flip" aria-label="Flip" title="Flip horizontal (H)"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l-5 5 5 5V7zM16 7l5 5-5 5V7z"/></svg></button>
+      <span class="lv-sep"></span>
+      <button class="icon-btn" id="lv-play" aria-label="Slideshow" title="Slideshow (Space)"><svg viewBox="0 0 24 24"><path d="M7 5v14l12-7z"/></svg></button>
+      <button class="icon-btn" id="lv-full" aria-label="Full screen" title="Full screen (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="icon-btn" id="lv-info" aria-label="Info" title="Info (I)"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18zM12 11v6M12 7.5v.5"/></svg></button>
+      <button class="icon-btn" id="lv-more" aria-label="More actions" title="More"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.7" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+  <div class="lv-stage" id="lv-stage"><img id="lv-img" alt="" draggable="false"><div class="lv-msg" id="lv-msg" hidden></div></div>
+  <button class="lv-nav prev" id="lv-prev" aria-label="Previous photo"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="lv-nav next" id="lv-next" aria-label="Next photo"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <aside class="lv-info" id="lv-infopanel" hidden></aside>
+  <div class="lv-strip" id="lv-strip"></div>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+<div id="drop-hint" hidden><div>Drop to view</div></div>
+
+<script src="js/version.js"></script>
+<script src="js/core.js"></script>
+<script src="js/formats.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/media.js"></script>
+<script src="js/player.js"></script>
+<script src="js/convert.js"></script>
+<script src="js/lite.js"></script>
+</body>
+</html>
+
+</body></html>

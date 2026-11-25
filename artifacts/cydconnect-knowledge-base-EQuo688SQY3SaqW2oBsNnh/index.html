@@ -1,0 +1,452 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydConnect Knowledge Base</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a sticky search header, then a single column of answer cards; editor tools appear only for editors.
+   Palette: Cydcor blue on cool neutrals; light and dark themes. */
+:root{
+  --bg:#F3F6F9; --panel:#FFFFFF; --panel-2:#EDF2F7; --line:#D5DEE7; --ink:#0F1A26; --muted:#5A6B7C;
+  --cyd:#0088C2; --cyd-strong:#006E9E; --on-cyd:#FFFFFF; --cyd-soft:#E2F2FA; --ok:#1E8E4E; --ok-soft:#E3F4EA; --warn:#A85F00; --warn-soft:#FBEFD9; --bad:#C0392B;
+  --code-bg:#0E1923; --code-ink:#BFF0FF;
+  --display:"Montserrat", "Segoe UI", system-ui, sans-serif; --body:"Inter", "Segoe UI", system-ui, sans-serif; --mono:"JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A111A; --panel:#121C28; --panel-2:#182434; --line:#26364A; --ink:#E7EEF5; --muted:#93A6B8;
+  --cyd:#2BB3EE; --cyd-strong:#5CC6F4; --on-cyd:#03131D; --cyd-soft:#10283A; --ok:#4CC38A; --ok-soft:#0F2A1D; --warn:#E3A33B; --warn-soft:#2E2210; --bad:#EF6B5B;
+  --code-bg:#060B11; --code-ink:#BFF0FF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A111A; --panel:#121C28; --panel-2:#182434; --line:#26364A; --ink:#E7EEF5; --muted:#93A6B8;
+  --cyd:#2BB3EE; --cyd-strong:#5CC6F4; --on-cyd:#03131D; --cyd-soft:#10283A; --ok:#4CC38A; --ok-soft:#0F2A1D; --warn:#E3A33B; --warn-soft:#2E2210; --bad:#EF6B5B;
+  --code-bg:#060B11; --code-ink:#BFF0FF; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:980px;margin:0 auto;padding-block:20px 60px;display:grid;gap:16px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:grid;gap:10px;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px;flex:none}
+h1{margin:0;font:800 22px/1.1 var(--display);letter-spacing:.01em;text-wrap:balance}
+h1 small{display:block;font:700 11px var(--display);letter-spacing:.22em;color:var(--cyd);margin-bottom:3px}
+.spacer{flex:1}
+.who{font-size:13px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--body);padding:3px 10px;border-radius:999px;background:var(--panel-2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.pill.editor{background:var(--cyd-soft);color:var(--cyd-strong);border-color:transparent}
+.searchrow{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea,button{font:inherit;color:var(--ink)}
+#q{flex:1;min-width:0;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:16px}
+#q:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--cyd);outline-offset:1px}
+select{padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{border:none;background:none;padding:7px 12px;border-radius:8px;color:var(--muted);font-weight:600;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--cyd-soft);color:var(--cyd-strong)}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:8px 13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--cyd)}
+.btn.primary{background:var(--cyd);border-color:var(--cyd);color:var(--on-cyd)}
+.btn.small{padding:4px 10px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+.stats{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.note{font-size:14px;color:var(--muted);padding:12px 14px;border-radius:10px;background:var(--panel);border:1px dashed var(--line)}
+.list{display:grid;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:10px;min-width:0}
+.card h3{margin:0;font:700 17px/1.35 var(--body);text-wrap:balance}
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted)}
+.chip{font:600 12px var(--body);padding:2px 9px;border-radius:999px;background:var(--panel-2);color:var(--muted)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.draft{background:var(--warn-soft);color:var(--warn)} .chip.app{background:var(--cyd-soft);color:var(--cyd-strong)}
+.answer{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.cmd{display:flex;gap:8px;align-items:stretch;min-width:0}
+.cmd code{flex:1;min-width:0;overflow-x:auto;display:block;font:500 13.5px/1.5 var(--mono);background:var(--code-bg);color:var(--code-ink);padding:10px 12px;border-radius:9px;white-space:pre}
+.files{display:flex;gap:8px;flex-wrap:wrap}
+.files a{font-size:13px;color:var(--cyd-strong);text-decoration:none;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+.files a:hover{border-color:var(--cyd)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+mark{background:var(--cyd-soft);color:inherit;border-radius:3px;padding:0 2px}
+.form{background:var(--panel);border:1px solid var(--cyd);border-radius:12px;padding:16px 18px;display:grid;gap:12px}
+.form h2{margin:0;font:800 17px var(--display)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label.f{display:grid;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+label.f input,label.f textarea,label.f select{font-weight:400;color:var(--ink);padding:9px 11px;border-radius:9px;border:1px solid var(--line);background:var(--bg)}
+label.f textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status{font-size:13px;min-height:18px}
+.status.err{color:var(--bad)} .status.ok{color:var(--ok)}
+.confirm{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--bad)}
+table.q{width:100%;border-collapse:collapse;font-size:14px}
+table.q th,table.q td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.q th{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.scroll{overflow-x:auto}
+@media (max-width:640px){ .grid2{grid-template-columns:1fr} h1{font-size:19px} }
+@media (prefers-reduced-motion: no-preference){ .card{transition:border-color .15s} .card:hover{border-color:var(--cyd)} }
+.howit{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 16px}
+.howit summary{cursor:pointer;font:700 15px var(--body);padding:10px 0;color:var(--cyd-strong)}
+.howit .scroll svg{min-width:640px;display:block;margin-bottom:12px}
+.howit svg{--kb-box:var(--panel);--kb-it:var(--cyd-soft);--kb-ok:var(--ok-soft);--kb-okline:var(--ok);--kb-ink:var(--ink);--kb-muted:var(--muted);--kb-line:var(--cyd);--kb-num:var(--cyd);--kb-arrow:var(--muted);--kb-zone:var(--cyd)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div class="brand">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="13" fill="var(--cyd)"/><path d="M18 32 l8 6 -8 6" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><rect x="31" y="41" width="15" height="4" rx="2" fill="#fff"/><circle cx="44" cy="20" r="6" fill="none" stroke="#fff" stroke-width="3.5"/><path d="M48.5 24.5 L53 29" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
+        <h1><small>CYDCOR</small>CydConnect Knowledge Base</h1>
+      </div>
+      <span class="spacer"></span>
+      <span class="pill" id="role">Loading…</span>
+    </div>
+    <div class="searchrow">
+      <input id="q" type="search" placeholder="Ask a question, e.g. “silent install” or “find big files”" aria-label="Search the knowledge base" autocomplete="off">
+      <select id="fApp" aria-label="Filter by app"><option value="">All apps</option></select>
+      <select id="fCat" aria-label="Filter by category"><option value="">All categories</option></select>
+    </div>
+    <div class="row">
+      <div class="tabs" role="group" aria-label="Views">
+        <button type="button" data-view="answers" aria-pressed="true">Answers</button>
+        <button type="button" data-view="questions" aria-pressed="false">Questions to answer</button>
+      </div>
+      <span class="spacer"></span>
+      <span class="stats" id="stats"></span>
+    </div>
+  </header>
+
+  <details class="howit"><summary>How this knowledge base works</summary><div class="scroll"><svg width="100%" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="kbt kbd" font-family="Inter, 'Segoe UI', Arial, sans-serif">
+<title id="kbt">How the CydConnect Knowledge Base learns</title>
+<desc id="kbd">A person searches the answers. If they find it, they use it. If not, they ask a question: the question goes to the Questions list and is emailed to itservicedesk@cydcor.com. An editor reviews it and saves a new approved answer, exports it to the Claude project and the CydConnect app, and the next person finds it.</desc>
+<style>
+ .bx{fill:var(--kb-box,#FFFFFF);stroke:var(--kb-line,#00A1E0);stroke-width:2}
+ .it{fill:var(--kb-it,#E3F4FB);stroke:var(--kb-line,#00A1E0);stroke-width:2}
+ .ok{fill:var(--kb-ok,#E6F5EC);stroke:var(--kb-okline,#1E8E4E);stroke-width:2}
+ .t{fill:var(--kb-ink,#0F1A26);font-size:19px;font-weight:700}
+ .s{fill:var(--kb-muted,#4F6274);font-size:14.5px}
+ .n{fill:var(--kb-num,#00A1E0);font-size:19px;font-weight:800}
+ .a{stroke:var(--kb-arrow,#5A6B7C);stroke-width:2;fill:none;marker-end:url(#ah)}
+ .ln{stroke:var(--kb-arrow,#5A6B7C);stroke-width:2;fill:none}
+ .lb{fill:var(--kb-muted,#4F6274);font-size:14px;font-weight:700}
+ .zone{fill:none;stroke:var(--kb-zone,#9FD9F2);stroke-width:1.5;stroke-dasharray:6 6}
+ .zl{fill:var(--kb-num,#00A1E0);font-size:13px;font-weight:800;letter-spacing:2px}
+</style>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--kb-arrow,#5A6B7C)"/></marker></defs>
+
+<rect class="zone" x="896" y="190" width="290" height="345" rx="16"/>
+<text class="zl" x="912" y="214">EDITORS ONLY</text>
+
+<!-- 1 search -->
+<rect class="bx" x="30" y="50" width="260" height="84" rx="12"/>
+<text class="n" x="50" y="85">1</text><text class="t" x="74" y="85">Search the answers</text>
+<text class="s" x="50" y="112">Everyone · read-only</text>
+<!-- decision -->
+<path class="bx" d="M430 42 L520 92 L430 142 L340 92 Z"/>
+<text class="t" x="430" y="98" text-anchor="middle">Found it?</text>
+<!-- use -->
+<rect class="ok" x="600" y="50" width="280" height="84" rx="12"/>
+<text class="t" x="620" y="85">Use the answer</text>
+<text class="s" x="620" y="112">Copy the command into the terminal</text>
+<path class="a" d="M290 92 H336"/><path class="a" d="M520 92 H596"/><text class="lb" x="545" y="82">Yes</text>
+
+<!-- 2 ask -->
+<rect class="bx" x="300" y="250" width="260" height="84" rx="12"/>
+<text class="n" x="320" y="285">2</text><text class="t" x="344" y="285">Ask a question</text>
+<text class="s" x="320" y="312">Questions tab · Prepare email</text>
+<path class="a" d="M430 142 V246"/><text class="lb" x="440" y="200">No</text>
+
+<rect class="bx" x="610" y="200" width="270" height="76" rx="12"/>
+<text class="t" x="628" y="232">Questions list</text>
+<text class="s" x="628" y="257">Waits for review; changes nothing</text>
+<rect class="bx" x="610" y="300" width="270" height="76" rx="12"/>
+<text class="t" x="628" y="332">Emailed</text>
+<text class="s" x="628" y="357">itservicedesk@cydcor.com</text>
+<path class="a" d="M560 292 H585 V238 H606"/><path class="a" d="M585 292 V338 H606"/>
+
+<!-- 3 review -->
+<rect class="it" x="915" y="240" width="255" height="84" rx="12"/>
+<text class="n" x="935" y="275">3</text><text class="t" x="959" y="275">Review and answer</text>
+<text class="s" x="935" y="302">Answer, or Remove duplicates</text>
+<path class="a" d="M880 238 H898 V282 H911"/><path class="ln" d="M880 338 H898 V282"/>
+
+<!-- 4 approved -->
+<rect class="it" x="915" y="430" width="255" height="84" rx="12"/>
+<text class="n" x="935" y="465">4</text><text class="t" x="959" y="465">Save the answer</text>
+<text class="s" x="935" y="492">New KB-0063 · marked Answered</text>
+<path class="a" d="M1042 324 V426"/>
+
+<!-- 5 export -->
+<rect class="bx" x="600" y="430" width="280" height="84" rx="12"/>
+<text class="n" x="620" y="465">5</text><text class="t" x="644" y="465">Export CSV</text>
+<text class="s" x="620" y="492">Refresh the Claude project and app</text>
+<path class="a" d="M915 472 H884"/>
+
+<!-- next person -->
+<rect class="ok" x="30" y="430" width="300" height="84" rx="12"/>
+<text class="t" x="50" y="465">Next person finds it</text>
+<text class="s" x="50" y="492">Asked once, answered for everyone</text>
+<path class="a" d="M600 472 H334"/>
+<path class="a" d="M160 430 V138"/>
+
+<text class="s" x="30" y="575">Answers change only when an editor saves them. Questions and emails never change the knowledge base by themselves.</text>
+</svg>
+</div></details>
+
+  <div class="row" id="editorBar" hidden>
+    <button type="button" class="btn primary" id="addBtn">Add an answer</button>
+    <label class="btn" for="importFile">Import workbook or CSV</label>
+    <input type="file" id="importFile" accept=".xlsx,.csv" hidden>
+    <button type="button" class="btn" id="exportBtn">Export CSV for SharePoint</button>
+    <button type="button" class="btn" id="exportJson">Export JSON for the app</button>
+    <span class="status" id="barStatus" role="status"></span>
+  </div>
+
+  <div id="formHost"></div>
+  <div class="note" id="notice" hidden></div>
+
+  <section id="answersView" class="list" aria-live="polite"></section>
+
+  <section id="questionsView" hidden>
+    <form class="form" id="askForm">
+      <h2>Ask a question</h2>
+      <p class="stats" style="margin:0">Your question is emailed to itservicedesk@cydcor.com from your own Outlook. An editor adds the answer here.</p>
+      <div class="grid2">
+        <label class="f">Your question<input name="question" required maxlength="400" placeholder="How do I…"></label>
+        <label class="f">App<select name="app"><option>CydConnect Data</option><option>CydConnect Files</option><option>CydConnect Terminal</option><option>Build kit</option><option>Other</option></select></label>
+      </div>
+      <label class="f">What were you doing? (optional)<input name="context" maxlength="400"></label>
+      <div class="row"><button class="btn primary" type="submit">Prepare email</button><span class="status" id="askStatus" role="status"></span></div>
+    </form>
+    <div class="scroll"><table class="q" id="qTable"></table></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const FIELDS = ["id","app","category","question","answer","command","tags","status","owner","updated"];
+const state = { entries: [], questions: [], view: "answers", canEdit: false, canWrite: false, db: null, assets: null, downloads: null, me: null, loaded: false, editing: null, confirmDel: null };
+
+/* ---------------------------------------------------------------- rendering */
+function terms(){ return $("#q").value.toLowerCase().split(/\s+/).filter(t => t.length > 1); }
+function score(e, ts){
+  if (!ts.length) return 1;
+  const hay = [e.question, e.tags, e.answer, e.command, e.category, e.app].join(" ").toLowerCase();
+  let s = 0; for (const t of ts){ if (!hay.includes(t)) return 0; s += (e.question || "").toLowerCase().includes(t) ? 3 : (e.tags || "").toLowerCase().includes(t) ? 2 : 1; }
+  return s;
+}
+function hl(text, ts){
+  let out = esc(text);
+  for (const t of ts){ const re = new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi"); out = out.replace(re, "<mark>$1</mark>"); }
+  return out;
+}
+function fillFilters(){
+  const apps = [...new Set(state.entries.map(e => e.app).filter(Boolean))].sort();
+  const cats = [...new Set(state.entries.map(e => e.category).filter(Boolean))].sort();
+  const keep = (sel, vals, label) => { const v = sel.value; sel.innerHTML = `<option value="">${label}</option>` + vals.map(x => `<option>${esc(x)}</option>`).join(""); if (vals.includes(v)) sel.value = v; };
+  keep($("#fApp"), apps, "All apps"); keep($("#fCat"), cats, "All categories");
+}
+function renderAnswers(){
+  const host = $("#answersView");
+  if (!state.loaded){ host.innerHTML = `<div class="note">Loading answers…</div>`; return; }
+  const ts = terms(), app = $("#fApp").value, cat = $("#fCat").value;
+  const visible = state.entries.filter(e => state.canEdit || e.status !== "Draft - review");
+  const rows = visible.filter(e => (!app || e.app === app) && (!cat || e.category === cat))
+    .map(e => [score(e, ts), e]).filter(([s]) => s > 0).sort((a, b) => b[0] - a[0] || String(a[1].id).localeCompare(String(b[1].id))).map(([, e]) => e);
+  $("#stats").textContent = `${rows.length} of ${visible.length} answers`;
+  if (!visible.length){ host.innerHTML = `<div class="note">No answers yet. ${state.canEdit ? "Click “Add an answer” or import the starter workbook." : "Editors are adding them; ask a question on the Questions tab."}</div>`; return; }
+  if (!rows.length){ host.innerHTML = `<div class="note">Nothing matches. Try fewer words, or <button type="button" class="btn small" id="askFromSearch">ask a question</button>.</div>`;
+    $("#askFromSearch")?.addEventListener("click", () => { setView("questions"); $("#askForm").question.value = $("#q").value; $("#askForm").question.focus(); }); return; }
+  host.innerHTML = rows.map(e => {
+    const draft = e.status === "Draft - review";
+    const files = (e.files || []).map(f => `<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a>`).join("");
+    const del = state.confirmDel === e._doc
+      ? `<span class="confirm">Delete this answer? <button type="button" class="btn small danger" data-del-yes="${esc(e._doc)}">Delete</button><button type="button" class="btn small" data-del-no>Keep</button></span>`
+      : `<button type="button" class="btn small" data-edit="${esc(e._doc)}">Edit</button><button type="button" class="btn small danger" data-del="${esc(e._doc)}">Delete</button>`;
+    return `<article class="card" id="card-${esc(e._doc)}">
+      <div class="meta"><span class="chip app">${esc(e.app)}</span><span>${esc(e.category)}</span><span class="chip ${draft ? "draft" : "ok"}">${draft ? "Draft, not reviewed" : "Verified ✓"}</span><span>${esc(e.id)}</span></div>
+      <h3>${hl(e.question, ts)}</h3>
+      ${e.answer ? `<p class="answer">${hl(e.answer, ts)}</p>` : ""}
+      ${e.command ? `<div class="cmd"><code>${esc(e.command)}</code><button type="button" class="btn small" data-copy="${esc(e._doc)}">Copy</button></div>` : ""}
+      ${files ? `<div class="files">${files}</div>` : ""}
+      ${state.canEdit ? `<div class="actions">${del}</div>` : ""}
+    </article>`;
+  }).join("");
+}
+function renderQuestions(){
+  const t = $("#qTable");
+  const open = state.questions.slice().sort((a, b) => String(b.askedOn || "").localeCompare(String(a.askedOn || "")));
+  if (!open.length){ t.innerHTML = `<tr><td class="note">No questions waiting.</td></tr>`; return; }
+  t.innerHTML = `<tr><th>Asked</th><th>App</th><th>Question</th><th>Status</th>${state.canEdit ? "<th></th>" : ""}</tr>` + open.map(q =>
+    `<tr><td>${esc(q.askedOn)}</td><td>${esc(q.app)}</td><td>${esc(q.question)}${q.context ? `<div class="stats">${esc(q.context)}</div>` : ""}</td><td>${esc(q.status)}${q.answerId ? ` → ${esc(q.answerId)}` : ""}</td>
+     ${state.canEdit ? `<td><div class="row">${q.status !== "Answered" ? `<button type="button" class="btn small" data-answer="${esc(q._doc)}">Answer</button>` : ""}<button type="button" class="btn small danger" data-qdel="${esc(q._doc)}">Remove</button></div></td>` : ""}</tr>`).join("");
+}
+function render(){ state.view === "answers" ? renderAnswers() : renderQuestions(); }
+function setView(v){
+  state.view = v;
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  $("#answersView").hidden = v !== "answers"; $("#questionsView").hidden = v !== "questions";
+  render();
+}
+
+/* ---------------------------------------------------------------- editor form */
+function openForm(entry, prefill){
+  const e = entry || { id: nextId(), app: "CydConnect Data", category: "Using the app", question: prefill || "", answer: "", command: "", tags: "", status: "Approved", files: [] };
+  state.editing = { doc: entry?._doc || e.id, files: [...(e.files || [])] };
+  $("#formHost").innerHTML = `<form class="form" id="editForm">
+    <h2>${entry ? "Edit answer " + esc(e.id) : "New answer " + esc(e.id)}</h2>
+    <label class="f">Question<input name="question" required value="${esc(e.question)}"></label>
+    <label class="f">Answer<textarea name="answer">${esc(e.answer)}</textarea></label>
+    <label class="f">Command (what Insert puts at the prompt)<input name="command" value="${esc(e.command)}" style="font-family:var(--mono)"></label>
+    <div class="grid2">
+      <label class="f">App<input name="app" list="appList" value="${esc(e.app)}"></label>
+      <label class="f">Category<input name="category" list="catList" value="${esc(e.category)}"></label>
+      <label class="f">Tags (separate with ;)<input name="tags" value="${esc(e.tags)}"></label>
+      <label class="f">Status<select name="status"><option ${e.status === "Approved" ? "selected" : ""}>Approved</option><option ${e.status === "Draft - review" ? "selected" : ""}>Draft - review</option></select></label>
+    </div>
+    <datalist id="appList">${[...new Set(state.entries.map(x => x.app))].map(a => `<option value="${esc(a)}">`).join("")}</datalist>
+    <datalist id="catList">${[...new Set(state.entries.map(x => x.category))].map(a => `<option value="${esc(a)}">`).join("")}</datalist>
+    <div class="row"><label class="btn" for="attach">Attach files</label><input type="file" id="attach" multiple hidden><span class="files" id="attached"></span></div>
+    <div class="row"><button class="btn primary" type="submit">Save answer</button><button class="btn" type="button" id="cancelEdit">Cancel</button><span class="status" id="formStatus" role="status"></span></div>
+  </form>`;
+  drawAttached();
+  $("#editForm").scrollIntoView({ block: "start", behavior: "smooth" });
+  $("#editForm").question.focus();
+}
+function drawAttached(){
+  $("#attached").innerHTML = state.editing.files.map((f, i) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a><button type="button" class="btn small" data-unattach="${i}" aria-label="Remove ${esc(f.name)}">✕</button>`).join("");
+}
+function nextId(){
+  const n = Math.max(0, ...state.entries.map(e => parseInt(String(e.id).replace(/\D/g, ""), 10) || 0)) + 1;
+  return "KB-" + String(n).padStart(4, "0");
+}
+function today(){ return new Date().toISOString().slice(0, 10); }
+const SERVICE_DESK = "itservicedesk@cydcor.com";
+function mailtoFor(q){
+  const subject = `CydConnect question: ${q.question.slice(0, 80)}`;
+  const body = `Question: ${q.question}\nApp: ${q.app}\nWhat I was doing: ${q.context || "-"}\nAsked on: ${q.askedOn}\n\nSent from the CydConnect Knowledge Base page.`;
+  return `mailto:${SERVICE_DESK}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/* ---------------------------------------------------------------- import / export */
+function rowsFromFile(file){
+  return file.arrayBuffer().then(buf => {
+    if (/\.csv$/i.test(file.name)){
+      const wb = XLSX.read(new TextDecoder().decode(buf), { type: "string" });
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
+    }
+    const wb = XLSX.read(buf, { type: "array" });
+    const name = wb.SheetNames.find(n => /q\s*&?\s*a/i.test(n)) || wb.SheetNames[0];
+    return XLSX.utils.sheet_to_json(wb.Sheets[name], { defval: "" });
+  });
+}
+function normalize(r){
+  const pick = (...keys) => { for (const k of Object.keys(r)) if (keys.includes(k.trim().toLowerCase())) return String(r[k] ?? "").trim(); return ""; };
+  return { id: pick("id"), app: pick("app"), category: pick("category"), question: pick("question"), answer: pick("answer"), command: pick("command"),
+           tags: pick("tags"), status: pick("status") || "Approved", owner: pick("owner") || "Editors", updated: pick("updated") || today() };
+}
+function csv(rows){
+  const q = v => /[",\n]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : String(v ?? "");
+  return [FIELDS.join(","), ...rows.map(e => FIELDS.map(f => q(e[f] ?? "")).join(","))].join("\r\n");
+}
+async function save(filename, text){
+  const st = $("#barStatus");
+  if (!state.downloads){ st.className = "status err"; st.textContent = "Saving files isn't available in this view."; return; }
+  try { await state.downloads.save({ filename, data: text }); st.className = "status ok"; st.textContent = `Saved ${filename}`; }
+  catch (e){ st.className = "status err"; st.textContent = e?.code === "declined" ? "Save cancelled." : "The file wasn't saved. Try again."; }
+}
+
+/* ---------------------------------------------------------------- events */
+$("#q").addEventListener("input", () => { if (state.view !== "answers") setView("answers"); else renderAnswers(); });
+$("#fApp").addEventListener("change", renderAnswers); $("#fCat").addEventListener("change", renderAnswers);
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+$("#addBtn").addEventListener("click", () => openForm(null));
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  if (b.dataset.copy){ const e = state.entries.find(x => x._doc === b.dataset.copy);
+    try { await navigator.clipboard.writeText(e.command); b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1500); }
+    catch { const code = b.previousElementSibling; const r = document.createRange(); r.selectNodeContents(code); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }
+  if (b.dataset.edit) openForm(state.entries.find(x => x._doc === b.dataset.edit));
+  if (b.dataset.del){ state.confirmDel = b.dataset.del; renderAnswers(); }
+  if (b.hasAttribute("data-del-no")){ state.confirmDel = null; renderAnswers(); }
+  if (b.dataset.delYes){ try { await state.db.collection("kb").doc(b.dataset.delYes).delete(); } catch { $("#barStatus").className = "status err"; $("#barStatus").textContent = "Couldn't delete it. Try again."; } state.confirmDel = null; }
+  if (b.id === "cancelEdit"){ $("#formHost").innerHTML = ""; state.editing = null; }
+  if (b.dataset.unattach !== undefined){ state.editing.files.splice(Number(b.dataset.unattach), 1); drawAttached(); }
+  if (b.dataset.answer){ const q = state.questions.find(x => x._doc === b.dataset.answer); state.answering = q._doc; setView("answers"); openForm(null, q.question); }
+  if (b.dataset.qdel){ try { await state.db.collection("questions").doc(b.dataset.qdel).delete(); } catch {} }
+  if (b.id === "exportBtn") save(`CydConnect-Knowledge-Base-${today()}.csv`, csv(state.entries));
+  if (b.id === "exportJson") save(`cydconnect-kb-${today()}.json`, JSON.stringify(state.entries.filter(e => e.status === "Approved").map(e => Object.fromEntries(FIELDS.map(f => [f, e[f] ?? ""]))), null, 1));
+});
+document.addEventListener("change", async ev => {
+  if (ev.target.id === "attach"){
+    const st = $("#formStatus");
+    if (!state.assets){ st.className = "status err"; st.textContent = "Only editors can attach files."; return; }
+    for (const f of ev.target.files){
+      st.className = "status"; st.textContent = `Uploading ${f.name}…`;
+      try { const a = await state.assets.upload(f); state.editing.files.push({ id: a.id, url: a.url, name: f.name, size: a.sizeBytes, type: a.contentType }); drawAttached(); st.textContent = ""; }
+      catch (e){ st.className = "status err"; st.textContent = `${f.name} wasn't uploaded (${e?.code || "error"}). Images, PDFs, text and CSV files up to 20 MB work.`; }
+    }
+    ev.target.value = "";
+  }
+  if (ev.target.id === "importFile"){
+    const st = $("#barStatus"), file = ev.target.files[0]; ev.target.value = ""; if (!file) return;
+    st.className = "status"; st.textContent = `Reading ${file.name}…`;
+    try {
+      const rows = (await rowsFromFile(file)).map(normalize).filter(r => r.question);
+      if (!rows.length){ st.className = "status err"; st.textContent = "No rows with a Question column were found."; return; }
+      let n = 0, id = parseInt(nextId().slice(3), 10);
+      for (const r of rows){
+        if (!r.id) r.id = "KB-" + String(id++).padStart(4, "0");
+        const existing = state.entries.find(e => e.id === r.id);
+        await state.db.collection("kb").doc(r.id).set({ ...r, files: existing?.files || [] });
+        st.textContent = `Imported ${++n} of ${rows.length}…`;
+      }
+      st.className = "status ok"; st.textContent = `Imported ${n} answers from ${file.name}.`;
+    } catch (e){ st.className = "status err"; st.textContent = e?.code === "quota_exceeded" ? "The knowledge base is full; remove old answers first." : "Import stopped. Check the file has ID, App, Category, Question and Answer columns."; }
+  }
+});
+document.addEventListener("submit", async ev => {
+  ev.preventDefault();
+  if (ev.target.id === "editForm"){
+    const f = ev.target, st = $("#formStatus"), id = state.editing.doc;
+    const entry = { id, app: f.app.value.trim(), category: f.category.value.trim(), question: f.question.value.trim(), answer: f.answer.value.trim(),
+      command: f.command.value.trim(), tags: f.tags.value.trim(), status: f.status.value, owner: "Editors", updated: today(), files: state.editing.files };
+    st.className = "status"; st.textContent = "Saving…";
+    try {
+      await state.db.collection("kb").doc(id).set(entry);
+      if (state.answering){ await state.db.collection("questions").doc(state.answering).update({ status: "Answered", answerId: id }); state.answering = null; }
+      $("#formHost").innerHTML = ""; state.editing = null;
+      document.getElementById("card-" + id)?.scrollIntoView({ block: "center" });
+    } catch (e){ st.className = "status err"; st.textContent = "Couldn't save. Only editors can change answers."; }
+  }
+  if (ev.target.id === "askForm"){
+    const f = ev.target, st = $("#askStatus");
+    const q = { question: f.question.value.trim(), app: f.app.value, context: f.context.value.trim(), askedOn: today(), status: "Open", answerId: "" };
+    let saved = false;
+    if (state.canWrite && state.db){ try { await state.db.collection("questions").add(q); saved = true; } catch {} }
+    st.className = "status ok";
+    st.innerHTML = `${saved ? "Saved to the list. " : ""}Last step: <a class="btn small primary" href="${esc(mailtoFor(q))}" target="_blank" rel="noopener">Email itservicedesk@cydcor.com</a>`;
+    f.reset();
+  }
+});
+
+/* ---------------------------------------------------------------- boot */
+(async () => {
+  render();
+  const [db, user, downloads, assets] = await Promise.all(["db", "user", "downloads", "assets"].map(n => window.claude?.use?.(n).catch(() => null) ?? Promise.resolve(null)));
+  state.db = db; state.downloads = downloads; state.assets = assets;
+  if (user){ state.canEdit = !!(await user.canEdit()); state.canWrite = (await user.can("data.write")) !== false; }
+  $("#role").textContent = state.canEdit ? "Editor" : "Read-only"; $("#role").classList.toggle("editor", state.canEdit);
+  $("#editorBar").hidden = !state.canEdit;
+  if (!db){ state.loaded = true; $("#notice").hidden = false; $("#notice").textContent = "The knowledge base can't be reached in this view. Open it in Claude while signed in to your Cydcor account."; render(); return; }
+  const slow = setTimeout(() => { if (!state.loaded){ $("#notice").hidden = false; $("#notice").textContent = "Still connecting to the knowledge base…"; } }, 10000);
+  db.collection("kb").onSnapshot(snap => {
+    state.entries = snap.docs.map(d => ({ ...d.data(), _doc: d.id }));
+    if (!snap.metadata.fromCache){ state.loaded = true; clearTimeout(slow); $("#notice").hidden = true; }
+    else if (state.entries.length) state.loaded = true;
+    fillFilters(); render();
+  }, () => { state.loaded = true; clearTimeout(slow); $("#notice").hidden = false; $("#notice").textContent = "The knowledge base stopped updating. Reload the page."; render(); });
+  db.collection("questions").onSnapshot(snap => { state.questions = snap.docs.map(d => ({ ...d.data(), _doc: d.id })); if (state.view === "questions") renderQuestions(); }, () => {});
+})();
+</script>
+
+</body></html>

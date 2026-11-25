@@ -1,0 +1,73 @@
+{
+ "title": "CydVerse Documents",
+ "url": "https://claude.ai/artifact/9yvkC2XdHJ75sN5Jh35y7U",
+ "type": "web page",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "CydVerse-Administrator-Manual.docx.b64.txt",
+   "bytes": 3943108,
+   "sha256": "2d85bdb812c868598ca336a3471fcb068f030df386bd0c10934fcff2090e82e0"
+  },
+  {
+   "path": "CydVerse-Concept.docx.b64.txt",
+   "bytes": 4146164,
+   "sha256": "d78fc2d8a2b578443e34071c728d1f69c35939b5f107c051e913a72ee997e6fb"
+  },
+  {
+   "path": "CydVerse-Concept.pptx.b64.txt",
+   "bytes": 4403188,
+   "sha256": "a236b51b5e4a43d3d4096cda4e3f93766bb89e85d72f16f870a90c0047fb7dcd"
+  },
+  {
+   "path": "arch.png",
+   "bytes": 451113,
+   "sha256": "58e0d3e9047aadb1869ba0bc3b9f50b107be5bca48c064a3eb8e15080ec12d14"
+  },
+  {
+   "path": "control.png",
+   "bytes": 223176,
+   "sha256": "daad73cf51f481403f7ce7980ae020c12d15de2f6478c13f56d07f7ffc1949ef"
+  },
+  {
+   "path": "ha.png",
+   "bytes": 426321,
+   "sha256": "ffdcb6a09f720b6a6b8bf6d9443bd1c7cc0efc0030c76f03f99d4b1a0f128a72"
+  },
+  {
+   "path": "index.html",
+   "bytes": 16512,
+   "sha256": "337c219a880af03c44f62d713f6968c67d818456cffed475a20f5d9bf9594195"
+  },
+  {
+   "path": "journey.png",
+   "bytes": 215834,
+   "sha256": "f3ebe6e250e854c8c878733d3315e5ee027a346ef32eb255c799f939fe51994d"
+  },
+  {
+   "path": "migrate.png",
+   "bytes": 416127,
+   "sha256": "33d2be8d88906c047ad0e97551f2e95d3dbabe03ce49cafa6165f20820accb4c"
+  },
+  {
+   "path": "mission.png",
+   "bytes": 400143,
+   "sha256": "5f003382186ec4f10f29b4519bdfb7010a0ff15987965e21e7c3612823dd1b82"
+  },
+  {
+   "path": "net.png",
+   "bytes": 341994,
+   "sha256": "188d5ede8e772d828423c9a2a70813cf6884b06d24394e4b31cc87b579e29a87"
+  },
+  {
+   "path": "servers.png",
+   "bytes": 378767,
+   "sha256": "d28dedcaa05c27ad0cd26fc6684d2258ce782dd84b4d8bc982a3bcf5b0692ae0"
+  },
+  {
+   "path": "sites.png",
+   "bytes": 434337,
+   "sha256": "8c4677cbd56567f4838cc7c65e2e24b7056ebe2ebf9af64cab3bf11fde308efa"
+  }
+ ]
+}

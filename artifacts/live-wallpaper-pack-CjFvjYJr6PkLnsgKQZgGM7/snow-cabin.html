@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Snowfall Cabin</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#06101e}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. snow-cabin.html?snow=2&wind=2 =====
+const CFG = {
+  fps: 60,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  snow: 1,       // snowfall density
+  wind: 1,       // wind strength
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const TAU = Math.PI * 2, rand = (a, b) => a + Math.random() * (b - a);
+let W, H, DPR, scene, flake, puff, flakes = [], smoke = [], chimney, windows = [], t = 0;
+
+function sprite(rgb, soft) {
+  const s = 32, cv = document.createElement('canvas'); cv.width = cv.height = s;
+  const g = cv.getContext('2d'), gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(soft, `rgba(${rgb},.6)`); gr.addColorStop(1, `rgba(${rgb},0)`);
+  g.fillStyle = gr; g.fillRect(0, 0, s, s); return cv;
+}
+
+function hill(g, base, amp, f, seed, top, bottom) {
+  const gr = g.createLinearGradient(0, base - amp, 0, H); gr.addColorStop(0, top); gr.addColorStop(1, bottom);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(0, H);
+  for (let xx = 0; xx <= W; xx += 6 * DPR) g.lineTo(xx, base - amp * (.5 + .3 * Math.sin(xx / W * f + seed) + .2 * Math.sin(xx / W * f * 2.7 + seed * 2)));
+  g.lineTo(W, H); g.fill();
+}
+const hillY = (xx, base, amp, f, seed) => base - amp * (.5 + .3 * Math.sin(xx / W * f + seed) + .2 * Math.sin(xx / W * f * 2.7 + seed * 2));
+
+function snowyPine(g, px, base, h, dark) {
+  g.fillStyle = '#1a1410'; g.fillRect(px - h * .02, base - h * .14, h * .04, h * .14);
+  for (let k = 0; k < 5; k++) {
+    const ty = base - h * .1 - k * h * .16, tw = h * .3 * (1 - k * .16), tip = ty - h * .26;
+    g.fillStyle = dark; g.beginPath(); g.moveTo(px - tw, ty); g.lineTo(px, tip); g.lineTo(px + tw, ty); g.fill();
+    g.fillStyle = 'rgba(230,240,255,.92)'; g.beginPath(); g.moveTo(px - tw * .55, ty - h * .1); g.lineTo(px, tip); g.lineTo(px + tw * .55, ty - h * .1);
+    g.quadraticCurveTo(px, ty - h * .05, px - tw * .55, ty - h * .1); g.fill();
+    g.beginPath(); g.ellipse(px - tw * .75, ty - h * .012, tw * .25, h * .018, 0, 0, TAU); g.ellipse(px + tw * .75, ty - h * .012, tw * .25, h * .018, 0, 0, TAU); g.fill();
+  }
+}
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  flake = sprite('255,255,255', .35); puff = sprite('200,208,225', .2);
+  scene = document.createElement('canvas'); scene.width = W; scene.height = H;
+  const g = scene.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#030814'); gr.addColorStop(.5, '#0d2242'); gr.addColorStop(1, '#2b4a72');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < W * H / 4000; i++) { g.fillStyle = `rgba(255,255,255,${rand(.1, .7)})`; g.fillRect(Math.random() * W, Math.random() * H * .5, DPR, DPR); }
+  const mx = W * .78, my = H * .17, mr = Math.min(W, H) * .045, halo = g.createRadialGradient(mx, my, mr, mx, my, mr * 8);
+  halo.addColorStop(0, 'rgba(200,220,255,.3)'); halo.addColorStop(1, 'rgba(200,220,255,0)');
+  g.fillStyle = halo; g.fillRect(0, 0, W, H); g.fillStyle = '#eef2ff'; g.beginPath(); g.arc(mx, my, mr, 0, TAU); g.fill();
+  hill(g, H * .62, H * .14, 4, 1, '#6d86ad', '#2a3d5c');
+  for (let i = 0; i < 40; i++) { const px = Math.random() * W; snowyPine(g, px, hillY(px, H * .62, H * .14, 4, 1) + 4 * DPR, H * rand(.05, .09), '#13262e'); }
+  hill(g, H * .76, H * .12, 3, 4, '#9fb4d6', '#4a6288');
+  // cabin on the middle hill
+  const cxp = W * .38, base = hillY(cxp, H * .76, H * .12, 3, 4) + 6 * DPR, cw = Math.min(W, H) * .2, ch = cw * .45;
+  g.fillStyle = '#2a1a12'; g.fillRect(cxp - cw / 2, base - ch, cw, ch);
+  g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = DPR; for (let ly = base - ch; ly < base; ly += ch / 7) { g.beginPath(); g.moveTo(cxp - cw / 2, ly); g.lineTo(cxp + cw / 2, ly); g.stroke(); }
+  chimney = [cxp + cw * .25, base - ch - cw * .42];
+  g.fillStyle = '#3a2a24'; g.fillRect(chimney[0] - cw * .04, chimney[1], cw * .08, cw * .3);
+  g.fillStyle = '#e8f0ff'; g.fillRect(chimney[0] - cw * .05, chimney[1] - cw * .025, cw * .1, cw * .03);
+  g.fillStyle = '#e8f0ff'; g.beginPath(); g.moveTo(cxp - cw * .62, base - ch + 2); g.lineTo(cxp, base - ch - cw * .38); g.lineTo(cxp + cw * .62, base - ch + 2); g.closePath(); g.fill();
+  g.fillStyle = '#c4d2ec'; g.beginPath(); g.moveTo(cxp - cw * .62, base - ch + 2); g.lineTo(cxp + cw * .62, base - ch + 2); g.lineTo(cxp + cw * .6, base - ch + cw * .04); g.lineTo(cxp - cw * .6, base - ch + cw * .04); g.fill();
+  windows = [[cxp - cw * .3, base - ch * .62, cw * .16, ch * .34], [cxp + cw * .14, base - ch * .62, cw * .16, ch * .34]];
+  g.fillStyle = '#1a0f0a'; g.fillRect(cxp - cw * .06, base - ch * .7, cw * .12, ch * .7);
+  for (const [wx, wy, ww, wh] of windows) {
+    const lg = g.createRadialGradient(wx + ww / 2, base + ch * .2, 0, wx + ww / 2, base + ch * .2, cw * .5);
+    lg.addColorStop(0, 'rgba(255,170,80,.35)'); lg.addColorStop(1, 'rgba(255,170,80,0)');
+    g.fillStyle = lg; g.fillRect(wx - cw * .5, base - ch, cw * 1.2, ch * 2);
+  }
+  hill(g, H * .93, H * .1, 2.2, 2, '#c8d6ee', '#7d93b8');
+  for (const px of [W * .06, W * .13, W * .82, W * .9, W * .97]) snowyPine(g, px, hillY(px, H * .93, H * .1, 2.2, 2) + 10 * DPR, H * rand(.32, .45), '#0a1a1e');
+  const N = Math.round(W * H / 2500 * CFG.snow);
+  flakes = Array.from({ length: N }, () => ({ x: Math.random() * W, y: Math.random() * H, z: Math.pow(Math.random(), 1.8), ph: Math.random() * TAU }));
+  smoke = [];
+}
+
+function frame(dt) {
+  t += dt;
+  const wind = (Math.sin(t * .13) * .6 + Math.max(0, Math.sin(t * .05)) * Math.sin(t * .9) * .6) * CFG.wind;
+  x.drawImage(scene, 0, 0);
+  // warm flickering windows
+  x.globalCompositeOperation = 'lighter';
+  for (const [wx, wy, ww, wh] of windows) {
+    const fl = .85 + .15 * Math.sin(t * 9 + wx) * Math.sin(t * 5.3);
+    x.fillStyle = `rgba(255,${160 + 40 * fl | 0},70,${fl})`; x.fillRect(wx, wy, ww, wh);
+    const g = x.createRadialGradient(wx + ww / 2, wy + wh / 2, 0, wx + ww / 2, wy + wh / 2, ww * 2.2);
+    g.addColorStop(0, `rgba(255,170,80,${.35 * fl})`); g.addColorStop(1, 'rgba(255,170,80,0)');
+    x.fillStyle = g; x.fillRect(wx - ww * 2, wy - ww * 2, ww * 5, ww * 5);
+  }
+  x.globalCompositeOperation = 'source-over';
+  for (const [wx, wy, ww, wh] of windows) { x.fillStyle = '#2a1a12'; x.fillRect(wx + ww / 2 - DPR, wy, 2 * DPR, wh); x.fillRect(wx, wy + wh / 2 - DPR, ww, 2 * DPR); }
+  // chimney smoke
+  if (Math.random() < dt * 8) smoke.push({ x: chimney[0], y: chimney[1], r: 6 * DPR, a: .5, vy: -rand(18, 28) * DPR });
+  for (const s of smoke) { s.y += s.vy * dt; s.x += (wind * 30 + 6) * DPR * dt; s.r += 10 * DPR * dt; s.a -= dt * .09; }
+  smoke = smoke.filter(s => s.a > 0);
+  for (const s of smoke) { x.globalAlpha = s.a * .5; x.drawImage(puff, s.x - s.r, s.y - s.r, s.r * 2, s.r * 2); }
+  x.globalAlpha = 1;
+  // snow
+  for (const f of flakes) {
+    const sz = (1 + f.z * 7) * DPR, sp = (20 + f.z * 70) * DPR;
+    f.y += sp * dt; f.x += (Math.sin(t * .8 + f.ph) * 10 + wind * 60 * (.4 + f.z)) * DPR * dt;
+    if (f.y > H + 10) { f.y = -10; f.x = Math.random() * W; }
+    if (f.x > W + 10) f.x = -10; if (f.x < -10) f.x = W + 10;
+    x.globalAlpha = .35 + f.z * .55; x.drawImage(flake, f.x - sz, f.y - sz, sz * 2, sz * 2);
+  }
+  x.globalAlpha = 1;
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

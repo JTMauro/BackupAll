@@ -1,0 +1,18 @@
+{
+ "title": "Proximia Connect — Executive Security Overview",
+ "url": "https://claude.ai/artifact/QzTZFwmwoK8UdL6RJCw7st",
+ "type": "Docs",
+ "updated": "2026-10-29",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "d8d74489d4e457b5211c630cc9c6e8d0eb84c6ca8e5961a5a61ee05846e6f152"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 7594,
+   "sha256": "cedab0b2d54c2c780844ab04fee846ecf431e873081221c17bfa4274bc74b0c6"
+  }
+ ]
+}

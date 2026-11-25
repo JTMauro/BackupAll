@@ -1,0 +1,63 @@
+{
+ "title": "CydConnect Preview",
+ "url": "https://claude.ai/artifact/VB2bYfBLvbboNDmCxU75f8",
+ "type": "web page",
+ "updated": "2026-11-20",
+ "files": [
+  {
+   "path": "data_chart.jpg",
+   "bytes": 158833,
+   "sha256": "9b2f2423d03d0117b22a8f69bdcaa08f4b12927fe0ed49c42342e0e55c9d6920"
+  },
+  {
+   "path": "data_emerald.jpg",
+   "bytes": 157921,
+   "sha256": "83e6468e1c2b1de2e99f9a7b60d342f762da44b99bb26ab1b307855007d1b2f6"
+  },
+  {
+   "path": "data_menu.jpg",
+   "bytes": 166207,
+   "sha256": "9472ad36451cb4b230317f6d4792e125104d386f7fbab1e5d5176260596abe03"
+  },
+  {
+   "path": "ftp.jpg",
+   "bytes": 199787,
+   "sha256": "7b83f2d2b993e1dfbeb5d99e238abf37435183ad929a1444b8e334a41d11b6fc"
+  },
+  {
+   "path": "home.jpg",
+   "bytes": 189058,
+   "sha256": "ad7a79ccb8cec08ac398006f4d62f62178ace51abeee18e90a8aacb51346fc06"
+  },
+  {
+   "path": "icon.png",
+   "bytes": 41474,
+   "sha256": "ebc445861b0ba0795f5137bd330e09d8337a5cea9e6abedc2fb183565fef2901"
+  },
+  {
+   "path": "index.html",
+   "bytes": 7429,
+   "sha256": "f03af7361c489adefa6ad1ee85db10c2886540adee06caaf790d816a40043cd2"
+  },
+  {
+   "path": "pgp.jpg",
+   "bytes": 122540,
+   "sha256": "ecc5aa02b41b631ce3c22a15385c3b3d663433a582f7ab96a0fefba55a4a458f"
+  },
+  {
+   "path": "popouts.jpg",
+   "bytes": 202454,
+   "sha256": "06661c75be6d7f97e9462712d5e341a4fc54642e8ea41e8b43834b02eae70a2f"
+  },
+  {
+   "path": "ssh.jpg",
+   "bytes": 147483,
+   "sha256": "795ea841954784ff0dcb82b56aeac0cc3a537e3eb3495bdf03b74c06e1086622"
+  },
+  {
+   "path": "terminal.jpg",
+   "bytes": 118385,
+   "sha256": "e008238c0e5630deef57c1ed664f9c5b9fa179ee24ada8d208a749739fa0a1c3"
+  }
+ ]
+}

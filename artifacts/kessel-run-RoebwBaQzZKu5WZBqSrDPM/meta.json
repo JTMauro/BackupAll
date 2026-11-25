@@ -1,0 +1,13 @@
+{
+ "title": "Kessel Run",
+ "url": "https://claude.ai/artifact/RoebwBaQzZKu5WZBqSrDPM",
+ "type": "web page",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 255584,
+   "sha256": "40f2eba1731145a3949e40b0794eebafe72c6259675cf858b9e1da587ec11b2f"
+  }
+ ]
+}

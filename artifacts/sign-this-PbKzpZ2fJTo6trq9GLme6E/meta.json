@@ -1,0 +1,13 @@
+{
+ "title": "Sign This",
+ "url": "https://claude.ai/artifact/PbKzpZ2fJTo6trq9GLme6E",
+ "type": "web page",
+ "updated": "2026-11-02",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 108905,
+   "sha256": "b8ffcc630ca19844794b081ca6093431f4d77385928205f4467a23b652b91dee"
+  }
+ ]
+}

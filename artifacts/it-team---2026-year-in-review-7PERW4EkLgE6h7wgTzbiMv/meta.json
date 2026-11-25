@@ -1,0 +1,18 @@
+{
+ "title": "IT Team – 2026 Year in Review",
+ "url": "https://claude.ai/artifact/7PERW4EkLgE6h7wgTzbiMv",
+ "type": "Docs",
+ "updated": "2026-11-20",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "6e7fff44cce049cbae17644f10364a1dda6cacb194a29d65ccbf429b6edfdac8"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 6463,
+   "sha256": "654a66edcee512704078b8a11d13122cc203496188a95a54e36c643490720184"
+  }
+ ]
+}

@@ -1,0 +1,298 @@
+{
+ "title": "Recall",
+ "url": "https://claude.ai/artifact/Utud5xqgrTqVyWzwiMCbzt",
+ "type": "web page",
+ "updated": "2026-11-08",
+ "files": [
+  {
+   "path": "features.js",
+   "bytes": 52552,
+   "sha256": "5d046a7e86282fa9aed15e9716a465d9118840c718b0e43d19c93d679962e5b1"
+  },
+  {
+   "path": "games/board.js",
+   "bytes": 54570,
+   "sha256": "85dae279230cb3272f5386519411df46b0c8a7cc7276cc9e4bd533cf383f14a5"
+  },
+  {
+   "path": "games/board2.js",
+   "bytes": 46221,
+   "sha256": "bf9951a94aa895ebf05b3054b7908fcd5438c27bd5473c9a20f8e6b538468635"
+  },
+  {
+   "path": "games/board3.js",
+   "bytes": 66638,
+   "sha256": "77066c7c7d616c2604655d260d94f69ff09f492868f600323bd2b993e756401e"
+  },
+  {
+   "path": "games/cards.js",
+   "bytes": 59148,
+   "sha256": "e1c3fd1d2f258bdb1ce27679632c5527b55c9bc2c7ab5096a4437b90b929edc2"
+  },
+  {
+   "path": "games/cards2.js",
+   "bytes": 68530,
+   "sha256": "cdaaaedd025a3710f4e8c3ef2cbdeb1500b4c9a520bccbda267e9cac9f13a681"
+  },
+  {
+   "path": "games/cards3.js",
+   "bytes": 92377,
+   "sha256": "1085b11e9cf3b2891c78e61b4f6f5e06d68d24833c9c90cd1b1a3eb753067c4d"
+  },
+  {
+   "path": "games/catpat.js",
+   "bytes": 33035,
+   "sha256": "31fc50cdd26d7ad18a9aac3dd52670ff032ad717614194ad899d290cc487c1f1"
+  },
+  {
+   "path": "games/cube.js",
+   "bytes": 69819,
+   "sha256": "153be83252f2ddc65eb47e20df9a131d079b1f2cba29644cdc6dd4f9da505aca"
+  },
+  {
+   "path": "games/cube2.js",
+   "bytes": 74397,
+   "sha256": "23798a34c36917ee2254d9f3e56a5940f0245e65d00b97d3beebba12c1e4eda8"
+  },
+  {
+   "path": "games/daily.js",
+   "bytes": 60242,
+   "sha256": "7d13f70810aacc0414de073d907ffc8dc2ba069e0cd2da71253436bc34c36232"
+  },
+  {
+   "path": "games/everyday.js",
+   "bytes": 57296,
+   "sha256": "78cebaf4693659a83e0cf5254faeb0ed5932c696d1850ed7514d401a8e92aba2"
+  },
+  {
+   "path": "games/extra.js",
+   "bytes": 23358,
+   "sha256": "ae128a91ba3a726e45c55a0ab6d032ddda42cb9ee06cda5ab3417e240c8fc4a2"
+  },
+  {
+   "path": "games/fair1.js",
+   "bytes": 45418,
+   "sha256": "87f843de4154f7fee43ee1bf160ec530abb0c9a1bfc1ccc3208a473299f01f09"
+  },
+  {
+   "path": "games/fair2.js",
+   "bytes": 71137,
+   "sha256": "f51c9a3b0754f1f6aac4b0d34851a4427aa380347a9d98c931f4a6a736958b01"
+  },
+  {
+   "path": "games/fair3.js",
+   "bytes": 43215,
+   "sha256": "fe05c4ac1fa4ca61b2ab339a2e206dfca175724d614292003833b813616e9d9a"
+  },
+  {
+   "path": "games/gentle.js",
+   "bytes": 67832,
+   "sha256": "1d4edc3fadf20f1a1ddf0cb643d0c95267a8450d85e8d5b341be88b2fa17b798"
+  },
+  {
+   "path": "games/gentle3.js",
+   "bytes": 74414,
+   "sha256": "cdb7083c0a1c25c75aaae7ae83aeb2412d88c7e46611ec7a39bd587b38d43641"
+  },
+  {
+   "path": "games/gentle4.js",
+   "bytes": 58332,
+   "sha256": "d57a078163d3ce6ebb323c849b5fdb0357708016268d9312e5127a0cb29e4315"
+  },
+  {
+   "path": "games/gentle5.js",
+   "bytes": 100597,
+   "sha256": "cc883c35f3f2ddb980357153f7ee6abf06f2bb8800d3469ff277d7485ec246af"
+  },
+  {
+   "path": "games/gentle6.js",
+   "bytes": 77035,
+   "sha256": "e2b05b0e5116e04670bface72e30536e507cea98f113e991f6893d7221eb69da"
+  },
+  {
+   "path": "games/gentle7.js",
+   "bytes": 77196,
+   "sha256": "d72bd57e22508e3ae11d3b4980462b049b70c5928b68ba4d44b08dab600704bb"
+  },
+  {
+   "path": "games/logic.js",
+   "bytes": 61486,
+   "sha256": "11017424dc072bdcc83ad696b3cc673899f2fe4207b1195100642a837858150f"
+  },
+  {
+   "path": "games/logic2.js",
+   "bytes": 49693,
+   "sha256": "179526da267afbced8a33c440da7d705c9eed6683fe9060c4d3b9fc4d4e4981d"
+  },
+  {
+   "path": "games/logic3.js",
+   "bytes": 37631,
+   "sha256": "f1483b740d2ac5ccbb60f4dbc035a07a9269c7888a3176a9b68b1f8cd75d2d0c"
+  },
+  {
+   "path": "games/logic4.js",
+   "bytes": 60150,
+   "sha256": "71ab7cd57e85cbfc5cca872405f3a621a733317f885cbd202cbdbe9d8149510c"
+  },
+  {
+   "path": "games/logic5.js",
+   "bytes": 60993,
+   "sha256": "baadd3f6135dbd9c47f28b2c01b32b6b7da8bcd8f7397771d8158dd8a804e779"
+  },
+  {
+   "path": "games/logic6.js",
+   "bytes": 61102,
+   "sha256": "75fed064fb30425b7025bf178e06c24421bcb2dcabee8d3d32f2dd577a706928"
+  },
+  {
+   "path": "games/looking2.js",
+   "bytes": 25977,
+   "sha256": "e86df323bfbd5d4c9cabff6b4b373084f59883052da5fa111cee106f59d6cf9f"
+  },
+  {
+   "path": "games/memory.js",
+   "bytes": 27021,
+   "sha256": "98208f0c2c6a694903bdf5fb28cae89013b5bda18fefd41bd02b8d1b4a42ad23"
+  },
+  {
+   "path": "games/memory2.js",
+   "bytes": 46166,
+   "sha256": "16a79da783d9faea644b2338e73cf8b2a254e3150fff8f9205f1c0d620f55d51"
+  },
+  {
+   "path": "games/misc7.js",
+   "bytes": 65276,
+   "sha256": "952e1f20da9ed505a016fcdaecd7db765d3e8b65779320a42923662e380a4124"
+  },
+  {
+   "path": "games/more1.js",
+   "bytes": 65352,
+   "sha256": "538bcf73134cd745c5e1a942b17376a9266a1517830d95b4387992ae48b2f404"
+  },
+  {
+   "path": "games/music.js",
+   "bytes": 60584,
+   "sha256": "1cdff24176189921a185d79d6b56ee7d6e5a8812bffa892f7a0d26afca387b19"
+  },
+  {
+   "path": "games/puzzle6.js",
+   "bytes": 45925,
+   "sha256": "798245313fd3557f45458659c5685a6c18357ffa86486e4c86dc362ec3e510a1"
+  },
+  {
+   "path": "games/relax.js",
+   "bytes": 67391,
+   "sha256": "035f21db71d3c73a4a440b91b5e835aebd616c2b78e2129b4e0b242e5313c49e"
+  },
+  {
+   "path": "games/relax2.js",
+   "bytes": 60876,
+   "sha256": "4c3659c410d721a2ddf9a1d0b45badeda5871fb64d2cdd9f3e720ec124f50725"
+  },
+  {
+   "path": "games/sing.js",
+   "bytes": 73019,
+   "sha256": "f38df8e76a6c40b8fd6e2280e08b9635a3c66edc5783d9e926fa557ef81087d5"
+  },
+  {
+   "path": "games/slide.js",
+   "bytes": 63948,
+   "sha256": "84de8e4b83a7de1a03f20959f3806fe9ee811bfbf453b16f426fd077c0310be8"
+  },
+  {
+   "path": "games/slide3.js",
+   "bytes": 63414,
+   "sha256": "3fbeb647c2fcbd97659e56e78d2d76a03a4fbc5ce2ded1288594d34b03f28300"
+  },
+  {
+   "path": "games/together.js",
+   "bytes": 88447,
+   "sha256": "9a3fe9c2ce09d0d0d1848de1348ca48ab2a10a7137a622d72831671aedd5a89c"
+  },
+  {
+   "path": "games/words2.js",
+   "bytes": 72827,
+   "sha256": "4eaefcfaf686e89b55e19dfb4d5180aad746850b44c3a0c26776ff38fa60a6eb"
+  },
+  {
+   "path": "games/words3.js",
+   "bytes": 77593,
+   "sha256": "1584dfa26776e5e1317e855cb3378c8261f9b1404d6e603119dc4b96005ede07"
+  },
+  {
+   "path": "games/words4.js",
+   "bytes": 39363,
+   "sha256": "594f380c2419e095ee40c004f176cf5a610b5c0ab2aef1eb52dde2824140816c"
+  },
+  {
+   "path": "index.html",
+   "bytes": 137738,
+   "sha256": "9ba3ff0da9f27cf6cd46e6cb4bd94d343546d9b1ba37ce491530ae8148e28cad"
+  },
+  {
+   "path": "mivida/index.html",
+   "bytes": 299335,
+   "sha256": "09490befa1972336d1d3fc8f8479887c9efac429e959a32f95790d5019d09af5"
+  },
+  {
+   "path": "mymusic.js",
+   "bytes": 25735,
+   "sha256": "da554d7e8d3db3b4a8e0c02bae1dcb9acf95d7bb73db85ac2ede773045211f9a"
+  },
+  {
+   "path": "photoframe.js",
+   "bytes": 17399,
+   "sha256": "7089f920f30f744f5ccc64cfb153ffddade576b76049e70360df70ac456da25a"
+  },
+  {
+   "path": "samples/acoustic_bass.json",
+   "bytes": 224746,
+   "sha256": "8a036956184c96fd1d934d9fc330925752a9847b6656e137a52176d60debe89c"
+  },
+  {
+   "path": "samples/acoustic_grand_piano.json",
+   "bytes": 647718,
+   "sha256": "4177e6c363fa86b0a0c3cad10f3ed191f32a469d64f1a916b29a25aa210211ee"
+  },
+  {
+   "path": "samples/acoustic_guitar_nylon.json",
+   "bytes": 288106,
+   "sha256": "eebf9278a79055b8f43f86fcd53e2dd2afeb6261ea5e7c14f65e4debb26a3947"
+  },
+  {
+   "path": "samples/alto_sax.json",
+   "bytes": 426858,
+   "sha256": "e69c324c2d31a2f9b3cb19aa97c65740ac9fb9994d2988b538ec10b9802fb729"
+  },
+  {
+   "path": "samples/clarinet.json",
+   "bytes": 477764,
+   "sha256": "cc231ad4e67f6749bb4d612abc50147c17912b77a50265c84fff48eb302195e9"
+  },
+  {
+   "path": "samples/muted_trumpet.json",
+   "bytes": 371850,
+   "sha256": "16d478f4e4dae1ed100a7f594e8f5df0c2e24973439cc184e05e8ba636afd02c"
+  },
+  {
+   "path": "samples/string_ensemble_1.json",
+   "bytes": 477764,
+   "sha256": "799c73559d9d3857e4d1368825dd545daa7ef7590781db77c312c7b840155e50"
+  },
+  {
+   "path": "samples/tenor_sax.json",
+   "bytes": 443638,
+   "sha256": "7a15d139f5b67273027b83bacf4f8d18e33ce63b8e125fb6d24d59487696b646"
+  },
+  {
+   "path": "samples/trombone.json",
+   "bytes": 347298,
+   "sha256": "baab6a4ba388f18fe2cf6c5d1b85ca485bda01fd1c3526b88c681f42acdb2b98"
+  },
+  {
+   "path": "samples/vibraphone.json",
+   "bytes": 316358,
+   "sha256": "fcc9b9a6e88f62412c1a9bd331372dbcf00743d4885c51c4dca8707dec3c7f47"
+  }
+ ]
+}

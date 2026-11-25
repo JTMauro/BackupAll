@@ -1,0 +1,29 @@
+{
+  "dir": {
+    "type": "dropdown",
+    "text": "Turning direction",
+    "value": 0,
+    "items": [
+      "Right",
+      "Left"
+    ]
+  },
+  "size": {
+    "type": "slider",
+    "text": "Logo size (% of screen height)",
+    "min": 20,
+    "max": 90,
+    "tick": 70,
+    "step": 1,
+    "value": 60
+  },
+  "period": {
+    "type": "slider",
+    "text": "Seconds per full turn (higher = slower)",
+    "min": 8,
+    "max": 90,
+    "tick": 82,
+    "step": 1,
+    "value": 24
+  }
+}

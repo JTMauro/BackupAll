@@ -1,0 +1,18 @@
+{
+ "title": "Architect User Manual",
+ "url": "https://claude.ai/artifact/Ara74TVUhXWULtzHFhrwfg",
+ "type": "Docs",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "8ed1c165bc3a24e926d8c910e904b0fc7dd3f1d8f7c71f8c547b7604bc20ba79"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 27927,
+   "sha256": "767ed51d5caa21562cf32e644b7d41a57f61b7397688318258b77206aea0d765"
+  }
+ ]
+}

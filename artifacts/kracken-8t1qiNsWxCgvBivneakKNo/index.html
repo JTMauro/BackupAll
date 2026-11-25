@@ -1,0 +1,2108 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kracken</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: Matrix terminal — digital-rain canvas behind a tabbed console.
+     Drop a file → auto-diagnose → 3D action key → progress → password modal. */
+  :root{
+    --void:#000700; --panel:#02140a; --grid:#073b1f;
+    --phos:#39ff6a; --phos-dim:#1c8f3d; --phos-deep:#0a3b1c;
+    --amber:#ffd13b; --danger:#ff5a5a; --ink:#bfffcf;
+    color-scheme: dark;
+    --disp:"VT323","Share Tech Mono",ui-monospace,monospace;
+    --mono:"Share Tech Mono",ui-monospace,"Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--void);color:var(--ink);font-family:var(--mono);
+    overflow-x:hidden;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-block:clamp(14px,4vw,40px);min-height:100%;
+  }
+  #rain{position:fixed;inset:0;z-index:0;opacity:.4;pointer-events:none}
+  body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,20,8,.33) 3px,rgba(0,0,0,0) 4px);
+    mix-blend-mode:overlay}
+  .wrap{position:relative;z-index:2;max-width:820px;margin:0 auto}
+
+  header{text-align:center;margin-bottom:18px}
+  .glyphs{font-family:var(--disp);font-size:.85rem;letter-spacing:.5em;color:var(--phos-dim);
+    text-shadow:0 0 8px rgba(57,255,106,.5);margin-bottom:.3em}
+  h1{font-family:var(--disp);margin:.05em 0;line-height:.95;font-weight:400;letter-spacing:.03em;
+    font-size:clamp(2.1rem,8vw,4rem);color:var(--phos);text-wrap:balance;
+    text-shadow:0 0 6px rgba(57,255,106,.9),0 0 22px rgba(57,255,106,.5),0 0 40px rgba(57,255,106,.28)}
+  .sub{color:var(--phos-dim);font-size:.95rem;letter-spacing:.14em;text-transform:uppercase}
+  .cursor{display:inline-block;width:.55ch;height:1em;background:var(--phos);margin-left:.1em;
+    transform:translateY(.12em);animation:blink 1s steps(1) infinite;box-shadow:0 0 10px var(--phos)}
+  @keyframes blink{50%{opacity:0}}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;justify-content:center;margin:18px 0 0;flex-wrap:wrap}
+  .tab{font-family:var(--mono);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--phos-dim);background:transparent;border:1px solid var(--grid);border-bottom:none;
+    border-radius:8px 8px 0 0;padding:9px 16px;cursor:pointer}
+  .tab:hover{color:var(--phos)}
+  .tab[aria-selected="true"]{color:var(--void);background:linear-gradient(180deg,var(--phos),var(--phos-dim));
+    text-shadow:0 1px 0 rgba(200,255,210,.5)}
+  .tab.ghost{opacity:.5;font-size:.74rem;letter-spacing:.2em}
+  .tab.ghost[aria-selected="true"]{opacity:1}
+
+  .console{background:linear-gradient(180deg,rgba(2,24,12,.93),rgba(1,10,5,.95));
+    border:1px solid var(--grid);border-radius:0 0 10px 10px;padding:clamp(16px,3.5vw,26px);
+    box-shadow:0 0 0 1px rgba(57,255,106,.08),0 24px 60px rgba(0,0,0,.7),inset 0 0 60px rgba(7,59,31,.33);
+    backdrop-filter:blur(2px)}
+
+  /* dropzone */
+  .drop{border:1.5px dashed var(--phos-dim);border-radius:10px;padding:clamp(24px,6vw,44px) 18px;
+    text-align:center;cursor:pointer;transition:.15s;background:rgba(3,30,15,.4)}
+  .drop:hover,.drop.hot{border-color:var(--phos);background:rgba(10,59,28,.5);
+    box-shadow:inset 0 0 40px rgba(57,255,106,.12),0 0 20px rgba(57,255,106,.25)}
+  .drop .big{font-family:var(--disp);font-size:1.7rem;color:var(--phos);letter-spacing:.04em;
+    text-shadow:0 0 12px rgba(57,255,106,.5)}
+  .drop .small{color:var(--phos-dim);font-size:.85rem;margin-top:6px;letter-spacing:.06em}
+
+  .fileline{display:flex;align-items:center;gap:10px;margin:16px 0 4px;flex-wrap:wrap;
+    font-size:.95rem;color:var(--ink)}
+  .fileline .nm{color:var(--phos);word-break:break-all}
+  .reset{margin-left:auto;background:none;border:1px solid var(--grid);color:var(--phos-dim);
+    border-radius:6px;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;padding:5px 10px;cursor:pointer}
+  .reset:hover{color:var(--danger);border-color:var(--danger)}
+
+  /* diagnosis banner */
+  .diag{margin:14px 0;border-radius:9px;padding:14px 16px;border:1px solid var(--grid);
+    background:rgba(3,30,15,.5)}
+  .diag .tag{font-family:var(--disp);font-size:1.5rem;letter-spacing:.03em}
+  .diag.enc .tag{color:var(--amber)} .diag.prot .tag{color:var(--phos)}
+  .diag.open .tag{color:var(--phos)} .diag.err .tag{color:var(--danger)}
+  .diag.rms .tag{color:var(--amber)} .diag.rms{border-color:var(--amber)}
+  .diag p{margin:.4em 0 0;font-size:.92rem;color:var(--ink);line-height:1.5}
+  .diag .meta{color:var(--phos-dim);font-size:.8rem;margin-top:6px;letter-spacing:.05em}
+
+  label.lbl{display:block;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--phos-dim);margin:14px 0 6px}
+  input[type=text],textarea{width:100%;min-width:0;background:#010c06;color:var(--ink);
+    border:1px solid var(--grid);border-radius:6px;font-family:var(--mono);font-size:1rem;
+    padding:11px 13px;box-shadow:inset 0 2px 10px rgba(0,0,0,.7)}
+  textarea{resize:vertical;min-height:52px}
+  input::placeholder,textarea::placeholder{color:#2e6b42}
+  input:focus,textarea:focus{outline:none;border-color:var(--phos);
+    box-shadow:inset 0 2px 10px rgba(0,0,0,.7),0 0 0 1px var(--phos),0 0 16px rgba(57,255,106,.4)}
+
+  /* 3D action key */
+  .act{display:inline-flex;align-items:center;gap:10px;margin-top:18px;cursor:pointer;border:none;
+    font-family:var(--disp);font-size:1.5rem;letter-spacing:.03em;color:var(--void);
+    background:linear-gradient(180deg,var(--phos),var(--phos-dim));padding:14px 26px 16px;border-radius:9px;
+    transition:transform .07s,box-shadow .07s,filter .15s;
+    box-shadow:0 6px 0 var(--phos-deep),0 10px 0 #041a0c,0 16px 24px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.55),inset 0 -3px 8px rgba(0,30,12,.5);
+    text-shadow:0 1px 0 rgba(180,255,200,.6)}
+  .act:hover{filter:brightness(1.08)}
+  .act:active{transform:translateY(8px);box-shadow:0 2px 0 var(--phos-deep),0 3px 0 #041a0c,0 6px 12px rgba(0,0,0,.6)}
+  .act:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+  .act.warn{background:linear-gradient(180deg,var(--amber),#b8860b);
+    box-shadow:0 6px 0 #6b4f00,0 10px 0 #2e2200,0 16px 24px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.5)}
+  .act.warn:active{box-shadow:0 2px 0 #5c4300,0 3px 0 #2e2200,0 6px 12px rgba(0,0,0,.6)}
+  .act[disabled]{opacity:.4;cursor:not-allowed;filter:grayscale(.4)}
+  .btnrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+  /* progress */
+  .prog{margin-top:18px;border-top:1px dashed var(--grid);padding-top:16px;display:none}
+  .prog.show{display:block}
+  .bar{height:10px;background:#010c06;border:1px solid var(--grid);border-radius:999px;overflow:hidden;margin:8px 0}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--phos-dim),var(--phos));
+    box-shadow:0 0 12px var(--phos);transition:width .2s}
+  .pstat{font-size:.86rem;color:var(--ink);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .pstat b{color:var(--phos)} .pcur{color:var(--phos-dim);word-break:break-all}
+
+  .note{margin-top:12px;font-size:.84rem;color:var(--phos-dim);line-height:1.5}
+  .note::before{content:"› ";color:var(--phos)}
+  .note.warn{color:var(--amber)} .note.warn::before{color:var(--amber)}
+  .note.bad{color:var(--danger)} .note.bad::before{color:var(--danger)}
+
+  /* secondary buttons */
+  .wbtn{font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;cursor:pointer;
+    background:#031e0f;color:var(--phos);border:1px solid var(--phos-dim);border-radius:6px;padding:9px 12px}
+  .wbtn:hover{background:#0a3b1c;box-shadow:0 0 12px rgba(57,255,106,.25)}
+  .wlinfo{font-size:.8rem;color:var(--phos-dim);letter-spacing:.05em}
+  #hashOut{margin-top:12px;background:#010c06;border:1px solid var(--grid);border-radius:7px;
+    padding:12px 44px 12px 12px;position:relative}
+  #hashOut .hmode{color:var(--amber);font-size:.8rem;letter-spacing:.08em;margin-bottom:6px}
+  #hashOut code{font-family:var(--mono);font-size:.76rem;color:var(--phos);word-break:break-all;white-space:pre-wrap}
+  .runrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .runbtn{position:relative;font-family:var(--disp);font-size:1.15rem;letter-spacing:.03em;cursor:pointer;
+    color:var(--void);background:linear-gradient(180deg,var(--amber),#b8860b);border:none;border-radius:7px;
+    padding:10px 16px;box-shadow:0 4px 0 #6b4f00,0 8px 14px rgba(0,0,0,.5);text-shadow:0 1px 0 rgba(255,240,200,.5)}
+  .runbtn:hover{filter:brightness(1.08)}
+  .runbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #6b4f00}
+  .cmdline{margin-top:10px;font-family:var(--mono);font-size:.8rem;color:var(--amber);background:#0a0800;
+    border:1px solid #4a3800;border-radius:6px;padding:9px 11px;overflow-x:auto;white-space:nowrap;
+    opacity:.75;transition:opacity .15s,box-shadow .15s}
+  .runrow:hover ~ .cmdline,.cmdline:hover{opacity:1;box-shadow:0 0 14px rgba(255,209,59,.3)}
+  .runhint{margin-top:10px;font-size:.8rem;color:var(--phos-dim);line-height:1.5}
+  .runhint a{color:var(--phos)}
+
+  /* holographic cube + lightning */
+  .holo{width:100%;height:200px;display:block;margin-bottom:12px;border:1px solid var(--grid);
+    border-radius:10px;background:radial-gradient(ellipse at center,rgba(7,59,31,.5),rgba(1,8,4,.9) 70%);
+    box-shadow:inset 0 0 50px rgba(57,255,106,.12)}
+
+  /* attack lanes */
+  .lane{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--grid);
+    border-radius:7px;margin-top:8px;background:rgba(3,30,15,.4);font-size:.84rem}
+  .ldot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--phos-dim)}
+  .lane.run .ldot{background:var(--phos);box-shadow:0 0 8px var(--phos);animation:pulse 1s infinite}
+  .lane.found .ldot{background:var(--phos);box-shadow:0 0 14px var(--phos)}
+  .lane.found{border-color:var(--phos);box-shadow:0 0 16px rgba(57,255,106,.3)}
+  .lane.exhausted .ldot{background:#2e6b42} .lane.stopped .ldot{background:var(--amber)}
+  .lane.error .ldot{background:var(--danger)}
+  @keyframes pulse{50%{opacity:.35}}
+  .lname{flex:0 0 150px;color:var(--phos);letter-spacing:.04em}
+  @media(max-width:520px){.lname{flex-basis:110px}}
+  .lcur{flex:1 1 auto;min-width:0;color:var(--phos-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lcount{flex:0 0 auto;color:var(--ink);font-variant-numeric:tabular-nums}
+
+  /* GPU slider toggles */
+  .gpuctl{margin-top:16px;border-top:1px dashed var(--grid);padding-top:14px;display:flex;flex-direction:column;gap:11px}
+  .toggle{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+  .toggle input{position:absolute;opacity:0;width:0;height:0}
+  .toggle .tk{position:relative;flex:0 0 auto;width:46px;height:24px;border-radius:999px;background:#021a0d;
+    border:1px solid var(--phos-dim);transition:.2s;box-shadow:inset 0 2px 8px rgba(0,0,0,.6)}
+  .toggle .tk::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:var(--phos-dim);transition:.2s;box-shadow:0 0 6px rgba(0,0,0,.5)}
+  .toggle input:checked+.tk{background:#0a3b1c;border-color:var(--phos);box-shadow:inset 0 0 12px rgba(57,255,106,.4)}
+  .toggle input:checked+.tk::after{left:24px;background:var(--phos);box-shadow:0 0 12px var(--phos)}
+  .toggle input:focus-visible+.tk{outline:2px solid var(--amber);outline-offset:2px}
+  .toggle .tl{font-size:.9rem;letter-spacing:.04em;color:var(--ink)}
+  .toggle .tl em{color:var(--phos-dim);font-style:normal;font-size:.8rem}
+  .gpustatus{display:none;font-size:.82rem;color:var(--amber);letter-spacing:.04em;padding-left:2px}
+  .lane.run .ldot{}
+
+  /* password modal */
+  .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    background:rgba(0,7,0,.82);backdrop-filter:blur(3px);padding:20px}
+  .modal.show{display:flex}
+  .card{max-width:440px;width:100%;background:linear-gradient(180deg,#042413,#02140a);
+    border:1px solid var(--phos);border-radius:14px;padding:28px 24px;text-align:center;
+    box-shadow:0 0 0 1px rgba(57,255,106,.3),0 0 50px rgba(57,255,106,.4),0 30px 70px rgba(0,0,0,.8)}
+  .card .hd{font-family:var(--disp);font-size:1.7rem;color:var(--phos);letter-spacing:.04em;
+    text-shadow:0 0 14px rgba(57,255,106,.6)}
+  .card .pw{font-family:var(--mono);font-size:clamp(1.5rem,7vw,2.3rem);color:var(--void);margin:16px 0;
+    background:var(--phos);border-radius:8px;padding:14px 10px;word-break:break-all;user-select:all;
+    box-shadow:0 0 24px rgba(57,255,106,.6)}
+  .card .mstat{color:var(--phos-dim);font-size:.82rem;letter-spacing:.06em}
+  .card .mbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .mbtn{font-family:var(--mono);font-size:.9rem;letter-spacing:.08em;cursor:pointer;border-radius:7px;padding:11px 16px}
+  .mbtn.go{background:var(--phos);color:var(--void);border:none;font-weight:bold;
+    box-shadow:0 4px 0 var(--phos-deep)}
+  .mbtn.go:active{transform:translateY(3px);box-shadow:0 1px 0 var(--phos-deep)}
+  .mbtn.sec{background:transparent;color:var(--phos);border:1px solid var(--phos-dim)}
+
+  .pane{display:none} .pane.show{display:block}
+  .pane h2{font-family:var(--disp);font-size:1.6rem;color:var(--phos);letter-spacing:.03em;margin:.2em 0 .5em;font-weight:400}
+  .pane p,.pane li{font-size:.94rem;line-height:1.6;color:var(--ink)}
+  .pane b{color:var(--phos)} .pane code{color:var(--amber);font-family:var(--mono)}
+  .pane ol{padding-left:1.2em}
+  .checklist{list-style:none;padding-left:0}
+  .checklist li{position:relative;padding-left:26px;margin:9px 0}
+  .checklist li::before{content:"";position:absolute;left:0;top:2px;width:15px;height:15px;
+    border:1px solid var(--phos-dim);border-radius:4px;box-shadow:inset 0 0 8px rgba(57,255,106,.15)}
+  .checklist li::after{content:"✓";position:absolute;left:3px;top:0;color:var(--phos-dim);font-size:.8rem}
+  .codebox{position:relative;background:#010c06;border:1px solid var(--grid);border-radius:8px;
+    padding:14px 14px 14px;overflow:auto;max-height:420px;margin-top:10px}
+  .codebox pre{margin:0;font-family:var(--mono);font-size:.78rem;color:var(--phos);white-space:pre;line-height:1.45}
+  .copybtn{position:absolute;top:8px;right:8px;background:var(--phos-deep);color:var(--phos);
+    border:1px solid var(--phos-dim);border-radius:5px;font-family:var(--mono);font-size:.7rem;
+    letter-spacing:.1em;padding:6px 9px;cursor:pointer;z-index:2}
+  .copybtn:hover{background:#0e5a2b}
+  .locknote{color:var(--amber);font-size:.82rem;letter-spacing:.05em;margin-bottom:4px}
+
+  footer{text-align:center;margin-top:22px;color:var(--phos-dim);font-size:.76rem;letter-spacing:.1em}
+  @media(prefers-reduced-motion:reduce){.cursor{animation:none}#rain{display:none}}
+</style>
+
+<canvas id="rain" aria-hidden="true"></canvas>
+
+<div class="wrap">
+  <header>
+    <div class="glyphs">クラーケン ・ 放 て</div>
+    <h1>KRACKEN<span class="cursor"></span></h1>
+    <div class="sub">// word · excel · powerpoint password recovery</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-pane="unlock">Unlock</button>
+    <button class="tab" role="tab" aria-selected="false" data-pane="clue">Clue Finder</button>
+    <button class="tab" role="tab" aria-selected="false" data-pane="howto">How-to</button>
+    <button class="tab ghost" role="tab" aria-selected="false" data-pane="engine">· engine ·</button>
+  </div>
+
+  <main class="console">
+    <!-- UNLOCK PANE -->
+    <section class="pane show" id="pane-unlock" role="tabpanel">
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose or drop a file">
+        <div class="big">DROP FILE HERE</div>
+        <div class="small">or click to browse · .xlsx .docx .pptx and more · never leaves your device</div>
+        <input id="file" type="file" hidden
+          accept=".xlsx,.xlsm,.xlsb,.xls,.docx,.docm,.doc,.pptx,.pptm,.ppt,.ppsx">
+      </div>
+
+      <div id="work" hidden>
+        <div class="fileline">
+          <span>FILE:</span><span class="nm" id="fname"></span>
+          <button class="reset" id="reset">✕ CLEAR</button>
+        </div>
+        <div id="diagHost"></div>
+
+        <!-- encrypted controls -->
+        <div id="encCtl" hidden>
+          <label class="lbl" for="hints">Clues about the owner — names, pets, dates, old passwords (comma-separated)</label>
+          <input id="hints" type="text" placeholder="Acme, Smith, Fluffy, 1998, oldpassword">
+          <label class="lbl" for="words">Extra words (optional, one per line)</label>
+          <textarea id="words" placeholder="project names&#10;nicknames&#10;street names"></textarea>
+          <label class="lbl" for="masks">Masks (optional) — <code style="color:var(--amber)">?u</code>=A-Z <code style="color:var(--amber)">?l</code>=a-z <code style="color:var(--amber)">?d</code>=0-9 <code style="color:var(--amber)">?s</code>=symbol. One per line.</label>
+          <textarea id="masks" placeholder="?u?l?l?l?l?d?d?d?d&#10;Acme?d?d?d?d"></textarea>
+          <div class="btnrow" style="margin-top:12px">
+            <button class="wbtn" id="loadWlBtn">+ LOAD WORDLIST FILE</button>
+            <span class="wlinfo" id="wlInfo"></span>
+            <input id="wlFile" type="file" accept=".txt,.lst,.dic,.csv" hidden>
+            <button class="wbtn" id="hashBtn">&gt;_ EXPORT HASH FOR GPU</button>
+          </div>
+          <div id="hashOut" hidden></div>
+
+          <div class="gpuctl">
+            <label class="toggle"><input type="checkbox" id="gpuToggle"><span class="tk"></span><span class="tl">WebGPU acceleration <em>(experimental)</em></span></label>
+            <label class="toggle"><input type="checkbox" id="gpuPerfToggle"><span class="tk"></span><span class="tl">Prefer System GPU <em>(high-performance adapter)</em></span></label>
+            <div class="gpustatus" id="gpuStatus"></div>
+          </div>
+
+          <div class="btnrow" style="margin-top:16px">
+            <button class="act warn" id="crackBtn">RELEASE THE KRACKEN</button>
+            <button class="act" id="cancelBtn" hidden style="font-size:1.1rem;padding:12px 20px">■ STOP / KILL</button>
+          </div>
+        </div>
+
+        <!-- protected control -->
+        <div id="protCtl" hidden>
+          <button class="act" id="clearBtn">CLEAR PROTECTION &amp; SAVE</button>
+        </div>
+
+        <div class="prog" id="prog">
+          <canvas id="holo" class="holo" aria-hidden="true"></canvas>
+          <div class="pstat"><span>TOTAL TRIED: <b id="ptries">0</b></span><span>ELAPSED: <b id="ptime">0s</b></span></div>
+          <div id="lanes"></div>
+        </div>
+
+        <div class="note" id="note" hidden></div>
+      </div>
+    </section>
+
+    <!-- CLUE FINDER PANE -->
+    <section class="pane" id="pane-clue" role="tabpanel">
+      <h2>Clue Finder</h2>
+      <p>The fastest unlocks come from <b>knowing something about the owner</b> — not raw compute. Interview the client with these, type the answers, and send them straight into the attack. Every field is optional; more is better.</p>
+      <label class="lbl" for="c_names">Names — person, spouse, kids, pets, nicknames, maiden name</label>
+      <input id="c_names" type="text" placeholder="John, Sarah, Buddy, JD, Maiden">
+      <label class="lbl" for="c_dates">Important years / dates — birthdays, anniversary, grad year</label>
+      <input id="c_dates" type="text" placeholder="1986, 2014, 0612">
+      <label class="lbl" for="c_org">Company, department, project names, clients</label>
+      <input id="c_org" type="text" placeholder="Cydcor, Q3, ProjectApex">
+      <label class="lbl" for="c_life">Hobbies, teams, towns, favorite things</label>
+      <input id="c_life" type="text" placeholder="Lakers, fishing, Dallas, Mustang">
+      <label class="lbl" for="c_old">Old / reused passwords they can remember (tried exactly, first)</label>
+      <input id="c_old" type="text" placeholder="Summer2019!, oldpass123">
+      <label class="lbl" for="c_notes">Anything else (one per line)</label>
+      <textarea id="c_notes" placeholder="street name&#10;first car&#10;lucky number"></textarea>
+      <div class="btnrow" style="margin-top:14px">
+        <button class="act" id="clueSend" style="font-size:1.2rem;padding:12px 20px">→ SEND TO ATTACK</button>
+      </div>
+      <div class="note" id="clueNote" hidden></div>
+
+      <h2 style="margin-top:26px">Or find it without cracking</h2>
+      <p>Often the password — or an already-unlocked copy — is sitting somewhere. Walk this list with the client:</p>
+      <ul class="checklist">
+        <li>Search their <b>email</b> for the file name and words like "password", "pwd", "the password is".</li>
+        <li><b>OneDrive / SharePoint / Google Drive version history</b> — an earlier version may predate the lock.</li>
+        <li>Their <b>password manager</b> (1Password, LastPass, Bitwarden, Keychain, Windows Credential Manager).</li>
+        <li><b>Browser-saved passwords</b>, and any <code>passwords.xlsx</code> / notes file / sticky note.</li>
+        <li><b>Backups</b>, Recent Files, AutoRecover/temp copies, or a cloud trash/recycle bin.</li>
+        <li>Ask <b>whoever created or sent</b> the file — they likely set or know the password.</li>
+      </ul>
+    </section>
+
+    <!-- HOW-TO PANE -->
+    <section class="pane" id="pane-howto" role="tabpanel">
+      <h2>How it works</h2>
+      <p>Everything runs <b>inside this page</b>, on your own machine. Your file is never uploaded anywhere — close the tab and it's gone.</p>
+      <ol>
+        <li><b>Drop the file.</b> It auto-detects the lock type.</li>
+        <li><b>PROTECTED</b> (editing lock) → one click removes it and saves <code>name-cleared.ext</code>.</li>
+        <li><b>ENCRYPTED</b> (password-to-open) → add every clue about the owner, hit CRACK. On success the password pops up and you can save <code>name-decrypted.ext</code> — keeping the original extension.</li>
+      </ol>
+      <h2>Central dispatch — no password tried twice</h2>
+      <p>Hitting <b>RELEASE THE KRACKEN</b> builds <b>one de-duplicated master stream</b> that merges every strategy below, then hands each unique candidate to exactly one instance — a pool of CPU cores plus the GPU if enabled. <b>No password is ever tried on more than one instance</b>, so every bit of compute goes to a *new* guess. Each live instance shows its own status line; the first to hit wins and kills the rest.</p>
+      <p>The strategies, merged in priority order (from "not guessing at all" to smart guessing):</p>
+      <ul>
+        <li><b>Breached / reused</b> — known, leaked and reused passwords tried <i>verbatim</i>. A lookup, not a guess — highest yield. Load a breach list (rockyou) or the owner's old passwords to supercharge it.</li>
+        <li><b>Clues + rules</b> — your clues mangled: cases, leet (<code>a→@</code>), reversals, doubling, hundreds of suffixes/years.</li>
+        <li><b>Smart model (Markov)</b> — a probabilistic model trained on real passwords; generates in <i>likelihood order</i>, not blindly.</li>
+        <li><b>Wordlist + rules</b>, <b>Combinator</b>, <b>Dates</b>, <b>Masks</b> — the rest of the keyspace, de-duplicated against everything above.</li>
+      </ul>
+      <h2>Going faster</h2>
+      <p><b>WebGPU acceleration</b> (slider) runs the heavy hash loop for thousands of different candidates at once on your GPU — the real path toward 10,000+/sec (Office 2007 files; experimental). <b>Prefer System GPU</b> asks for your discrete/gaming GPU over the integrated one. The CPU pool always runs underneath as the reliable floor. For a strong password, <b>Export Hash for GPU</b> → <code>hashcat</code> is still the fastest route (millions/sec on a real GPU).</p>
+      <p>Use the <b>Clue Finder</b> tab to interview the client and load everything in one click. <b>STOP / KILL</b> terminates every instance instantly.</p>
+      <p class="note">Honest truth: modern Office AES can't be bypassed — every tool (ours, hashcat, the $1,000 commercial ones) <i>guesses and checks</i>. The only non-guessing win is the Breached/reused lane or finding an existing copy. A long, random, unique password may simply be unrecoverable.</p>
+      <p class="note warn">A long, random password may still be uncrackable here or on a GPU. If clues run out, the best move is often finding an un-passworded copy (email, OneDrive/SharePoint version history, a backup).</p>
+    </section>
+
+    <!-- ENGINE PANE (tucked away) -->
+    <section class="pane" id="pane-engine" role="tabpanel">
+      <div class="locknote">⚠ Internal — command-line engine &amp; GPU escalation. Keep private.</div>
+      <p>Same logic as a standalone Python script, for batch jobs or handing a hash to <code>hashcat</code> when the in-browser attack is too slow.</p>
+      <div class="codebox">
+        <button class="copybtn" id="copyPy">COPY</button>
+        <pre id="pySrc">#!/usr/bin/env python3
+&quot;&quot;&quot;
+excel_unlock.py  —  Excel password toolkit for legitimate data recovery.
+
+Covers BOTH kinds of Excel password protection:
+
+  1. &quot;diagnose&quot; : tell you which kind of protection the file has.
+  2. &quot;strip&quot;    : remove sheet / workbook *protection* (the editing lock).
+                  This does NOT need a password. Instant. Works on .xlsx/.xlsm.
+  3. &quot;recover&quot;  : recover the *open password* on an ENCRYPTED file by trying
+                  a wordlist + smart mutations (names, dates, l33t, etc).
+  4. &quot;open&quot;     : if you already know / recovered the password, write out a
+                  clean decrypted copy.
+  5. &quot;hash&quot;     : export the encryption hash so you can run it on hashcat/john
+                  (GPU) if the Python attack isn&#x27;t fast enough.
+
+Only use this on files you own or are authorized to recover.
+
+Usage:
+  python3 excel_unlock.py diagnose  FILE.xlsx
+  python3 excel_unlock.py strip     FILE.xlsx [-o OUT.xlsx]
+  python3 excel_unlock.py recover   FILE.xlsx [--wordlist W.txt] [--hints a,b,c]
+  python3 excel_unlock.py open      FILE.xlsx --password PW [-o OUT.xlsx]
+  python3 excel_unlock.py hash      FILE.xlsx
+&quot;&quot;&quot;
+import argparse
+import itertools
+import os
+import shutil
+import sys
+import zipfile
+import re
+
+# ---------------------------------------------------------------------------
+# helpers
+# ---------------------------------------------------------------------------
+
+def _is_zip(path):
+    &quot;&quot;&quot;A real .xlsx is a ZIP. An encrypted file is an OLE2 compound file.&quot;&quot;&quot;
+    try:
+        with open(path, &quot;rb&quot;) as f:
+            sig = f.read(8)
+        return sig[:2] == b&quot;PK&quot;
+    except OSError:
+        return False
+
+
+def _is_ole(path):
+    with open(path, &quot;rb&quot;) as f:
+        sig = f.read(8)
+    return sig == b&quot;\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1&quot;
+
+
+# ---------------------------------------------------------------------------
+# 1. diagnose
+# ---------------------------------------------------------------------------
+
+def cmd_diagnose(args):
+    path = args.file
+    if not os.path.exists(path):
+        sys.exit(f&quot;[!] File not found: {path}&quot;)
+
+    if _is_ole(path):
+        print(&quot;Result: ENCRYPTED  (Password-to-Open / &#x27;Encrypt with Password&#x27;)&quot;)
+        print(&quot;  The whole file is encrypted. You cannot see any data without&quot;)
+        print(&quot;  the password. Use:   recover   (to guess it)  or   hash  (GPU).&quot;)
+        return
+
+    if not _is_zip(path):
+        print(&quot;Result: UNKNOWN format — not a standard .xlsx ZIP and not an&quot;)
+        print(&quot;  encrypted OLE file. It may be an old .xls (BIFF) or corrupt.&quot;)
+        return
+
+    # It&#x27;s a zip → inspect for protection tags.
+    sheet_prot = []
+    wb_prot = False
+    with zipfile.ZipFile(path) as z:
+        for name in z.namelist():
+            if re.match(r&quot;xl/worksheets/sheet\d+\.xml$&quot;, name):
+                data = z.read(name).decode(&quot;utf-8&quot;, &quot;replace&quot;)
+                if &quot;&lt;sheetProtection&quot; in data:
+                    sheet_prot.append(name)
+            if name == &quot;xl/workbook.xml&quot;:
+                data = z.read(name).decode(&quot;utf-8&quot;, &quot;replace&quot;)
+                if &quot;&lt;workbookProtection&quot; in data:
+                    wb_prot = True
+
+    if sheet_prot or wb_prot:
+        print(&quot;Result: PROTECTED  (editing lock — NOT encrypted)&quot;)
+        print(&quot;  The data is readable; only editing is locked. No password&quot;)
+        print(&quot;  needed to remove it. Use:   strip&quot;)
+        if sheet_prot:
+            print(f&quot;  Protected sheets: {&#x27;, &#x27;.join(sheet_prot)}&quot;)
+        if wb_prot:
+            print(&quot;  Workbook structure is protected.&quot;)
+    else:
+        print(&quot;Result: NO PASSWORD found. The file is a normal .xlsx with no&quot;)
+        print(&quot;  sheet protection and no encryption. It should open freely.&quot;)
+
+
+# ---------------------------------------------------------------------------
+# 2. strip  (remove sheet / workbook protection, no password required)
+# ---------------------------------------------------------------------------
+
+def cmd_strip(args):
+    path = args.file
+    if not _is_zip(path):
+        sys.exit(&quot;[!] This file is not a plain .xlsx ZIP. If &#x27;diagnose&#x27; says it &quot;
+                 &quot;is ENCRYPTED, use &#x27;recover&#x27; instead — &#x27;strip&#x27; cannot help.&quot;)
+
+    out = args.output or _suffix(path, &quot;-unlocked&quot;)
+    tmp = out + &quot;.tmp&quot;
+    removed = 0
+
+    # Regexes for both self-closing &lt;... /&gt; and paired &lt;sheetProtection&gt;...&lt;/&gt;
+    pat_sheet = re.compile(r&quot;&lt;sheetProtection\b[^&gt;]*/&gt;|&lt;sheetProtection\b.*?&lt;/sheetProtection&gt;&quot;, re.S)
+    pat_wb = re.compile(r&quot;&lt;workbookProtection\b[^&gt;]*/&gt;|&lt;workbookProtection\b.*?&lt;/workbookProtection&gt;&quot;, re.S)
+
+    with zipfile.ZipFile(path) as zin, zipfile.ZipFile(tmp, &quot;w&quot;, zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if re.match(r&quot;xl/worksheets/sheet\d+\.xml$&quot;, item.filename):
+                text = data.decode(&quot;utf-8&quot;, &quot;replace&quot;)
+                new, n = pat_sheet.subn(&quot;&quot;, text)
+                removed += n
+                data = new.encode(&quot;utf-8&quot;)
+            elif item.filename == &quot;xl/workbook.xml&quot;:
+                text = data.decode(&quot;utf-8&quot;, &quot;replace&quot;)
+                new, n = pat_wb.subn(&quot;&quot;, text)
+                removed += n
+                data = new.encode(&quot;utf-8&quot;)
+            zout.writestr(item, data)
+
+    shutil.move(tmp, out)
+    if removed:
+        print(f&quot;[+] Removed {removed} protection block(s).&quot;)
+        print(f&quot;[+] Unlocked file written to: {out}&quot;)
+    else:
+        print(&quot;[i] No protection tags were present. Copied file to:&quot;, out)
+        print(&quot;    (If the file actually prompts for a password to OPEN, it is&quot;)
+        print(&quot;     ENCRYPTED — run &#x27;recover&#x27; instead.)&quot;)
+
+
+# ---------------------------------------------------------------------------
+# 3 / 4 / 5 — encrypted-file operations (need msoffcrypto)
+# ---------------------------------------------------------------------------
+
+def _need_msoffcrypto():
+    try:
+        import msoffcrypto  # noqa
+        return msoffcrypto
+    except ImportError:
+        sys.exit(&quot;[!] This action needs &#x27;msoffcrypto-tool&#x27;.\n&quot;
+                 &quot;    Install it with:  pip3 install msoffcrypto-tool&quot;)
+
+
+def _try_password(path, password):
+    &quot;&quot;&quot;Return True if password decrypts the file.&quot;&quot;&quot;
+    import msoffcrypto
+    import io
+    with open(path, &quot;rb&quot;) as f:
+        off = msoffcrypto.OfficeFile(f)
+        try:
+            off.load_key(password=password)
+            buf = io.BytesIO()
+            off.decrypt(buf)      # raises on wrong password
+            return True
+        except Exception:
+            return False
+
+
+def cmd_open(args):
+    _need_msoffcrypto()
+    import msoffcrypto
+    out = args.output or _suffix(args.file, &quot;-decrypted&quot;)
+    with open(args.file, &quot;rb&quot;) as f:
+        off = msoffcrypto.OfficeFile(f)
+        off.load_key(password=args.password)
+        with open(out, &quot;wb&quot;) as g:
+            off.decrypt(g)
+    print(f&quot;[+] Decrypted copy written to: {out}&quot;)
+
+
+def cmd_hash(args):
+    &quot;&quot;&quot;Export a hashcat/john-compatible hash string via office2john if present,
+    otherwise explain the fallback.&quot;&quot;&quot;
+    import subprocess
+    for cand in (&quot;office2john&quot;, &quot;office2john.py&quot;):
+        exe = shutil.which(cand)
+        if exe:
+            subprocess.run([exe, args.file])
+            print(&quot;\n[i] Feed the line above to hashcat (-m 9400/9500/9600 by &quot;
+                  &quot;Office version) or John the Ripper.&quot;)
+            return
+    print(&quot;[i] &#x27;office2john&#x27; is not installed in this environment.&quot;)
+    print(&quot;    Get it from the John the Ripper &#x27;jumbo&#x27; package (run/office2john.py),&quot;)
+    print(&quot;    then:   office2john.py FILE.xlsx &gt; hash.txt&quot;)
+    print(&quot;    hashcat -m 9600 hash.txt wordlist.txt      # Office 2013+&quot;)
+    print(&quot;    hashcat -m 9500 hash.txt wordlist.txt      # Office 2010&quot;)
+    print(&quot;    hashcat -m 9400 hash.txt wordlist.txt      # Office 2007&quot;)
+
+
+# ---------- candidate generation for &#x27;recover&#x27; ----------
+
+LEET = {&quot;a&quot;: &quot;@&quot;, &quot;A&quot;: &quot;@&quot;, &quot;s&quot;: &quot;$&quot;, &quot;S&quot;: &quot;$&quot;, &quot;o&quot;: &quot;0&quot;, &quot;O&quot;: &quot;0&quot;,
+        &quot;i&quot;: &quot;1&quot;, &quot;I&quot;: &quot;1&quot;, &quot;e&quot;: &quot;3&quot;, &quot;E&quot;: &quot;3&quot;}
+SUFFIXES = [&quot;&quot;, &quot;1&quot;, &quot;12&quot;, &quot;123&quot;, &quot;1234&quot;, &quot;!&quot;, &quot;!!&quot;, &quot;@&quot;, &quot;#&quot;, &quot;01&quot;,
+            &quot;2020&quot;, &quot;2021&quot;, &quot;2022&quot;, &quot;2023&quot;, &quot;2024&quot;, &quot;2025&quot;, &quot;2026&quot;, &quot;00&quot;, &quot;99&quot;]
+
+
+def _mutations(word):
+    word = word.strip()
+    if not word:
+        return
+    seen = set()
+
+    def emit(w):
+        if w and w not in seen:
+            seen.add(w)
+            return True
+        return False
+
+    bases = {word, word.lower(), word.upper(),
+             word.capitalize(), word.title()}
+    # light l33t on the lowercase base
+    leeted = &quot;&quot;.join(LEET.get(c, c) for c in word.lower())
+    bases.add(leeted)
+    for b in bases:
+        for suf in SUFFIXES:
+            cand = b + suf
+            if emit(cand):
+                yield cand
+
+
+def _candidate_stream(wordlist_path, hints):
+    # 1. hints and their mutations first — most likely to hit.
+    for h in hints:
+        for m in _mutations(h):
+            yield m
+    # 2. wordlist + mutations
+    if wordlist_path and os.path.exists(wordlist_path):
+        with open(wordlist_path, &quot;r&quot;, encoding=&quot;utf-8&quot;, errors=&quot;ignore&quot;) as f:
+            for line in f:
+                for m in _mutations(line):
+                    yield m
+
+
+def cmd_recover(args):
+    _need_msoffcrypto()
+    if not _is_ole(args.file):
+        sys.exit(&quot;[!] This file is NOT encrypted (no open-password). &quot;
+                 &quot;If editing is locked, use &#x27;strip&#x27; instead.&quot;)
+
+    hints = [h for h in (args.hints.split(&quot;,&quot;) if args.hints else []) if h.strip()]
+    wl = args.wordlist
+    if not wl and not hints:
+        default = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               &quot;wordlists&quot;, &quot;common.txt&quot;)
+        if os.path.exists(default):
+            wl = default
+            print(f&quot;[i] No wordlist/hints given — using built-in: {wl}&quot;)
+
+    print(&quot;[i] Starting recovery. Press Ctrl-C to stop; progress prints every 200.&quot;)
+    tried = 0
+    try:
+        for cand in _candidate_stream(wl, hints):
+            tried += 1
+            if tried % 200 == 0:
+                print(f&quot;    ...{tried} tried (last: {cand!r})&quot;)
+            if _try_password(args.file, cand):
+                print(&quot;\n[+] ================= PASSWORD FOUND =================&quot;)
+                print(f&quot;[+]   {cand!r}&quot;)
+                print(f&quot;[+]   (after {tried} attempts)&quot;)
+                print(&quot;[+] Decrypt it with:&quot;)
+                print(f&#x27;      python3 excel_unlock.py open &quot;{args.file}&quot; &#x27;
+                      f&#x27;--password &quot;{cand}&quot;&#x27;)
+                return
+        print(f&quot;\n[-] Exhausted all candidates ({tried} tried). No match.&quot;)
+        print(&quot;    Next steps: add more --hints, a bigger --wordlist, or export&quot;)
+        print(&quot;    the hash (&#x27;hash&#x27; command) and run it on a GPU with hashcat.&quot;)
+    except KeyboardInterrupt:
+        print(f&quot;\n[i] Stopped by user after {tried} attempts.&quot;)
+
+
+# ---------------------------------------------------------------------------
+
+def _suffix(path, suf):
+    root, ext = os.path.splitext(path)
+    return f&quot;{root}{suf}{ext}&quot;
+
+
+def main():
+    p = argparse.ArgumentParser(description=&quot;Excel password toolkit (legit recovery).&quot;)
+    sub = p.add_subparsers(dest=&quot;cmd&quot;, required=True)
+
+    d = sub.add_parser(&quot;diagnose&quot;, help=&quot;Identify which protection the file has.&quot;)
+    d.add_argument(&quot;file&quot;)
+    d.set_defaults(func=cmd_diagnose)
+
+    s = sub.add_parser(&quot;strip&quot;, help=&quot;Remove sheet/workbook protection (no pw).&quot;)
+    s.add_argument(&quot;file&quot;)
+    s.add_argument(&quot;-o&quot;, &quot;--output&quot;)
+    s.set_defaults(func=cmd_strip)
+
+    r = sub.add_parser(&quot;recover&quot;, help=&quot;Guess the open-password of an encrypted file.&quot;)
+    r.add_argument(&quot;file&quot;)
+    r.add_argument(&quot;--wordlist&quot;)
+    r.add_argument(&quot;--hints&quot;, help=&quot;Comma-separated likely words: names, company, dates.&quot;)
+    r.set_defaults(func=cmd_recover)
+
+    o = sub.add_parser(&quot;open&quot;, help=&quot;Decrypt with a known password.&quot;)
+    o.add_argument(&quot;file&quot;)
+    o.add_argument(&quot;--password&quot;, required=True)
+    o.add_argument(&quot;-o&quot;, &quot;--output&quot;)
+    o.set_defaults(func=cmd_open)
+
+    h = sub.add_parser(&quot;hash&quot;, help=&quot;Export hash for hashcat/john (GPU).&quot;)
+    h.add_argument(&quot;file&quot;)
+    h.set_defaults(func=cmd_hash)
+
+    args = p.parse_args()
+    args.func(args)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>RELEASE THE KRACKEN · AUTHORIZED RECOVERY ONLY · RUNS 100% OFFLINE</footer>
+</div>
+
+<!-- password modal -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="card">
+    <div class="hd">✓ PASSWORD FOUND</div>
+    <div class="pw" id="mpw"></div>
+    <div class="mstat" id="mstat"></div>
+    <div class="mbtns">
+      <button class="mbtn go" id="mDecrypt">DECRYPT &amp; SAVE FILE</button>
+      <button class="mbtn sec" id="mCopy">COPY</button>
+      <button class="mbtn sec" id="mClose">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- core engine source (not executed here; loaded on main + into the worker) -->
+<script id="coreSrc" type="text/plain">/* Office Unlock core engine — runs identically in Node 18+ and the browser.
+   Handles OOXML (.xlsx/.docx/.pptx) editing-protection removal and
+   ECMA-376 Agile encryption password recovery + decryption. No dependencies. */
+(function (root) {
+  'use strict';
+
+  // ---------- small byte helpers ----------
+  function concat(arrs) {
+    let n = 0; for (const a of arrs) n += a.length;
+    const out = new Uint8Array(n); let o = 0;
+    for (const a of arrs) { out.set(a, o); o += a.length; }
+    return out;
+  }
+  function eq(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+  function u32le(n) { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n >>> 0, true); return b; }
+  function b64(s) {
+    if (typeof atob === 'function') { const bin = atob(s); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+    return new Uint8Array(Buffer.from(s, 'base64'));
+  }
+  function utf16le(str) {
+    const b = new Uint8Array(str.length * 2);
+    for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); b[i * 2] = c & 0xff; b[i * 2 + 1] = c >> 8; }
+    return b;
+  }
+
+  // ---------- CRC32 ----------
+  const CRC = (function () { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+  // ---------- deflate via native streams ----------
+  async function inflateRaw(u8) {
+    const ds = new DecompressionStream('deflate-raw');
+    const s = new Response(u8).body.pipeThrough(ds);
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+  async function deflateRaw(u8) {
+    const cs = new CompressionStream('deflate-raw');
+    const s = new Response(u8).body.pipeThrough(cs);
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+
+  // ---------- minimal ZIP (central-directory based) ----------
+  async function unzip(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    // find EOCD
+    let eocd = -1;
+    for (let i = u8.length - 22; i >= 0; i--) { if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; } }
+    if (eocd < 0) throw new Error('Not a valid ZIP (no EOCD).');
+    const total = dv.getUint16(eocd + 10, true);
+    let p = dv.getUint32(eocd + 16, true);
+    const entries = [];
+    for (let i = 0; i < total; i++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      const method = dv.getUint16(p + 10, true);
+      const compSize = dv.getUint32(p + 20, true);
+      const fnLen = dv.getUint16(p + 28, true);
+      const exLen = dv.getUint16(p + 30, true);
+      const cmLen = dv.getUint16(p + 32, true);
+      const lho = dv.getUint32(p + 42, true);
+      const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + fnLen));
+      // local header
+      const lfn = dv.getUint16(lho + 26, true);
+      const lex = dv.getUint16(lho + 28, true);
+      const dstart = lho + 30 + lfn + lex;
+      const comp = u8.subarray(dstart, dstart + compSize);
+      let data;
+      if (method === 0) data = comp.slice();
+      else if (method === 8) data = await inflateRaw(comp);
+      else throw new Error('Unsupported ZIP compression method ' + method);
+      entries.push({ name, data });
+      p += 46 + fnLen + exLen + cmLen;
+    }
+    return entries;
+  }
+  async function zip(entries) {
+    const enc = new TextEncoder();
+    const locals = []; const central = []; let offset = 0;
+    for (const e of entries) {
+      const nameB = enc.encode(e.name);
+      const crc = crc32(e.data);
+      const def = await deflateRaw(e.data);
+      const useStore = def.length >= e.data.length;
+      const method = useStore ? 0 : 8;
+      const body = useStore ? e.data : def;
+      const lh = new Uint8Array(30 + nameB.length);
+      const ldv = new DataView(lh.buffer);
+      ldv.setUint32(0, 0x04034b50, true); ldv.setUint16(4, 20, true); ldv.setUint16(6, 0, true);
+      ldv.setUint16(8, method, true); ldv.setUint16(10, 0, true); ldv.setUint16(12, 0x21, true);
+      ldv.setUint32(14, crc, true); ldv.setUint32(18, body.length, true); ldv.setUint32(22, e.data.length, true);
+      ldv.setUint16(26, nameB.length, true); ldv.setUint16(28, 0, true);
+      lh.set(nameB, 30);
+      locals.push(lh, body);
+      const ch = new Uint8Array(46 + nameB.length);
+      const cdv = new DataView(ch.buffer);
+      cdv.setUint32(0, 0x02014b50, true); cdv.setUint16(4, 20, true); cdv.setUint16(6, 20, true);
+      cdv.setUint16(8, 0, true); cdv.setUint16(10, method, true); cdv.setUint16(12, 0, true); cdv.setUint16(14, 0x21, true);
+      cdv.setUint32(16, crc, true); cdv.setUint32(20, body.length, true); cdv.setUint32(24, e.data.length, true);
+      cdv.setUint16(28, nameB.length, true);
+      cdv.setUint32(42, offset, true);
+      ch.set(nameB, 46);
+      central.push(ch);
+      offset += lh.length + body.length;
+    }
+    const cdBytes = concat(central); const cdOffset = offset;
+    const eocd = new Uint8Array(22); const edv = new DataView(eocd.buffer);
+    edv.setUint32(0, 0x06054b50, true); edv.setUint16(8, entries.length, true); edv.setUint16(10, entries.length, true);
+    edv.setUint32(12, cdBytes.length, true); edv.setUint32(16, cdOffset, true);
+    return concat([...locals, cdBytes, eocd]);
+  }
+
+  // ---------- signatures & diagnosis ----------
+  const OLE_SIG = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
+  function isZip(u8) { return u8[0] === 0x50 && u8[1] === 0x4B; }
+  function isOle(u8) { for (let i = 0; i < 8; i++) if (u8[i] !== OLE_SIG[i]) return false; return true; }
+
+  // protection elements per OOXML type
+  const PROT = [
+    { re: /<sheetProtection\b[^>]*\/>|<sheetProtection\b[\s\S]*?<\/sheetProtection>/g, kind: 'Excel sheet' },
+    { re: /<workbookProtection\b[^>]*\/>|<workbookProtection\b[\s\S]*?<\/workbookProtection>/g, kind: 'Excel workbook' },
+    { re: /<w:documentProtection\b[^>]*\/>|<w:documentProtection\b[\s\S]*?<\/w:documentProtection>/g, kind: 'Word document' },
+    { re: /<w:writeProtection\b[^>]*\/>|<w:writeProtection\b[\s\S]*?<\/w:writeProtection>/g, kind: 'Word write' },
+    { re: /\s*modifyVerifier[^=]*="[^"]*"/g, kind: 'PowerPoint modify', attr: true },
+    { re: /<fileSharing\b[^>]*\/>|<fileSharing\b[\s\S]*?<\/fileSharing>/g, kind: 'Excel modify-password' },
+  ];
+
+  async function diagnose(u8) {
+    if (isOle(u8)) {
+      let scheme = 'unknown', weak = null, provider = '';
+      try {
+        const cfb = parseCFB(u8);
+        // Classify the DataSpaces transform: password encryption vs IRM/RMS rights-management.
+        const names = cfb.entries.map(e => e.name);
+        const low = names.map(n => n.toLowerCase());
+        const hasDRM = low.some(n => n.indexOf('drm') >= 0 || n.indexOf('\u0009drmcontent') >= 0);
+        const hasStrong = low.some(n => n.indexOf('strongencryption') >= 0);
+        if (hasDRM && !hasStrong) {
+          return {
+            type: 'rms', scheme: 'rms', label: 'RIGHTS-MANAGED (IRM / RMS)',
+            details: names.filter(n => /drm/i.test(n)).map(n => n.replace(/[\u0000-\u001f]/g, ''))
+          };
+        }
+        const info = cfb.stream('EncryptionInfo');
+        if (info) {
+          const dv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+          const maj = dv.getUint16(0, true), min = dv.getUint16(2, true);
+          if (maj === 4 && min === 4) scheme = 'agile';
+          else if ((maj === 3 || maj === 4) && min === 2) {
+            scheme = 'standard';
+            const algId = dv.getUint32(12 + 8, true);
+            if (algId === 0x6801) { scheme = 'rc4'; weak = 'RC4 encryption — weak; a GPU cracks this fast.'; }
+          } else if (min === 3 || maj <= 2) { scheme = 'rc4'; weak = 'Legacy RC4 (40-bit) — very weak; crackable quickly or with rainbow tables.'; }
+          const txt = new TextDecoder('latin1').decode(info.subarray(0, 200));
+          if (/RC4/i.test(txt)) provider = 'RC4';
+        } else {
+          scheme = 'legacy'; weak = 'Office 97–2003 encryption (RC4-40) — weak; use the Engine tab (office2john + hashcat).';
+        }
+      } catch (e) {}
+      return { type: 'encrypted', scheme, weak, label: 'ENCRYPTED (password-to-open)' };
+    }
+    if (!isZip(u8)) return { type: 'unknown', label: 'Unrecognized format' };
+    const entries = await unzip(u8);
+    const found = []; let modifyOnly = false, hasVba = false;
+    for (const e of entries) {
+      if (e.name === 'xl/vbaProject.bin' || /vbaProject\.bin$/.test(e.name)) hasVba = true;
+      if (!/\.xml$/.test(e.name)) continue;
+      const text = new TextDecoder().decode(e.data);
+      for (const p of PROT) { p.re.lastIndex = 0; if (p.re.test(text)) found.push(p.kind); }
+      if (/<fileSharing\b[^>]*(workbookPassword|hashValue|algorithmName)/.test(text) ||
+          /<w:writeProtection\b/.test(text)) modifyOnly = true;
+    }
+    const notes = [];
+    if (modifyOnly) notes.push('Password-to-MODIFY only — the file is not encrypted, opens read-only, and the lock strips right off.');
+    if (hasVba) notes.push('Contains a VBA macro project; any macro-password is separate and also removable.');
+    if (found.length || modifyOnly) return { type: 'protected', label: 'PROTECTED (editing lock)', details: [...new Set(found)], notes };
+    return { type: 'open', label: 'No password — opens freely', notes };
+  }
+
+  async function stripProtection(u8) {
+    const entries = await unzip(u8);
+    let removed = 0;
+    for (const e of entries) {
+      if (!/\.xml$/.test(e.name)) continue;
+      let text = new TextDecoder().decode(e.data); let changed = false;
+      for (const p of PROT) {
+        p.re.lastIndex = 0;
+        if (p.re.test(text)) { p.re.lastIndex = 0; text = text.replace(p.re, ''); changed = true; removed++; }
+      }
+      if (changed) e.data = new TextEncoder().encode(text);
+    }
+    return { removed, bytes: await zip(entries) };
+  }
+
+  // ---------- CFB (compound file) parser ----------
+  function parseCFB(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const secShift = dv.getUint16(30, true), secSize = 1 << secShift;
+    const miniShift = dv.getUint16(32, true), miniSize = 1 << miniShift;
+    const firstDir = dv.getUint32(48, true);
+    const miniCutoff = dv.getUint32(56, true);
+    const firstMiniFat = dv.getUint32(60, true);
+    const firstDifat = dv.getUint32(68, true);
+    const numDifat = dv.getUint32(72, true);
+    const EPS = secSize / 4;
+    const difat = [];
+    for (let i = 0; i < 109; i++) difat.push(dv.getUint32(76 + i * 4, true));
+    let s = firstDifat, cnt = numDifat;
+    while (cnt-- > 0 && s !== 0xFFFFFFFE && s !== 0xFFFFFFFF) {
+      const off = (s + 1) * secSize;
+      for (let i = 0; i < EPS - 1; i++) difat.push(dv.getUint32(off + i * 4, true));
+      s = dv.getUint32(off + (EPS - 1) * 4, true);
+    }
+    const fat = [];
+    for (const fs of difat) { if (fs === 0xFFFFFFFF || fs === 0xFFFFFFFE) continue; const off = (fs + 1) * secSize; for (let j = 0; j < EPS; j++) fat.push(dv.getUint32(off + j * 4, true)); }
+    function chain(start) { const out = []; let x = start; let guard = 0; while (x !== 0xFFFFFFFE && x !== 0xFFFFFFFF && x >= 0 && x < fat.length && guard++ < 1e7) { const off = (x + 1) * secSize; out.push(u8.subarray(off, off + secSize)); x = fat[x]; } return concat(out); }
+    const dirBytes = chain(firstDir);
+    const entries = [];
+    for (let o = 0; o + 128 <= dirBytes.length; o += 128) {
+      const nameLen = dirBytes[o + 64] | (dirBytes[o + 65] << 8);
+      if (nameLen === 0) continue;
+      let name = ''; for (let i = 0; i < nameLen - 2; i += 2) name += String.fromCharCode(dirBytes[o + i] | (dirBytes[o + i + 1] << 8));
+      const ddv = new DataView(dirBytes.buffer, dirBytes.byteOffset + o, 128);
+      entries.push({ name, type: dirBytes[o + 66], start: ddv.getUint32(116, true), size: ddv.getUint32(120, true) + ddv.getUint32(124, true) * 4294967296 });
+    }
+    const rootEntry = entries.find(e => e.type === 5);
+    const miniStream = rootEntry ? chain(rootEntry.start).subarray(0, rootEntry.size) : new Uint8Array(0);
+    const miniFat = [];
+    { let x = firstMiniFat; let g = 0; while (x !== 0xFFFFFFFE && x !== 0xFFFFFFFF && g++ < 1e7) { const off = (x + 1) * secSize; for (let j = 0; j < EPS; j++) miniFat.push(dv.getUint32(off + j * 4, true)); x = fat[x]; } }
+    function miniChain(start, size) { const out = []; let x = start; let g = 0; while (x !== 0xFFFFFFFE && x !== 0xFFFFFFFF && x >= 0 && g++ < 1e7) { const off = x * miniSize; out.push(miniStream.subarray(off, off + miniSize)); x = miniFat[x]; if (x === undefined) break; } return concat(out).subarray(0, size); }
+    function stream(name) { const e = entries.find(x => x.name === name && x.type === 2); if (!e) return null; return e.size >= miniCutoff ? chain(e.start).subarray(0, e.size) : miniChain(e.start, e.size); }
+    return { stream, entries };
+  }
+
+  // ---------- Agile encryption ----------
+  const ALGO = { SHA512: 'SHA-512', SHA384: 'SHA-384', SHA256: 'SHA-256', SHA1: 'SHA-1' };
+  const BK_VHI = new Uint8Array([0xfe, 0xa7, 0xd2, 0x76, 0x3b, 0x4b, 0x9e, 0x79]);
+  const BK_VHV = new Uint8Array([0xd7, 0xaa, 0x0f, 0x6d, 0x30, 0x61, 0x34, 0x4e]);
+  const BK_KEY = new Uint8Array([0x14, 0x6e, 0x0b, 0xe7, 0xab, 0xac, 0xd0, 0xd6]);
+
+  function attr(xml, el, name) {
+    const m = xml.match(new RegExp('<[^>]*\\b' + el + '\\b[^>]*>'));
+    if (!m) return null;
+    const a = m[0].match(new RegExp('\\b' + name + '="([^"]*)"'));
+    return a ? a[1] : null;
+  }
+  function parseAgile(info) {
+    const xml = new TextDecoder().decode(info.subarray(8));
+    const kd = {
+      saltSize: +attr(xml, 'keyData', 'saltSize'), blockSize: +attr(xml, 'keyData', 'blockSize'),
+      keyBits: +attr(xml, 'keyData', 'keyBits'), hashSize: +attr(xml, 'keyData', 'hashSize'),
+      hash: ALGO[attr(xml, 'keyData', 'hashAlgorithm')] || 'SHA-512',
+      salt: b64(attr(xml, 'keyData', 'saltValue')),
+    };
+    const ek = {
+      spinCount: +attr(xml, 'encryptedKey', 'spinCount'), blockSize: +attr(xml, 'encryptedKey', 'blockSize'),
+      keyBits: +attr(xml, 'encryptedKey', 'keyBits'), hashSize: +attr(xml, 'encryptedKey', 'hashSize'),
+      hash: ALGO[attr(xml, 'encryptedKey', 'hashAlgorithm')] || 'SHA-512',
+      salt: b64(attr(xml, 'encryptedKey', 'saltValue')),
+      verifierHashInput: b64(attr(xml, 'encryptedKey', 'encryptedVerifierHashInput')),
+      verifierHashValue: b64(attr(xml, 'encryptedKey', 'encryptedVerifierHashValue')),
+      encryptedKeyValue: b64(attr(xml, 'encryptedKey', 'encryptedKeyValue')),
+    };
+    return { kd, ek };
+  }
+  async function digest(algo, data) { return new Uint8Array(await crypto.subtle.digest(algo, data)); }
+
+  // Fast synchronous SHA-1 — the spin loop runs tens of thousands of these,
+  // and avoiding one Promise per call is ~30x faster than subtle.digest here.
+  function sha1(msg) {
+    const ml = msg.length;
+    const withOne = ml + 1;
+    const total = withOne + ((56 - (withOne % 64) + 64) % 64) + 8;
+    const b = new Uint8Array(total);
+    b.set(msg); b[ml] = 0x80;
+    const bits = ml * 8;
+    const dv = new DataView(b.buffer);
+    dv.setUint32(total - 4, bits >>> 0, false);
+    dv.setUint32(total - 8, Math.floor(bits / 4294967296), false);
+    let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+    const w = new Int32Array(80);
+    for (let i = 0; i < total; i += 64) {
+      for (let j = 0; j < 16; j++) w[j] = dv.getInt32(i + j * 4, false);
+      for (let j = 16; j < 80; j++) { const n = w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16]; w[j] = (n << 1) | (n >>> 31); }
+      let a = h0, bb = h1, c = h2, d = h3, e = h4;
+      for (let j = 0; j < 80; j++) {
+        let f, k;
+        if (j < 20) { f = (bb & c) | (~bb & d); k = 0x5A827999; }
+        else if (j < 40) { f = bb ^ c ^ d; k = 0x6ED9EBA1; }
+        else if (j < 60) { f = (bb & c) | (bb & d) | (c & d); k = 0x8F1BBCDC; }
+        else { f = bb ^ c ^ d; k = 0xCA62C1D6; }
+        const t = (((a << 5) | (a >>> 27)) + f + e + k + w[j]) | 0;
+        e = d; d = c; c = (bb << 30) | (bb >>> 2); bb = a; a = t;
+      }
+      h0 = (h0 + a) | 0; h1 = (h1 + bb) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0; h4 = (h4 + e) | 0;
+    }
+    const out = new Uint8Array(20); const odv = new DataView(out.buffer);
+    odv.setInt32(0, h0, false); odv.setInt32(4, h1, false); odv.setInt32(8, h2, false);
+    odv.setInt32(12, h3, false); odv.setInt32(16, h4, false);
+    return out;
+  }
+
+  // Fast synchronous SHA-256.
+  const K256 = new Uint32Array([
+    0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+    0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+    0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+    0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+    0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+    0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+    0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+    0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  function sha256(msg) {
+    const ml = msg.length, withOne = ml + 1;
+    const total = withOne + ((56 - (withOne % 64) + 64) % 64) + 8;
+    const b = new Uint8Array(total); b.set(msg); b[ml] = 0x80;
+    const dv = new DataView(b.buffer); const bits = ml * 8;
+    dv.setUint32(total - 4, bits >>> 0, false); dv.setUint32(total - 8, Math.floor(bits / 4294967296), false);
+    let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+    const w = new Uint32Array(64);
+    for (let i = 0; i < total; i += 64) {
+      for (let j = 0; j < 16; j++) w[j] = dv.getUint32(i + j * 4, false);
+      for (let j = 16; j < 64; j++) {
+        const a = w[j-15], b2 = w[j-2];
+        const s0 = ((a>>>7)|(a<<25)) ^ ((a>>>18)|(a<<14)) ^ (a>>>3);
+        const s1 = ((b2>>>17)|(b2<<15)) ^ ((b2>>>19)|(b2<<13)) ^ (b2>>>10);
+        w[j] = (w[j-16] + s0 + w[j-7] + s1) >>> 0;
+      }
+      let a=h0,b2=h1,c=h2,d=h3,e=h4,f=h5,g=h6,h=h7;
+      for (let j = 0; j < 64; j++) {
+        const S1 = ((e>>>6)|(e<<26)) ^ ((e>>>11)|(e<<21)) ^ ((e>>>25)|(e<<7));
+        const ch = (e & f) ^ (~e & g);
+        const t1 = (h + S1 + ch + K256[j] + w[j]) >>> 0;
+        const S0 = ((a>>>2)|(a<<30)) ^ ((a>>>13)|(a<<19)) ^ ((a>>>22)|(a<<10));
+        const maj = (a & b2) ^ (a & c) ^ (b2 & c);
+        const t2 = (S0 + maj) >>> 0;
+        h=g; g=f; f=e; e=(d+t1)>>>0; d=c; c=b2; b2=a; a=(t1+t2)>>>0;
+      }
+      h0=(h0+a)>>>0;h1=(h1+b2)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;h5=(h5+f)>>>0;h6=(h6+g)>>>0;h7=(h7+h)>>>0;
+    }
+    const out = new Uint8Array(32); const od = new DataView(out.buffer);
+    [h0,h1,h2,h3,h4,h5,h6,h7].forEach((v,i)=>od.setUint32(i*4,v>>>0,false));
+    return out;
+  }
+
+  // Fast synchronous SHA-512 / SHA-384 (64-bit via hi/lo 32-bit words).
+  const K512h=new Int32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2,0xca273ece,0xd186b8c7,0xeada7dd6,0xf57d4f7f,0x06f067aa,0x0a637dc5,0x113f9804,0x1b710b35,0x28db77f5,0x32caab7b,0x3c9ebe0a,0x431d67c4,0x4cc5d4be,0x597f299c,0x5fcb6fab,0x6c44198c]);
+  const K512l=new Int32Array([0xd728ae22,0x23ef65cd,0xec4d3b2f,0x8189dbbc,0xf348b538,0xb605d019,0xaf194f9b,0xda6d8118,0xa3030242,0x45706fbe,0x4ee4b28c,0xd5ffb4e2,0xf27b896f,0x3b1696b1,0x25c71235,0xcf692694,0x9ef14ad2,0x384f25e3,0x8b8cd5b5,0x77ac9c65,0x592b0275,0x6ea6e483,0xbd41fbd4,0x831153b5,0xee66dfab,0x2db43210,0x98fb213f,0xbeef0ee4,0x3da88fc2,0x930aa725,0xe003826f,0x0a0e6e70,0x46d22ffc,0x5c26c926,0x5ac42aed,0x9d95b3df,0x8baf63de,0x3c77b2a8,0x47edaee6,0x1482353b,0x4cf10364,0xbc423001,0xd0f89791,0x0654be30,0xd6ef5218,0x5565a910,0x5771202a,0x32bbd1b8,0xb8d2d0c8,0x5141ab53,0xdf8eeb99,0xe19b48a8,0xc5c95a63,0xe3418acb,0x7763e373,0xd6b2b8a3,0x5defb2fc,0x43172f60,0xa1f0ab72,0x1a6439ec,0x23631e28,0xde82bde9,0xb2c67915,0xe372532b,0xea26619c,0x21c0c207,0xcde0eb1e,0xee6ed178,0x72176fba,0xa2c898a6,0xbef90dae,0x131c471b,0x23047d84,0x40c72493,0x15c9bebc,0x9c100d4c,0xcb3e42b6,0xfc657e2a,0x3ad6faec,0x4a475817]);
+  const IV512 = { h:new Int32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]), l:new Int32Array([0xf3bcc908,0x84caa73b,0xfe94f82b,0x5f1d36f1,0xade682d1,0x2b3e6c1f,0xfb41bd6b,0x137e2179]) };
+  const IV384 = { h:new Int32Array([0xcbbb9d5d,0x629a292a,0x9159015a,0x152fecd8,0x67332667,0x8eb44a87,0xdb0c2e0d,0x47b5481d]), l:new Int32Array([0xc1059ed8,0x367cd507,0x3070dd17,0xf70e5939,0xffc00b31,0x68581511,0x64f98fa7,0xbefa4fa4]) };
+  function sha512core(msg, IV, outLen) {
+    const ml = msg.length, withOne = ml + 1;
+    const total = withOne + ((112 - (withOne % 128) + 128) % 128) + 16;
+    const b = new Uint8Array(total); b.set(msg); b[ml] = 0x80;
+    const dv = new DataView(b.buffer); const bits = ml * 8;
+    dv.setUint32(total - 4, bits >>> 0, false); dv.setUint32(total - 8, Math.floor(bits / 4294967296), false);
+    const Hh = Int32Array.from(IV.h), Hl = Int32Array.from(IV.l);
+    const Wh = new Int32Array(80), Wl = new Int32Array(80);
+    for (let off = 0; off < total; off += 128) {
+      for (let i = 0; i < 16; i++) { Wh[i] = dv.getInt32(off + i*8, false); Wl[i] = dv.getInt32(off + i*8 + 4, false); }
+      for (let i = 16; i < 80; i++) {
+        let xh = Wh[i-15], xl = Wl[i-15];
+        // s0 = rotr(x,1) ^ rotr(x,8) ^ shr(x,7)
+        let s0h = ((xh>>>1)|(xl<<31)) ^ ((xh>>>8)|(xl<<24)) ^ (xh>>>7);
+        let s0l = ((xl>>>1)|(xh<<31)) ^ ((xl>>>8)|(xh<<24)) ^ ((xl>>>7)|(xh<<25));
+        let yh = Wh[i-2], yl = Wl[i-2];
+        // s1 = rotr(y,19) ^ rotr(y,61) ^ shr(y,6)
+        let s1h = ((yh>>>19)|(yl<<13)) ^ ((yl>>>29)|(yh<<3)) ^ (yh>>>6);
+        let s1l = ((yl>>>19)|(yh<<13)) ^ ((yh>>>29)|(yl<<3)) ^ ((yl>>>6)|(yh<<26));
+        const l = (Wl[i-16]>>>0) + (s0l>>>0) + (Wl[i-7]>>>0) + (s1l>>>0);
+        const h = (Wh[i-16] + s0h + Wh[i-7] + s1h + Math.floor(l / 4294967296)) | 0;
+        Wh[i] = h; Wl[i] = l | 0;
+      }
+      let ah=Hh[0],al=Hl[0],bh=Hh[1],bl=Hl[1],ch=Hh[2],cl=Hl[2],dh=Hh[3],dl=Hl[3],
+          eh=Hh[4],el=Hl[4],fh=Hh[5],fl=Hl[5],gh=Hh[6],gl=Hl[6],hh=Hh[7],hl=Hl[7];
+      for (let i = 0; i < 80; i++) {
+        // S1 = rotr(e,14)^rotr(e,18)^rotr(e,41)
+        let S1h = ((eh>>>14)|(el<<18)) ^ ((eh>>>18)|(el<<14)) ^ ((el>>>9)|(eh<<23));
+        let S1l = ((el>>>14)|(eh<<18)) ^ ((el>>>18)|(eh<<14)) ^ ((eh>>>9)|(el<<23));
+        let chh = (eh & fh) ^ (~eh & gh), chl = (el & fl) ^ (~el & gl);
+        let t1l = (hl>>>0) + (S1l>>>0) + (chl>>>0) + (K512l[i]>>>0) + (Wl[i]>>>0);
+        let t1h = (hh + S1h + chh + K512h[i] + Wh[i] + Math.floor(t1l / 4294967296)) | 0;
+        t1l = t1l | 0;
+        let S0h = ((ah>>>28)|(al<<4)) ^ ((al>>>2)|(ah<<30)) ^ ((al>>>7)|(ah<<25));
+        let S0l = ((al>>>28)|(ah<<4)) ^ ((ah>>>2)|(al<<30)) ^ ((ah>>>7)|(al<<25));
+        let majh = (ah & bh) ^ (ah & ch) ^ (bh & ch), majl = (al & bl) ^ (al & cl) ^ (bl & cl);
+        let t2l = (S0l>>>0) + (majl>>>0);
+        let t2h = (S0h + majh + Math.floor(t2l / 4294967296)) | 0; t2l = t2l | 0;
+        hh=gh; hl=gl; gh=fh; gl=fl; fh=eh; fl=el;
+        let el2 = (dl>>>0) + (t1l>>>0); let eh2 = (dh + t1h + Math.floor(el2/4294967296)) | 0;
+        eh=eh2; el=el2|0;
+        dh=ch; dl=cl; ch=bh; cl=bl; bh=ah; bl=al;
+        let al2 = (t1l>>>0) + (t2l>>>0); let ah2 = (t1h + t2h + Math.floor(al2/4294967296)) | 0;
+        ah=ah2; al=al2|0;
+      }
+      let x;
+      x=(Hl[0]>>>0)+(al>>>0); Hh[0]=(Hh[0]+ah+Math.floor(x/4294967296))|0; Hl[0]=x|0;
+      x=(Hl[1]>>>0)+(bl>>>0); Hh[1]=(Hh[1]+bh+Math.floor(x/4294967296))|0; Hl[1]=x|0;
+      x=(Hl[2]>>>0)+(cl>>>0); Hh[2]=(Hh[2]+ch+Math.floor(x/4294967296))|0; Hl[2]=x|0;
+      x=(Hl[3]>>>0)+(dl>>>0); Hh[3]=(Hh[3]+dh+Math.floor(x/4294967296))|0; Hl[3]=x|0;
+      x=(Hl[4]>>>0)+(el>>>0); Hh[4]=(Hh[4]+eh+Math.floor(x/4294967296))|0; Hl[4]=x|0;
+      x=(Hl[5]>>>0)+(fl>>>0); Hh[5]=(Hh[5]+fh+Math.floor(x/4294967296))|0; Hl[5]=x|0;
+      x=(Hl[6]>>>0)+(gl>>>0); Hh[6]=(Hh[6]+gh+Math.floor(x/4294967296))|0; Hl[6]=x|0;
+      x=(Hl[7]>>>0)+(hl>>>0); Hh[7]=(Hh[7]+hh+Math.floor(x/4294967296))|0; Hl[7]=x|0;
+    }
+    const out = new Uint8Array(64); const od = new DataView(out.buffer);
+    for (let i = 0; i < 8; i++) { od.setInt32(i*8, Hh[i], false); od.setInt32(i*8+4, Hl[i], false); }
+    return outLen === 64 ? out : out.subarray(0, outLen);
+  }
+  function sha512(msg) { return sha512core(msg, IV512, 64); }
+  function sha384(msg) { return sha512core(msg, IV384, 48); }
+  const SYNCH = { 'SHA-1': sha1, 'SHA-256': sha256, 'SHA-384': sha384, 'SHA-512': sha512 };
+
+  // -------- allocation-free spin loops (the hot path) --------
+  // The Office KDF hashes a FIXED-length input tens of thousands of times:
+  //   h = H( LE32(i) || h ).  Input length is constant, so its padding/length
+  //   never change — we reuse ONE padded block and run only the compression,
+  //   with zero per-iteration allocation. 10-40x faster than re-hashing.
+  const _W1 = new Int32Array(80);
+  function sha1Compress(H, dv) {
+    const w = _W1;
+    for (let j = 0; j < 16; j++) w[j] = dv.getInt32(j * 4, false);
+    for (let j = 16; j < 80; j++) { const n = w[j-3]^w[j-8]^w[j-14]^w[j-16]; w[j] = (n<<1)|(n>>>31); }
+    let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4];
+    for (let j = 0; j < 80; j++) {
+      let f,k;
+      if (j<20){f=(b&c)|(~b&d);k=0x5A827999;} else if (j<40){f=b^c^d;k=0x6ED9EBA1;}
+      else if (j<60){f=(b&c)|(b&d)|(c&d);k=0x8F1BBCDC;} else {f=b^c^d;k=0xCA62C1D6;}
+      const t=(((a<<5)|(a>>>27))+f+e+k+w[j])|0; e=d;d=c;c=(b<<30)|(b>>>2);b=a;a=t;
+    }
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+b)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;H[4]=(H[4]+e)|0;
+  }
+  // spin h = SHA1(LE32(i) || h), input = 4 + 20 = 24 bytes -> one 64-byte block.
+  function sha1Spin(initial20, spinCount) {
+    const block = new Uint8Array(64), dv = new DataView(block.buffer);
+    block[24] = 0x80; dv.setUint32(60, 24 * 8, false);          // constant padding + bit length
+    block.set(initial20, 4);
+    const H = new Int32Array(5);
+    for (let i = 0; i < spinCount; i++) {
+      dv.setUint32(0, i, true);
+      H[0]=0x67452301;H[1]=0xEFCDAB89;H[2]=0x98BADCFE;H[3]=0x10325476;H[4]=0xC3D2E1F0;
+      sha1Compress(H, dv);
+      dv.setInt32(4,H[0],false);dv.setInt32(8,H[1],false);dv.setInt32(12,H[2],false);dv.setInt32(16,H[3],false);dv.setInt32(20,H[4],false);
+    }
+    const out = new Uint8Array(20), od = new DataView(out.buffer);
+    for (let i=0;i<5;i++) od.setInt32(i*4,H[i],false);
+    return out;
+  }
+  const _W512h = new Int32Array(80), _W512l = new Int32Array(80);
+  function sha512Compress(Hh, Hl, dv) {
+    const Wh=_W512h, Wl=_W512l;
+    for (let i=0;i<16;i++){ Wh[i]=dv.getInt32(i*8,false); Wl[i]=dv.getInt32(i*8+4,false); }
+    for (let i=16;i<80;i++){
+      let xh=Wh[i-15],xl=Wl[i-15];
+      let s0h=((xh>>>1)|(xl<<31))^((xh>>>8)|(xl<<24))^(xh>>>7);
+      let s0l=((xl>>>1)|(xh<<31))^((xl>>>8)|(xh<<24))^((xl>>>7)|(xh<<25));
+      let yh=Wh[i-2],yl=Wl[i-2];
+      let s1h=((yh>>>19)|(yl<<13))^((yl>>>29)|(yh<<3))^(yh>>>6);
+      let s1l=((yl>>>19)|(yh<<13))^((yh>>>29)|(yl<<3))^((yl>>>6)|(yh<<26));
+      const l=(Wl[i-16]>>>0)+(s0l>>>0)+(Wl[i-7]>>>0)+(s1l>>>0);
+      const h=(Wh[i-16]+s0h+Wh[i-7]+s1h+Math.floor(l/4294967296))|0;
+      Wh[i]=h; Wl[i]=l|0;
+    }
+    let ah=Hh[0],al=Hl[0],bh=Hh[1],bl=Hl[1],ch=Hh[2],cl=Hl[2],dh=Hh[3],dl=Hl[3],
+        eh=Hh[4],el=Hl[4],fh=Hh[5],fl=Hl[5],gh=Hh[6],gl=Hl[6],hh=Hh[7],hl=Hl[7];
+    for (let i=0;i<80;i++){
+      let S1h=((eh>>>14)|(el<<18))^((eh>>>18)|(el<<14))^((el>>>9)|(eh<<23));
+      let S1l=((el>>>14)|(eh<<18))^((el>>>18)|(eh<<14))^((eh>>>9)|(el<<23));
+      let chh=(eh&fh)^(~eh&gh), chl=(el&fl)^(~el&gl);
+      let t1l=(hl>>>0)+(S1l>>>0)+(chl>>>0)+(K512l[i]>>>0)+(Wl[i]>>>0);
+      let t1h=(hh+S1h+chh+K512h[i]+Wh[i]+Math.floor(t1l/4294967296))|0; t1l=t1l|0;
+      let S0h=((ah>>>28)|(al<<4))^((al>>>2)|(ah<<30))^((al>>>7)|(ah<<25));
+      let S0l=((al>>>28)|(ah<<4))^((ah>>>2)|(al<<30))^((ah>>>7)|(al<<25));
+      let majh=(ah&bh)^(ah&ch)^(bh&ch), majl=(al&bl)^(al&cl)^(bl&cl);
+      let t2l=(S0l>>>0)+(majl>>>0); let t2h=(S0h+majh+Math.floor(t2l/4294967296))|0; t2l=t2l|0;
+      hh=gh;hl=gl;gh=fh;gl=fl;fh=eh;fl=el;
+      let el2=(dl>>>0)+(t1l>>>0); let eh2=(dh+t1h+Math.floor(el2/4294967296))|0; eh=eh2;el=el2|0;
+      dh=ch;dl=cl;ch=bh;cl=bl;bh=ah;bl=al;
+      let al2=(t1l>>>0)+(t2l>>>0); let ah2=(t1h+t2h+Math.floor(al2/4294967296))|0; ah=ah2;al=al2|0;
+    }
+    let x;
+    x=(Hl[0]>>>0)+(al>>>0);Hh[0]=(Hh[0]+ah+Math.floor(x/4294967296))|0;Hl[0]=x|0;
+    x=(Hl[1]>>>0)+(bl>>>0);Hh[1]=(Hh[1]+bh+Math.floor(x/4294967296))|0;Hl[1]=x|0;
+    x=(Hl[2]>>>0)+(cl>>>0);Hh[2]=(Hh[2]+ch+Math.floor(x/4294967296))|0;Hl[2]=x|0;
+    x=(Hl[3]>>>0)+(dl>>>0);Hh[3]=(Hh[3]+dh+Math.floor(x/4294967296))|0;Hl[3]=x|0;
+    x=(Hl[4]>>>0)+(el>>>0);Hh[4]=(Hh[4]+eh+Math.floor(x/4294967296))|0;Hl[4]=x|0;
+    x=(Hl[5]>>>0)+(fl>>>0);Hh[5]=(Hh[5]+fh+Math.floor(x/4294967296))|0;Hl[5]=x|0;
+    x=(Hl[6]>>>0)+(gl>>>0);Hh[6]=(Hh[6]+gh+Math.floor(x/4294967296))|0;Hl[6]=x|0;
+    x=(Hl[7]>>>0)+(hl>>>0);Hh[7]=(Hh[7]+hh+Math.floor(x/4294967296))|0;Hl[7]=x|0;
+  }
+  // spin h = SHA512(LE32(i) || h), input = 4 + 64 = 68 bytes -> one 128-byte block.
+  function sha512Spin(initial64, spinCount) {
+    const block = new Uint8Array(128), dv = new DataView(block.buffer);
+    block[68] = 0x80; dv.setUint32(124, 68 * 8, false);
+    block.set(initial64, 4);
+    const Hh = new Int32Array(8), Hl = new Int32Array(8);
+    for (let i = 0; i < spinCount; i++) {
+      for (let k=0;k<8;k++){ Hh[k]=IV512.h[k]; Hl[k]=IV512.l[k]; }
+      dv.setUint32(0, i, true);
+      sha512Compress(Hh, Hl, dv);
+      for (let k=0;k<8;k++){ dv.setInt32(4+k*8,Hh[k],false); dv.setInt32(4+k*8+4,Hl[k],false); }
+    }
+    const out = new Uint8Array(64), od = new DataView(out.buffer);
+    for (let i=0;i<8;i++){ od.setInt32(i*8,Hh[i],false); od.setInt32(i*8+4,Hl[i],false); }
+    return out;
+  }
+
+  // AES-CBC decrypt with NO padding, via the WebCrypto pad-block trick.
+  async function aesCbcNoPad(keyBytes, iv, data) {
+    const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['encrypt', 'decrypt']);
+    const last = data.subarray(data.length - 16);
+    const enc = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-CBC', iv: last }, key, new Uint8Array(16).fill(16)));
+    const full = concat([data, enc.subarray(0, 16)]);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, full));
+  }
+  // AES-ECB decrypt (no native support): CBC with IV=0 then undo the chaining.
+  async function aesEcbNoPad(keyBytes, data) {
+    const zero = new Uint8Array(16);
+    const out = await aesCbcNoPad(keyBytes, zero, data);
+    for (let i = 16; i < out.length; i++) out[i] ^= data[i - 16];
+    return out;
+  }
+
+  // Dispatch: inspect EncryptionInfo and build the right session.
+  function encryptionSession(u8) {
+    const cfb = parseCFB(u8);
+    const info = cfb.stream('EncryptionInfo');
+    if (!info) throw new Error('No EncryptionInfo stream.');
+    const dv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+    const maj = dv.getUint16(0, true), min = dv.getUint16(2, true);
+    if (maj === 4 && min === 4) return buildAgile(u8, cfb, info);
+    if ((maj === 3 || maj === 4) && min === 2) return buildStandard(u8, cfb, info, dv);
+    return { ok: false, scheme: 'unsupported' };
+  }
+
+  // ECMA-376 Standard Encryption (AES-ECB + SHA-1). Office 2007-2013, LibreOffice default.
+  function buildStandard(u8, cfb, info, dv) {
+    const headerSize = dv.getUint32(8, true);
+    const h = 12;
+    const keyBits = dv.getUint32(h + 16, true) || 128;
+    const keyBytes = keyBits / 8;
+    const vs = 12 + headerSize;
+    const saltSize = dv.getUint32(vs, true);
+    const salt = info.subarray(vs + 4, vs + 4 + saltSize);
+    const encVerifier = info.subarray(vs + 4 + saltSize, vs + 4 + saltSize + 16);
+    const vhSizeOff = vs + 4 + saltSize + 16;
+    const encVerifierHash = info.subarray(vhSizeOff + 4, vhSizeOff + 4 + 32);
+
+    function derive(password) {
+      let x = sha1(concat([salt, utf16le(password)]));
+      x = sha1Spin(x, 50000);                       // allocation-free hot loop
+      x = sha1(concat([x, new Uint8Array(4)]));
+      const b1 = new Uint8Array(64).fill(0x36), b2 = new Uint8Array(64).fill(0x5c);
+      for (let j = 0; j < x.length; j++) { b1[j] ^= x[j]; b2[j] ^= x[j]; }
+      return concat([sha1(b1), sha1(b2)]).subarray(0, keyBytes);
+    }
+    async function verify(password) {
+      const key = await derive(password);
+      const verifier = await aesEcbNoPad(key, encVerifier);
+      const vhash = await aesEcbNoPad(key, encVerifierHash);
+      const calc = await digest('SHA-1', verifier);
+      return eq(calc.subarray(0, 20), vhash.subarray(0, 20));
+    }
+    async function decrypt(password) {
+      const key = await derive(password);
+      const pkg = cfb.stream('EncryptedPackage');
+      const pdv = new DataView(pkg.buffer, pkg.byteOffset, pkg.byteLength);
+      const total = pdv.getUint32(0, true) + pdv.getUint32(4, true) * 4294967296;
+      let enc = pkg.subarray(8);
+      if (enc.length % 16) enc = enc.subarray(0, enc.length - (enc.length % 16));
+      const dec = await aesEcbNoPad(key, enc);
+      return dec.subarray(0, total);
+    }
+    // GPU assist: GPU does the 50k SHA-1 spin; CPU does the cheap finish + AES check.
+    const gpu = {
+      spinCount: 50000, scheme: 'sha1',
+      prep: function (password) {           // H0 = SHA1(salt || pw) -> 5 big-endian words
+        const x = sha1(concat([salt, utf16le(password)]));
+        const w = new Uint32Array(5); const dv = new DataView(x.buffer, x.byteOffset, 20);
+        for (let i = 0; i < 5; i++) w[i] = dv.getUint32(i * 4, false);
+        return w;
+      },
+      finishVerify: async function (spun20) {   // spun20 = post-spin 20-byte hash
+        let x = sha1(concat([spun20, new Uint8Array(4)]));
+        const b1 = new Uint8Array(64).fill(0x36), b2 = new Uint8Array(64).fill(0x5c);
+        for (let j = 0; j < x.length; j++) { b1[j] ^= x[j]; b2[j] ^= x[j]; }
+        const key = concat([sha1(b1), sha1(b2)]).subarray(0, keyBytes);
+        const verifier = await aesEcbNoPad(key, encVerifier);
+        const vhash = await aesEcbNoPad(key, encVerifierHash);
+        return eq(sha1(verifier).subarray(0, 20), vhash.subarray(0, 20));
+      }
+    };
+    return { ok: true, scheme: 'standard', verify, decrypt, spinCount: 50000, keyBits, hash: 'SHA-1', gpu };
+  }
+
+  // ECMA-376 Agile Encryption (AES-CBC). Office 2013+ default.
+  function buildAgile(u8, cfb, info) {
+    const { kd, ek } = parseAgile(info);
+
+    const HF = SYNCH[ek.hash];        // fast synchronous hash for this file
+    const fastSpin = ek.hash === 'SHA-512' ? sha512Spin : ek.hash === 'SHA-1' ? sha1Spin : null;
+    function spin(password) {
+      let h = HF(concat([ek.salt, utf16le(password)]));
+      if (fastSpin) return fastSpin(h, ek.spinCount);   // allocation-free hot loop
+      const buf = new Uint8Array(4 + h.length); const bdv = new DataView(buf.buffer);
+      for (let i = 0; i < ek.spinCount; i++) { bdv.setUint32(0, i, true); buf.set(h, 4); h = HF(buf); }
+      return h;
+    }
+    function deriveKey(hfinal, blockKey) {
+      const x = HF(concat([hfinal, blockKey]));
+      const kb = ek.keyBits / 8;
+      if (x.length >= kb) return x.subarray(0, kb);
+      const out = new Uint8Array(kb).fill(0x36); out.set(x); return out;
+    }
+    async function verify(password) {
+      const h = spin(password);
+      const k1 = deriveKey(h, BK_VHI);
+      const vin = await aesCbcNoPad(k1, ek.salt.subarray(0, ek.blockSize), ek.verifierHashInput);
+      const k2 = deriveKey(h, BK_VHV);
+      const vval = await aesCbcNoPad(k2, ek.salt.subarray(0, ek.blockSize), ek.verifierHashValue);
+      const calc = HF(vin.subarray(0, ek.verifierHashInput.length === 16 ? 16 : vin.length));
+      return eq(calc.subarray(0, ek.hashSize), vval.subarray(0, ek.hashSize));
+    }
+    async function decrypt(password) {
+      const h = spin(password);
+      const kk = deriveKey(h, BK_KEY);
+      const secret = await aesCbcNoPad(kk, ek.salt.subarray(0, ek.blockSize), ek.encryptedKeyValue);
+      const pkg = cfb.stream('EncryptedPackage');
+      const pdv = new DataView(pkg.buffer, pkg.byteOffset, pkg.byteLength);
+      const totalSize = pdv.getUint32(0, true) + pdv.getUint32(4, true) * 4294967296;
+      const enc = pkg.subarray(8);
+      const seg = 4096; const out = [];
+      for (let i = 0, n = 0; i < enc.length; i += seg, n++) {
+        const block = enc.subarray(i, i + seg);
+        const iv = (await digest(kd.hash, concat([kd.salt, u32le(n)]))).subarray(0, kd.blockSize);
+        out.push(await aesCbcNoPad(secret, iv, block));
+      }
+      return concat(out).subarray(0, totalSize);
+    }
+    return { ok: true, scheme: 'agile', verify, decrypt, spinCount: ek.spinCount, keyBits: ek.keyBits, hash: ek.hash };
+  }
+
+  // ---------- hash export for GPU (hashcat / John) ----------
+  function hex(u8) { let s = ''; for (let i = 0; i < u8.length; i++) s += u8[i].toString(16).padStart(2, '0'); return s; }
+  function hashExport(u8) {
+    const cfb = parseCFB(u8); const info = cfb.stream('EncryptionInfo');
+    if (!info) return { ok: false, reason: 'legacy', note: 'Legacy Office 97–2003 — extract with office2john (Engine tab).' };
+    const dv = new DataView(info.buffer, info.byteOffset, info.byteLength);
+    const maj = dv.getUint16(0, true), min = dv.getUint16(2, true);
+    if (maj === 4 && min === 4) {
+      const { ek } = parseAgile(info);
+      const year = ek.hash === 'SHA-1' ? 2010 : 2013;
+      const mode = ek.hash === 'SHA-1' ? 9500 : 9600;
+      const hash = `$office$*${year}*${ek.spinCount}*${ek.keyBits}*${ek.salt.length}*${hex(ek.salt)}*${hex(ek.verifierHashInput)}*${hex(ek.verifierHashValue).slice(0, 64)}`;
+      return { ok: true, scheme: 'agile', mode, year, hash };
+    }
+    if ((maj === 3 || maj === 4) && min === 2) {
+      const headerSize = dv.getUint32(8, true), h = 12;
+      const keyBits = dv.getUint32(h + 16, true) || 128;
+      const vs = 12 + headerSize, saltSize = dv.getUint32(vs, true);
+      const salt = info.subarray(vs + 4, vs + 4 + saltSize);
+      const encVerifier = info.subarray(vs + 4 + saltSize, vs + 4 + saltSize + 16);
+      const vho = vs + 4 + saltSize + 16;
+      const encVerifierHash = info.subarray(vho + 4, vho + 4 + 32);
+      const hash = `$office$*2007*20*${keyBits}*${saltSize}*${hex(salt)}*${hex(encVerifier)}*${hex(encVerifierHash).slice(0, 40)}`;
+      return { ok: true, scheme: 'standard', mode: 9400, year: 2007, hash };
+    }
+    return { ok: false, reason: 'rc4', note: 'RC4 scheme — use office2john (Engine tab) to extract the hash.' };
+  }
+
+  // ---------- smart candidate generation ----------
+  const LEET2 = { a: '@', A: '@', s: '$', S: '$', o: '0', O: '0', i: '1', I: '1', e: '3', E: '3', t: '7', T: '7' };
+  function cap(w) { return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w; }
+  function caseVariants(w) {
+    const tog = [...w].map((c, i) => i % 2 ? c.toLowerCase() : c.toUpperCase()).join('');
+    return [...new Set([w, w.toLowerCase(), w.toUpperCase(), cap(w), tog])];
+  }
+  function leetVariants(w) {
+    const light = w.replace(/[aAoO]/g, c => LEET2[c]);
+    const full = w.replace(/[aAsSoOiIeEtT]/g, c => LEET2[c]);
+    return [...new Set([w, light, full])];
+  }
+  const APPEND = (() => {
+    const a = ['', '1', '2', '3', '12', '123', '1234', '12345', '123456', '321', '007', '69', '420', '1234567', '11'];
+    for (let i = 0; i <= 99; i++) a.push(String(i).padStart(2, '0'));
+    for (let y = 1960; y <= 2035; y++) a.push(String(y));
+    ['!', '!!', '!!!', '@', '#', '$', '%', '?', '.', '*', '_', '-', '&', '123!', '!@#', '1!', '01!', '2024!', '2025!', '#1'].forEach(s => a.push(s));
+    ['1', '12', '123'].forEach(d => ['!', '@', '#', '.', '*'].forEach(s => a.push(d + s)));
+    return [...new Set(a)];
+  })();
+  const PREP = ['', '1', '!', '@', '#'];
+
+  function* rulesOver(words) {
+    for (const w0 of (words || [])) {
+      const w = (w0 || '').trim(); if (!w) continue;
+      const seen = new Set();
+      for (const c of caseVariants(w)) for (const l of leetVariants(c)) {
+        // reversed base too
+        const rev = [...l].reverse().join('');
+        for (const base of (l === rev ? [l] : [l, rev])) {
+          for (const pre of PREP) for (const app of APPEND) {
+            const cand = pre + base + app;
+            if (cand && !seen.has(cand)) { seen.add(cand); yield cand; }
+          }
+          // doubled word
+          const dbl = base + base;
+          if (!seen.has(dbl)) { seen.add(dbl); yield dbl; }
+        }
+      }
+    }
+  }
+  const MCHAR = { l: 'abcdefghijklmnopqrstuvwxyz', u: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', d: '0123456789', s: '!@#$%^&*()-_=+.?' };
+  MCHAR.a = MCHAR.l + MCHAR.u + MCHAR.d + MCHAR.s;
+  function* oneMask(mask) {
+    const sets = [];
+    for (let i = 0; i < mask.length; i++) {
+      if (mask[i] === '?' && i + 1 < mask.length) { const t = mask[++i]; sets.push(MCHAR[t] || t); }
+      else sets.push(mask[i]);
+    }
+    const idx = new Array(sets.length).fill(0), sizes = sets.map(s => s.length);
+    let total = 1; for (const z of sizes) total *= z;
+    const CAP = 5e7;
+    for (let n = 0; n < total && n < CAP; n++) {
+      let s = ''; for (let k = 0; k < sets.length; k++) s += sets[k][idx[k]];
+      yield s;
+      for (let k = sets.length - 1; k >= 0; k--) { if (++idx[k] < sizes[k]) break; idx[k] = 0; }
+    }
+  }
+  function* masksOver(masks) { for (const m of (masks || [])) if (m && m.trim()) yield* oneMask(m.trim()); }
+  function* combinatorOver(words) {
+    const seps = ['', '.', '_', '-', '!', '@', '1', '123', '2024', '2025'];
+    const list = [...new Set((words || []).map(w => (w || '').trim()).filter(Boolean))].slice(0, 60);
+    for (const a of list) for (const b of list) for (const s of seps) { yield a + s + b; yield cap(a) + s + cap(b); }
+  }
+  function* datesStream() {
+    const seen = new Set(); const push = s => { if (seen.has(s)) return false; seen.add(s); return true; };
+    const mon = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const seasons = ['spring', 'summer', 'fall', 'autumn', 'winter'];
+    for (let y = 1950; y <= 2035; y++) {
+      if (push(String(y))) yield String(y);
+      for (const s of seasons) { for (const v of [s + y, cap(s) + y]) if (push(v)) yield v; }
+      for (const m of mon) { for (const v of [m + y, cap(m) + y]) if (push(v)) yield v; }
+    }
+    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    for (let y = 1950; y <= 2035; y++) {
+      const yy = String(y).slice(2);
+      for (const m of months) for (let d = 1; d <= 31; d++) {
+        const dd = String(d).padStart(2, '0');
+        for (const v of [m + dd + y, dd + m + y, m + dd + yy, dd + m + yy]) if (push(v)) yield v;
+      }
+    }
+  }
+  const KEYWALKS = ['qwerty', 'qwertyuiop', 'qwerty123', 'qwerty1', 'asdfgh', 'asdfghjkl', 'zxcvbn', 'zxcvbnm',
+    '1q2w3e', '1q2w3e4r', '1qaz2wsx', '1qaz2wsx3edc', 'qazwsx', 'qweasd', '123qwe', 'qwe123', 'asd123',
+    '1234567890', '0987654321', 'poiuyt', 'password1', 'passw0rd', 'p@ssw0rd', 'P@ssw0rd', 'Password1',
+    'Password123', 'admin123', 'root', 'toor', 'letmein1', 'welcome1', 'Welcome1', 'Welcome123',
+    'monkey', 'football', 'baseball', 'dragon', 'master1', 'trustno1', 'sunshine', 'princess', 'shadow',
+    'superman', 'batman', 'michael', 'jordan23', 'hunter2', 'abc123!', 'Abc123!', 'Abcd1234', 'Qwerty123!'];
+  function* keyboardStream() { const seen = new Set(); for (const k of KEYWALKS) if (!seen.has(k)) { seen.add(k); yield k; } }
+
+  // builtin common list (used by the wordlist lane)
+  const COMMON = ['password', 'Password', 'password1', '123456', '12345678', '123456789', 'qwerty', 'abc123',
+    'letmein', 'admin', 'welcome', 'excel', 'finance', 'budget', 'report', 'confidential', 'private',
+    'secret', 'master', 'changeme', 'office', 'microsoft', 'company', 'money', 'summer', 'winter',
+    'dragon', 'sunshine', 'iloveyou', 'monkey', 'football', 'login', 'passw0rd', 'access', 'default',
+    'temp', 'test', 'data', 'sales', 'accounting', 'payroll', 'invoice', 'client', 'secure', 'backup'];
+
+  // --- exact lookup: try known / breached / reused passwords verbatim (NOT guessing) ---
+  function* exactStream(words) {
+    const seen = new Set();
+    for (const w0 of (words || [])) { const w = (w0 || '').trim(); if (w && !seen.has(w)) { seen.add(w); yield w; } }
+  }
+
+  // --- probabilistic model: order-2 char Markov, best-first (likelihood order) ---
+  function MaxHeap() { this.a = []; }
+  MaxHeap.prototype.size = function () { return this.a.length; };
+  MaxHeap.prototype.push = function (x) { const a = this.a; a.push(x); let i = a.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (a[p].lp >= a[i].lp) break; const t = a[p]; a[p] = a[i]; a[i] = t; i = p; } };
+  MaxHeap.prototype.pop = function () { const a = this.a; const top = a[0]; const last = a.pop(); if (a.length) { a[0] = last; let i = 0; const n = a.length; for (; ;) { let l = 2 * i + 1, r = l + 1, m = i; if (l < n && a[l].lp > a[m].lp) m = l; if (r < n && a[r].lp > a[m].lp) m = r; if (m === i) break; const t = a[m]; a[m] = a[i]; a[i] = t; i = m; } } return top; };
+  MaxHeap.prototype.trim = function (n) { if (this.a.length <= n) return; const kept = []; for (let i = 0; i < n && this.a.length; i++) kept.push(this.pop()); this.a = kept; };
+  function trainMarkov(words) {
+    const trans = {}; const SS = '\u0002\u0002';
+    for (let w of words) { w = (w || '').trim(); if (!w || w.length > 24) continue; const s = SS + w + '\u0003'; for (let i = 2; i < s.length; i++) { const ctx = s[i - 2] + s[i - 1], ch = s[i]; (trans[ctx] || (trans[ctx] = {}))[ch] = (trans[ctx][ch] || 0) + 1; } }
+    const model = {}; for (const ctx in trans) { const row = trans[ctx]; let tot = 0; for (const c in row) tot += row[c]; model[ctx] = Object.keys(row).map(c => ({ c, lp: Math.log(row[c] / tot) })).sort((a, b) => b.lp - a.lp); }
+    return model;
+  }
+  function* markovGen(words) {
+    const base = (words && words.length ? words : COMMON).concat(COMMON, KEYWALKS);
+    const model = trainMarkov(base); const SS = '\u0002\u0002';
+    const heap = new MaxHeap(); heap.push({ str: '', ctx: SS, lp: 0 });
+    const seen = new Set(); let emitted = 0; const CAP = 3e6, MINL = 4, MAXL = 16;
+    while (heap.size() && emitted < CAP) {
+      const node = heap.pop(); const row = model[node.ctx]; if (!row) continue;
+      for (const e of row) {
+        if (e.c === '\u0003') { if (node.str.length >= MINL && !seen.has(node.str)) { seen.add(node.str); emitted++; yield node.str; } continue; }
+        if (node.str.length >= MAXL) continue;
+        heap.push({ str: node.str + e.c, ctx: node.ctx[1] + e.c, lp: node.lp + e.lp });
+      }
+      if (heap.size() > 160000) heap.trim(90000);
+    }
+  }
+
+  // -------- MASTER stream: merge every strategy, de-duplicate GLOBALLY --------
+  // One instance of this feeds all CPU cores + the GPU, so a candidate is handed
+  // out to exactly ONE instance and never tried twice anywhere.
+  function masterStream(p) {
+    const order = ['breach', 'clues', 'markov', 'wordlist', 'combinator', 'dates', 'mask'];
+    const weight = { breach: 5, clues: 4, markov: 3, wordlist: 2, combinator: 1, dates: 1, mask: 1 };
+    return (function* () {
+      const gens = order.map(id => strategyStream(id, p));
+      const active = gens.map(() => true);
+      const w = order.map(id => weight[id] || 1);
+      const seen = new Set(); const CAP = 5e6;
+      let any = true;
+      while (any) {
+        any = false;
+        for (let gi = 0; gi < gens.length; gi++) {
+          if (!active[gi]) continue;
+          for (let k = 0; k < w[gi]; k++) {
+            let r; try { r = gens[gi].next(); } catch (e) { active[gi] = false; break; }
+            if (r.done) { active[gi] = false; break; }
+            any = true;
+            const c = r.value;
+            if (seen.has(c)) continue;
+            if (seen.size < CAP) seen.add(c);
+            yield c;
+          }
+        }
+      }
+    })();
+  }
+
+  // strategy dispatcher — one lane per strategy, run in parallel by the app.
+  function strategyStream(name, p) {
+    p = p || {};
+    const hints = p.hints || [], words = p.words || [];
+    const pool = [...new Set(hints.concat(words, COMMON, KEYWALKS))];
+    switch (name) {
+      case 'breach': return exactStream(words.concat(hints, COMMON, KEYWALKS));
+      case 'markov': return markovGen(pool);
+      case 'clues': return rulesOver(hints);
+      case 'wordlist': return rulesOver([...new Set(words.concat(COMMON, KEYWALKS))]);
+      case 'mask': return masksOver(p.masks && p.masks.length ? p.masks : ['?u?l?l?l?l?d?d', '?u?l?l?l?l?d?d?d?d', '?l?l?l?l?l?l?d?d']);
+      case 'combinator': return combinatorOver(hints.concat(words));
+      case 'dates': return datesStream();
+      case 'keyboard': return keyboardStream();
+      default: return (function* () { })();
+    }
+  }
+  const STRATEGIES = [
+    { id: 'breach', label: 'Breached / reused' },
+    { id: 'clues', label: 'Clues + rules' },
+    { id: 'markov', label: 'Smart model (Markov)' },
+    { id: 'wordlist', label: 'Wordlist + rules' },
+    { id: 'combinator', label: 'Combinator' },
+    { id: 'dates', label: 'Dates' },
+    { id: 'mask', label: 'Masks' },
+  ];
+
+  // legacy single-stream (kept for the CLI-style flow)
+  function* mutations(word) { yield* rulesOver([word]); }
+  function* candidates(hints, words) { yield* rulesOver((hints || []).concat(words || [])); }
+
+  const API = { diagnose, stripProtection, encryptionSession, hashExport, strategyStream, masterStream, STRATEGIES, candidates, mutations, unzip, zip, parseCFB, isZip, isOle, crc32 };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  root.UnlockCore = API;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>
+
+<script>
+(function(){
+  "use strict";
+  // ---- Matrix rain ----
+  var cv=document.getElementById('rain'),ctx=cv.getContext('2d'),cols,drops,fs=16;
+  var gl="アイウエオカキクケコサシスセソタチツテトナニヌネノﾊﾋﾌﾍﾎ0123456789ABCDEF$#@".split("");
+  function sz(){cv.width=innerWidth;cv.height=innerHeight;cols=Math.floor(cv.width/fs);
+    drops=Array(cols).fill(1).map(function(){return Math.random()*-50});}
+  sz();addEventListener('resize',sz);
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function draw(){ctx.fillStyle="rgba(0,7,0,.08)";ctx.fillRect(0,0,cv.width,cv.height);ctx.font=fs+"px monospace";
+    for(var i=0;i<cols;i++){var ch=gl[Math.floor(Math.random()*gl.length)];var y=drops[i]*fs;
+      ctx.fillStyle=Math.random()>.975?"#bfffcf":"#39ff6a";ctx.fillText(ch,i*fs,y);
+      if(y>cv.height&&Math.random()>.975)drops[i]=0;drops[i]++;}}
+  if(!reduce)setInterval(draw,55);
+
+  // ---- tabs ----
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.setAttribute('aria-selected', x===t?'true':'false');});
+    document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('show');});
+    document.getElementById('pane-'+t.dataset.pane).classList.add('show');
+  });});
+
+  // ---- load core on main thread ----
+  var coreSrc=document.getElementById('coreSrc').textContent;
+  (new Function(coreSrc))();
+  var C=window.UnlockCore;
+
+  // ---- CPU pool worker: a pure VERIFIER. The main thread owns the one
+  //      de-duplicated master stream and hands each worker a distinct batch,
+  //      so no password is ever tried on more than one instance. ----
+  var workerGlue=coreSrc+"\n"+
+    "var C=self.UnlockCore,SESS=null;"+
+    "onmessage=async function(e){var d=e.data;"+
+    " if(d.cmd==='init'){try{SESS=C.encryptionSession(d.bytes);"+
+    "   if(!SESS.ok){postMessage({t:'unsupported',scheme:SESS.scheme});return;}"+
+    "   postMessage({t:'ready'});}catch(err){postMessage({t:'error',msg:String(err&&err.message||err)});}return;}"+
+    " if(d.cmd==='work'){var cs=d.candidates,tried=0,hit=null,last='';"+
+    "   for(var i=0;i<cs.length;i++){last=cs[i];tried++;if(await SESS.verify(cs[i])){hit=cs[i];break;}}"+
+    "   postMessage({t:'done',tried:tried,last:last,hit:hit});return;}"+
+    "};";
+  var workerURL=URL.createObjectURL(new Blob([workerGlue],{type:'text/javascript'}));
+  var workers=[];
+  function killAll(){ workers.forEach(function(w){try{w.terminate();}catch(e){}}); workers=[]; GPU.stop(); }
+
+  // ---- WebGPU accelerator: runs the 50k SHA-1 spin for thousands of DIFFERENT
+  //      candidates in parallel on the system GPU. Experimental; CPU is the floor. ----
+  var WGSL=
+    "struct P{count:u32,spin:u32,a:u32,b:u32};\n"+
+    "@group(0) @binding(0) var<storage,read> h0:array<u32>;\n"+
+    "@group(0) @binding(1) var<storage,read_write> outb:array<u32>;\n"+
+    "@group(0) @binding(2) var<uniform> pr:P;\n"+
+    "fn rotl(x:u32,n:u32)->u32{return (x<<n)|(x>>(32u-n));}\n"+
+    "@compute @workgroup_size(64)\n"+
+    "fn main(@builtin(global_invocation_id) g:vec3<u32>){\n"+
+    " let idx=g.x; if(idx>=pr.count){return;}\n"+
+    " var a0=h0[idx*5u];var a1=h0[idx*5u+1u];var a2=h0[idx*5u+2u];var a3=h0[idx*5u+3u];var a4=h0[idx*5u+4u];\n"+
+    " var w:array<u32,80>;\n"+
+    " for(var it:u32=0u; it<pr.spin; it=it+1u){\n"+
+    "  let b0=it&0xffu;let b1=(it>>8u)&0xffu;let b2=(it>>16u)&0xffu;let b3=(it>>24u)&0xffu;\n"+
+    "  w[0]=(b0<<24u)|(b1<<16u)|(b2<<8u)|b3; w[1]=a0;w[2]=a1;w[3]=a2;w[4]=a3;w[5]=a4;\n"+
+    "  w[6]=0x80000000u;w[7]=0u;w[8]=0u;w[9]=0u;w[10]=0u;w[11]=0u;w[12]=0u;w[13]=0u;w[14]=0u;w[15]=192u;\n"+
+    "  for(var i=16u;i<80u;i=i+1u){let n=w[i-3u]^w[i-8u]^w[i-14u]^w[i-16u];w[i]=rotl(n,1u);}\n"+
+    "  var A=0x67452301u;var B=0xEFCDAB89u;var Cc=0x98BADCFEu;var D=0x10325476u;var E=0xC3D2E1F0u;\n"+
+    "  for(var i=0u;i<80u;i=i+1u){var f:u32;var k:u32;\n"+
+    "   if(i<20u){f=(B&Cc)|((~B)&D);k=0x5A827999u;}else if(i<40u){f=B^Cc^D;k=0x6ED9EBA1u;}\n"+
+    "   else if(i<60u){f=(B&Cc)|(B&D)|(Cc&D);k=0x8F1BBCDCu;}else{f=B^Cc^D;k=0xCA62C1D6u;}\n"+
+    "   let t=rotl(A,5u)+f+E+k+w[i]; E=D;D=Cc;Cc=rotl(B,30u);B=A;A=t;}\n"+
+    "  a0=0x67452301u+A;a1=0xEFCDAB89u+B;a2=0x98BADCFEu+Cc;a3=0x10325476u+D;a4=0xC3D2E1F0u+E;\n"+
+    " }\n"+
+    " outb[idx*5u]=a0;outb[idx*5u+1u]=a1;outb[idx*5u+2u]=a2;outb[idx*5u+3u]=a3;outb[idx*5u+4u]=a4;\n"+
+    "}\n";
+  var GPU=(function(){
+    var dev=null,pipe=null,running=false,info='';
+    return {
+      supported:function(){return typeof navigator!=='undefined'&&!!navigator.gpu;},
+      info:function(){return info;},
+      stop:function(){running=false;},
+      isRunning:function(){return running;},
+      init:async function(highPerf){
+        if(!navigator.gpu) return false;
+        try{
+          var adapter=await navigator.gpu.requestAdapter({powerPreference:highPerf?'high-performance':'low-power'});
+          if(!adapter) return false;
+          dev=await adapter.requestDevice();
+          try{var ai=adapter.info||(adapter.requestAdapterInfo?await adapter.requestAdapterInfo():null);
+            info=ai?((ai.vendor||'')+' '+(ai.architecture||ai.description||'')).trim():'GPU';}catch(e){info='GPU';}
+          var mod=dev.createShaderModule({code:WGSL});
+          pipe=dev.createComputePipeline({layout:'auto',compute:{module:mod,entryPoint:'main'}});
+          return true;
+        }catch(e){ info='error: '+e.message; return false; }
+      },
+      // H0: Uint32Array(N*5) -> returns Uint32Array(N*5) spun hashes
+      spin:async function(H0,N,spinCount){
+        var bytes=N*5*4;
+        var inBuf=dev.createBuffer({size:bytes,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST});
+        var outBuf=dev.createBuffer({size:bytes,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC});
+        var readBuf=dev.createBuffer({size:bytes,usage:GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ});
+        var uni=dev.createBuffer({size:16,usage:GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST});
+        dev.queue.writeBuffer(inBuf,0,H0.buffer,H0.byteOffset,bytes);
+        dev.queue.writeBuffer(uni,0,new Uint32Array([N,spinCount,0,0]));
+        var bg=dev.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[
+          {binding:0,resource:{buffer:inBuf}},{binding:1,resource:{buffer:outBuf}},{binding:2,resource:{buffer:uni}}]});
+        var enc=dev.createCommandEncoder();
+        var pass=enc.beginComputePass();pass.setPipeline(pipe);pass.setBindGroup(0,bg);
+        pass.dispatchWorkgroups(Math.ceil(N/64));pass.end();
+        enc.copyBufferToBuffer(outBuf,0,readBuf,0,bytes);
+        dev.queue.submit([enc.finish()]);
+        await readBuf.mapAsync(GPUMapMode.READ);
+        var res=new Uint32Array(readBuf.getMappedRange().slice(0));
+        readBuf.unmap();
+        inBuf.destroy();outBuf.destroy();readBuf.destroy();uni.destroy();
+        return res;
+      },
+      setRunning:function(v){running=v;}
+    };
+  })();
+
+  // ---- state + helpers ----
+  var S={bytes:null,name:'',diag:null,password:null,wordlist:[]};
+  var inFrame=window.self!==window.top;
+  var gpuOn=false, gpuHighPerf=false;
+  function setGpuStatus(t){var e=document.getElementById('gpuStatus');if(!e)return;e.textContent=t||'';e.style.display=t?'block':'none';}
+  function $(id){return document.getElementById(id);}
+  function parts(fn){var i=fn.lastIndexOf('.');return i>0?{base:fn.slice(0,i),ext:fn.slice(i)}:{base:fn,ext:''};}
+  function note(msg,cls){var n=$('note');n.hidden=false;n.className='note'+(cls?' '+cls:'');n.textContent=msg;}
+  function save(bytes,name){
+    try{var a=document.createElement('a');var url=URL.createObjectURL(new Blob([bytes]));
+      a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(url);},2000);
+      if(inFrame)note('Saved "'+name+'". If no download appeared, you are in preview mode — download this app and open it locally to save files.','warn');
+      else note('Saved "'+name+'" to your Downloads.');
+    }catch(e){note('This preview can’t save files. Download the app and open it locally. ('+e.message+')','bad');}
+  }
+
+  // ---- file intake ----
+  var drop=$('drop'),fileInput=$('file');
+  drop.addEventListener('click',function(){fileInput.click();});
+  drop.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click();}});
+  ['dragover','dragenter'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('hot');});});
+  ['dragleave','drop'].forEach(function(ev){drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove('hot');});});
+  drop.addEventListener('drop',function(e){if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);});
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])load(e.target.files[0]);});
+  $('reset').addEventListener('click',reset);
+
+  function reset(){killAll();S={bytes:null,name:'',diag:null,password:null,wordlist:[]};$('work').hidden=true;
+    $('drop').style.display='';$('note').hidden=true;$('prog').classList.remove('show');
+    $('encCtl').hidden=true;$('protCtl').hidden=true;$('hashOut').hidden=true;$('wlInfo').textContent='';
+    $('lanes').innerHTML='';fileInput.value='';}
+
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+  async function load(file){
+    killAll();
+    S.name=file.name;S.bytes=new Uint8Array(await file.arrayBuffer());S.password=null;
+    $('drop').style.display='none';$('work').hidden=false;$('fname').textContent=file.name;
+    $('note').hidden=true;$('prog').classList.remove('show');$('encCtl').hidden=true;$('protCtl').hidden=true;
+    $('hashOut').hidden=true;$('lanes').innerHTML='';
+    var d;try{d=await C.diagnose(S.bytes);}catch(e){d={type:'unknown',label:'Could not read file',err:e.message};}
+    S.diag=d;renderDiag(d);
+  }
+
+  function renderDiag(d){
+    var host=$('diagHost');var cls=d.type==='encrypted'?'enc':d.type==='protected'?'prot':d.type==='open'?'open':d.type==='rms'?'rms':'err';
+    var body='';
+    if(d.type==='rms'){
+      body='<p>This file is <b>rights-managed (IRM / RMS)</b> — protected by your organization’s rights server and certificates, <b>not a password</b>. Cracking cannot help: there is no password to guess.</p>'+
+           '<p class="note warn">To open it, the owner must use their own Microsoft account / the company rights server that the file was issued for, or an admin must re-grant access. A password tool (any password tool) is useless here.</p>'+
+           (d.details&&d.details.length?'<div class="meta">transforms: '+esc(d.details.join(' · '))+'</div>':'');
+      host.innerHTML='<div class="diag rms"><span class="tag">'+esc(d.label)+'</span>'+body+'</div>';
+      return;
+    }
+    if(d.type==='encrypted'){
+      body='<p>The whole file is encrypted with a password-to-open. Add every clue you can below, then release the Kracken — all attack lanes run at once.</p>'+
+           '<div class="meta">scheme: '+esc(d.scheme||'?')+(d.scheme==='standard'?' (AES, Office 2007–13)':d.scheme==='agile'?' (AES, Office 2013+)':'')+'</div>';
+      if(d.weak) body+='<p class="note warn" style="margin-top:8px">'+esc(d.weak)+'</p>';
+      $('encCtl').hidden=false;
+    }else if(d.type==='protected'){
+      body='<p>Only editing is locked — the content is readable. One click removes it; no password needed.</p>'+
+           '<div class="meta">'+esc((d.details||[]).join(' · '))+'</div>';
+      (d.notes||[]).forEach(function(n){body+='<p class="note" style="margin-top:6px">'+esc(n)+'</p>';});
+      $('protCtl').hidden=false;
+    }else if(d.type==='open'){
+      body='<p>No password found. This file already opens freely.</p>';
+      (d.notes||[]).forEach(function(n){body+='<p class="note" style="margin-top:6px">'+esc(n)+'</p>';});
+    }else{
+      body='<p>'+(d.err?('Error: '+esc(d.err)):'This doesn’t look like a modern Office file. Very old .xls/.doc/.ppt (pre-2007) use a different format this tool can’t read — try the Engine tab.')+'</p>';
+    }
+    host.innerHTML='<div class="diag '+cls+'"><span class="tag">'+esc(d.label)+'</span>'+body+'</div>';
+  }
+
+  // ---- Clue Finder → feed the attack ----
+  $('clueSend').addEventListener('click',function(){
+    function comma(id){return ($(id).value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);}
+    function lines(id){return ($(id).value||'').split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);}
+    var olds=comma('c_old');
+    var clues=comma('c_names').concat(comma('c_dates'),comma('c_org'),comma('c_life'),lines('c_notes'),olds);
+    clues=clues.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+    var cn=$('clueNote');
+    if(!clues.length){cn.hidden=false;cn.className='note warn';cn.textContent='No clues entered yet — fill in what the client knows.';return;}
+    // merge into hints (dedup with existing)
+    var cur=($('hints').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    $('hints').value=cur.concat(clues).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ');
+    // old/reused passwords also go to the exact-match pool (tried verbatim, first)
+    if(olds.length){var w=($('words').value||'').split(/\r?\n/).filter(Boolean).concat(olds);
+      $('words').value=w.filter(function(v,i,a){return a.indexOf(v)===i;}).join('\n');}
+    if(S.bytes && S.diag && S.diag.type==='encrypted'){
+      tabs.forEach(function(x){x.setAttribute('aria-selected',x.dataset.pane==='unlock'?'true':'false');});
+      document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('show');});
+      $('pane-unlock').classList.add('show');
+      note(clues.length+' clues loaded. Hit RELEASE THE KRACKEN below.');
+    }else{
+      cn.hidden=false;cn.className='note';
+      cn.textContent=clues.length+' clues saved. Now open the Unlock tab and drop the '+(S.bytes?'':'')+'encrypted file — your clues are already loaded.';
+    }
+  });
+
+  // ---- wordlist loader + hash export ----
+  $('loadWlBtn').addEventListener('click',function(){$('wlFile').click();});
+  $('wlFile').addEventListener('change',async function(e){
+    var f=e.target.files[0]; if(!f)return;
+    var txt=await f.text();
+    S.wordlist=txt.split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+    $('wlInfo').textContent=S.wordlist.length.toLocaleString()+' words loaded from '+f.name;
+  });
+  function buildRunner(hash, mode, origName){
+    var f='kracken_hash.txt';
+    var sh="#!/usr/bin/env bash\n"+
+      "# Kracken hashcat runner for "+origName+"\n"+
+      "# 1) Install hashcat:  https://hashcat.net/hashcat/   (macOS: brew install hashcat)\n"+
+      "# 2) Put a wordlist (e.g. rockyou.txt) beside this file, or pass one as an argument.\n"+
+      "set -e\ncd \"$(dirname \"$0\")\"\n"+
+      "cat > "+f+" <<'HASH'\n"+hash+"\nHASH\n"+
+      "WORDLIST=\"${1:-rockyou.txt}\"\n"+
+      "echo \"Running: hashcat -m "+mode+" -a 0 "+f+" $WORDLIST\"\n"+
+      "hashcat -m "+mode+" -a 0 "+f+" \"$WORDLIST\" || true\n"+
+      "# Brute force example (8 chars, lower+digits):  hashcat -m "+mode+" -a 3 "+f+" ?l?l?l?l?l?l?l?l\n"+
+      "hashcat -m "+mode+" "+f+" --show\n";
+    var bat="@echo off\r\ntitle Kracken hashcat runner\r\n"+
+      "REM Install hashcat: https://hashcat.net/hashcat/  (run this inside the hashcat folder, or add hashcat to PATH)\r\n"+
+      "cd /d \"%~dp0\"\r\n> "+f+" echo "+hash+"\r\n"+
+      "set WORDLIST=%1\r\nif \"%WORDLIST%\"==\"\" set WORDLIST=rockyou.txt\r\n"+
+      "hashcat -m "+mode+" -a 0 "+f+" %WORDLIST%\r\nhashcat -m "+mode+" "+f+" --show\r\npause\r\n";
+    return {sh:sh,bat:bat,hash:hash};
+  }
+  $('hashBtn').addEventListener('click',function(){
+    var box=$('hashOut');
+    try{var h=C.hashExport(S.bytes);
+      if(!h.ok){box.hidden=false;box.innerHTML='<div class="hmode">Hash export</div><code>'+esc(h.note||'Not available for this file.')+'</code>';return;}
+      var cmd='hashcat -m '+h.mode+' -a 0 kracken_hash.txt rockyou.txt';
+      box.hidden=false;
+      box.innerHTML='<button class="copybtn" id="copyHash">COPY HASH</button>'+
+        '<div class="hmode">hashcat -m '+h.mode+'  ·  John the Ripper compatible  ·  scheme: '+esc(h.scheme)+'</div>'+
+        '<code id="hashStr">'+esc(h.hash)+'</code>'+
+        '<div class="runrow">'+
+          '<button class="runbtn" id="dlRunner" title="'+esc(cmd)+'">⚡ BUILD RUNNER &amp; HASH FILE</button>'+
+          '<button class="wbtn" id="copyCmd">COPY COMMAND</button>'+
+        '</div>'+
+        '<div class="cmdline" id="cmdLine">$ '+esc(cmd)+'</div>'+
+        '<div class="runhint">Hover the button to see the command. Click it to save a double-click runner (<b>.command</b> for Mac/Linux, <b>.bat</b> for Windows) plus <b>kracken_hash.txt</b>. Browsers can’t launch apps directly — the script does, once <a href="https://hashcat.net/hashcat/" target="_blank" rel="noopener">hashcat</a> is installed.</div>';
+      $('copyHash').addEventListener('click',function(){copy($('hashStr').textContent,this);});
+      $('copyCmd').addEventListener('click',function(){copy(cmd,this);});
+      $('dlRunner').addEventListener('click',function(){
+        var r=buildRunner(h.hash,h.mode,S.name);var enc=new TextEncoder();
+        save(enc.encode(r.sh),'run_hashcat.command');
+        save(enc.encode(r.sh),'run_hashcat.sh');
+        save(enc.encode(r.bat),'run_hashcat.bat');
+        save(enc.encode(r.hash+'\n'),'kracken_hash.txt');
+        note('Saved runner scripts + kracken_hash.txt. Put a wordlist (e.g. rockyou.txt) beside them, then double-click run_hashcat.command (Mac/Linux) or run_hashcat.bat (Windows).');
+      });
+    }catch(err){box.hidden=false;box.innerHTML='<div class="hmode">Hash export failed</div><code>'+esc(err.message)+'</code>';}
+  });
+
+  // ---- GPU sliders ----
+  $('gpuToggle').addEventListener('change',function(){
+    gpuOn=this.checked;
+    if(!gpuOn){ setGpuStatus(''); return; }
+    if(!GPU.supported()){ setGpuStatus('WebGPU is not available in this browser. Try recent Chrome or Edge. CPU still runs.'); }
+    else { setGpuStatus('WebGPU enabled — the system GPU will accelerate Office 2007 (SHA-1) files on crack.'); }
+  });
+  $('gpuPerfToggle').addEventListener('change',function(){ gpuHighPerf=this.checked;
+    if(gpuOn&&GPU.supported()) setGpuStatus('WebGPU enabled'+(gpuHighPerf?' · requesting high-performance (discrete/system) GPU':' · default GPU')+'.');
+  });
+
+  // ---- strip / clear protection ----
+  $('clearBtn').addEventListener('click',async function(){
+    try{note('Removing protection…');
+      var r=await C.stripProtection(S.bytes);var p=parts(S.name);
+      save(r.bytes,p.base+'-cleared'+p.ext);
+      openModalInfo('PROTECTION REMOVED',r.removed+' lock(s) stripped',p.base+'-cleared'+p.ext,null);
+    }catch(e){note('Failed: '+e.message,'bad');}
+  });
+
+  // ---- holographic cube struck by lightning (progress indicator) ----
+  var Holo=(function(){
+    var cvs=$('holo'),cx=cvs.getContext('2d'),W=0,H=0,raf=null,t=0,bolts=[],charge=0,reduced=reduce;
+    var V=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
+    var E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    var F=[[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]];
+    function fit(){var r=cvs.getBoundingClientRect();var dpr=Math.min(devicePixelRatio||1,2);
+      W=cvs.width=Math.max(1,r.width*dpr);H=cvs.height=Math.max(1,r.height*dpr);cx.scale(dpr,dpr);
+      W=r.width;H=r.height;}
+    function rot(p,ax,ay){
+      var cosY=Math.cos(ay),sinY=Math.sin(ay),cosX=Math.cos(ax),sinX=Math.sin(ax);
+      var x=p[0],y=p[1],z=p[2];
+      var x1=x*cosY+z*sinY,z1=-x*sinY+z*cosY;
+      var y1=y*cosX-z1*sinX,z2=y*sinX+z1*cosX;
+      return [x1,y1,z2];
+    }
+    function proj(p){var s=Math.min(W,H)*0.26,d=4,f=d/(d+p[2]);
+      return [W/2+p[0]*s*f, H/2+p[1]*s*f];}
+    function bolt(){
+      // from a random edge of the canvas toward the cube centre area
+      var side=Math.floor(Math.random()*4),sx,sy;
+      if(side===0){sx=Math.random()*W;sy=0;} else if(side===1){sx=W;sy=Math.random()*H;}
+      else if(side===2){sx=Math.random()*W;sy=H;} else {sx=0;sy=Math.random()*H;}
+      var ex=W/2+(Math.random()-0.5)*W*0.18, ey=H/2+(Math.random()-0.5)*H*0.18;
+      var pts=seg(sx,sy,ex,ey,5,Math.min(W,H)*0.18);
+      bolts.push({pts:pts,life:1,branch:Math.random()<0.6});charge=1;
+    }
+    function seg(x1,y1,x2,y2,depth,disp){
+      if(depth<=0)return [[x1,y1],[x2,y2]];
+      var mx=(x1+x2)/2+(Math.random()-0.5)*disp, my=(y1+y2)/2+(Math.random()-0.5)*disp;
+      var a=seg(x1,y1,mx,my,depth-1,disp/2), b=seg(mx,my,x2,y2,depth-1,disp/2);
+      return a.slice(0,-1).concat(b);
+    }
+    function drawBolt(b){
+      cx.save();cx.globalAlpha=b.life;
+      for(var pass=0;pass<2;pass++){
+        cx.beginPath();cx.moveTo(b.pts[0][0],b.pts[0][1]);
+        for(var i=1;i<b.pts.length;i++)cx.lineTo(b.pts[i][0],b.pts[i][1]);
+        if(pass===0){cx.strokeStyle='rgba(57,255,106,'+(0.5*b.life)+')';cx.lineWidth=7;cx.shadowColor='#39ff6a';cx.shadowBlur=24;}
+        else{cx.strokeStyle='rgba(215,255,225,'+b.life+')';cx.lineWidth=2;cx.shadowBlur=8;cx.shadowColor='#bfffcf';}
+        cx.stroke();
+      }
+      if(b.branch&&b.pts.length>4){var k=Math.floor(b.pts.length/2);var p=b.pts[k];
+        cx.beginPath();cx.moveTo(p[0],p[1]);
+        cx.lineTo(p[0]+(Math.random()-0.5)*60,p[1]+(Math.random()-0.5)*60);
+        cx.strokeStyle='rgba(180,255,200,'+(0.6*b.life)+')';cx.lineWidth=1.5;cx.stroke();}
+      cx.restore();
+    }
+    function frame(ts){
+      t+=0.016;
+      cx.clearRect(0,0,W,H);
+      var ax=Math.sin(t*0.5)*0.4+0.5, ay=t*0.6;
+      var P=V.map(function(v){return proj(rot(v,ax,ay));});
+      // faces (holographic translucent fill)
+      cx.save();
+      F.forEach(function(f){
+        cx.beginPath();cx.moveTo(P[f[0]][0],P[f[0]][1]);
+        for(var i=1;i<f.length;i++)cx.lineTo(P[f[i]][0],P[f[i]][1]);cx.closePath();
+        var fl=0.05+0.05*Math.sin(t*3+f[0]);
+        cx.fillStyle='rgba(57,255,106,'+(fl+charge*0.12)+')';cx.fill();
+      });
+      cx.restore();
+      // edges
+      cx.save();cx.strokeStyle='rgba(57,255,106,'+(0.8)+')';cx.lineWidth=1.6;
+      cx.shadowColor='#39ff6a';cx.shadowBlur=10+charge*20;
+      E.forEach(function(e){cx.beginPath();cx.moveTo(P[e[0]][0],P[e[0]][1]);cx.lineTo(P[e[1]][0],P[e[1]][1]);cx.stroke();});
+      cx.restore();
+      // vertices
+      cx.save();cx.fillStyle='#bfffcf';cx.shadowColor='#39ff6a';cx.shadowBlur=12;
+      P.forEach(function(p){cx.beginPath();cx.arc(p[0],p[1],2.2,0,7);cx.fill();});
+      cx.restore();
+      // scanlines over the cube
+      cx.save();cx.globalAlpha=0.08;cx.strokeStyle='#39ff6a';cx.lineWidth=1;
+      for(var y=((t*30)%8);y<H;y+=8){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke();}
+      cx.restore();
+      // lightning
+      if(Math.random()<0.06)bolt();
+      for(var i=bolts.length-1;i>=0;i--){drawBolt(bolts[i]);bolts[i].life-=0.08;if(bolts[i].life<=0)bolts.splice(i,1);}
+      charge*=0.86;
+      raf=requestAnimationFrame(frame);
+    }
+    function staticFrame(){cx.clearRect(0,0,W,H);var ax=0.5,ay=0.7;
+      var P=V.map(function(v){return proj(rot(v,ax,ay));});
+      cx.strokeStyle='rgba(57,255,106,.8)';cx.lineWidth=1.6;cx.shadowColor='#39ff6a';cx.shadowBlur=10;
+      E.forEach(function(e){cx.beginPath();cx.moveTo(P[e[0]][0],P[e[0]][1]);cx.lineTo(P[e[1]][0],P[e[1]][1]);cx.stroke();});}
+    return {
+      start:function(){fit();bolts=[];charge=0;if(reduced){staticFrame();return;}if(!raf)raf=requestAnimationFrame(frame);},
+      stop:function(){if(raf){cancelAnimationFrame(raf);raf=null;}cx.clearRect(0,0,W,H);}
+    };
+  })();
+
+  // ---- CENTRAL DISPATCH: one de-duplicated master stream feeds every instance.
+  //      Each candidate is pulled by the main thread and handed to exactly ONE
+  //      worker/GPU batch, so no password is ever tried on more than one instance. ----
+  var t0=0,timer=null,instTries={},totalTried=0,master=null,masterDone=false,found=false,liveInstances=0;
+  var CPU_BATCH=24, GPU_BATCH=2048;
+  function fmt(ms){var s=Math.floor(ms/1000);return s<60?s+'s':Math.floor(s/60)+'m'+(s%60)+'s';}
+  $('crackBtn').addEventListener('click',startCrack);
+  $('cancelBtn').addEventListener('click',function(){
+    found=true;killAll();
+    document.querySelectorAll('.lane.run').forEach(function(el){el.className='lane stopped';
+      el.querySelector('.lcur').textContent='stopped';});
+    endCrack();note('Stopped — all instances killed after '+totalTried.toLocaleString()+' unique guesses.');
+  });
+
+  function setLane(id,state,cur){var el=document.getElementById('lane-'+id);if(!el)return;
+    el.className='lane '+state;
+    if(cur!=null)el.querySelector('.lcur').textContent=cur;
+    el.querySelector('.lcount').textContent=(instTries[id]||0).toLocaleString();}
+  function addLane(id,label){var row=document.createElement('div');
+    row.className='lane run';row.id='lane-'+id;
+    row.innerHTML='<span class="ldot"></span><span class="lname">'+esc(label)+'</span>'+
+      '<span class="lcur">starting…</span><span class="lcount">0</span>';
+    $('lanes').appendChild(row);instTries[id]=0;}
+
+  function pull(k){var a=[];if(masterDone||found)return a;
+    for(var i=0;i<k;i++){var r=master.next();if(r.done){masterDone=true;break;}a.push(r.value);}return a;}
+
+  function onFound(pw){ if(found)return; found=true;S.password=pw;killAll();
+    document.querySelectorAll('.lane.run').forEach(function(el){el.className='lane stopped';
+      el.querySelector('.lcur').textContent='stopped';});
+    endCrack();showPassword(pw,totalTried);}
+
+  function instanceEnded(){ liveInstances--; if(liveInstances<=0 && !found){
+    endCrack();note('Search exhausted — no match after '+totalTried.toLocaleString()+' unique guesses. Add clues, a wordlist or a mask; or Export Hash for a GPU run.','warn'); } }
+
+  function startCrack(){
+    killAll();found=false;masterDone=false;totalTried=0;instTries={};
+    var hints=($('hints').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    var words=($('words').value||'').split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean).concat(S.wordlist||[]);
+    var masks=($('masks').value||'').split(/\r?\n/).map(function(s){return s.trim();}).filter(Boolean);
+    master=C.masterStream({hints:hints,words:words,masks:masks});
+
+    $('prog').classList.add('show');$('note').hidden=true;$('ptries').textContent='0';
+    $('crackBtn').hidden=true;$('cancelBtn').hidden=false;Holo.start();
+    $('lanes').innerHTML='';
+    t0=Date.now();clearInterval(timer);
+    timer=setInterval(function(){$('ptime').textContent=fmt(Date.now()-t0);$('ptries').textContent=totalTried.toLocaleString();},300);
+
+    var N=Math.min(8,Math.max(1,navigator.hardwareConcurrency||4));
+    liveInstances=0;
+    for(var i=0;i<N;i++) spawnCpu(i);
+    // GPU instance (experimental) — only for SHA-1 (Office 2007) files
+    if(gpuOn && GPU.supported() && S.diag && S.diag.scheme==='standard') startGpu();
+    else if(gpuOn && S.diag && S.diag.scheme!=='standard') setGpuStatus('GPU idle — accelerates Office 2007 (SHA-1) files only; this one uses CPU.');
+  }
+
+  function spawnCpu(i){
+    var id='cpu'+i; addLane(id,'CPU core '+(i+1)); liveInstances++;
+    var w=new Worker(workerURL); workers.push(w);
+    w.onmessage=function(e){var m=e.data;
+      if(m.t==='ready'){ feed(w,id); }
+      else if(m.t==='done'){ instTries[id]+=m.tried; totalTried+=m.tried; setLane(id,'run','trying: '+m.last);
+        if(m.hit){ setLane(id,'found','✓ '+m.hit); onFound(m.hit); } else feed(w,id); }
+      else if(m.t==='unsupported'){ setLane(id,'error','scheme '+m.scheme+' not in-browser'); setGpuStatus('');
+        if(!found){found=true;killAll();endCrack();note('This file uses "'+m.scheme+'" encryption the in-browser cracker can’t process — use Export Hash + hashcat (Engine tab).','warn');} }
+      else if(m.t==='error'){ setLane(id,'error',m.msg); instanceEnded(); }
+    };
+    w.postMessage({cmd:'init',bytes:S.bytes});
+  }
+  function feed(w,id){ if(found)return; var batch=pull(CPU_BATCH);
+    if(!batch.length){ setLane(id,'exhausted','done'); instanceEnded(); return; }
+    w.postMessage({cmd:'work',candidates:batch}); }
+
+  async function startGpu(){
+    var ok=await GPU.init(gpuHighPerf);
+    if(!ok){ setGpuStatus('GPU unavailable — '+(GPU.supported()?'adapter not granted':'WebGPU not supported in this browser')+'. Using CPU.'); return; }
+    setGpuStatus('GPU active: '+(GPU.info()||'system GPU')+(gpuHighPerf?' · high-performance':''));
+    var id='gpu'; addLane(id,'⚡ GPU'); liveInstances++; GPU.setRunning(true);
+    var sess=C.encryptionSession(S.bytes); var g=sess.gpu;
+    if(!g){ setLane(id,'error','no GPU assist'); instanceEnded(); return; }
+    try{
+      while(!found && GPU.isRunning()){
+        var batch=pull(GPU_BATCH);
+        if(!batch.length){ setLane(id,'exhausted','done'); instanceEnded(); break; }
+        var H0=new Uint32Array(batch.length*5);
+        for(var i=0;i<batch.length;i++){ H0.set(g.prep(batch[i]), i*5); }
+        var spun=await GPU.spin(H0,batch.length,g.spinCount);
+        for(var j=0;j<batch.length && !found;j++){
+          var b=new Uint8Array(20),bd=new DataView(b.buffer);
+          for(var k=0;k<5;k++) bd.setUint32(k*4,spun[j*5+k],false);
+          if(await g.finishVerify(b)){ setLane(id,'found','✓ '+batch[j]); onFound(batch[j]); return; }
+        }
+        instTries[id]+=batch.length; totalTried+=batch.length;
+        setLane(id,'run','batch @ '+batch[batch.length-1]);
+        await new Promise(function(r){setTimeout(r);});
+      }
+    }catch(err){ setLane(id,'error','GPU: '+err.message); setGpuStatus('GPU error — '+err.message+'. CPU continues.'); instanceEnded(); }
+  }
+
+  function endCrack(){clearInterval(timer);$('ptime').textContent=fmt(Date.now()-t0);
+    $('ptries').textContent=totalTried.toLocaleString();Holo.stop();
+    $('crackBtn').hidden=false;$('cancelBtn').hidden=true;}
+
+  function total(){return totalTried;}
+
+  // ---- password modal ----
+  var modal=$('modal');
+  function showPassword(pw,tries){
+    $('mpw').textContent=pw;$('mstat').textContent='recovered in '+tries+' guesses · '+fmt(Date.now()-t0);
+    $('mDecrypt').style.display='';modal.classList.add('show');
+  }
+  function openModalInfo(title,stat,savedName){
+    $('.hd');document.querySelector('.card .hd').textContent='✓ '+title;
+    $('mpw').textContent=savedName;$('mstat').textContent=stat;
+    $('mDecrypt').style.display='none';modal.classList.add('show');
+  }
+  $('mClose').addEventListener('click',function(){modal.classList.remove('show');
+    document.querySelector('.card .hd').textContent='✓ PASSWORD FOUND';});
+  modal.addEventListener('click',function(e){if(e.target===modal)$('mClose').click();});
+  $('mCopy').addEventListener('click',function(){copy($('mpw').textContent,this);});
+  $('mDecrypt').addEventListener('click',async function(){
+    this.textContent='DECRYPTING…';
+    try{var sess=C.encryptionSession(S.bytes);var bytes=await sess.decrypt(S.password);
+      var p=parts(S.name);save(bytes,p.base+'-decrypted'+p.ext);
+      modal.classList.remove('show');
+    }catch(e){note('Decrypt failed: '+e.message,'bad');}
+    this.textContent='DECRYPT & SAVE FILE';
+  });
+
+  // ---- copy helper ----
+  function copy(txt,btn){var old=btn.textContent;
+    function ok(){btn.textContent='COPIED';setTimeout(function(){btn.textContent=old;},1300);}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,sel);else sel();
+    function sel(){try{var r=document.createRange();r.selectNodeContents(btn===$('copyPy')?$('pySrc'):$('mpw'));
+      var s=getSelection();s.removeAllRanges();s.addRange(r);ok();}catch(e){}}}
+  $('copyPy').addEventListener('click',function(){copy($('pySrc').textContent,this);});
+})();
+</script>
+
+</body></html>

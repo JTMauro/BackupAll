@@ -1,0 +1,18 @@
+{
+ "title": "IT 2026 Savings, Enhancements and 2027 Outlook",
+ "url": "https://claude.ai/artifact/LX8Yg56n34Xo7pcWCP5MNe",
+ "type": "Docs",
+ "updated": "2026-11-24",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "1edfacd65f34c466569d6d0a547e17f8bac7ac9d95d552e97b1984ed6b3157f8"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 4088,
+   "sha256": "3e4c1e69fbecdb970a6622750a985b06362b1112fbe788ec36b6627838624994"
+  }
+ ]
+}

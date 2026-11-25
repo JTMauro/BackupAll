@@ -1,0 +1,545 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Visuvius</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2230;--mute:#667085;--line:#d9dde5;--accent:#2557d6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b2029;--ink:#e8ebf2;--mute:#9aa3b5;--line:#2c3342;--accent:#7ea2ff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b2029;--ink:#e8ebf2;--mute:#9aa3b5;--line:#2c3342;--accent:#7ea2ff;color-scheme:dark}
+*{box-sizing:border-box}
+html{font-size:calc(16px * var(--scale,1))}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.5 system-ui,sans-serif}
+#ui{min-height:100vh;padding-block:1rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:56rem;margin:0 auto;filter:var(--fix,none)}
+h1{font-size:1.4rem;margin:.2rem 0 1rem}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.tabs button{flex:1 1 9rem;padding:.7rem;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:.6rem;font:inherit;cursor:pointer}
+.tabs button[aria-selected=true]{border-color:var(--accent);box-shadow:inset 0 -3px var(--accent);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:1rem;margin-bottom:1rem}
+.card h2{font-size:1.05rem;margin:0 0 .5rem}
+label{display:block;margin:.5rem 0 .2rem}
+input[type=range]{width:100%}
+button.b{padding:.55rem 1rem;border-radius:.5rem;border:1px solid var(--accent);background:var(--accent);color:#fff;font:inherit;cursor:pointer}
+button.b.alt{background:transparent;color:var(--accent)}
+.mute{color:var(--mute);font-size:.9rem}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+#sampleWrap{border:1px dashed var(--line);border-radius:.6rem;padding:1rem;transition:filter .15s;overflow:hidden}
+#cardRef{height:3rem;background:linear-gradient(90deg,#8aa,#aab);border-radius:.4rem;width:342px;max-width:100%;display:flex;align-items:center;justify-content:center;color:#000;font-size:.8rem}
+#stage{height:20rem;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:.6rem;border:1px solid var(--line);color:#000}
+.big{font-size:2.2rem;font-weight:700}
+[hidden]{display:none!important}
+.res{font-size:1.1rem}
+.duo{display:flex;gap:0;border-radius:.5rem;overflow:hidden;border:1px solid var(--line)}
+.duo div{flex:1;display:flex;align-items:center;justify-content:center;color:#000;font-weight:700;letter-spacing:.3em;padding:1.2rem .4rem;min-width:0;overflow:hidden}
+#toast{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));max-width:18rem;padding:.6rem .9rem;border-radius:.6rem;background:var(--ink);color:var(--bg);font-size:.85rem;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:1;transition:opacity .6s}
+#toast.gone{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+.pv{background:#fff;color:#000;border:1px solid var(--line);border-radius:.5rem;padding:.6rem;overflow:hidden;line-height:1.3}
+</style>
+<!-- sharpening filter: used as automatic "correction" for the whole app -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="sharp" color-interpolation-filters="sRGB">
+    <feConvolveMatrix id="kern" order="3" kernelMatrix="0 0 0 0 1 0 0 0 0" preserveAlpha="true"/>
+  </filter>
+</svg>
+
+<div id="ui">
+  <div class="row" style="justify-content:space-between"><h1>Visuvius</h1><button class="b" id="revert" hidden title="Shortcut: Esc">Revert screen to normal</button></div>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t1" aria-selected="true">1 · Blur &amp; correction</button>
+    <button role="tab" id="t2" aria-selected="false">2 · Eye tests</button>
+    <button role="tab" id="t3" aria-selected="false">3 · Near vision &amp; age</button>
+    <button role="tab" id="t4" aria-selected="false">4 · Sight type &amp; health</button>
+  </div>
+
+  <div class="card" id="setup">
+    <h2>Viewing setup (used by the simulation and the tests)</h2>
+    <p class="mute">Blur on a screen depends on real size and distance, so set these first. Hold a bank card to the screen and drag until the bar is exactly as wide as the card (85.6 mm).</p>
+    <div id="cardRef">card width</div>
+    <input id="cardw" type="range" min="200" max="900" value="342" aria-label="Card width calibration">
+    <label for="dist">Distance from your eyes to the screen: <b id="distv">0.6</b> m</label>
+    <input id="dist" type="range" min="0.3" max="6" step="0.1" value="0.6">
+    <label for="pupil">Pupil size: <b id="pupilv">4</b> mm <span class="mute">(3 bright room, 5-6 dim room)</span></label>
+    <input id="pupil" type="range" min="2" max="7" step="0.5" value="4">
+    <label><input type="checkbox" id="accom" checked> Eye can refocus up close (under about 40; untick to simulate presbyopia)</label>
+  </div>
+
+  <!-- TAB 1 -->
+  <section id="p1">
+    <div class="card">
+      <h2>Simulate eye blur</h2>
+      <label for="diop">Blur strength: <b id="diopv">0.00</b> D <span class="mute" id="diopnote"></span></label>
+      <input id="diop" type="range" min="-5" max="5" step="0.25" value="0">
+      <p class="mute" id="defnote"></p>
+      <p class="mute">Negative = short-sighted (blurry far), positive = long-sighted (blurry near). Both are shown as blur on screen.</p>
+      <div id="sampleWrap">
+        <h3 style="margin-top:0">Sample window</h3>
+        <p>The quick brown fox jumps over the lazy dog. 0123456789</p>
+        <p class="mute">Small print: Settings · File · Edit · View · Help</p>
+        <button class="b alt">Button</button> <button class="b">Primary</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Screen correction</h2>
+      <p class="mute">Applies text scaling, contrast and sharpening to this whole app so the simulated blur above is easier to read.</p>
+      <label for="corr">Correction level: <b id="corrv">0.0</b></label>
+      <input id="corr" type="range" min="0" max="5" step="0.25" value="0">
+      <div id="sysBox" hidden>
+        <label><input type="checkbox" id="sysScale" checked> Whole computer: make everything bigger (Windows display scaling, no overlay)</label>
+        <label><input type="checkbox" id="sysText"> Whole computer: also increase text size</label>
+      </div>
+      <div class="row" style="margin-top:.6rem">
+        <button class="b alt" id="corrToggle">Compare: correction ON</button>
+        <button class="b alt" id="reset">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section id="p2" hidden>
+    <div class="card">
+      <h2>Setup</h2>
+      <p class="mute">Wear your usual glasses if you have them. Cover one eye to test separately. Use the arrow keys (or buttons) so you can answer from a distance; Space = "can't tell".</p>
+      <div class="row">
+        <button class="b" id="startAcuity">Start letter test (Tumbling E)</button>
+        <button class="b" id="startAstig">Start astigmatism test</button>
+      </div>
+    </div>
+    <div class="card" id="testCard" hidden>
+      <div id="stage"></div>
+      <div class="row" id="answers" style="margin-top:.6rem;justify-content:center">
+        <button class="b alt" data-d="left">◀ Left</button>
+        <button class="b alt" data-d="up">▲ Up</button>
+        <button class="b alt" data-d="down">▼ Down</button>
+        <button class="b alt" data-d="right">Right ▶</button>
+        <button class="b alt" data-d="none">Can't tell</button>
+      </div>
+      <p class="mute" id="prog" style="text-align:center"></p>
+    </div>
+    <div class="card" id="resCard" hidden>
+      <h2>Result</h2>
+      <p class="res" id="resText"></p>
+      <p class="mute" id="resNote"></p>
+      <div class="row">
+        <button class="b" id="autoFix">Apply automatic screen fix</button>
+        <button class="b alt" id="goTab1">See in tab 1</button>
+      </div>
+    </div>
+    <div class="card" id="patCard">
+      <h2>Pattern check</h2>
+      <p id="patText" class="res"></p>
+      <p class="mute">Run the letter test twice: once from 3 m or more (far) and once at about 40 cm (near), with your usual glasses off or on, the same each time.</p>
+    </div>
+    <p class="mute">This is a screening aid, not a medical diagnosis. Book a proper eye exam with an optometrist.</p>
+  </section>
+
+  <!-- TAB 3 -->
+  <section id="p3" hidden>
+    <div class="card">
+      <h2>Arm's-length test (near point and age)</h2>
+      <p class="mute">Age-related loss of near focus (presbyopia) shows up as a near point that moves away. Do this with one eye covered and no reading glasses. Complete the calibration card above first.</p>
+      <label for="age">Your age</label>
+      <input id="age" type="number" min="18" max="90" value="55" style="width:6rem;font:inherit;padding:.3rem">
+      <p class="mute">Hold the screen at arm's length so the small text below is sharp. Bring it slowly closer until it first turns blurry. Stop and measure from your eye to the screen with a ruler or tape.</p>
+      <div id="nearText" style="background:#fff;color:#000;border:1px solid var(--line);border-radius:.5rem;padding:.8rem;overflow:hidden">The quick brown fox jumps over the lazy dog. 0123456789</div>
+      <label for="np">Closest distance where the text stays sharp: <b id="npv">50</b> cm</label>
+      <input id="np" type="range" min="10" max="100" step="1" value="50">
+    </div>
+    <div class="card">
+      <h2>Your result</h2>
+      <p class="res" id="nearRes"></p>
+      <h2 style="margin-top:1rem">How small print looks to you without glasses</h2>
+      <div class="row" style="align-items:stretch">
+        <div style="flex:1 1 14rem;min-width:0"><div class="mute" id="pvBookLbl"></div><div class="pv" id="pvBook"></div></div>
+        <div style="flex:1 1 14rem;min-width:0"><div class="mute" id="pvScrLbl"></div><div class="pv" id="pvScr"></div></div>
+        <div style="flex:1 1 14rem;min-width:0"><div class="mute" id="pvFixLbl"></div><div class="pv" id="pvFix"></div></div>
+      </div>
+      <svg id="decay" viewBox="0 0 340 200" width="100%" role="img" aria-label="Focusing ability by age"></svg>
+      <p class="mute" id="nearNote"></p>
+      <div class="row">
+        <button class="b" id="nearApply">Use my result for this screen</button>
+      </div>
+      <p class="mute">Amplitude values are population averages (Hofstetter). Your own result can differ. Reading glasses or progressive lenses are the true fix.</p>
+    </div>
+  </section>
+
+  <!-- TAB 4 -->
+  <section id="p4" hidden>
+    <div class="card">
+      <h2>Nearsighted or farsighted? (red-green test)</h2>
+      <p class="mute">Cover one eye, take your glasses off, and sit at the distance in the setup card (3 m or more works best; use the arrow keys and Enter). Look at the letters on the red and green halves. Which half is clearer?</p>
+      <div class="duo" id="duo"><div id="duoR" style="background:#d9261c"></div><div id="duoG" style="background:#1f9d3f"></div></div>
+      <div class="row" style="margin-top:.6rem">
+        <button class="b alt" id="duoRed">Red is clearer</button>
+        <button class="b alt" id="duoEq">Equal</button>
+        <button class="b alt" id="duoGreen">Green is clearer</button>
+      </div>
+      <p class="res" id="duoRes"></p>
+      <p class="mute">Light of different colors focuses at slightly different depths, which is what this test uses. Farsighted eyes can refocus to cheat it, so treat it as a hint. Confirm with the distance and near results on tab 2.</p>
+    </div>
+    <div class="card">
+      <h2>Astigmatism</h2>
+      <p class="mute">The line fan from tab 2: lines in one direction look darker or sharper.</p>
+      <button class="b" id="goAstig">Start astigmatism test</button>
+    </div>
+    <div class="card">
+      <h2>Glaucoma screen (side vision)</h2>
+      <p class="mute">Glaucoma usually dims side vision first, and you rarely notice. Cover one eye. Keep looking at the center dot. Press Space (or the button) each time a faint dot flashes anywhere. It takes about 1 minute per eye. Use the setup card distance, and sit about 30 to 40 cm from the screen so the sides fit.</p>
+      <div class="row">
+        <label style="margin:0"><input type="radio" name="vfeye" value="right" checked> Right eye open (left covered)</label>
+        <label style="margin:0"><input type="radio" name="vfeye" value="left"> Left eye open (right covered)</label>
+      </div>
+      <div class="row" style="margin:.6rem 0">
+        <button class="b" id="vfStart">Start side-vision test</button>
+        <button class="b alt" id="vfSaw" disabled>I saw it</button>
+      </div>
+      <canvas id="vf" style="display:block;background:#000;border-radius:.5rem;max-width:100%"></canvas>
+      <p class="res" id="vfRes"></p>
+      <p class="mute">Screen brightness and room light change what you can see, so this is only a rough screen. Missing a few dots can also be tiredness or looking away. It cannot rule glaucoma in or out; only an eye pressure check and optic nerve exam can.</p>
+    </div>
+    <div class="card">
+      <h2>Amsler grid (center of vision)</h2>
+      <p class="mute">Cover one eye, look at the dot in the middle at normal reading distance, with reading glasses if you use them.</p>
+      <svg id="amsler" viewBox="0 0 200 200" width="240" height="240" style="background:#fff;border-radius:.4rem;max-width:100%"></svg>
+      <div class="row" style="margin-top:.5rem">
+        <button class="b alt" id="amOk">All lines look straight</button>
+        <button class="b alt" id="amBad">Wavy, blurry or missing areas</button>
+      </div>
+      <p class="res" id="amRes"></p>
+    </div>
+  </section>
+</div>
+
+<div id="toast" role="status" aria-live="polite">Not medical advice. Always see an eye doctor.</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const root = document.documentElement;
+const store = {get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- tabs ---------- */
+function tab(n){
+  [1,2,3,4].forEach(i=>{ $('#p'+i).hidden = n!==i; $('#t'+i).setAttribute('aria-selected', n===i); });
+  if(n===3) renderNear();
+  if(n===4) renderDuo();
+}
+$('#t1').onclick=()=>tab(1); $('#t2').onclick=()=>tab(2); $('#t3').onclick=()=>tab(3); $('#t4').onclick=()=>tab(4); $('#goTab1').onclick=()=>tab(1);
+
+/* ---------- blur simulation ---------- */
+// Physical model: an eye resting at refractive error R is sharp for objects at vergence -R (diopters).
+// An object at distance d has vergence 1/d. Error e = 1/d + R. Nearer than rest focus (e>0) can be
+// refocused up to the accommodation amplitude; farther (e<0) cannot. Blur disc on screen (mm) = pupil(mm) x defocus(D) x distance(m).
+// A CSS blur radius is a Gaussian sigma; a uniform disc of diameter D has sigma = D/4.
+let measuredA = null; // set by the near-point test
+function defocusAt(R, A, dm){ const e = 1/dm + R; return e>0 ? Math.max(0, e-A) : -e; }
+function defocus(R){
+  return defocusAt(R, measuredA!==null ? measuredA : ($('#accom').checked ? 3 : 0), +$('#dist').value);
+}
+const blurPx = (def, dm) => (+$('#pupil').value)*def*dm*pxPerMm()/4;
+function setBlur(){
+  const d = +$('#diop').value, dm = +$('#dist').value, pupil = +$('#pupil').value;
+  $('#diopv').textContent = (d>0?'+':'')+d.toFixed(2);
+  $('#diopnote').textContent = d<0?'(short-sighted)':d>0?'(long-sighted)':'';
+  $('#distv').textContent = dm.toFixed(1); $('#pupilv').textContent = pupil;
+  const def = defocus(d), mm = pupil*def*dm, sigma = mm*pxPerMm()/4;
+  $('#sampleWrap').style.filter = sigma>0.05 ? `blur(${sigma.toFixed(2)}px)` : 'none';
+  $('#defnote').textContent = `At ${dm.toFixed(1)} m this eye has ${def.toFixed(2)} D of focus error, a blur circle about ${mm.toFixed(1)} mm wide on the screen.`;
+  if(def<0.05 && d!==0) $('#defnote').textContent += d<0
+    ? ` A ${d} D short-sighted eye sees clearly closer than ${(1/-d).toFixed(1)} m, so move the distance slider past that to see blur.`
+    : ` A long-sighted eye can refocus up close here. Untick "Eye can refocus" below to see the blur.`;
+}
+$('#diop').oninput = setBlur;
+['dist','pupil','accom'].forEach(i=>$('#'+i).addEventListener('input',setBlur));
+$('#cardw').addEventListener('input',setBlur);
+
+/* ---------- screen correction (applies to the whole app) ---------- */
+let corrOn = true;
+function applyCorrection(){
+  const c = +$('#corr').value;
+  $('#corrv').textContent = c.toFixed(1);
+  const on = corrOn && c>0;
+  const k = Math.min(1.2, c*0.22);                 // sharpen strength
+  $('#kern').setAttribute('kernelMatrix', `0 ${-k} 0 ${-k} ${1+4*k} ${-k} 0 ${-k} 0`);
+  root.style.setProperty('--scale', on ? (1+c*0.08).toFixed(3) : 1);
+  root.style.setProperty('--fix', on ? `url(#sharp) contrast(${(1+c*0.05).toFixed(3)})` : 'none');
+  $('#corrToggle').textContent = 'Compare: correction ' + (corrOn?'ON':'OFF');
+  $('#revert').hidden = !(c>0);
+  if(window.visuvius){ // desktop app: also set the system text size (debounced)
+    clearTimeout(applyCorrection.t);
+    applyCorrection.t=setTimeout(()=>window.visuvius.apply({
+      text: on && $('#sysText').checked ? Math.round(100*(1+c*0.08)) : 100,
+      steps: on && $('#sysScale').checked ? Math.round(c*0.8) : 0}),400);
+  }
+}
+$('#corr').oninput = applyCorrection;
+$('#corrToggle').onclick = ()=>{corrOn=!corrOn;applyCorrection()};
+$('#reset').onclick = ()=>{$('#corr').value=0;$('#diop').value=0;corrOn=true;setBlur();applyCorrection()};
+
+/* ---------- eye tests ---------- */
+const MM_PER_ARCMIN_PER_M = 0.29089;               // 1 arcmin at 1 m ≈ 0.2909 mm
+const LEVELS = [1.0,0.8,0.6,0.5,0.4,0.3,0.2,0.1,0.0,-0.1,-0.2]; // logMAR (1.0 = 20/200, 0.0 = 20/20, -0.2 = 20/13)
+const pxPerMm = () => (+$('#cardw').value)/85.6;
+$('#cardw').addEventListener('input',()=>{ $('#cardRef').style.width = $('#cardw').value+'px'; store.set('cardw',+$('#cardw').value)});
+$('#dist').addEventListener('input',()=>store.set('dist',+$('#dist').value));
+
+const DIRS = {right:0,down:90,left:180,up:270};
+function eSvg(px, dir){
+  // 5x5 grid "E"; a 20/20 letter subtends 5 arcmin
+  const rects = [[0,0,5,1],[0,2,5,1],[0,4,5,1],[0,0,1,5]]
+    .map(r=>`<rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="#000"/>`).join('');
+  return `<svg width="${px}" height="${px}" viewBox="0 0 5 5" style="transform:rotate(${DIRS[dir]}deg)" shape-rendering="crispEdges">${rects}</svg>`;
+}
+const sizePx = (logMAR)=> $('#dist').value*1000 * 5 * MM_PER_ARCMIN_PER_M/1000 * Math.pow(10,logMAR) * pxPerMm();
+
+const acu = {far:null, near:null, mid:null};
+let T = null; // acuity state
+function startAcuity(){
+  T = {lvl:0, n:0, ok:0, best:null, cur:null};
+  $('#resCard').hidden = true; $('#testCard').hidden = false; $('#answers').hidden = false;
+  nextE();
+}
+function nextE(){
+  const dirs = Object.keys(DIRS);
+  T.cur = dirs[Math.floor(Math.random()*4)];
+  const px = Math.max(1, sizePx(LEVELS[T.lvl]));
+  $('#stage').innerHTML = eSvg(px.toFixed(1), T.cur);
+  $('#prog').textContent = `Level ${T.lvl+1}/${LEVELS.length} · letter ${T.n+1}/3 · which way do the prongs point?`;
+}
+function answer(d){
+  if(!T) return;
+  if(T.astig) return;
+  T.n++; if(d===T.cur) T.ok++;
+  if(T.n===3){
+    if(T.ok>=2){ T.best = LEVELS[T.lvl]; T.lvl++; T.n=0; T.ok=0;
+      if(T.lvl>=LEVELS.length) return finishAcuity();
+    } else return finishAcuity();
+  }
+  nextE();
+}
+function finishAcuity(){
+  const best = T.best===null ? 1.1 : T.best;
+  // letter stroke = 10^logMAR arcmin; 1 D of defocus with a 4 mm pupil roughly costs 0.4 logMAR
+  const est = Math.min(5, +(Math.max(0,Math.pow(10,best)-1)*0.66*4/(+$('#pupil').value)).toFixed(2));
+  store.set('result', {logMAR:best, est, at:new Date().toISOString()});
+  const d = +$('#dist').value;
+  if(d>=2.5) acu.far = best; else if(d<=0.6) acu.near = best; else acu.mid = best;
+  updatePattern();
+  showResult(best, est);
+  T = null; $('#testCard').hidden = true;
+}
+function updatePattern(){
+  const far = acu.far, near = acu.near, el = $('#patText');
+  const nearPoint = (typeof nearTouched!=='undefined' && nearTouched) ? nearCalc() : null;
+  const weakFocus = nearPoint && nearPoint.A < nearPoint.ref.min;
+  const snel = v => '20/'+Math.round(20*Math.pow(10,v));
+  if(far===null || near===null){
+    el.textContent = (far===null && near===null) ? 'No results yet.' :
+      `Only the ${far!==null?'far':'near'} test is done (${snel(far!==null?far:near)}). Do the other distance to see the pattern.`;
+    return;
+  }
+  const farGood = far<=0.1, nearWeak = near>=Math.max(0.3, far+0.2);
+  let msg;
+  if(farGood && nearWeak) msg = `Sharp at distance (${snel(far)}) but weaker up close (${snel(near)}). That is the classic arm's-length pattern: presbyopia, which is also common with long-sightedness. ${weakFocus?'Your near-point test agrees. ':''}Reading glasses are the usual fix.`;
+  else if(farGood) msg = `Sharp at both distances (far ${snel(far)}, near ${snel(near)}). No focusing issue detected by this test.`;
+  else if(near<=far-0.2) msg = `Clearer up close (${snel(near)}) than far away (${snel(far)}). That pattern fits short-sightedness.`;
+  else msg = `Blurry at both distances (far ${snel(far)}, near ${snel(near)}). That can mean short or long-sightedness, astigmatism, or an eye health problem. `;
+  el.textContent = msg + ' See an eye doctor promptly for any sudden change, flashes, floaters or pain.';
+}
+function showResult(best, est){
+  const snellen = Math.round(20*Math.pow(10,best));
+  $('#resCard').hidden = false;
+  $('#resText').textContent = `Best line read: logMAR ${best.toFixed(1)} (about 20/${snellen}). Estimated focus error at ${(+$('#dist').value).toFixed(1)} m: ~${est.toFixed(2)} D.`;
+  $('#resNote').textContent = est<0.2 ? 'Your vision looks sharp at this distance. Little or no screen correction is needed.'
+    : 'Tap “Apply automatic screen fix” to set text size, contrast and sharpening from this result.';
+  $('#autoFix').dataset.est = est;
+}
+$('#autoFix').onclick = ()=>{
+  const est = +$('#autoFix').dataset.est;
+  $('#corr').value = Math.min(5, est); $('#diop').value = 0; corrOn = true; setBlur(); applyCorrection();
+  $('#resNote').textContent = 'Correction applied to this app and saved. See the note below about other apps.';
+};
+
+/* astigmatism fan: pick the line direction that looks darkest */
+function startAstig(){
+  T = {astig:true};
+  $('#resCard').hidden = true; $('#testCard').hidden = false; $('#answers').hidden = true;
+  let lines='';
+  for(let a=0;a<180;a+=15){
+    const r=a*Math.PI/180, x=Math.cos(r)*130, y=Math.sin(r)*130;
+    lines += `<line data-a="${a}" x1="${-x}" y1="${-y}" x2="${x}" y2="${y}" stroke="#000" stroke-width="3" style="cursor:pointer"/>`;
+  }
+  $('#stage').innerHTML = `<svg viewBox="-140 -140 280 280" width="300" height="300">${lines}</svg>`;
+  $('#prog').textContent = 'Look from your test distance. If all lines look equally dark, press “Can’t tell/Equal”. Otherwise click the darkest/sharpest line.';
+  const eq = document.createElement('button'); eq.className='b alt'; eq.textContent='All equal'; eq.id='eq';
+  $('#prog').after(eq);
+  const done = a => { eq.remove(); T=null; $('#testCard').hidden=true; $('#resCard').hidden=false;
+    $('#resText').textContent = a===null ? 'All lines looked equal: no sign of astigmatism.' : `Lines near ${a}° looked clearer than others: possible astigmatism.`;
+    $('#resNote').textContent = a===null ? '' : 'Screens cannot fix astigmatism well; consider an optometrist visit.';
+  };
+  eq.onclick = ()=>done(null);
+  $('#stage').querySelectorAll('line').forEach(l=>l.onclick=()=>done(+l.dataset.a));
+}
+$('#startAcuity').onclick = startAcuity;
+$('#startAstig').onclick = startAstig;
+document.querySelectorAll('#answers button').forEach(b=>b.onclick=()=>answer(b.dataset.d));
+addEventListener('keydown', e=>{
+  const m = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',' ':'none'}[e.key];
+  if(m && T && !T.astig){ e.preventDefault(); answer(m); }
+});
+
+
+/* ---------- near point and age ---------- */
+const hof = age => ({max:Math.max(0,25-0.4*age), avg:Math.max(0,18.5-0.3*age), min:Math.max(0,15-0.25*age)});
+const q25 = x => Math.round(x*4)/4;
+function nearCalc(){
+  const age = +$('#age').value||55, np = +$('#np').value, A = 100/np, dm = +$('#dist').value;
+  const ref = hof(age);
+  return {age, np, A, ref, addBook:q25(Math.max(0,2.5-A*2/3)), addScr:q25(Math.max(0,1/dm-A*2/3)), dm};
+}
+let nearTouched = false;
+function renderNear(){
+  nearTouched = true;
+  const r = nearCalc();
+  $('#npv').textContent = r.np;
+  $('#nearText').style.fontSize = (2.9*pxPerMm()).toFixed(1)+'px';   // about 8 pt print
+  const pos = r.A<r.ref.min ? 'below the typical range for your age' : r.A>r.ref.max ? 'above the typical range for your age' : 'within the typical range for your age';
+  $('#nearRes').textContent = `Focusing ability about ${r.A.toFixed(1)} D, ${pos} (average at ${r.age} is ${r.ref.avg.toFixed(1)} D). Estimated reading add: +${r.addBook.toFixed(2)} D at 40 cm, +${r.addScr.toFixed(2)} D at your screen distance of ${r.dm.toFixed(1)} m.`;
+  $('#nearNote').textContent = r.addBook<0.25 ? 'You are not losing much near focus yet.' : `That matches a reading prescription around +${r.addBook.toFixed(2)}. Typical ages: +1.00 at 45, +1.50 at 50, +2.00 at 55, +2.25 at 60+.`;
+  const txt='The quick brown fox jumps over the lazy dog. 0123456789';
+  const fs=(2.9*pxPerMm()).toFixed(1)+'px';
+  const show=(id,lbl,t,dm,A)=>{ const def=defocusAt(0,A,dm), px=blurPx(def,dm);
+    $('#'+id).textContent=txt; $('#'+id).style.fontSize=fs; $('#'+id).style.filter=px>0.05?`blur(${px.toFixed(2)}px)`:'none';
+    $('#'+id+'Lbl').textContent=t+` (${def.toFixed(2)} D of blur)`; };
+  show('pvBook','','At 40 cm, reading',0.4,r.A);
+  show('pvScr','','At your screen distance of '+r.dm.toFixed(1)+' m',r.dm,r.A);
+  show('pvFix','','With the estimated +'+r.addBook.toFixed(2)+' D reading glasses at 40 cm',0.4,r.A+r.addBook);
+  drawDecay(r);
+  updatePattern();
+}
+function drawDecay(r){
+  const W=340,H=200,L=34,R=10,T=10,B=30, x=a=>L+(a-10)/(80-10)*(W-L-R), y=d=>T+(1-d/18)*(H-T-B);
+  const line=(f,cls,dash)=>{let p='';for(let a=10;a<=80;a+=5)p+=(p?'L':'M')+x(a).toFixed(1)+' '+y(f(a)).toFixed(1);return `<path d="${p}" fill="none" stroke="${cls}" stroke-width="2" ${dash?'stroke-dasharray="4 3"':''}/>`;};
+  let g='';
+  for(const d of [0,3,6,9,12,15,18]) g+=`<line x1="${L}" x2="${W-R}" y1="${y(d)}" y2="${y(d)}" stroke="var(--line)"/><text x="${L-5}" y="${y(d)+4}" font-size="10" text-anchor="end" fill="var(--mute)">${d}</text>`;
+  for(const a of [10,20,30,40,50,60,70,80]) g+=`<text x="${x(a)}" y="${H-14}" font-size="10" text-anchor="middle" fill="var(--mute)">${a}</text>`;
+  g+=`<text x="${(L+W-R)/2}" y="${H-2}" font-size="10" text-anchor="middle" fill="var(--mute)">age (years)</text><text x="10" y="${T+4}" font-size="10" fill="var(--mute)">D</text>`;
+  g+=line(a=>hof(a).max,'var(--mute)',true)+line(a=>hof(a).min,'var(--mute)',true)+line(a=>hof(a).avg,'var(--mute)',false);
+  const age=Math.min(80,Math.max(10,r.age));
+  g+=`<circle cx="${x(age)}" cy="${y(Math.min(18,r.A))}" r="6" fill="var(--accent)"/><text x="${Math.min(W-R-4,x(age)+9)}" y="${y(Math.min(18,r.A))-8}" font-size="11" fill="var(--accent)" text-anchor="${x(age)>W-80?'end':'start'}">you</text>`;
+  $('#decay').innerHTML=g;
+}
+['age','np'].forEach(i=>$('#'+i).addEventListener('input',renderNear));
+['cardw','dist'].forEach(i=>$('#'+i).addEventListener('input',()=>{ if(!$('#p3').hidden) renderNear(); }));
+$('#nearApply').onclick=()=>{
+  const r=nearCalc();
+  measuredA=r.A; $('#diop').value=0;
+  $('#corr').value=Math.min(5,q25(r.addScr*1.6)); corrOn=true;
+  setBlur(); applyCorrection();
+  $('#nearNote').textContent=`Applied: the simulation now uses your ${r.A.toFixed(1)} D focusing ability and the screen correction is set from a +${r.addScr.toFixed(2)} D reading add. Use Revert at the top to undo.`;
+};
+
+
+/* ---------- tab 4: red-green, side vision, Amsler ---------- */
+function renderDuo(){
+  const fsz = Math.max(10, sizePx(0.3)/0.72);            // letter height for about 20/40 at the set distance
+  for(const id of ['duoR','duoG']){ const e=$('#'+id); e.textContent='E F P T O Z'; e.style.fontSize=fsz.toFixed(1)+'px'; }
+}
+function duoDone(k){
+  $('#duoRes').textContent = k==='r' ? 'Red clearer: leans nearsighted (myopia), or over-corrected with minus lenses. Distance blur is likely.'
+    : k==='g' ? 'Green clearer: leans farsighted (hyperopia), or under-corrected. Up-close strain is likely.'
+    : 'Equal: no clear nearsighted or farsighted lean at this distance.';
+}
+$('#duoRed').onclick=()=>duoDone('r'); $('#duoGreen').onclick=()=>duoDone('g'); $('#duoEq').onclick=()=>duoDone('e');
+['cardw','dist'].forEach(i=>$('#'+i).addEventListener('input',()=>{ if(!$('#p4').hidden) renderDuo(); }));
+$('#goAstig').onclick=()=>{ tab(2); startAstig(); };
+
+const vf = {running:false, pts:[], i:0, shownAt:0, answered:false, cur:null, timers:[], eye:'right', res:[], catchFP:0, catchN:0};
+function vfGeom(){
+  const cv=$('#vf'), w=Math.min(720, Math.max(280, $('#p4').clientWidth-40)), h=Math.round(w*0.62);
+  cv.width=w; cv.height=h; cv.style.width=w+'px'; cv.style.height=h+'px';
+  const mmPerDeg=(deg)=>Math.tan(deg*Math.PI/180)*(+$('#dist').value)*1000;
+  return {cv, w, h, px:deg=>mmPerDeg(deg)*pxPerMm()};
+}
+function vfDrawBase(g, eye){
+  const c=g.cv.getContext('2d'); c.fillStyle='#000'; c.fillRect(0,0,g.w,g.h);
+  c.fillStyle='#e8e8e8'; c.beginPath(); c.arc(g.w/2,g.h/2,5,0,7); c.fill(); return c;
+}
+function vfBuild(g, eye){
+  const pts=[], rings=[6,12,18,24,30], angles=[0,45,90,135,180,225,270,315];
+  for(const e of rings) for(const a of angles){
+    const r=g.px(e), x=Math.cos(a*Math.PI/180)*r, y=-Math.sin(a*Math.PI/180)*r;
+    if(Math.abs(x)>g.w/2-8 || Math.abs(y)>g.h/2-8) continue;
+    const bs = (eye==='right' ? a===0 : a===180) && (e===12 || e===18);   // natural blind spot, about 15 deg temporal
+    if(bs) continue;
+    pts.push({e,a,x,y});
+  }
+  return pts;
+}
+function vfStart(){
+  vfStop();
+  const g=vfGeom(); vf.eye=document.querySelector('input[name=vfeye]:checked').value;
+  const base=vfBuild(g,vf.eye);
+  if(base.length<8){ $('#vfRes').textContent='The screen is too small at this distance to test the sides. Sit closer or use a bigger window.'; return; }
+  vf.pts=base.sort(()=>Math.random()-0.5).map(p=>({...p, catch:false}));
+  for(let k=0;k<4;k++) vf.pts.splice(Math.floor(Math.random()*vf.pts.length),0,{catch:true});
+  vf.i=0; vf.res=[]; vf.catchFP=0; vf.catchN=0; vf.running=true; vf.g=g; vf.maxE=Math.max(...base.map(p=>p.e));
+  $('#vfSaw').disabled=false; $('#vfRes').textContent='Look at the center dot...';
+  vfDrawBase(g,vf.eye);
+  vf.timers.push(setTimeout(vfNext,1500));
+}
+function vfStop(){ vf.running=false; vf.timers.forEach(clearTimeout); vf.timers=[]; $('#vfSaw').disabled=true; }
+function vfNext(){
+  if(!vf.running) return;
+  if(vf.i>=vf.pts.length) return vfFinish();
+  const p=vf.pts[vf.i++], g=vf.g; vf.cur=p; vf.answered=false; vf.shownAt=performance.now();
+  const c=vfDrawBase(g,vf.eye);
+  if(!p.catch){ c.fillStyle='rgb(80,80,80)'; c.beginPath(); c.arc(g.w/2+p.x, g.h/2+p.y, Math.max(3,g.px(0.45)/2), 0, 7); c.fill(); }
+  vf.timers.push(setTimeout(()=>vfDrawBase(g,vf.eye),250));
+  vf.timers.push(setTimeout(()=>{
+    if(p.catch){ vf.catchN++; if(vf.answered) vf.catchFP++; } else vf.res.push({...p, seen:vf.answered});
+    vfNext();
+  }, 1400+Math.random()*600));
+}
+function vfAnswer(){
+  if(!vf.running||vf.answered||!vf.cur) return;
+  if(performance.now()-vf.shownAt>80) vf.answered=true;
+}
+$('#vfStart').onclick=vfStart; $('#vfSaw').onclick=vfAnswer;
+addEventListener('keydown',e=>{ if(vf.running && e.key===' '){ e.preventDefault(); vfAnswer(); } });
+function vfFinish(){
+  vfStop();
+  const g=vf.g, c=g.cv.getContext('2d'); vfDrawBase(g,vf.eye);
+  let missed=[];
+  for(const r of vf.res){ c.beginPath(); if(r.seen){ c.fillStyle='#3ec46d'; c.arc(g.w/2+r.x,g.h/2+r.y,5,0,7); c.fill(); } else { missed.push(r); c.strokeStyle='#ff5a4d'; c.lineWidth=3; c.moveTo(g.w/2+r.x-6,g.h/2+r.y-6); c.lineTo(g.w/2+r.x+6,g.h/2+r.y+6); c.moveTo(g.w/2+r.x+6,g.h/2+r.y-6); c.lineTo(g.w/2+r.x-6,g.h/2+r.y+6); c.stroke(); } }
+  const n=vf.res.length, m=missed.length, up=missed.filter(r=>r.y<0).length, down=m-up, left=missed.filter(r=>r.x<0).length, right=m-left;
+  const lopsided = m>=3 && (Math.max(up,down)/m>=0.75 || Math.max(left,right)/m>=0.75);
+  let msg=`${vf.eye==='right'?'Right':'Left'} eye: saw ${n-m} of ${n} spots, out to about ${vf.maxE} degrees from center (green = seen, red X = missed). `;
+  if(vf.catchN && vf.catchFP>=2) msg+='You pressed when nothing flashed several times, so this run is unreliable. Try again. ';
+  else if(m<=1) msg+='No clear gaps in side vision on this screen.';
+  else if(lopsided) msg+='Missed spots cluster in one area. That is worth an eye exam, since glaucoma often starts with a patch of lost side vision.';
+  else if(m>=3) msg+='Several spots missed. Repeat the test, and see an eye doctor if it happens again.';
+  else msg+='A couple of spots missed. Repeat once to see if it is the same place.';
+  $('#vfRes').textContent=msg;
+}
+(function(){ let g=''; for(let i=0;i<=200;i+=10) g+=`<line x1="${i}" y1="0" x2="${i}" y2="200" stroke="#000" stroke-width=".8"/><line x1="0" y1="${i}" x2="200" y2="${i}" stroke="#000" stroke-width=".8"/>`;
+  $('#amsler').innerHTML=g+'<circle cx="100" cy="100" r="3.2" fill="#000"/>'; })();
+$('#amOk').onclick=()=>{ $('#amRes').textContent='Normal grid. Repeat with the other eye.'; };
+$('#amBad').onclick=()=>{ $('#amRes').textContent='Distortion or gaps near the center can point to a macula problem. Book an eye exam soon, and urgently if it came on suddenly.'; };
+
+/* ---------- revert ---------- */
+function revert(){ measuredA = null; setBlur(); $('#corr').value = 0; corrOn = true; applyCorrection(); if(window.visuvius) window.visuvius.revert(); }
+$('#revert').onclick = revert;
+if(window.visuvius) $('#sysBox').hidden = false;
+['sysText','sysScale'].forEach(i=>$('#'+i).addEventListener('change',applyCorrection));
+addEventListener('keydown', e=>{ if(e.key==='Escape') revert(); });
+// Correction lives only in this page's styles, so closing the app drops it; clear it explicitly as well.
+addEventListener('pagehide', ()=>{ root.style.removeProperty('--scale'); root.style.removeProperty('--fix'); });
+
+setTimeout(()=>$('#toast').classList.add('gone'),6000);
+
+/* ---------- restore ---------- */
+$('#cardw').value = store.get('cardw',342); $('#cardRef').style.width = $('#cardw').value+'px';
+$('#dist').value = store.get('dist',0.6);
+$('#corr').value = 0; // never restored: the screen always starts and ends uncorrected
+setBlur(); applyCorrection();
+</script>
+
+</body></html>

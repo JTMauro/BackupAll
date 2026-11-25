@@ -1,0 +1,33 @@
+{
+ "title": "Morph This",
+ "url": "https://claude.ai/artifact/4cRoYzdgqhznicxc1BoVMt",
+ "type": "web page",
+ "updated": "2026-11-15",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 126769,
+   "sha256": "3bbb19df02936f934a04338f386de97d8f822c85be0afc44a7d47f50fd4f90df"
+  },
+  {
+   "path": "models/face_landmark_68_model-weights_manifest.json",
+   "bytes": 8486,
+   "sha256": "0b4e54af5d8dcd837847f1dc1f2ce192e28681aa68007878b7afbfb5f90998c1"
+  },
+  {
+   "path": "models/face_landmark_68_model.wasm",
+   "bytes": 356840,
+   "sha256": "4611ef65c87d836d03d684b30eec4d195d8b219fa1dd58fc58945831c6b9299b"
+  },
+  {
+   "path": "models/tiny_face_detector_model-weights_manifest.json",
+   "bytes": 3220,
+   "sha256": "6e3ad4984497352ab344ac9c175550dc94c651e3998d4710b41a73dc14cb3755"
+  },
+  {
+   "path": "models/tiny_face_detector_model.wasm",
+   "bytes": 193321,
+   "sha256": "b7503ce7df31039b1c43316a9b865cab6a70dd748cc602d3fa28b551503c3871"
+  }
+ ]
+}

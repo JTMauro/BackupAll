@@ -1,0 +1,273 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kessel Run FX Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: full-bleed test range; one glass rail with three sample groups (explosions, engine, audio). */
+  :root {
+    color-scheme: dark;
+    --void: #05070b;
+    --glass: rgba(10, 16, 24, 0.76);
+    --line: rgba(150, 190, 230, 0.16);
+    --ink: #e4ecf5;
+    --dim: #8b9bb0;
+    --signal: #ffb347;
+    --signal-ink: #1a1006;
+    --ok: #63d3a0;
+    --font-display: "Chakra Petch", "Rajdhani", "Segoe UI", sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--void); color: var(--ink); font-family: var(--font-body); overflow: hidden; }
+  #stage { position: fixed; inset: 0; display: block; width: 100%; height: 100%; }
+  .rail {
+    position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+    width: min(340px, calc(100% - 32px)); max-height: calc(100% - 28px); overflow-y: auto;
+    background: var(--glass); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  h1 { margin: 0; font: 700 22px/1.05 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; text-wrap: balance; }
+  h1 span { color: var(--signal); }
+  .sub { margin: 4px 0 0; color: var(--dim); font-size: 12.5px; line-height: 1.45; }
+  .label { font: 500 11px/1 var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin: 0 0 7px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  button {
+    font: 600 13px/1 var(--font-body); color: var(--ink); background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line); border-radius: 9px; padding: 10px; cursor: pointer;
+  }
+  button:hover { background: rgba(255,255,255,0.08); }
+  button[aria-pressed="true"] { border-color: var(--signal); background: rgba(255, 179, 71, 0.14); color: var(--signal); }
+  button.primary { background: var(--signal); color: var(--signal-ink); border-color: var(--signal); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; font-size: 13px; }
+  .row output { font: 500 12px/1 var(--font-mono); color: var(--signal); font-variant-numeric: tabular-nums; }
+  .row input { grid-column: 1 / -1; width: 100%; accent-color: var(--signal); }
+  .meter { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; margin-top: 6px; }
+  .meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #63d3a0, #ffb347, #ff6a3d); transition: width .1s; }
+  .note { font: 400 11.5px/1.45 var(--font-mono); color: var(--dim); margin: 0; }
+  .note b { color: var(--ok); font-weight: 500; }
+  @media (max-width: 640px) {
+    .rail { top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-height: 50%; width: calc(100% - 32px); }
+  }
+</style>
+
+<canvas id="stage" aria-label="3D sample board: explosion range and engine test stand"></canvas>
+
+<aside class="rail" aria-label="Sample controls">
+  <div>
+    <h1>Kessel Run <span>FX board</span></h1>
+    <p class="sub">Samples from <code>kessel-fx.js</code> for review. Turn sound on first; your browser only allows audio after a click.</p>
+  </div>
+  <button type="button" id="sound" class="primary" aria-pressed="false">Turn sound on</button>
+  <div>
+    <p class="label">Explosions</p>
+    <div class="grid3">
+      <button type="button" id="ex-air">Air</button>
+      <button type="button" id="ex-ground">Ground</button>
+      <button type="button" id="ex-ship">Ship</button>
+    </div>
+  </div>
+  <div class="row">
+    <label for="dist">Listener distance</label><output id="dist-out">60 m</output>
+    <input id="dist" type="range" min="0" max="1500" step="10" value="60">
+  </div>
+  <div class="row">
+    <label for="exsize">Explosion size</label><output id="exsize-out">12 m</output>
+    <input id="exsize" type="range" min="4" max="30" step="1" value="12">
+  </div>
+  <div>
+    <p class="label">Engine test stand (Lancer, V2 flame)</p>
+    <div class="grid2" style="margin-bottom:6px">
+      <button type="button" id="style-rumble" aria-pressed="true">Rumble (deep)</button>
+      <button type="button" id="style-jet" aria-pressed="false">Jet (original)</button>
+    </div>
+    <div class="grid2">
+      <button type="button" id="engine" aria-pressed="false">Engine sound</button>
+      <button type="button" id="ab" aria-pressed="false">Afterburner</button>
+      <button type="button" id="cruise" aria-pressed="false">Cruise drone</button>
+      <button type="button" id="haze" aria-pressed="true">Heat haze</button>
+    </div>
+  </div>
+  <div class="row">
+    <label for="rpm">Throttle (rpm)</label><output id="rpm-out">0.60</output>
+    <input id="rpm" type="range" min="0" max="1.6" step="0.01" value="0.6">
+    <div class="meter" style="grid-column: 1 / -1"><span id="spool"></span></div>
+  </div>
+  <div class="row">
+    <label for="damage">Damage</label><output id="damage-out">0.00</output>
+    <input id="damage" type="range" min="0" max="1" step="0.01" value="0">
+  </div>
+  <p class="note" id="status">Loading Three.js r160…</p>
+</aside>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import * as K from './kessel-assets.js';
+import * as FX from './kessel-fx.js';
+
+const $ = (id) => document.getElementById(id);
+const renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.72;
+renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 20000);
+camera.position.set(-30, 26, 92);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-6, 10, 0);
+controls.enableDamping = true;
+controls.maxPolarAngle = Math.PI * 0.49;
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const sunDir = new THREE.Vector3(0.5, 0.18, -0.85).normalize(); // low evening sun: explosions read well
+const sky = K.createSky(THREE, { sunDirection: sunDir, horizon: [0.36, 0.27, 0.23], zenith: [0.04, 0.07, 0.16], sunColor: [0.9, 0.6, 0.4] });
+scene.add(sky.mesh);
+scene.fog = new THREE.FogExp2(new THREE.Color(0.2, 0.16, 0.14), 0.0011);
+const sun = new THREE.DirectionalLight(0xffd6b0, 1.6);
+sun.position.copy(sunDir).multiplyScalar(200);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60, near: 10, far: 500 });
+scene.add(sun, new THREE.HemisphereLight(0x8fa4c4, 0x3a3027, 0.35));
+// one persistent flash light, driven by the explosion's flash (as the game does)
+const flashLight = new THREE.PointLight(0xffa860, 0, 260, 2);
+scene.add(flashLight);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200, 200, 200), K.makeTerrainMaterial(THREE, { sandLevel: -40, snowLevel: 900, grass: 0x3a4a2a, rock: 0x5a5049, haze: 0x3a3430 }));
+ground.rotation.x = -Math.PI / 2;
+const gp = ground.geometry.attributes.position;
+for (let i = 0; i < gp.count; i++) {
+  const x = gp.getX(i), y = gp.getY(i), r = Math.hypot(x, y);
+  gp.setZ(i, r < 90 ? 0 : (Math.sin(x * 0.02) * Math.cos(y * 0.025) * 0.5 + 0.5) * (r - 90) * 0.18);
+}
+ground.geometry.computeVertexNormals();
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Engine test stand: a Lancer on a stand with V2 flames
+const lancer = K.buildLancer(THREE);
+lancer.g.position.set(26, 6, 6);
+lancer.g.rotation.y = -Math.PI / 2.4;
+lancer.g.traverse((o) => { if (o.material && 'envMapIntensity' in o.material) o.material.envMapIntensity = 0.55; });
+scene.add(lancer.g);
+FX.upgradeShipFlames(THREE, lancer);
+const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.6, 5.2, 16), new THREE.MeshStandardMaterial({ color: 0x2f3237, metalness: 0.6, roughness: 0.5 }));
+stand.position.set(26, 2.6, 6);
+stand.castShadow = true;
+scene.add(stand);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.6, 0.45, 0.82);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// ---- audio ----
+let ctx = null, master = null, engine = null;
+const state = { rpm: 0.6, boost: false, cruise: false, damage: 0, haze: true, style: 'rumble' };
+function audio() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.8; master.connect(ctx.destination);
+  }
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+$('sound').addEventListener('click', () => {
+  audio();
+  const on = $('sound').getAttribute('aria-pressed') !== 'true';
+  $('sound').setAttribute('aria-pressed', String(on));
+  $('sound').textContent = on ? 'Sound is on' : 'Turn sound on';
+  $('sound').classList.toggle('primary', !on);
+  master.gain.setTargetAtTime(on ? 0.8 : 0, ctx.currentTime, 0.05);
+  if (on && !engine) toggleEngine(true);
+});
+function toggleEngine(on) {
+  audio();
+  if (on && !engine) { engine = FX.createEngineAudio(ctx, master, { style: state.style }); engine.setState(state); }
+  if (!on && engine) { engine.stop(); engine = null; }
+  $('engine').setAttribute('aria-pressed', String(!!engine));
+}
+$('engine').addEventListener('click', () => toggleEngine(!engine));
+for (const st of ['rumble', 'jet']) $(`style-${st}`).addEventListener('click', () => {
+  state.style = st;
+  ['rumble', 'jet'].forEach((k) => $(`style-${k}`).setAttribute('aria-pressed', String(k === st)));
+  if (engine) { toggleEngine(false); toggleEngine(true); }
+});
+const pressToggle = (id, key, after) => $(id).addEventListener('click', () => {
+  state[key] = !state[key]; $(id).setAttribute('aria-pressed', String(state[key])); engine?.setState(state); after?.();
+});
+pressToggle('ab', 'boost');
+pressToggle('cruise', 'cruise');
+pressToggle('haze', 'haze', () => lancer.engines.forEach((e) => e.object.children.forEach((c) => { if (c.renderOrder === 9) c.visible = state.haze; })));
+$('rpm').addEventListener('input', (e) => { state.rpm = +e.target.value; $('rpm-out').textContent = state.rpm.toFixed(2); engine?.setState(state); });
+$('damage').addEventListener('input', (e) => { state.damage = +e.target.value; $('damage-out').textContent = state.damage.toFixed(2); engine?.setState(state); });
+$('dist').addEventListener('input', (e) => { $('dist-out').textContent = `${e.target.value} m`; });
+$('exsize').addEventListener('input', (e) => { $('exsize-out').textContent = `${e.target.value} m`; });
+
+// ---- explosions ----
+const live = [];
+function explode(type) {
+  const size = +$('exsize').value;
+  const ex = FX.createExplosionV2(THREE, { size, type });
+  ex.object.position.set(-4 + (Math.random() - 0.5) * 10, type === 'ground' ? 0 : size * 1.4, -22 + (Math.random() - 0.5) * 10);
+  scene.add(ex.object);
+  live.push(ex);
+  if (ctx && $('sound').getAttribute('aria-pressed') === 'true') {
+    FX.playExplosion(ctx, master, { size: size / 10 * (type === 'ship' ? 1.3 : 1), distance: +$('dist').value });
+  }
+}
+['air', 'ground', 'ship'].forEach((t) => $(`ex-${t}`).addEventListener('click', () => explode(t)));
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false); composer.setSize(w, h); bloom.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+
+const clock = new THREE.Clock();
+let auto = 0;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  K.updateKesselAssets(t);
+  FX.updateKesselFx(t);
+  controls.update();
+  // visuals follow the same spooled rpm the audio hears (or a local spool when sound is off)
+  const rpmNow = engine ? engine.rpm() : (auto += (state.rpm - auto) * (1 - Math.exp(-dt / 1.0)));
+  lancer.setEngine({ throttle: rpmNow, afterburner: state.boost });
+  lancer.updateEngines(dt);
+  $('spool').style.width = `${(rpmNow / 1.6) * 100}%`;
+  let flash = 0;
+  for (let i = live.length - 1; i >= 0; i--) {
+    const ex = live[i];
+    const alive = ex.update(dt, camera);
+    if (ex.flash.intensity > flash) { flash = ex.flash.intensity; flashLight.position.copy(ex.flash.position); }
+    if (!alive) { scene.remove(ex.object); ex.dispose(); live.splice(i, 1); }
+  }
+  flashLight.intensity = flash;
+  composer.render();
+});
+$('status').innerHTML = `<b>Ready</b> · three r${THREE.REVISION} · bloom 0.82 · ACES · one flash light`;
+window.__fx = { explode, FX, scene };
+</script>
+
+</body></html>

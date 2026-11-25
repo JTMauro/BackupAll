@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drone Flights 4K</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#05070b}
+  video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2.5s ease;will-change:opacity,transform}
+  #dim{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none}
+  #cap{position:fixed;left:28px;bottom:24px;font:500 13px/1.3 "Segoe UI",system-ui,sans-serif;letter-spacing:.06em;color:rgba(255,255,255,.75);text-shadow:0 1px 6px rgba(0,0,0,.7);opacity:0;transition:opacity 1.5s}
+  #msg{position:fixed;inset:0;display:none;place-items:center;text-align:center;color:#9aa6bd;font:15px/1.6 "Segoe UI",system-ui,sans-serif;background:radial-gradient(circle at 50% 40%,#16213a,#05070b)}
+</style>
+</head>
+<body>
+<video id="a" muted playsinline preload="auto"></video>
+<video id="b" muted playsinline preload="auto"></video>
+<div id="dim"></div>
+<div id="cap"></div>
+<div id="msg"><div>No drone videos could be loaded.<br>Connect to the internet to stream them, or run <b>download-drone-videos.bat</b><br>to save local copies into the <b>videos</b> folder.</div></div>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. drone-video.html?pace=0.4&only=landscape =====
+const CFG = {
+  pace: 0.5,          // playback speed: 1 = real time, 0.5 = half speed (calm), 0.25 = very slow
+  clip: 45,           // seconds of screen time per clip before crossfading to the next
+  fade: 2.5,          // crossfade length in seconds
+  quality: '2160p',   // streaming quality: '2160p' (4K), '1440p', '1080p' or 'original'
+  only: 'all',        // 'all', 'city' or 'landscape'
+  shuffle: 1,         // 1 = random order, 0 = in list order
+  drift: 1,           // 1 = very slow push-in zoom on each shot, 0 = off
+  dim: 0,             // darken the video for icon readability (0 – 0.6)
+  captions: 1,        // 1 = show the location name briefly, 0 = off
+  folder: 'videos/',  // local clips: 1.webm/1.mp4, 2.webm/2.mp4 … (absolute paths like C:/Users/you/Videos/Drone/ work too)
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => {
+  if (!(name in CFG)) return;
+  CFG[name] = val;
+  if (name === 'pace') for (const v of vids) v.playbackRate = Math.max(.0625, val);
+  if (name === 'dim') dimEl.style.opacity = val;
+};
+
+// Freely licensed 4K drone footage from Wikimedia Commons (see README for credits and licenses)
+const CLIPS = [
+  { file: 'Eiffel_Tower_Drone_4k-Qx_c1X3zfEc-313-251.webm', h: '90', title: 'Paris · Eiffel Tower', kind: 'city' },
+  { file: 'Fourviews_Baía,_Funchal_Madeira_-_Drone_4K.webm', h: 'fd', title: 'Funchal Bay, Madeira', kind: 'city' },
+  { file: 'Akureyri_-_Capital_of_the_north_Iceland_-_city_drone_flight.webm', h: 'b0', title: 'Akureyri, Iceland', kind: 'city' },
+  { file: 'BLED_LAKE_SLOVENIA_DRONE_FOOTAGE_4K.webm', h: 'd6', title: 'Lake Bled, Slovenia', kind: 'landscape' },
+  { file: 'MADEIRA_-_Welcome_to_Paradise_-_4K_Drone_Video.webm', h: 'bd', title: 'Madeira coastline', kind: 'landscape' },
+  { file: 'Drone_flyover_video_of_the_Haneji_Inland_Sea,_Okinawa_Prefecture.webm', h: '44', title: 'Haneji Inland Sea, Okinawa', kind: 'landscape' },
+  { file: 'Drone_Footage_Black_Balsam_Knob_NC_4k.webm', h: '8a', title: 'Black Balsam Knob, North Carolina', kind: 'landscape' },
+  { file: '4K_Drone_Video,_Lake_Of_The_Ozarks_,_Missouri_USA.webm', h: '04', title: 'Lake of the Ozarks, Missouri', kind: 'landscape' },
+  { file: 'Piz_Glims,_aerial_video.webm', h: 'ab', title: 'Piz Glims, Swiss Alps', kind: 'landscape' },
+  { file: 'Mistail,_aerial_video.webm', h: 'b5', title: 'Mistail, Switzerland', kind: 'landscape' },
+  { file: 'Low_flight_over_the_Arkansas_River_in_Pathfinder_Park_drone_videos_4k.webm', h: 'b6', title: 'Arkansas River', kind: 'landscape' },
+  { file: 'Pointe_du_Hoc_4K_Drone_Flight.webm', h: '32', title: 'Pointe du Hoc, Normandy', kind: 'landscape' },
+];
+
+const vids = [document.getElementById('a'), document.getElementById('b')];
+const dimEl = document.getElementById('dim'), cap = document.getElementById('cap');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+dimEl.style.opacity = CFG.dim;
+for (const v of vids) v.style.transitionDuration = CFG.fade + 's';
+
+function streamUrls(c) {
+  const f = encodeURIComponent(c.file), base = 'https://upload.wikimedia.org/wikipedia/commons/';
+  const orig = `${base}${c.h[0]}/${c.h}/${f}`;
+  const tc = q => `${base}transcoded/${c.h[0]}/${c.h}/${f}/${f}.${q}.vp9.webm`;
+  const order = { '2160p': ['2160p', '1440p', '1080p'], '1440p': ['1440p', '1080p'], '1080p': ['1080p', '720p'], original: [] }[CFG.quality] || ['2160p', '1440p', '1080p'];
+  return [...order.map(tc), orig];
+}
+
+function folderUrl() {
+  let f = CFG.folder.replace(/\\/g, '/');
+  if (/^[A-Za-z]:\//.test(f)) f = 'file:///' + f;
+  return f.endsWith('/') ? f : f + '/';
+}
+
+// look for local clips named 1.webm / 1.mp4, 2.webm / 2.mp4 … and stop after a few gaps
+function probe(url) {
+  return new Promise(res => {
+    const v = document.createElement('video'); v.muted = true; v.preload = 'metadata';
+    const done = ok => { v.removeAttribute('src'); v.load(); res(ok); };
+    v.onloadedmetadata = () => done(true); v.onerror = () => done(false);
+    setTimeout(() => done(false), 4000); v.src = url;
+  });
+}
+async function findLocal() {
+  const list = [], dir = folderUrl();
+  let misses = 0;
+  for (let i = 1; i <= 60 && misses < 3; i++) {
+    let hit = null;
+    for (const ext of ['webm', 'mp4', 'mov', 'mkv']) if (await probe(dir + i + '.' + ext)) { hit = dir + i + '.' + ext; break; }
+    if (hit) { list.push({ urls: [hit], title: '', kind: 'all' }); misses = 0; } else misses++;
+  }
+  return list;
+}
+
+// load a clip into a hidden video, seek past any intro, resolve when ready to play
+function prepare(el, item) {
+  return new Promise(res => {
+    let i = 0, done = false;
+    const finish = ok => { if (done) return; done = true; el.onerror = el.onloadedmetadata = el.onseeked = null; res(ok); };
+    const tryNext = () => {
+      if (done) return;
+      if (i >= item.urls.length) return finish(false);
+      el.src = item.urls[i++]; el.load();
+    };
+    el.onerror = tryNext;
+    el.onloadedmetadata = () => {
+      const d = el.duration, need = CFG.clip * CFG.pace + CFG.fade + 4;
+      let s = 0;
+      if (isFinite(d) && d > need + 10) { const lo = Math.min(d * .12, d - need), hi = Math.max(lo, d - need); s = lo + Math.random() * (hi - lo); }
+      el.onseeked = () => finish(true);
+      el.currentTime = s;
+      if (s === 0) setTimeout(() => finish(true), 50);
+    };
+    setTimeout(() => finish(false), 60000);
+    tryNext();
+  });
+}
+
+function showCaption(text) {
+  if (!CFG.captions || !text) return;
+  cap.textContent = text; cap.style.opacity = 1;
+  setTimeout(() => cap.style.opacity = 0, 7000);
+}
+
+function startDrift(el) {
+  if (!CFG.drift || !el.animate) return;
+  const dx = (Math.random() - .5) * 2, dy = (Math.random() - .5) * 1.5;
+  el.animate([{ transform: 'scale(1.02)' }, { transform: `scale(1.08) translate(${dx}%, ${dy}%)` }],
+    { duration: (CFG.clip + CFG.fade * 2) * 1000, easing: 'linear', fill: 'forwards' });
+}
+
+async function main() {
+  let queue = await findLocal();
+  const local = queue.length > 0;
+  if (!local) queue = CLIPS.filter(c => CFG.only === 'all' || c.kind === CFG.only).map(c => ({ urls: streamUrls(c), title: c.title }));
+  let order = [], pos = 0;
+  const nextItem = () => {
+    if (pos >= order.length) {
+      order = queue.map((_, i) => i);
+      if (CFG.shuffle) for (let i = order.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [order[i], order[j]] = [order[j], order[i]]; }
+      pos = 0;
+    }
+    return queue[order[pos++]];
+  };
+  let cur = 0, shown = false, failures = 0;
+  let item = nextItem(), ready = prepare(vids[cur], item);
+  while (true) {
+    const el = vids[cur], other = vids[1 - cur];
+    if (!(await ready)) {
+      // this clip couldn't load; try the next one in the same slot
+      if (++failures >= queue.length * 2 && !shown) { document.getElementById('msg').style.display = 'grid'; return; }
+      item = nextItem(); ready = prepare(el, item); continue;
+    }
+    failures = 0;
+    el.playbackRate = Math.max(.0625, CFG.pace);
+    try { await el.play(); } catch (e) {}
+    startDrift(el);
+    el.style.zIndex = 1; other.style.zIndex = 0;
+    el.style.opacity = 1; other.style.opacity = 0;
+    showCaption(item.title); shown = true;
+    setTimeout(() => { other.pause(); }, CFG.fade * 1000 + 100);
+    // load the next shot in the background while this one plays
+    const nextIt = nextItem();
+    await sleep(CFG.fade * 1000 + 500);
+    const nextReady = prepare(other, nextIt);
+    const t0 = performance.now();
+    while ((performance.now() - t0) / 1000 < CFG.clip - CFG.fade && !el.ended) await sleep(250);
+    item = nextIt; ready = nextReady; cur = 1 - cur;
+  }
+}
+main();
+</script>
+</body>
+</html>

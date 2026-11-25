@@ -1,0 +1,18 @@
+{
+ "title": "RTX 5080 Desktop Options (Design + Local AI)",
+ "url": "https://claude.ai/artifact/XS79tbtFVmK2NLH9SbNNX6",
+ "type": "Docs",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "fa2a4597b205cd036cc22aa2ac1b3d419420444829401ffd4c862c94a17af0c4"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 8086,
+   "sha256": "27c5fccff30e7ffb3641c8724167d06ee20a8e3a3c880d1d9e02c27ce7a48267"
+  }
+ ]
+}

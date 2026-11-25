@@ -1,0 +1,108 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IT Holiday Invite Files</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Montserrat:wght@500;700;800&display=swap">
+<style>
+/* Layout: one centered column: GIF preview, save buttons, then the text to paste under it in the invite */
+:root{
+  --bg:#f4f5f2; --card:#ffffff; --fg:#0b0b0c; --muted:#5a5e55; --line:#dcdfd6;
+  --lime:#CDDB28; --blue:#0078C8; --ok:#2f7d32; --err:#b3261e;
+  --font:"Aspira","Montserrat",system-ui,sans-serif; --display:"Quincy CF","Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0d0e10;--card:#17191c;--fg:#f1f2ee;--muted:#a3a79c;--line:#2b2e33;--blue:#4fb5f0;--ok:#7cc77f;--err:#f08a82;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d0e10;--card:#17191c;--fg:#f1f2ee;--muted:#a3a79c;--line:#2b2e33;--blue:#4fb5f0;--ok:#7cc77f;--err:#f08a82;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font)}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.kicker{font-weight:800;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,4vw,36px);line-height:1.05;margin:4px 0 0;text-wrap:balance}
+.preview{display:block;width:100%;max-width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#000}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+button{font:800 14px var(--font);border-radius:6px;padding:12px 18px;cursor:pointer;border:2px solid var(--fg);background:transparent;color:var(--fg)}
+button.primary{background:var(--lime);border-color:var(--lime);color:#000}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.status{min-height:1.2em;font-size:13px;font-weight:700;color:var(--muted)}
+.status.ok{color:var(--ok)} .status.err{color:var(--err)}
+.paste{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.paste h2{margin:0;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.paste .body{font-size:15px;line-height:1.5}
+.paste .body p{margin:0 0 8px}
+.paste a{color:var(--blue);font-weight:700}
+.help{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+</style>
+
+<div class="wrap">
+  <div>
+    <div class="kicker">IT Holiday Event · Dec 15</div>
+    <h1>Invite files for the calendar</h1>
+  </div>
+
+  <img class="preview" src="it-holiday-event.gif" alt="Animated invite: CYDNI toasting under the Malibu Brewing Co. sign with the event details" width="640" height="360">
+
+  <div class="btns">
+    <button class="primary" id="saveGif" type="button" data-file="it-holiday-event.gif">Save GIF</button>
+    <button id="savePng" type="button" data-file="it-holiday-event-invite.png">Save still PNG</button>
+    <button id="saveHtml" type="button" data-file="IT-Holiday-Event.html">Save HTML</button>
+  </div>
+  <div class="status" id="status" aria-live="polite"></div>
+
+  <section class="paste" aria-labelledby="ph">
+    <h2 id="ph">Text to paste under the GIF</h2>
+    <div class="body" id="pasteText">
+      <p><b>Join us for our final IT event of the year!</b></p>
+      <p><b>Tuesday, December 15 · 3:00 – 5:30 PM</b><br>Malibu Brewing Company (Patio)<br>29281 Agoura Rd, Agoura Hills, CA 91301</p>
+      <p>📍 <a href="https://www.google.com/maps/search/?api=1&amp;query=Malibu+Brewing+Company+29281+Agoura+Rd+Agoura+Hills+CA+91301" target="_blank" rel="noopener">Open in Google Maps</a></p>
+    </div>
+    <div class="btns"><button id="copyText" type="button">Copy text with link</button></div>
+    <p class="help">In Outlook: Insert &gt; Pictures to add the GIF, then paste this text below it. The map link stays clickable.</p>
+  </section>
+</div>
+
+<script>
+(async () => {
+  const status = document.getElementById('status');
+  const say = (msg, cls) => { status.textContent = msg; status.className = 'status' + (cls ? ' ' + cls : ''); };
+  const saveBtns = [...document.querySelectorAll('button[data-file]')];
+  let downloads = null;
+  try { downloads = await window.claude?.use?.('downloads'); } catch { downloads = null; }
+  if (!downloads) { saveBtns.forEach(b => b.disabled = true); say('Saving isn’t available in this view. Open the page on claude.ai to save files.'); }
+
+  saveBtns.forEach(btn => btn.addEventListener('click', async () => {
+    if (!downloads) return;
+    const name = btn.dataset.file;
+    btn.disabled = true; say('Preparing ' + name + '…');
+    try {
+      const res = await fetch(name);
+      if (!res.ok) throw new Error('fetch');
+      const blob = await res.blob();
+      await downloads.save({ filename: name, data: blob });
+      say('Saved ' + name, 'ok');
+    } catch (err) {
+      const c = err && err.code;
+      say(c === 'declined' ? 'Save cancelled.'
+        : c === 'rate_limited' ? 'A save prompt is already open.'
+        : c === 'unavailable' || c === 'not_granted' ? 'Saving isn’t available in this view.'
+        : 'The file didn’t save. Try again.', c === 'declined' ? '' : 'err');
+    }
+    btn.disabled = false;
+  }));
+
+  // copy the text block as rich text so the link survives the paste
+  document.getElementById('copyText').addEventListener('click', async () => {
+    const el = document.getElementById('pasteText');
+    try {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([el.innerHTML], { type: 'text/html' }),
+        'text/plain': new Blob([el.innerText], { type: 'text/plain' })
+      })]);
+      say('Copied. Paste it under the GIF in your invite.', 'ok');
+    } catch {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      say('Text selected. Press Ctrl+C (Cmd+C on Mac) to copy.');
+    }
+  });
+})();
+</script>
+
+</body></html>

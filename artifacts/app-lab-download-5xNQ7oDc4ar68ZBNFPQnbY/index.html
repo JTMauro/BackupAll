@@ -1,0 +1,200 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>App Lab Download</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a lab "kit sheet": hero with the download panel, screenshots, then build steps beside signing
+   options, then what's in the box. Same tokens as App Lab. */
+:root{
+  --bg:#E3EBEE; --panel:#F7FAFB; --sunk:#E7EEF1; --ink:#10222B; --muted:#4D636D; --line:#C2D1D6;
+  --accent:#0E7C8B; --accent-ink:#FFFFFF; --mark:#F2C230; --mark-ink:#2A2100; --ok:#22804F; --warn:#A86F00;
+  --font-display:"Archivo","Helvetica Neue",Arial,sans-serif; --font-body:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace; --r:10px;
+  --shadow:0 14px 40px rgba(16,34,43,.16),0 2px 6px rgba(16,34,43,.08);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#071014; --panel:#0F1C22; --sunk:#0A151A; --ink:#E1EEF1; --muted:#8EA6AF; --line:#24404A;
+  --accent:#4FC7D6; --accent-ink:#04161A; --mark:#E8C14A; --mark-ink:#1E1700; --ok:#5CC08A; --warn:#E3AE45;
+  --shadow:0 14px 40px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#071014; --panel:#0F1C22; --sunk:#0A151A; --ink:#E1EEF1; --muted:#8EA6AF; --line:#24404A;
+  --accent:#4FC7D6; --accent-ink:#04161A; --mark:#E8C14A; --mark-ink:#1E1700; --ok:#5CC08A; --warn:#E3AE45;
+  --shadow:0 14px 40px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--font-body);
+  background-image:radial-gradient(ellipse 80% 50% at 85% -10%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 70%)}
+.wrap{max-width:1100px;margin:0 auto;padding-block:40px 64px;display:grid;gap:36px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.1}
+h1{font-size:clamp(2.4rem,6vw,3.6rem);font-weight:800;font-stretch:115%;letter-spacing:-.01em}
+h2{font-size:1.35rem;font-weight:750;font-stretch:110%}
+h3{font-size:1rem;font-weight:700}
+p{margin:0}
+code{font-family:var(--font-mono);font-size:.86em;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.label,.eyebrow{font:500 .76rem/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.eyebrow{color:var(--accent);display:flex;gap:10px;align-items:center}
+.led{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;display:grid;gap:16px;min-width:0}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:center}
+.hero-copy{display:grid;gap:16px;min-width:0}
+.lede{color:var(--muted);font-size:1.08rem;max-width:58ch}
+.file{display:flex;gap:14px;align-items:center}
+.file-icon{width:46px;height:54px;flex:none;border-radius:7px;display:grid;place-items:center;font:600 .7rem var(--font-mono);
+  color:var(--accent-ink);background:var(--accent)}
+.file-name{font:500 1rem var(--font-mono);word-break:break-all}
+.file-meta{color:var(--muted);font-size:.88rem}
+.sum{display:flex;gap:8px;align-items:center;min-width:0}
+.sum code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;padding:6px 8px}
+.btn{appearance:none;cursor:pointer;font:600 1.05rem var(--font-body);border-radius:9px;padding:14px 20px;border:1px solid var(--accent);
+  background:var(--accent);color:var(--accent-ink);width:100%;transition:filter .15s,transform .08s}
+.btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+.btn:focus-visible,.copy:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn[disabled]{cursor:default;filter:grayscale(.5) opacity(.7)}
+.copy{appearance:none;cursor:pointer;font:600 .8rem var(--font-body);border:1px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:7px;padding:6px 10px;flex:none}
+.status{font-size:.9rem;color:var(--muted);min-height:1.4em}
+.status.ok{color:var(--ok)} .status.warn{color:var(--warn)}
+.note{font-size:.86rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+figure{margin:0;display:grid;gap:8px}
+figure img{width:100%;display:block;border-radius:var(--r);border:1px solid var(--line);box-shadow:var(--shadow)}
+figcaption{color:var(--muted);font-size:.88rem}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start}
+.steps li::before{content:counter(s);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 .9rem var(--font-mono);
+  color:var(--accent);border:1.5px solid var(--accent)}
+.opts{display:grid;gap:10px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--sunk)}
+.opt b{font-size:.95rem}
+.opt .tag{grid-row:1/3;grid-column:2;align-self:center;font:600 .68rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;color:var(--accent);white-space:nowrap}
+.opt .tag.alt{color:var(--muted)}
+.opt span:not(.tag){color:var(--muted);font-size:.88rem}
+.out{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:.92rem}
+.out li{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:4px 14px}
+.out code{white-space:nowrap}
+.specs{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:9px 18px}
+.specs dt{font:500 .76rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.specs dd{margin:0}
+@media (max-width:820px){.hero,.cols,.shots{grid-template-columns:minmax(0,1fr)}.out li{grid-template-columns:1fr}.specs{grid-template-columns:1fr;gap:2px}.specs dd{margin-bottom:8px}}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="led" aria-hidden="true"></span>Version 1.8.1 · Signed build kit</div>
+      <h1>App Lab for Windows</h1>
+      <p class="lede">Take apps apart, walk through their menus and settings, and rebuild the best parts. The desktop app reads installed apps in one click, scans any folder, fetches websites and drives other apps to map them. The package builds signed installers with the Cydcor code-signing certificate.</p>
+    </div>
+    <div class="card" aria-labelledby="dl-title">
+      <h2 id="dl-title">Download</h2>
+      <div class="file">
+        <div class="file-icon" aria-hidden="true">ZIP</div>
+        <div>
+          <div class="file-name">app-lab-desktop.zip</div>
+          <div class="file-meta">507 KB · source, one-click signed build, cloud build</div>
+        </div>
+      </div>
+      <div class="sum"><span class="label">SHA-256</span><code id="sha">d1b2ebfe4d9daad1ef67814789091f273184f78b41f07d69887df8af67f69da3</code><button class="copy" id="copySha" type="button">Copy</button></div>
+      <button class="btn" id="dl-btn" type="button">Download App Lab</button>
+      <div class="status" id="dl-status" role="status" aria-live="polite"></div>
+      <p class="note">This is the build kit, not a finished installer: Windows installers can only be signed where the Cydcor certificate lives. On that PC, double-click <code>BUILD APP LAB.cmd</code> and the signed installers appear in a few minutes.</p>
+    </div>
+  </section>
+
+  <section class="shots" aria-label="Screenshots">
+    <figure>
+      <img src="teardown.jpg" alt="App Lab teardown screen: a score sheet and an exploded view of an app's parts, with the lab bench and CYDNI behind" loading="eager">
+      <figcaption>Teardown in the desktop app, with CYDNI beside the title. Sample data.</figcaption>
+    </figure>
+    <figure>
+      <img src="usability.jpg" alt="Walkthrough usability view: measured tiles for screens, dialogs, menu items, settings, clicks to reach, unlabeled controls and shortcuts, then a Claude review scored 64 out of 100" loading="lazy">
+      <figcaption>Walkthrough: measured usability and Claude's review, from a mapped app. Sample data.</figcaption>
+    </figure>
+  </section>
+
+  <section class="cols">
+    <div class="card">
+      <h2>Make the signed Windows installers</h2>
+      <ol class="steps">
+        <li><div>Unzip <code>app-lab-desktop.zip</code> on a Windows 10/11 PC that has the Cydcor code-signing certificate, for example to <code>C:\AppLab</code>. A network drive works too: the build runs from a local copy and puts the installers back on the share. If the certificate is on a USB token, plug it in.</div></li>
+        <li><div>Double-click <code>BUILD APP LAB.cmd</code>. The first time, it installs Python 3.13, Inno Setup and the Windows signing tools if they're missing, then builds and self-tests the app (5 to 10 minutes).</div></li>
+        <li><div>If Windows asks to allow changes, click <b>Yes</b>. A second window signs everything; press Enter when it says it's done.</div></li>
+        <li><div>The <code>Output</code> folder opens with <code>AppLab-1.8.1-release.zip</code>: both signed installers, checksums, the public certificate and <code>DEPLOY.md</code>, ready to share.</div></li>
+      </ol>
+      <p class="muted" style="font-size:.88rem">Prefer to run it without building? In the <code>AppLab</code> folder: <code>py -3.13 -m venv .venv</code>, then <code>.venv\Scripts\pip install -r requirements.txt</code>, <code>.venv\Scripts\python tools\prepare_web.py</code> and <code>.venv\Scripts\python run.py</code>.</p>
+    </div>
+    <div class="card">
+      <h2>Ways to sign</h2>
+      <p class="muted" style="font-size:.92rem">Set <code>mode</code> in <code>signing.json</code>. No secrets go in that file.</p>
+      <div class="opts">
+        <div class="opt"><b>Cydcor certificate on this PC</b><span>In Windows' certificate store or on a USB token. Found automatically by subject "Cydcor".</span><span class="tag">local · default</span></div>
+        <div class="opt"><b>Azure Trusted Signing</b><span>No certificate on the PC; signs through Cydcor's Azure account after an Azure sign-in.</span><span class="tag alt">trusted-signing</span></div>
+        <div class="opt"><b>Azure Key Vault</b><span>The certificate stays in Key Vault; signing uses AzureSignTool.</span><span class="tag alt">keyvault</span></div>
+        <div class="opt"><b>GitHub Actions</b><span>Push the folder to a repository and run "Build App Lab". It signs with Azure Trusted Signing when the six secrets listed in the workflow are set.</span><span class="tag alt">cloud build</span></div>
+      </div>
+      <p class="muted" style="font-size:.88rem">Every route timestamps the signatures (SHA-256, RFC 3161) and verifies them before packaging, so installers stay valid after the certificate expires.</p>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div class="card">
+      <h2>What the build produces</h2>
+      <ul class="out">
+        <li><code>AppLab-Setup-1.8.1-PerUser.exe</code><span class="muted">for employees, no admin rights needed</span></li>
+        <li><code>AppLab-Setup-1.8.1.exe</code><span class="muted">for IT and Intune, all users, silent install</span></li>
+        <li><code>AppLab-1.8.1-release.zip</code><span class="muted">both installers, checksums, certificate and notes in one file</span></li>
+        <li><code>SHA256SUMS.txt</code><span class="muted">checksums of every installer</span></li>
+        <li><code>AppLab-publisher.cer</code><span class="muted">public signing certificate, for allow-listing</span></li>
+        <li><code>DEPLOY.md</code><span class="muted">silent-install, uninstall and Intune commands</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>What's in the desktop app</h2>
+      <dl class="specs">
+        <dt>Sources</dt><dd>Known apps, installed apps read straight from Windows, any folder or .exe, websites by address, or by hand.</dd>
+        <dt>Walkthrough</dt><dd>Maps a running app's menus, screens and settings in Safe auto, Full auto or Record mode, with a usability review and a clickable copy.</dd>
+        <dt>Claude</dt><dd>Teardowns, rebuilds and reviews through your organization's Anthropic API key, stored encrypted per Windows user.</dd>
+        <dt>Privacy</dt><dd>Scans and walkthroughs stay on the PC; only a specimen's notes go to Claude, when you ask.</dd>
+        <dt>Needs</dt><dd>Windows 10/11, 64-bit, with the Edge WebView2 runtime (built in). Building needs Python 3.11 to 3.13.</dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var btn = document.getElementById('dl-btn'), status = document.getElementById('dl-status');
+  function say(msg, cls) { status.textContent = msg; status.className = 'status' + (cls ? ' ' + cls : ''); }
+  var downloadsP = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  document.getElementById('copySha').addEventListener('click', function () {
+    var t = document.getElementById('sha').textContent, b = this;
+    try { navigator.clipboard.writeText(t).then(function () { b.textContent = 'Copied'; }, function () { b.textContent = 'Select it'; }); }
+    catch (e) { b.textContent = 'Select it'; }
+  });
+  btn.addEventListener('click', async function () {
+    btn.disabled = true; say('Preparing the file…');
+    try {
+      var downloads = await downloadsP;
+      if (!downloads) { say('Downloads aren’t available in this view. Open this page on claude.ai to download.', 'warn'); return; }
+      var res = await fetch('app-lab-desktop.b64.txt');
+      if (!res.ok) throw { code: 'fetch' };
+      var bin = atob((await res.text()).trim()), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      say('Confirm the download in the prompt.');
+      await downloads.save({ filename: 'app-lab-desktop.zip', data: new Blob([bytes], { type: 'application/zip' }) });
+      say('Saved app-lab-desktop.zip. Unzip it and open START HERE.txt.', 'ok');
+    } catch (e) {
+      var code = e && e.code;
+      if (code === 'declined') say('Download cancelled.');
+      else if (code === 'rate_limited') say('A download prompt is already open. Finish that one first.', 'warn');
+      else if (code === 'fetch') say('The file couldn’t be loaded. Reload the page and try again.', 'warn');
+      else say('The download didn’t go through. Try again.', 'warn');
+    } finally { btn.disabled = false; }
+  });
+})();
+</script>
+
+</body></html>

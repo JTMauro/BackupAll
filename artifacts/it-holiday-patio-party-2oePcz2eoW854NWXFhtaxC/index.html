@@ -1,0 +1,548 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IT Holiday Patio Party</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Montserrat:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: 16:9 stage: real patio photo in CSS 3D layers; Cydni under the sign at left, info card right. Single dusk look by design. */
+:root{
+  color-scheme: dark;
+  --ink:#07060f;
+  --night:#140f2e;
+  --dusk:#3b1f5e;
+  --lime:#CDDB28;
+  --blue:#00A1E0;
+  --orange:#EF5E2E;
+  --warm:#ffd27a;
+  --paper:#ffffff;
+  --mute:#b9b4cc;
+  --glass:rgba(10,8,24,.72);
+  --font-body:"Aspira","Montserrat",system-ui,sans-serif;
+  --font-display:"Quincy CF","Fraunces",Georgia,serif;
+}
+body{background:var(--ink);color:var(--paper);font-family:var(--font-body)}
+.wrap{max-width:1320px;margin:0 auto;padding-block:20px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- stage ---------- */
+.frame{position:relative}
+.stage{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;overflow:hidden;border-radius:6px;perspective:1000px;perspective-origin:50% 45%;background:var(--night);isolation:isolate}
+.world{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out}
+.layer{position:absolute;inset:-12%;transform-style:preserve-3d;pointer-events:none}
+.layer svg{width:100%;height:100%;display:block}
+.l-sky{transform:translateZ(-900px) scale(1.9)}
+.l-mtn{transform:translateZ(-650px) scale(1.65)}
+.l-bld{transform:translateZ(-300px) scale(1.3)}
+.l-lights{transform:translateZ(-180px) scale(1.18)}
+.l-back{transform:translateZ(-110px) scale(1.11)}
+.l-front{transform:translateZ(60px) scale(.94)}
+.l-fg{transform:translateZ(190px) scale(.81)}
+
+.bulb{animation:twinkle 2.6s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.55}}
+.flame{transform-origin:50% 100%;animation:flick .5s ease-in-out infinite alternate}
+@keyframes flick{from{transform:scaleY(1) skewX(-3deg)}to{transform:scaleY(1.15) skewX(4deg)}}
+.star{animation:twinkle 4s ease-in-out infinite}
+
+/* ---------- info card ---------- */
+.info{position:absolute;right:2.5%;top:50%;transform:translateY(-50%) translateZ(0);width:min(37%,450px);background:var(--glass);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:6px solid transparent;border-image:linear-gradient(90deg,#0DC2E2,#0DE2B7,var(--lime)) 1;padding:clamp(14px,2.2vw,30px);display:flex;flex-direction:column;gap:clamp(8px,1.2vw,16px);z-index:5}
+.kicker{font-weight:800;font-size:clamp(10px,1vw,13px);letter-spacing:.18em;text-transform:uppercase;color:var(--lime)}
+h1{font-family:var(--font-display);font-weight:900;font-size:clamp(20px,3.1vw,42px);line-height:1.04;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--lime)}
+.when{display:flex;align-items:stretch;gap:clamp(10px,1.4vw,18px)}
+.cal{background:var(--paper);color:var(--ink);text-align:center;min-width:clamp(52px,6vw,78px);display:flex;flex-direction:column}
+.cal b{display:block;background:var(--orange);color:var(--paper);font-size:clamp(9px,.85vw,12px);letter-spacing:.14em;padding:3px 0;font-weight:800}
+.cal span{font-family:var(--font-display);font-weight:900;font-size:clamp(24px,3vw,42px);line-height:1;padding:4px 0 2px}
+.cal i{font-style:normal;font-size:clamp(9px,.8vw,11px);font-weight:700;letter-spacing:.1em;padding-bottom:4px}
+.when-text{display:flex;flex-direction:column;justify-content:center;gap:2px}
+.day{font-weight:800;font-size:clamp(13px,1.35vw,19px)}
+.time{font-weight:800;font-size:clamp(15px,1.7vw,24px);color:var(--blue);font-variant-numeric:tabular-nums}
+.where{font-size:clamp(11px,1.05vw,15px);line-height:1.4;color:var(--mute)}
+.where strong{display:block;color:var(--paper);font-weight:800;font-size:clamp(12px,1.2vw,17px)}
+.where address{font-style:normal;user-select:all}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:800;font-size:clamp(11px,1vw,14px);letter-spacing:.04em;text-decoration:none;padding:.7em 1.1em;border:2px solid var(--lime);cursor:pointer;transition:transform .15s,background .15s,color .15s}
+.btn-primary{background:var(--lime);color:var(--ink)}
+.btn-primary:hover{background:var(--paper);border-color:var(--paper)}
+.btn-ghost{background:transparent;color:var(--paper)}
+.btn-ghost:hover{background:rgba(205,219,40,.15)}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn svg{width:1.15em;height:1.15em;flex:none}
+.logo{height:clamp(14px,1.5vw,22px);width:auto;align-self:flex-start;opacity:.9}
+
+/* ---------- Cydni ---------- */
+.cydni{position:absolute;left:6%;bottom:3%;width:min(21%,250px);z-index:6;transform-style:preserve-3d;perspective:700px}
+.cydni-spin{transform-style:preserve-3d;animation:spin 5.5s cubic-bezier(.6,0,.3,1) infinite}
+.cydni-spin svg{width:100%;height:auto;display:block;overflow:visible}
+@keyframes spin{
+  0%,30%{transform:rotateY(0) translateY(0)}
+  45%{transform:rotateY(180deg) translateY(-8%)}
+  60%,100%{transform:rotateY(360deg) translateY(0)}
+}
+.cydni-shadow{position:absolute;left:18%;right:18%;bottom:-2%;height:7%;background:radial-gradient(ellipse at center,rgba(0,0,0,.6),transparent 70%);animation:shadow 5.5s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes shadow{0%,30%,60%,100%{transform:scaleX(1);opacity:1}45%{transform:scaleX(.7);opacity:.6}}
+.toast{position:absolute;top:45%;left:24%;z-index:8;background:var(--paper);color:var(--ink);font-family:var(--font-display);font-weight:900;font-size:clamp(13px,1.7vw,24px);padding:.25em .6em .3em;border-radius:999px;white-space:nowrap;transform-origin:0 100%;animation:toast 5.5s ease-in-out infinite}
+.toast::after{content:"";position:absolute;left:14%;bottom:-8px;border:8px solid transparent;border-top-color:var(--paper);border-bottom:0}
+@keyframes toast{0%,62%{opacity:0;transform:scale(.6) rotate(-6deg)}70%,95%{opacity:1;transform:scale(1) rotate(-4deg)}100%{opacity:0;transform:scale(.9) rotate(-4deg)}}
+.fizz{animation:fizz 1.6s linear infinite}
+@keyframes fizz{from{transform:translateY(0);opacity:1}to{transform:translateY(-34px);opacity:0}}
+
+
+/* real patio photo slot: shown when patio.jpg loads, illustration is the fallback */
+.l-photo{display:none;inset:-4%;transform:translateZ(-300px) scale(1.3)}
+.l-banner{display:none;transform:translateZ(-150px) scale(1.15)}
+.stage.has-photo .l-photo{display:block}
+.stage.has-photo .l-sky,.stage.has-photo .l-mtn,.stage.has-photo .l-bld,.stage.has-photo .l-back,.stage.has-photo .l-front,.stage.has-photo .l-fg{display:none}
+/* 3D Cydni canvas */
+#cydni3d{position:absolute;left:4%;bottom:-2%;width:min(26%,320px);aspect-ratio:3/4;z-index:6;pointer-events:none}
+#cydniStill{position:absolute;left:4%;bottom:-2%;width:min(26%,320px);height:auto;z-index:6;pointer-events:none}
+.caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;margin-top:10px;font-size:12px;color:var(--mute)}
+.caption b{color:var(--lime);font-weight:700}
+
+/* ---------- phones: card drops below the scene ---------- */
+@media (max-width:760px){
+  .stage{aspect-ratio:4/3}
+  .info{position:static;transform:none;width:auto;margin-top:12px;backdrop-filter:none;background:#120e26}
+  .cydni{width:34%}
+  #cydni3d,#cydniStill{width:40%}
+  .toast{font-size:16px;left:30%;top:30%}
+}
+@media (prefers-reduced-motion:reduce){
+  .cydni-spin,.cydni-shadow,.bulb,.flame,.star,.fizz{animation:none}
+  .toast{animation:none;opacity:1;transform:rotate(-4deg)}
+  .world{transition:none}
+}
+</style>
+
+<div class="wrap">
+  <div class="frame">
+  <div class="stage" id="stage" aria-label="Illustrated dusk view of the Malibu Brewing Company patio in Agoura Hills, with string lights, umbrellas and Ladyface Mountain behind">
+    <div class="world" id="world">
+
+      <!-- real patio photo (patio.jpg); hidden until it loads -->
+      <div class="layer l-photo"><svg viewBox="0 0 846 622" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140f2e" stop-opacity=".25"/><stop offset=".5" stop-color="#140f2e" stop-opacity="0"/><stop offset="1" stop-color="#07060f" stop-opacity=".3"/></linearGradient></defs>
+        <image id="patio" href="patio.jpg" x="0" y="0" width="846" height="622" preserveAspectRatio="xMidYMid slice"/>
+        <rect width="846" height="622" fill="url(#dusk)"/>
+        <!-- Agoura Hills ribbon hung under the Malibu Brewing Co. sign -->
+        <g><line x1="140" y1="262" x2="140" y2="272" stroke="#111" stroke-width="2"/><line x1="265" y1="262" x2="265" y2="272" stroke="#111" stroke-width="2"/>
+        <path d="M122 271 H283 L275 281 L283 291 H122 L130 281 Z" fill="#CDDB28"/>
+        <text x="202.5" y="285" text-anchor="middle" fill="#000" font-family="Montserrat,sans-serif" font-weight="800" font-size="11.5" letter-spacing="4">AGOURA HILLS</text></g>
+      </svg></div>
+      <div class="layer l-banner"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <line x1="760" y1="60" x2="760" y2="120" stroke="#cfcfcf" stroke-width="3"/><line x1="1500" y1="60" x2="1500" y2="120" stroke="#cfcfcf" stroke-width="3"/>
+        <path d="M740 120 H1520 V190 Q1130 204 740 190 Z" fill="#111" stroke="#CDDB28" stroke-width="3"/>
+        <text x="1130" y="160" text-anchor="middle" fill="#fff" font-family="Fraunces,Georgia,serif" font-weight="900" font-size="38" letter-spacing="3">MALIBU BREWING COMPANY</text>
+        <text x="1130" y="182" text-anchor="middle" fill="#CDDB28" font-family="Montserrat,sans-serif" font-weight="800" font-size="14" letter-spacing="10">AGOURA HILLS</text>
+      </svg></div>
+
+      <!-- sky -->
+      <div class="layer l-sky"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#120d2c"/><stop offset=".45" stop-color="#3b1f5e"/>
+            <stop offset=".72" stop-color="#9a3d6b"/><stop offset=".9" stop-color="#ef7a3e"/><stop offset="1" stop-color="#ffc06a"/>
+          </linearGradient>
+          <radialGradient id="sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff3c4"/><stop offset=".35" stop-color="#ffcf73" stop-opacity=".9"/><stop offset="1" stop-color="#ff8a3d" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="1600" height="900" fill="url(#sky)"/>
+        <circle cx="1250" cy="560" r="240" fill="url(#sun)"/>
+        <g fill="#fff" id="stars"></g>
+      </svg></div>
+
+      <!-- Santa Monica Mountains / Ladyface -->
+      <div class="layer l-mtn"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g transform="translate(0 -110)">
+        <path d="M0 640 L120 600 L230 620 L360 560 L470 590 L560 545 L690 590 L800 575 L900 600 L1000 560 L1120 600 L1260 570 L1400 610 L1600 580 L1600 900 L0 900Z" fill="#4a2a5c" opacity=".75"/>
+        <path d="M0 690 L160 650 L300 672 L420 640 L520 600 L600 520 L640 470 L668 452 L700 480 L740 520 L790 560 L900 610 L1040 640 L1200 625 L1350 655 L1600 640 L1600 900 L0 900Z" fill="#2c1a3f"/>
+        <text x="668" y="440" text-anchor="middle" fill="#ffffff" opacity=".35" font-family="Montserrat,sans-serif" font-size="15" font-weight="700" letter-spacing="3">LADYFACE MOUNTAIN</text></g>
+      </svg></div>
+
+      <!-- brewery building + patio floor -->
+      <div class="layer l-bld"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2a0"/><stop offset="1" stop-color="#f29a46"/></linearGradient>
+          <linearGradient id="tank" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6d7180"/><stop offset=".45" stop-color="#e3e6ee"/><stop offset="1" stop-color="#585c6a"/></linearGradient>
+          <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a33"/><stop offset="1" stop-color="#1b141c"/></linearGradient>
+          <linearGradient id="banner" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101010"/><stop offset="1" stop-color="#232323"/></linearGradient>
+        </defs>
+        <path d="M0 620 H1600 V900 H0Z" fill="url(#floor)"/>
+        <g transform="translate(-60 0)">
+        <!-- fermenter tanks (brewery side) -->
+        <g transform="translate(1210 360)">
+          <rect x="0" y="40" width="90" height="220" rx="10" fill="url(#tank)"/><path d="M0 50 Q45 -10 90 50Z" fill="url(#tank)"/>
+          <rect x="105" y="70" width="80" height="190" rx="10" fill="url(#tank)"/><path d="M105 80 Q145 25 185 80Z" fill="url(#tank)"/>
+          <rect x="10" y="120" width="70" height="4" fill="#3c3f4a"/><rect x="115" y="140" width="60" height="4" fill="#3c3f4a"/>
+        </g>
+        <!-- building -->
+        <rect x="430" y="330" width="790" height="290" fill="#2a2230"/>
+        <path d="M410 335 L825 250 L1240 335 Z" fill="#1d1722"/>
+        <!-- roll-up glass doors glowing -->
+        <g>
+          <rect x="470" y="420" width="220" height="200" fill="url(#glow)"/>
+          <rect x="715" y="420" width="220" height="200" fill="url(#glow)"/>
+          <rect x="960" y="420" width="220" height="200" fill="url(#glow)"/>
+          <g stroke="#2a2230" stroke-width="5">
+            <path d="M470 470H690M470 520H690M470 570H690M580 420V620"/>
+            <path d="M715 470H935M715 520H935M715 570H935M825 420V620"/>
+            <path d="M960 470H1180M960 520H1180M960 570H1180M1070 420V620"/>
+          </g>
+          <!-- silhouettes inside -->
+          <g fill="#3a2430" opacity=".55">
+            <circle cx="540" cy="540" r="16"/><rect x="522" y="556" width="36" height="64" rx="12"/>
+            <circle cx="790" cy="535" r="16"/><rect x="772" y="551" width="36" height="69" rx="12"/>
+            <circle cx="860" cy="545" r="15"/><rect x="843" y="560" width="34" height="60" rx="12"/>
+            <circle cx="1110" cy="538" r="16"/><rect x="1092" y="554" width="36" height="66" rx="12"/>
+          </g>
+        </g>
+        <!-- banner: name of company -->
+        <g>
+          <line x1="470" y1="350" x2="470" y2="408" stroke="#cfcfcf" stroke-width="3"/>
+          <line x1="1180" y1="350" x2="1180" y2="408" stroke="#cfcfcf" stroke-width="3"/>
+          <path d="M455 340 H1195 V400 Q825 412 455 400 Z" fill="url(#banner)" stroke="#CDDB28" stroke-width="3"/>
+          <g fill="#CDDB28"><circle cx="472" cy="352" r="5"/><circle cx="1178" cy="352" r="5"/></g>
+          <text x="825" y="378" text-anchor="middle" fill="#ffffff" font-family="Fraunces,Georgia,serif" font-weight="900" font-size="34" letter-spacing="3">MALIBU BREWING COMPANY</text>
+          <text x="825" y="397" text-anchor="middle" fill="#CDDB28" font-family="Montserrat,sans-serif" font-weight="800" font-size="13" letter-spacing="9">AGOURA HILLS</text>
+        </g>
+        </g>
+        <!-- patio floor with perspective pavers -->
+        <g stroke="#ffffff" stroke-opacity=".07" stroke-width="2" id="pavers"></g>
+        <!-- warm spill of light from doors onto floor -->
+        <path d="M410 620 H1120 L1340 900 H190Z" fill="#ffb862" opacity=".12"/>
+      </svg></div>
+
+      <!-- string lights -->
+      <div class="layer l-lights"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" id="lights">
+        <defs><radialGradient id="bulbglow"><stop offset="0" stop-color="#fff6d0"/><stop offset=".3" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient></defs>
+      </svg></div>
+
+      <!-- back row of tables -->
+      <div class="layer l-back"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" id="back"></svg></div>
+
+      <!-- front row: tables + fire pit -->
+      <div class="layer l-front"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true" id="front">
+        <g transform="translate(700 770) scale(.8)">
+          <ellipse cx="0" cy="22" rx="120" ry="20" fill="#000" opacity=".45"/>
+          <rect x="-95" y="-10" width="190" height="34" fill="#4a4550"/>
+          <rect x="-100" y="-16" width="200" height="10" fill="#6a6470"/>
+          <g class="flame"><path d="M-60 -16 Q-50 -70 -30 -40 Q-20 -95 0 -48 Q15 -100 30 -42 Q50 -75 60 -16Z" fill="#ff8a3d"/></g>
+          <g class="flame" style="animation-delay:.2s"><path d="M-35 -16 Q-25 -55 -10 -35 Q0 -70 12 -36 Q28 -58 35 -16Z" fill="#ffd27a"/></g>
+        </g>
+      </svg></div>
+
+      <!-- foreground plants -->
+      <div class="layer l-fg"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g transform="translate(70 900)">
+          <rect x="-60" y="-110" width="150" height="110" fill="#1a1418"/>
+          <g fill="#20402e"><path d="M15 -110 L-70 -300 L0 -120Z"/><path d="M15 -110 L10 -340 L35 -115Z"/><path d="M20 -110 L120 -290 L40 -112Z"/><path d="M15 -110 L-120 -200 L5 -105Z"/><path d="M25 -110 L170 -210 L40 -100Z"/></g>
+        </g>
+        <g transform="translate(1560 900)">
+          <rect x="-90" y="-90" width="140" height="90" fill="#1a1418"/>
+          <g fill="#1d3a2a"><path d="M-20 -90 L-120 -250 L-10 -95Z"/><path d="M-20 -90 L-25 -290 L0 -95Z"/><path d="M-15 -90 L80 -240 L5 -92Z"/></g>
+        </g>
+      </svg></div>
+    </div>
+
+
+    <div class="toast" id="toast">¡Salud!</div>
+    <canvas id="cydni3d" aria-label="CYDNI the robot spinning and raising a soda in a toast"></canvas>
+    <!-- still of 3D CYDNI, shown only if the 3D model cannot load -->
+    <img id="cydniStill" src="cydni-toast.png" alt="CYDNI the robot raising a soda in a toast">
+  </div>
+
+    <!-- info, left -->
+    <section class="info" aria-labelledby="ttl">
+      <div class="kicker">IT Holiday Event</div>
+      <h1 id="ttl">Join us for our <em>final</em> IT event of the year</h1>
+      <div class="when">
+        <div class="cal" aria-hidden="true"><b>DEC</b><span>15</span><i>TUE</i></div>
+        <div class="when-text">
+          <div class="day">Tuesday, December 15</div>
+          <div class="time">3:00 – 5:30 PM</div>
+        </div>
+      </div>
+      <div class="where">
+        <strong>Malibu Brewing Company · Patio</strong>
+        <address id="addr">29281 Agoura Rd, Agoura Hills, CA 91301</address>
+      </div>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Malibu+Brewing+Company+29281+Agoura+Rd+Agoura+Hills+CA+91301" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+          Open in Google Maps
+        </a>
+        <button class="btn btn-ghost" id="copy" type="button">Copy address</button>
+      </div>
+      <img class="logo" src="logo-white.png" alt="Cydcor">
+    </section>
+  </div>
+
+  <div class="caption">
+    <span>Move your cursor or tilt your phone to look around the patio.</span>
+    <span>Doors <b>3:00 PM</b> · Sunset around <b>4:45 PM</b> over Ladyface Mountain</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  const el=(tag,attrs,parent)=>{const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);parent&&parent.appendChild(n);return n};
+
+  // stars
+  const stars=document.getElementById("stars");
+  let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+  for(let i=0;i<70;i++){const s=el("circle",{cx:rnd()*1600,cy:rnd()*380,r:(rnd()*1.6+.4).toFixed(2),opacity:(rnd()*.6+.3).toFixed(2),class:"star"},stars);s.style.animationDelay=(rnd()*4).toFixed(2)+"s"}
+
+  // perspective pavers converging on the doors
+  const pav=document.getElementById("pavers");
+  for(let i=-10;i<=10;i++)el("line",{x1:765+i*40,y1:620,x2:765+i*170,y2:900},pav);
+  [650,690,745,815,900].forEach(y=>el("line",{x1:0,y1:y,x2:1600,y2:y},pav));
+
+  // string lights: catenaries from the roofline out over the patio
+  const L=document.getElementById("lights");
+  const strands=[[ [370,330],[-100,470],120 ],[ [765,255],[240,520],140 ],[ [765,255],[1240,520],140 ],[ [1160,330],[1600,470],120 ],[ [240,520],[1240,520],90 ]];
+  let b=0;
+  strands.forEach(([a,c,sag])=>{
+    const mx=(a[0]+c[0])/2,my=(a[1]+c[1])/2+sag;
+    el("path",{d:`M${a[0]} ${a[1]} Q${mx} ${my} ${c[0]} ${c[1]}`,stroke:"#0b0812",fill:"none","stroke-width":2.5},L);
+    const n=14;
+    for(let i=1;i<n;i++){const t=i/n,x=(1-t)*(1-t)*a[0]+2*(1-t)*t*mx+t*t*c[0],y=(1-t)*(1-t)*a[1]+2*(1-t)*t*my+t*t*c[1];
+      const g=el("g",{class:"bulb"},L);g.style.animationDelay=((b++*0.37)%2.6).toFixed(2)+"s";
+      el("circle",{cx:x,cy:y+9,r:18,fill:"url(#bulbglow)"},g);el("circle",{cx:x,cy:y+9,r:5,fill:"#fff4c8"},g);}
+  });
+
+  // picnic tables with market umbrellas
+  function table(svg,x,y,s,canopy){
+    const g=el("g",{transform:`translate(${x} ${y}) scale(${s})`},svg);
+    el("ellipse",{cx:0,cy:8,rx:120,ry:14,fill:"#000",opacity:.4},g);
+    el("rect",{x:-3,y:-250,width:6,height:200,fill:"#cfc7b8"},g);
+    el("path",{d:"M-130 -230 Q-65 -300 0 -310 Q65 -300 130 -230 Q110 -238 87 -228 Q65 -240 43 -228 Q22 -240 0 -228 Q-22 -240 -43 -228 Q-65 -240 -87 -228 Q-110 -238 -130 -230Z",fill:canopy},g);
+    el("path",{d:"M0 -310 L-87 -229 M0 -310 L-43 -229 M0 -310 L43 -229 M0 -310 L87 -229",stroke:"#000",opacity:.18,"stroke-width":3},g);
+    el("rect",{x:-100,y:-62,width:200,height:14,fill:"#8a5a3b"},g);
+    el("path",{d:"M-80 -48 L-100 0 M80 -48 L100 0 M-80 -48 L-60 0 M80 -48 L60 0",stroke:"#5c3b27","stroke-width":8},g);
+    el("rect",{x:-118,y:-26,width:236,height:10,fill:"#6e4730"},g);
+    return g;
+  }
+  const back=document.getElementById("back"),front=document.getElementById("front");
+  table(back,460,690,.62,"#0f6f6a");table(back,1070,690,.62,"#0f6f6a");table(back,770,670,.55,"#CDDB28");
+  table(front,250,850,1,"#00A1E0");table(front,1180,850,.9,"#0f6f6a");
+
+  // pointer + tilt parallax
+  const world=document.getElementById("world"),stage=document.getElementById("stage");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function set(nx,ny){world.style.setProperty("--ry",(nx*6).toFixed(2)+"deg");world.style.setProperty("--rx",(-ny*3.5).toFixed(2)+"deg")}
+  if(!reduce){
+    stage.addEventListener("pointermove",e=>{const r=stage.getBoundingClientRect();set((e.clientX-r.left)/r.width*2-1,(e.clientY-r.top)/r.height*2-1)});
+    stage.addEventListener("pointerleave",()=>set(0,0));
+    addEventListener("deviceorientation",e=>{if(e.gamma==null)return;set(Math.max(-1,Math.min(1,e.gamma/30)),Math.max(-1,Math.min(1,(e.beta-45)/30)))});
+    // gentle idle sway so the depth reads even without a pointer
+    let t0=performance.now(),active=false;
+    stage.addEventListener("pointerenter",()=>active=true);stage.addEventListener("pointerleave",()=>active=false);
+    (function sway(t){if(!active){const k=(t-t0)/1000;set(Math.sin(k*.35)*.6,Math.sin(k*.27)*.3)}requestAnimationFrame(sway)})(t0);
+  }
+
+  // real patio photo
+  const img=document.getElementById('patio');
+  const pre=new Image();pre.onload=()=>stage.classList.add('has-photo');pre.src='patio.jpg';
+
+  // copy address
+  const btn=document.getElementById("copy"),addr=document.getElementById("addr").textContent;
+  btn.addEventListener("click",()=>{
+    const done=()=>{btn.textContent="Address copied";setTimeout(()=>btn.textContent="Copy address",1800)};
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents(document.getElementById("addr"));const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="Address selected"};
+    try{navigator.clipboard.writeText(addr).then(done,fallback)}catch(e){fallback()}
+  });
+})();
+</script>
+
+<!-- CYDNI 3D: the robot from the CYDNI 3D artifact, posed for a toast -->
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+const canvas = document.getElementById('cydni3d');
+const still = document.getElementById('cydniStill');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true }); }
+catch(e){ canvas.remove(); throw e; }
+renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(28, 3/4, 0.5, 300);
+camera.position.set(12, 11, 44);
+camera.lookAt(0, 9.2, 0);
+
+// warm patio key light + cool dusk rim
+scene.add(new THREE.HemisphereLight(0xfff1dc, 0x3b1f5e, 0.6));
+const key = new THREE.DirectionalLight(0xffe2b0, 2.4);
+key.position.set(-8, 28, 14); key.target.position.set(0, 6, 0);
+key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+Object.assign(key.shadow.camera, { left:-15, right:15, top:20, bottom:-10, near:2, far:70 });
+key.shadow.radius = 9; key.shadow.blurSamples = 12; key.shadow.bias = -0.0006; key.shadow.normalBias = 0.06;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight(0x9fd8ff, 1.6); rim.position.set(12, 12, -16); scene.add(rim);
+const fire = new THREE.PointLight(0xff9a4a, 40, 40); fire.position.set(10, 3, 8); scene.add(fire);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity:0.35 }));
+ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+
+const M = {
+  shell: new THREE.MeshPhysicalMaterial({ color:0xf1f2f3, roughness:0.32, clearcoat:1, clearcoatRoughness:0.18 }),
+  ring:  new THREE.MeshPhysicalMaterial({ color:0xc9cbcd, roughness:0.38, clearcoat:0.8, clearcoatRoughness:0.25 }),
+  visor: new THREE.MeshPhysicalMaterial({ color:0x1b1c1e, roughness:0.12, metalness:0.1, clearcoat:1, clearcoatRoughness:0.05 }),
+  dark:  new THREE.MeshPhysicalMaterial({ color:0x2a2b2d, roughness:0.35, metalness:0.2, clearcoat:0.6 }),
+  stick: new THREE.MeshStandardMaterial({ color:0xe6e8ea, roughness:0.3, metalness:0.4 }),
+  cyan:  new THREE.MeshPhysicalMaterial({ color:0x0096dc, roughness:0.3, clearcoat:1, clearcoatRoughness:0.12 }),
+  eye:   new THREE.MeshStandardMaterial({ color:0x00e1ff, emissive:0x00e1ff, emissiveIntensity:1.5, toneMapped:false }),
+  logo:  new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, roughness:0.35, clearcoat:0.7 }),
+  cup:   new THREE.MeshPhysicalMaterial({ color:0xe8202a, roughness:0.25, clearcoat:1, clearcoatRoughness:0.1 }),
+  band:  new THREE.MeshPhysicalMaterial({ color:0xCDDB28, roughness:0.3, clearcoat:1 }),
+  lid:   new THREE.MeshPhysicalMaterial({ color:0xffffff, roughness:0.3, clearcoat:0.6 }),
+  straw: new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.4 }),
+  fizz:  new THREE.MeshStandardMaterial({ color:0xffffff, transparent:true, opacity:0.85 }),
+};
+
+function stadiumShape(w, h){
+  const s = new THREE.Shape(), hw = w/2, hh = h/2;
+  if (w >= h){ const r = hh;
+    s.moveTo(0, -hh); s.lineTo(hw-r, -hh); s.absarc(hw-r, 0, r, -Math.PI/2, Math.PI/2, false);
+    s.lineTo(-hw+r, hh); s.absarc(-hw+r, 0, r, Math.PI/2, Math.PI*1.5, false); s.closePath();
+  } else { const r = hw;
+    s.moveTo(hw, 0); s.lineTo(hw, hh-r); s.absarc(0, hh-r, r, 0, Math.PI, false);
+    s.lineTo(-hw, -hh+r); s.absarc(0, -hh+r, r, Math.PI, Math.PI*2, false); s.closePath(); }
+  return s;
+}
+function slab(w, h, depth, b, segs=10){
+  const g = new THREE.ExtrudeGeometry(stadiumShape(w-2*b, h-2*b),
+    { depth:Math.max(0.001, depth-2*b), bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelSegments:segs, curveSegments:64 });
+  g.center(); g.computeVertexNormals(); return g;
+}
+function mesh(geo, mat, parent, x=0, y=0, z=0){
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z);
+  m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
+const robot = new THREE.Group(); scene.add(robot);
+const BODY_ZS = 0.72;
+const bodyR = y => 1.39 + (y - 0.95) / 5.7 * 1.16;
+const prof = [];
+for (let i=0;i<=16;i++){ const a=i/16*Math.PI/2; prof.push(new THREE.Vector2(Math.max(0.001,1.39*Math.sin(a)), 0.95-0.95*Math.cos(a))); }
+for (let i=1;i<=12;i++){ const y=0.95+i/12*5.7; prof.push(new THREE.Vector2(bodyR(y), y)); }
+for (let i=1;i<=18;i++){ const a=i/18*Math.PI/2; prof.push(new THREE.Vector2(1.45+1.1*Math.cos(a), 6.65+1.15*Math.sin(a))); }
+prof.push(new THREE.Vector2(0.001, 7.8));
+mesh(new THREE.LatheGeometry(prof, 128), M.shell, robot).scale.z = BODY_ZS;
+
+// chest swirl logo, wrapped onto the body
+const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.06 103"><path d="M51.14,17.19s3.1.02,3.1,2.52c0,2.72-3.1,2.72-3.1,2.72-16.170-.37-30.34,14.89-28.63,30.97.75,16.11,17.65,29.27,32.89,26.3,13.5-2.62,26.63-13.090,27.48-28.43,1.12,15.75-11.53,31.54-28.28,33.76-18.62,2.45-36.92-13.25-37.38-32.03-1.57-18.75,15.11-36.26,33.920-35.81Z"/><path d="M77.23,53.75s-.21,2.43-2.49,2.43-2.61-2.43-2.61-2.43c.25-11.2-10.31-21.02-21.45-19.83-11.16.52-19.22,11.89-18.23,22.79.87,9.5,8.66,18.97,19.7,19.84-11.3,1.02-23.01-7.93-24.83-20.25-1.8-13.7,9.75-27.16,23.56-27.5,13.8-1.15,26.68,11.12,26.34,24.96Z"/><path d="M63.75,45.63s1.97,2.35.33,3.76c-1.63,1.42-3.42-.67-3.42-.67-4.43-4.63-12.67-4.330-16.7.65-4.3,4.72-3.22,13.83,1.19,17.97,4.02,3.77,7.03,4.52,10.29,4.77-4.14,1.170-8.94-.38-12.8-3.11-6.91-5.3-7.76-16.45-1.75-22.76,5.63-6.66,16.85-6.93,22.86-.61Z"/></svg>`;
+{
+  const LOGO_Y = 5.9, S = 0.0276;
+  new SVGLoader().parse(LOGO_SVG).paths.forEach(p => SVGLoader.createShapes(p).forEach(shape => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth:5, bevelEnabled:true, bevelThickness:1, bevelSize:0.6, bevelSegments:3, curveSegments:24 });
+    g.translate(-50, -52, 0); g.scale(S, -S, S);
+    const pos = g.attributes.position;
+    for (let i=0;i<pos.count;i+=3) for (let c=0;c<3;c++){ const a = pos.array[(i+1)*3+c]; pos.array[(i+1)*3+c] = pos.array[(i+2)*3+c]; pos.array[(i+2)*3+c] = a; }
+    for (let i=0;i<pos.count;i++){ const x = pos.getX(i), y = pos.getY(i), R = bodyR(LOGO_Y + y);
+      pos.setZ(i, pos.getZ(i) + BODY_ZS*Math.sqrt(Math.max(0, R*R - x*x)) - 0.05); }
+    g.deleteAttribute('normal'); g.deleteAttribute('uv'); g.computeVertexNormals();
+    mesh(g, M.logo, robot, 0, LOGO_Y, 0);
+  }));
+}
+
+function finShape(k){
+  const s = new THREE.Shape();
+  s.moveTo(0, 0);
+  s.bezierCurveTo(0.62*k, -0.08, 0.52*k, -0.86, 0.42*k, -1.6);
+  s.bezierCurveTo(0.22*k, -2.85, -0.28*k, -3.95, -0.82*k, -4.56);
+  s.lineTo(0, 0); return s;
+}
+function makeArm(side){
+  const pivot = new THREE.Group(); pivot.position.set(2.4*side, 7.0, -0.05); robot.add(pivot);
+  const g = new THREE.ExtrudeGeometry(finShape(side), { depth:0.75, bevelEnabled:true, bevelThickness:0.2, bevelSize:0.16, bevelSegments:8, curveSegments:48 });
+  g.translate(0, 0, -0.375); g.computeVertexNormals();
+  mesh(g, M.cyan, pivot); return pivot;
+}
+const armL = makeArm(-1), armR = makeArm(1);
+
+// soda cup held at the tip of the raised arm; counter-rotated so it stays upright
+const cup = new THREE.Group(); cup.position.set(-0.6, -4.3, 0.2); armR.add(cup);
+const cupInner = new THREE.Group(); cupInner.position.y = 1.0; cup.add(cupInner);
+mesh(new THREE.CylinderGeometry(0.78, 0.58, 2.3, 40), M.cup, cupInner, 0, 0, 0);
+mesh(new THREE.CylinderGeometry(0.73, 0.68, 0.5, 40), M.band, cupInner, 0, 0.1, 0);
+mesh(new THREE.CylinderGeometry(0.86, 0.84, 0.18, 40), M.lid, cupInner, 0, 1.2, 0);
+const straw = mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.8, 16), M.straw, cupInner, 0.2, 1.95, 0); straw.rotation.z = -0.25;
+const bubbles = [0,1,2,3].map(i => mesh(new THREE.SphereGeometry(0.12 - i*0.015, 12, 8), M.fizz, cupInner, 0, 1.4, 0));
+
+mesh(new THREE.CylinderGeometry(0.52, 0.56, 1.0, 48), M.dark, robot, 0, 7.98, 0);
+const head = new THREE.Group(); head.position.set(0, 10.43, 0); robot.add(head);
+mesh(slab(7.32, 4.5, 4.2, 0.7), M.ring, head);
+mesh(slab(6.66, 3.84, 2.4, 0.22), M.shell, head, 0, 0, 1.11);
+mesh(slab(5.04, 2.22, 0.5, 0.16), M.visor, head, 0, 0, 2.32);
+for (const s of [-1, 1]){ const e = mesh(slab(2.0, 1.62, 0.8, 0.2), M.cyan, head, 3.72*s, 0, 0); e.rotation.y = Math.PI/2; }
+mesh(new RoundedBoxGeometry(2.36, 0.62, 1.8, 6, 0.22), M.dark, head, 0, 2.38, 0);
+mesh(new THREE.SphereGeometry(0.38, 48, 24, 0, Math.PI*2, 0, Math.PI/2), M.dark, head, 0, 2.62, 0);
+mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.95, 24), M.stick, head, 0, 3.3, 0);
+mesh(new THREE.SphereGeometry(0.37, 48, 32), M.cyan, head, 0, 3.94, 0);
+
+// happy eyes for the toast
+const arcGeo = () => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
+  new THREE.Vector3(-0.36,-0.16,0), new THREE.Vector3(0,0.42,0), new THREE.Vector3(0.36,-0.16,0)), 32, 0.085, 12, false);
+const eyes = new THREE.Group(); eyes.position.set(0, 0, 2.6); head.add(eyes);
+[-1.1, 1.1].forEach(x => { const m = new THREE.Mesh(arcGeo(), M.eye); m.position.x = x; eyes.add(m); });
+
+robot.position.y = 0.85;
+
+// sized to its box
+function resize(){
+  const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(canvas); resize();
+still.hidden = true;
+const toastEl = document.getElementById('toast'); toastEl.style.animation = 'none'; toastEl.style.transition = 'opacity .25s, transform .25s';
+
+// loop: spin a full turn, pause facing front, raise the cup for "Salud!"
+const clock = new THREE.Clock();
+const CYCLE = 5.5;
+let t = 0;
+const ease = x => x<.5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2;
+function tick(){
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), 0.05); t += dt;
+  const c = (t % CYCLE) / CYCLE;
+  // spin between 30% and 60% of the cycle (matches the CSS toast timing)
+  const sp = reduceMotion ? 0 : (c < .3 ? 0 : c > .6 ? 1 : ease((c - .3) / .3));
+  robot.rotation.y = 0.4 + sp * Math.PI * 2;
+  const hop = reduceMotion ? 0 : Math.sin(Math.min(1, Math.max(0, (c - .3) / .3)) * Math.PI) * 1.2;
+  robot.position.y = 0.85 + hop + (reduceMotion ? 0 : Math.sin(t*1.6)*0.2);
+  // toast: cup thrusts up after the spin
+  const lift = reduceMotion ? 1 : (c > .62 && c < .95 ? Math.sin((c - .62) / .33 * Math.PI) : 0);
+  armR.rotation.z = 2.35 + lift * 0.3;
+  armR.rotation.x = -0.25;
+  cup.rotation.z = -armR.rotation.z + 0.12 * lift;
+  const show = reduceMotion || (c > .63 && c < .97);
+  toastEl.style.opacity = show ? 1 : 0; toastEl.style.transform = show ? 'scale(1) rotate(-4deg)' : 'scale(.6) rotate(-6deg)';
+  armL.rotation.z = -0.15 - Math.sin(t*1.6)*0.05;
+  head.rotation.z = -0.06 - lift * 0.06;
+  bubbles.forEach((b, i) => { const k = ((t*0.8 + i/4) % 1); b.position.set(Math.sin(i*2.1)*0.25, 1.4 + k*1.6, Math.cos(i*1.7)*0.2); b.material.opacity = 0.85*(1-k); });
+  renderer.render(scene, camera);
+}
+tick();
+</script>
+
+</body></html>

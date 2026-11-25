@@ -1,0 +1,1228 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sign This</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ---------- themes ---------------------------------------------------- */
+:root {
+  --lx: 0px; --ly: 0px;   /* light offset: shadows fall away from the cursor */
+  --script: "Great Vibes", "Segoe Script", "Brush Script MT", "Snell Roundhand", cursive;
+  --sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "SF Mono", monospace;
+
+  --scene: #2b1d14;
+  --ink: #1d2a44;
+  --text: #22201c;
+  --muted: #6d665b;
+  --glass: rgba(255, 252, 244, 0.80);
+  --glass-strong: rgba(255, 253, 248, 0.94);
+  --edge: rgba(255, 255, 255, 0.85);
+  --line: rgba(60, 50, 35, 0.14);
+  --shadow: 32, 20, 10;
+  --accent: #7a1f2b;         /* sealing-wax red */
+  --accent-2: #a8323f;
+  --gold: #c9a24a;
+  --ok: #2f7d4f;
+  --warn: #b7791f;
+  --bad: #b23a3a;
+  --console: #14161c;
+  --console-text: #d7dbe4;
+  --chip: rgba(29, 42, 68, 0.08);
+}
+body[data-bg="black"] { --rim:rgba(255,255,255,.16); --scene:#050505; --text:#f1f1f1; --muted:#9a9a9a; --ink:#e9e9e9;
+  --glass:rgba(12,12,13,.92); --glass-strong:rgba(40,40,44,.97); --edge:rgba(255,255,255,.10);
+  --line:rgba(255,255,255,.10); --shadow:0,0,0; --chip:rgba(255,255,255,.08); --console:#000; }
+body[data-bg="white"] { --scene:#f4f4f2; --text:#1b1b1b; --muted:#6b6b6b; --ink:#1b1b1b;
+  --glass:rgba(255,255,255,.88); --glass-strong:#fff; --edge:#fff; --line:rgba(0,0,0,.09);
+  --shadow:40,40,50; --chip:rgba(0,0,0,.06); }
+body[data-bg="graphite"] { --rim:rgba(255,255,255,.16); --scene:#2c3036; --text:#eef0f3; --muted:#a3a9b3; --ink:#eef0f3;
+  --glass:rgba(38,42,48,.88); --glass-strong:rgba(68,74,84,.97); --edge:rgba(255,255,255,.12);
+  --line:rgba(255,255,255,.10); --shadow:0,0,0; --chip:rgba(255,255,255,.08); }
+body[data-bg="navy"] { --rim:rgba(255,255,255,.16); --scene:#0f1c3a; --text:#eef2fb; --muted:#9fb0d3; --ink:#eef2fb;
+  --glass:rgba(14,26,56,.88); --glass-strong:rgba(36,58,104,.97); --edge:rgba(255,255,255,.12);
+  --line:rgba(255,255,255,.10); --shadow:0,4,20; --chip:rgba(255,255,255,.08); }
+body[data-bg="forest"] { --rim:rgba(255,255,255,.16); --scene:#173126; --text:#eef6f0; --muted:#a3c4b0; --ink:#eef6f0;
+  --glass:rgba(18,40,31,.88); --glass-strong:rgba(40,82,63,.97); --edge:rgba(255,255,255,.12);
+  --line:rgba(255,255,255,.10); --shadow:0,10,5; --chip:rgba(255,255,255,.08); }
+body[data-bg="burgundy"] { --rim:rgba(255,255,255,.16); --scene:#3a1219; --text:#fbf0f1; --muted:#d6a7ae; --ink:#fbf0f1;
+  --glass:rgba(48,14,21,.88); --glass-strong:rgba(98,36,48,.97); --edge:rgba(255,255,255,.12);
+  --line:rgba(255,255,255,.10); --shadow:15,0,3; --chip:rgba(255,255,255,.08); --accent:#c9a24a; --accent-2:#e0bd67; }
+body[data-bg="slate"] { --scene:#dfe4ea; --text:#1d2430; --muted:#5f6b7b; --ink:#1d2430;
+  --glass:rgba(255,255,255,.80); --glass-strong:#fff; --edge:#fff; --line:rgba(0,0,0,.08);
+  --shadow:30,45,70; --chip:rgba(0,0,0,.06); }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: var(--sans); color: var(--text); background: var(--scene);
+  overflow: hidden; transition: background .5s ease, color .3s ease;
+}
+button, input, select { font: inherit; color: inherit; }
+
+/* ---------- background scene: desk, ruled paper, fountain pen -------- */
+.scene { position: fixed; inset: 0; perspective: 1800px; overflow: hidden; pointer-events: none; }
+.desk {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,214,160,.18), transparent 55%),
+    radial-gradient(ellipse at 80% 90%, rgba(0,0,0,.45), transparent 60%),
+    repeating-linear-gradient(92deg, rgba(0,0,0,.05) 0 3px, transparent 3px 11px),
+    linear-gradient(160deg, #5a3a24, #3b2416 60%, #24160d);
+  transition: opacity .5s;
+}
+.paper-wrap {
+  position: absolute; left: 50%; top: 50%; width: 1150px; height: 1450px;
+  transform: translate(-50%, -46%) rotateX(24deg) rotateZ(-7deg) translateZ(-120px);
+  transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(.2,.8,.2,1), opacity .5s;
+}
+.paper {
+  position: absolute; inset: 0; border-radius: 3px;
+  background:
+    radial-gradient(circle at 46px 220px, rgba(60,40,20,.35) 0 13px, transparent 14px),
+    radial-gradient(circle at 46px 720px, rgba(60,40,20,.35) 0 13px, transparent 14px),
+    radial-gradient(circle at 46px 1220px, rgba(60,40,20,.35) 0 13px, transparent 14px),
+    linear-gradient(90deg, transparent 128px, #e46a6a 128px, #e46a6a 130px, transparent 130px,
+                    transparent 135px, rgba(228,106,106,.5) 135px, rgba(228,106,106,.5) 136px, transparent 136px),
+    repeating-linear-gradient(180deg, transparent 0 34px, #9cc3e6 34px 35.5px) 0 140px / 100% calc(100% - 140px) no-repeat,
+    linear-gradient(180deg, #fffdf6, #fbf6e8 60%, #f4ecd8);
+  box-shadow:
+    0 2px 0 #e9e1cc, 0 4px 0 #e2d9c2, 0 6px 0 #dad0b8,           /* stacked sheets */
+    0 60px 80px -20px rgba(0,0,0,.65), 0 25px 40px rgba(0,0,0,.35);
+}
+.paper::after { /* faint fibre texture */
+  content: ""; position: absolute; inset: 0; opacity: .35; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.signature {
+  position: absolute; left: 2vw; bottom: 1vh; width: min(420px, 34vw); transform: rotate(-5deg) skewX(-6deg);
+  transition: opacity .5s;
+}
+.signature text {
+  font-family: var(--script); font-size: 128px; fill: none; stroke: #1d2a5a; stroke-width: 2.4;
+  stroke-dasharray: 2600; stroke-dashoffset: 2600; animation: write 3.2s .6s ease forwards;
+}
+.signature .fill { fill: #1d2a5a; stroke: none; opacity: 0; animation: inkfill 1.2s 3.1s ease forwards; }
+@keyframes write { to { stroke-dashoffset: 0; } }
+@keyframes inkfill { to { opacity: .92; } }
+.pen {
+  position: absolute; left: 50%; top: 50%; width: max(1500px, 125vw); margin-left: calc(max(1500px, 125vw) / -2);
+  transform: translateY(-50%) rotate(-26deg);
+  filter: drop-shadow(calc(-24px + var(--lx) * 1.5) calc(34px + var(--ly) * 1.5) 16px rgba(0,0,0,.5)) drop-shadow(-4px 8px 3px rgba(0,0,0,.4));
+  transition: transform 1.2s cubic-bezier(.2,.8,.2,1), opacity .5s;
+}
+body:not([data-bg="pen"]) .desk,
+body:not([data-bg="pen"]) .paper-wrap,
+body:not([data-bg="pen"]) .pen,
+body:not([data-bg="pen"]) .signature { opacity: 0; }
+/* Pen & paper: no panel - the controls float as cards directly on the ruled paper. */
+body[data-bg="pen"] { --glass-strong: rgba(255, 253, 247, 0.96); --glass: rgba(255, 252, 244, 0.94); }
+body[data-bg="pen"] .card { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+body[data-bg="pen"] .window { background: transparent; border-color: transparent; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none; }
+body[data-bg="pen"] header { border-bottom-color: transparent; }
+body[data-bg="pen"] .brand small { color: #5b5346; }
+body[data-bg="pen"] nav { background: rgba(255, 253, 247, 0.9); box-shadow: inset 0 2px 4px rgba(var(--shadow),.12), 0 1px 1px rgba(var(--shadow),.2), calc(var(--lx) * .6) calc(10px + var(--ly) * .6) 20px -6px rgba(var(--shadow),.4); }
+body[data-bg="pen"] .lede, body[data-bg="pen"] .summary { background: rgba(255,253,247,.82); padding: 8px 12px; border-radius: 10px; width: fit-content; }
+body[data-bg="pen"] .pathrow input { background: rgba(255,253,247,.9); }
+body:not([data-bg="pen"]) .scene { background:
+  radial-gradient(ellipse at 20% 0%, rgba(255,255,255,.07), transparent 60%),
+  radial-gradient(ellipse at 100% 100%, rgba(0,0,0,.18), transparent 60%); }
+
+/* ---------- app window ----------------------------------------------- */
+.stage { position: relative; height: 100%; display: grid; place-items: center; padding: 28px; perspective: 2200px; }
+.window {
+  width: min(1080px, 100%); height: min(740px, 100%);
+  display: grid; grid-template-rows: auto 1fr;
+  background: var(--glass); border-radius: 26px;
+  border: 1px solid var(--edge);
+  backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.08),
+    0 1px 0 rgba(var(--shadow),.10), 0 3px 0 rgba(var(--shadow),.08), 0 6px 0 rgba(var(--shadow),.06),
+    0 30px 60px -10px rgba(var(--shadow),.45), 0 70px 120px -30px rgba(var(--shadow),.55);
+  transform-style: preserve-3d; transform: rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition: transform .25s ease-out, background .4s;
+  animation: rise .9s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(40px) rotateX(14deg) scale(.96); } }
+
+header {
+  display: flex; align-items: center; gap: 18px; padding: 18px 26px 14px;
+  border-bottom: 1px solid var(--line); transform: translateZ(30px);
+}
+.seal {
+  width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: radial-gradient(circle at 35% 30%, var(--accent-2), var(--accent) 60%, #4a0f18);
+  box-shadow: inset 0 3px 6px rgba(255,255,255,.35), inset 0 -4px 8px rgba(0,0,0,.4),
+              0 2px 2px rgba(var(--shadow),.35), calc(var(--lx) * .5) calc(10px + var(--ly) * .5) 16px rgba(var(--shadow),.45);
+}
+.seal svg { width: 30px; height: 30px; }
+.brand h1 { margin: 0; font-family: var(--script); font-weight: 400; font-size: 46px; line-height: .9; color: var(--ink);
+  text-shadow: 0 1px 0 rgba(var(--shadow),.15), calc(var(--lx) * .2) calc(4px + var(--ly) * .2) 8px rgba(var(--shadow),.25); }
+.brand small { display: block; color: var(--muted); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin-top: 2px; }
+nav { margin-left: auto; display: flex; gap: 6px; padding: 5px; border-radius: 14px; background: var(--chip);
+  box-shadow: inset 0 2px 4px rgba(var(--shadow),.15); }
+nav button {
+  border: 0; background: transparent; padding: 9px 16px; border-radius: 10px; cursor: pointer; font-weight: 600;
+  font-size: 13.5px; color: var(--muted); transition: all .2s;
+}
+nav button[aria-selected="true"] { background: var(--glass-strong); color: var(--text);
+  box-shadow: 0 1px 0 var(--edge) inset, 0 4px 10px rgba(var(--shadow),.20), 0 1px 2px rgba(var(--shadow),.2); }
+
+main { position: relative; overflow: hidden; transform-style: preserve-3d; }
+.screen { position: absolute; inset: 0; padding: 22px 26px 24px; overflow: auto;
+  opacity: 0; pointer-events: none; transform: translateZ(-60px) rotateY(8deg); transition: opacity .35s, transform .45s cubic-bezier(.2,.8,.2,1); }
+.screen.active { opacity: 1; pointer-events: auto; transform: translateZ(0) rotateY(0); }
+
+/* raised 3D card */
+.card {
+  background: var(--glass-strong); border-radius: 18px; border: 1px solid var(--edge);
+  box-shadow:
+    inset 0 1px 0 var(--rim, rgba(255,255,255,.6)), inset 0 -1px 0 rgba(var(--shadow),.06),
+    0 1px 1px rgba(var(--shadow),.18),                                                   /* contact */
+    calc(var(--lx) * .25) calc(3px + var(--ly) * .25) 6px rgba(var(--shadow),.14),       /* near */
+    calc(var(--lx) * .8) calc(16px + var(--ly) * .8) 28px -6px rgba(var(--shadow),.30), /* ambient */
+    calc(var(--lx) * 1.6) calc(34px + var(--ly) * 1.6) 54px -16px rgba(var(--shadow),.40); /* cast */
+  transform-style: preserve-3d;
+}
+.tilt { transition: transform .2s ease-out, box-shadow .25s ease-out; will-change: transform; }
+.tilt.lifted { box-shadow:
+    inset 0 1px 0 var(--rim, rgba(255,255,255,.65)),
+    0 2px 2px rgba(var(--shadow),.14),
+    calc(var(--lx) * .5 + var(--tx, 0px)) calc(8px + var(--ly) * .5 + var(--ty, 0px)) 12px rgba(var(--shadow),.16),
+    calc(var(--lx) * 1.2 + var(--tx, 0px) * 2) calc(28px + var(--ly) * 1.2 + var(--ty, 0px) * 2) 40px -8px rgba(var(--shadow),.34),
+    calc(var(--lx) * 2.4 + var(--tx, 0px) * 3) calc(56px + var(--ly) * 2.4 + var(--ty, 0px) * 3) 80px -20px rgba(var(--shadow),.45); }
+
+/* sign screen */
+.sign-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 22px; height: 100%; min-height: 520px; }
+.col { display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.drop {
+  position: relative; padding: 30px 22px 24px; text-align: center; cursor: pointer;
+  border: 2px dashed rgba(29,42,90,.35); background:
+    linear-gradient(var(--glass-strong), var(--glass-strong)) padding-box;
+  box-shadow: inset 0 6px 18px rgba(var(--shadow),.14), inset 0 -2px 0 rgba(255,255,255,.4);
+}
+body:not([data-bg="pen"]):not([data-bg="white"]):not([data-bg="slate"]) .drop { border-color: rgba(255,255,255,.25); }
+.drop.over { border-color: var(--accent); transform: translateZ(18px) scale(1.01); }
+.drop .icon { width: 64px; height: 64px; margin: 0 auto 10px; display: block;
+  filter: drop-shadow(0 8px 10px rgba(var(--shadow),.3)); transition: transform .3s; }
+.drop:hover .icon { transform: translateY(-4px) rotate(-6deg); }
+.drop h2 { margin: 0 0 4px; font-size: 19px; }
+.drop p { margin: 0; color: var(--muted); font-size: 13px; }
+.pathrow { display: flex; gap: 8px; margin-top: 16px; }
+.pathrow input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 11px; border: 1px solid var(--line);
+  background: var(--chip); box-shadow: inset 0 2px 4px rgba(var(--shadow),.12); font-size: 13px; }
+.btn { border: 1px solid var(--line); background: var(--glass-strong); padding: 10px 14px; border-radius: 11px; cursor: pointer; font-weight: 600; font-size: 13px;
+  box-shadow: 0 1px 0 var(--edge) inset, 0 3px 0 rgba(var(--shadow),.14), 0 6px 12px rgba(var(--shadow),.12); transition: transform .1s, box-shadow .1s; }
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(var(--shadow),.14); }
+
+.queue { flex: 1; min-height: 150px; padding: 10px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.queue .empty { margin: auto; text-align: center; color: var(--muted); font-size: 13px; padding: 20px; }
+.qitem { display: grid; grid-template-columns: 36px 1fr auto auto; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 13px; background: var(--glass); border: 1px solid var(--line);
+  box-shadow: 0 1px 1px rgba(var(--shadow),.14), calc(var(--lx) * .3) calc(6px + var(--ly) * .3) 12px -4px rgba(var(--shadow),.30);
+  animation: drop-in .45s cubic-bezier(.2,.9,.3,1.3) both; }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-14px) rotateX(40deg); } }
+.ftype { width: 36px; height: 40px; border-radius: 6px 12px 6px 6px; display: grid; place-items: center; font-size: 9.5px; font-weight: 700; color: #fff;
+  background: linear-gradient(160deg, #3d5a99, #233866); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 3px 6px rgba(0,0,0,.25); letter-spacing: .03em; }
+.ftype.win { background: linear-gradient(160deg, #2f7fd6, #1c4f94); }
+.ftype.mac { background: linear-gradient(160deg, #6a6f7a, #2e3138); }
+.ftype.other { background: linear-gradient(160deg, #3b8a64, #205a3f); }
+.qname { min-width: 0; }
+.qname b { display: block; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qname span { display: block; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.qitem select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--chip); max-width: 170px; }
+.status { font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 99px; white-space: nowrap; background: var(--chip); color: var(--muted); }
+.status.ok { background: rgba(47,125,79,.15); color: var(--ok); }
+.status.bad { background: rgba(178,58,58,.15); color: var(--bad); }
+.status.run { background: rgba(183,121,31,.15); color: var(--warn); }
+.status.run::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: currentColor; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: .2; } }
+.x { border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 18px; line-height: 1; padding: 2px 4px; }
+
+.action { display: flex; align-items: center; gap: 22px; padding: 18px 22px; }
+.toggles { display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+.toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.toggle input { display: none; }
+.toggle i { width: 40px; height: 23px; border-radius: 99px; background: var(--chip); position: relative; box-shadow: inset 0 2px 5px rgba(var(--shadow),.3); transition: background .2s; flex: none; }
+.toggle i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.35); transition: transform .2s; }
+.toggle input:checked + i { background: var(--ok); }
+.toggle input:checked + i::after { transform: translateX(17px); }
+
+.signbtn {
+  margin-left: auto; position: relative; width: 150px; height: 150px; border-radius: 50%; border: 0; cursor: pointer; flex: none;
+  color: #fff6e6; font-family: var(--script); font-size: 38px; line-height: 1;
+  background: radial-gradient(circle at 34% 28%, var(--accent-2), var(--accent) 55%, #3e0c14 100%);
+  box-shadow:
+    inset 0 4px 10px rgba(255,255,255,.35), inset 0 -10px 18px rgba(0,0,0,.45),
+    0 0 0 6px rgba(var(--shadow),.06), 0 10px 0 #4a0f18,
+    calc(var(--lx) * .5) calc(14px + var(--ly) * .5) 10px rgba(var(--shadow),.45),
+    calc(var(--lx) * 1.4) calc(30px + var(--ly) * 1.4) 40px rgba(var(--shadow),.5);
+  transform: translateZ(40px); transition: transform .12s, box-shadow .12s, filter .2s;
+  text-shadow: 0 2px 2px rgba(0,0,0,.45);
+}
+.signbtn::before { /* embossed ring like a wax seal */
+  content: ""; position: absolute; inset: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,230,200,.35); box-shadow: inset 0 2px 4px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.2);
+}
+.signbtn:hover { filter: brightness(1.08); }
+.signbtn:active { transform: translateZ(40px) translateY(8px); box-shadow: inset 0 4px 10px rgba(255,255,255,.3), inset 0 -6px 14px rgba(0,0,0,.45), 0 2px 0 #4a0f18, calc(var(--lx) * .2) calc(4px + var(--ly) * .2) 6px rgba(var(--shadow),.55); }
+.signbtn:disabled { filter: grayscale(.7) brightness(.85); cursor: not-allowed; }
+.signbtn span { position: relative; display: block; padding-top: 4px; }
+
+.console { flex: 1; min-height: 170px; background: var(--console); color: var(--console-text); border-radius: 16px; padding: 14px 16px; overflow: auto;
+  font-family: var(--mono); font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-all;
+  box-shadow: inset 0 3px 12px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.4),
+    calc(var(--lx) * .8) calc(14px + var(--ly) * .8) 26px -6px rgba(var(--shadow),.45),
+    calc(var(--lx) * 1.6) calc(34px + var(--ly) * 1.6) 54px -16px rgba(var(--shadow),.45); }
+.console .h { color: #f3c969; font-weight: 500; }
+.console .ok { color: #79d29b; }
+.console .bad { color: #ff8a80; }
+.console .cmd { color: #8fb4ff; }
+.console .dim { color: #8a90a0; }
+.progress { height: 8px; border-radius: 99px; background: var(--chip); overflow: hidden; box-shadow: inset 0 1px 3px rgba(var(--shadow),.3); }
+.progress div { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--accent-2)); transition: width .4s; }
+.summary { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
+.summary a { color: var(--text); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+/* certificates screen */
+.lede { color: var(--muted); font-size: 13.5px; margin: 0 0 18px; max-width: 760px; }
+.lede code { font-family: var(--mono); font-size: 12px; background: var(--chip); padding: 1px 6px; border-radius: 6px; }
+.certs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; padding-bottom: 10px; }
+.cert { padding: 18px 18px 16px; position: relative; overflow: hidden; }
+.cert::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--muted); opacity: .5; }
+.cert.ready::before { background: var(--ok); opacity: 1; }
+.cert.missing-tools::before, .cert.not-configured::before { background: var(--warn); opacity: 1; }
+.cert h3 { margin: 0; font-size: 16px; transform: translateZ(20px); }
+.cert .prov { color: var(--muted); font-size: 12px; margin: 3px 0 12px; }
+.light { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+.light::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); box-shadow: 0 0 0 3px rgba(0,0,0,.06); }
+.ready .light::before { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+.missing-tools .light::before, .not-configured .light::before { background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+.cert ul { margin: 10px 0 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
+.pats { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.pats span { font-family: var(--mono); font-size: 10.5px; padding: 2px 7px; border-radius: 6px; background: var(--chip); }
+
+.cert-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cert-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.cert-actions .spacer { flex: 1; }
+.btn.sm { padding: 6px 11px; font-size: 12px; border-radius: 9px; }
+.btn.ghost { background: transparent; box-shadow: none; }
+.btn.primary { background: linear-gradient(180deg, var(--accent-2), var(--accent)); color: #fff6e6; border-color: rgba(0,0,0,.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 3px 0 #4a0f18, calc(var(--lx) * .4) calc(8px + var(--ly) * .4) 14px rgba(var(--shadow),.35); }
+.icon-btn { width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--line); background: var(--chip); cursor: pointer; font-size: 14px; line-height: 1; }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.icon-btn.danger:hover { color: var(--bad); border-color: var(--bad); }
+.toggle.small { font-size: 12px; color: var(--muted); }
+.add-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 190px; cursor: pointer;
+  border: 2px dashed rgba(122,31,43,.35); text-align: center; color: var(--text); font: inherit; }
+.add-card span { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; color: #fff6e6;
+  background: radial-gradient(circle at 34% 28%, var(--accent-2), var(--accent) 60%, #3e0c14);
+  box-shadow: inset 0 3px 6px rgba(255,255,255,.35), inset 0 -4px 8px rgba(0,0,0,.4), 0 4px 0 #4a0f18, calc(var(--lx) * .5) calc(12px + var(--ly) * .5) 18px rgba(var(--shadow),.45); }
+.add-card b { font-size: 15px; } .add-card small { color: var(--muted); font-size: 12px; }
+
+/* modal */
+.modal-back { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
+  background: rgba(10, 6, 4, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); perspective: 1600px; }
+.modal-back[hidden] { display: none; }
+.modal { width: min(640px, 100%); max-height: min(88vh, 860px); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden;
+  background: var(--glass-strong); animation: sheet .45s cubic-bezier(.2,.9,.3,1.15) both;
+  box-shadow: inset 0 1px 0 var(--rim, rgba(255,255,255,.7)), 0 2px 2px rgba(0,0,0,.2),
+              calc(var(--lx) * 1.2) calc(30px + var(--ly) * 1.2) 60px rgba(0,0,0,.45), calc(var(--lx) * 2.4) calc(70px + var(--ly) * 2.4) 120px -20px rgba(0,0,0,.5); }
+@keyframes sheet { from { opacity: 0; transform: translateY(40px) rotateX(18deg) scale(.95); } }
+.modal-head { display: flex; align-items: center; gap: 12px; padding: 18px 22px 12px; border-bottom: 1px solid var(--line); }
+.modal-head h2 { margin: 0; font-size: 19px; flex: 1; }
+.modal-body { overflow: auto; padding: 16px 22px 8px; }
+.modal-foot { display: flex; align-items: center; gap: 10px; padding: 14px 22px 18px; border-top: 1px solid var(--line); }
+.modal-foot .note { flex: 1; font-size: 11.5px; color: var(--muted); }
+.types h4 { margin: 14px 0 8px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.types h4:first-child { margin-top: 0; }
+.type-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.type { text-align: left; padding: 13px 14px; cursor: pointer; font: inherit; color: inherit; border-radius: 14px; }
+.type b { display: block; font-size: 14px; margin-bottom: 3px; } .type small { color: var(--muted); font-size: 12px; line-height: 1.4; display: block; }
+.connect-grid, .found { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.found { margin-bottom: 14px; }
+.type.connect { display: flex; gap: 12px; align-items: flex-start; }
+.plug { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; color: #fff6e6;
+  background: radial-gradient(circle at 34% 28%, var(--accent-2), var(--accent) 60%, #3e0c14); box-shadow: inset 0 2px 4px rgba(255,255,255,.35), 0 3px 0 #4a0f18; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: -4px 0 16px; font-size: 12.5px; }
+.links span { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+.links a, .cert ul a { color: var(--accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid currentColor; }
+.connecting { display: flex; gap: 14px; align-items: center; padding: 28px 6px; }
+.connecting small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.spinner { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--chip); border-top-color: var(--accent); animation: spin .9s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.field { margin-bottom: 14px; }
+.field[hidden] { display: none; }
+.field > label:not(.toggle) { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+.field .req { color: var(--accent); }
+.field input:not([type=checkbox]), .field select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--chip); box-shadow: inset 0 2px 4px rgba(var(--shadow),.10); font-size: 13.5px; }
+.field .help { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+.filerow { display: flex; gap: 8px; } .filerow input { flex: 1; min-width: 0; }
+details.more { margin: 6px 0 10px; border-top: 1px dashed var(--line); padding-top: 10px; }
+details.more summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.result { padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; }
+.result.ok { background: rgba(47,125,79,.13); color: var(--ok); } .result.warn { background: rgba(183,121,31,.14); color: var(--warn); }
+.result ul { margin: 6px 0 0; padding-left: 18px; }
+.general .field { margin-bottom: 10px; }
+
+/* help screen */
+.help-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; padding-bottom: 10px; }
+.help-card { padding: 18px 20px 16px; position: relative; font-size: 13.5px; line-height: 1.55; }
+.help-card.wide { grid-column: 1 / -1; }
+.help-card h3 { margin: 0 0 8px 44px; font-size: 16px; line-height: 32px; }
+.help-card ol, .help-card ul { margin: 0; padding-left: 20px; } .help-card li { margin-bottom: 5px; }
+.help-card p { margin: 0; } .help-card .tip { margin-top: 10px; font-size: 12.5px; color: var(--muted); }
+.step { position: absolute; left: 18px; top: 18px; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff6e6; font-weight: 700; font-size: 14px; background: radial-gradient(circle at 34% 28%, var(--accent-2), var(--accent) 60%, #3e0c14);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,.35), 0 3px 0 #4a0f18, calc(var(--lx) * .4) calc(8px + var(--ly) * .4) 12px rgba(var(--shadow),.4); }
+
+/* guide screen */
+.guide { padding: 26px 30px 30px; font-size: 14px; line-height: 1.6; max-width: 900px; margin: 0 auto; }
+.guide-title { font-family: var(--script); font-weight: 400; font-size: 44px; line-height: 1; color: var(--ink); margin: 0 0 10px; }
+.guide h2 { font-size: 18px; color: var(--ink); margin: 30px 0 8px; display: flex; align-items: center; gap: 10px; }
+.guide h2 .n { width: 28px; height: 28px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; color: #fff6e6;
+  background: radial-gradient(circle at 34% 28%, var(--accent-2), var(--accent) 60%, #3e0c14);
+  box-shadow: 0 3px 0 #4a0f18, calc(var(--lx) * .4) calc(8px + var(--ly) * .4) 12px rgba(var(--shadow),.35); }
+.guide h3 { font-size: 14.5px; margin: 16px 0 4px; color: var(--ink); }
+.guide p, .guide li { max-width: 72ch; } .guide ol, .guide ul { padding-left: 22px; } .guide li { margin-bottom: 4px; }
+.guide a { color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
+.guide code, .guide pre { font-family: var(--mono); font-size: 12px; background: var(--chip); border-radius: 5px; }
+.guide code { padding: 1px 6px; overflow-wrap: anywhere; } .guide pre { padding: 10px 12px; overflow-x: auto; }
+.guide .files { display: grid; gap: 8px; margin-top: 8px; }
+.guide .file { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; padding: 10px 14px;
+  background: var(--glass); border: 1px solid var(--line); border-radius: 11px; }
+.guide .file b { font-family: var(--mono); font-size: 12.5px; font-weight: 500; overflow-wrap: anywhere; }
+.guide .file .tag { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.guide .file small { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; }
+.guide .status-ok { color: var(--ok); } .guide .status-wait { color: var(--warn); }
+.guide .table-wrap { overflow-x: auto; margin: 6px 0; }
+.guide table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.guide th, .guide td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.guide th { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.guide td:first-child { font-weight: 600; color: var(--ink); }
+body:not(.demo) .demo-only { display: none; }
+
+/* appearance screen */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
+.swatch { cursor: pointer; padding: 10px; border: 2px solid transparent; text-align: left; }
+.swatch[aria-pressed="true"] { border-color: var(--accent); }
+.swatch .prev { height: 104px; border-radius: 12px; margin-bottom: 10px; position: relative; overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.25); }
+.swatch .prev::after { content: ""; position: absolute; left: 22%; right: 22%; top: 24%; bottom: 24%; border-radius: 8px;
+  background: rgba(255,255,255,.55); box-shadow: 0 8px 16px rgba(0,0,0,.35); }
+.swatch b { font-size: 13.5px; }
+.prev.prev-pen { background:
+  linear-gradient(90deg, transparent 18px, #e46a6a 18px 19px, transparent 19px),
+  repeating-linear-gradient(180deg, #fffdf6 0 12px, #9cc3e6 12px 13px); }
+.settings-row { display: flex; gap: 22px; margin-top: 26px; flex-wrap: wrap; }
+.settings-row .card { padding: 16px 18px; flex: 1; min-width: 260px; font-size: 13px; }
+.settings-row .card h3 { margin: 0 0 10px; font-size: 14px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 12.5px; }
+.kv span { color: var(--muted); }
+.kv code { font-family: var(--mono); font-size: 11.5px; word-break: break-all; }
+
+.banner { margin-bottom: 14px; padding: 12px 16px; border-radius: 12px; background: rgba(178,58,58,.12); color: var(--bad); font-size: 13px; display: none; }
+.banner.show { display: block; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 30px); opacity: 0; padding: 12px 20px; border-radius: 14px;
+  background: var(--glass-strong); border: 1px solid var(--edge); box-shadow: 0 16px 34px rgba(var(--shadow),.45); font-weight: 600; font-size: 14px;
+  transition: all .35s cubic-bezier(.2,.9,.3,1.3); z-index: 10; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .stage { padding: 12px; height: auto; min-height: 100%; place-items: start center; }
+  .window { height: auto; min-height: calc(100vh - 24px); }
+  .sign-grid { grid-template-columns: 1fr; }
+  .screen { position: relative; display: none; }
+  .screen.active { display: block; }
+  header { flex-wrap: wrap; }
+  nav { margin-left: 0; width: 100%; flex-wrap: wrap; justify-content: center; }
+  nav button { padding: 8px 12px; }
+}
+@media (max-width: 1440px), (max-height: 900px) { .signature { display: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .signature text { stroke-dashoffset: 0; } .signature .fill { opacity: .92; } }
+body.flat .window, body.flat .tilt { transform: none !important; }
+</style>
+
+
+<!-- background scene -->
+<div class="scene" aria-hidden="true">
+  <div class="desk"></div>
+  <div class="paper-wrap" id="paper">
+    <div class="paper"></div>
+  </div>
+  <svg class="signature" viewBox="0 0 560 170"><text x="10" y="128">Sign This</text><text class="fill" x="10" y="128">Sign This</text></svg>
+  <svg class="pen" id="pen" viewBox="0 0 980 140" aria-hidden="true">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff2c2"/><stop offset=".35" stop-color="#e2bb5c"/>
+        <stop offset=".7" stop-color="#9c7425"/><stop offset="1" stop-color="#e2c071"/>
+      </linearGradient>
+      <linearGradient id="lacquer" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5b1622"/><stop offset=".18" stop-color="#c25563"/>
+        <stop offset=".32" stop-color="#7a1f2b"/><stop offset=".75" stop-color="#3b0a12"/><stop offset="1" stop-color="#1f0408"/>
+      </linearGradient>
+      <linearGradient id="resin" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a1a1a"/><stop offset=".22" stop-color="#6b6b6b"/>
+        <stop offset=".38" stop-color="#151515"/><stop offset="1" stop-color="#000"/>
+      </linearGradient>
+    </defs>
+    <!-- nib -->
+    <path d="M6 70 C46 62 92 46 140 42 L140 98 C92 94 46 78 6 70Z" fill="url(#gold)" stroke="#7d5a17" stroke-width="1"/>
+    <path d="M16 70 L104 70" stroke="#3a2a08" stroke-width="1.6"/>
+    <circle cx="108" cy="70" r="4.5" fill="#3a2a08"/>
+    <path d="M118 52 q8 18 0 36" stroke="#7d5a17" stroke-width="1" fill="none" opacity=".7"/>
+    <path d="M126 50 q8 20 0 40" stroke="#7d5a17" stroke-width="1" fill="none" opacity=".6"/>
+    <!-- grip section -->
+    <rect x="138" y="44" width="96" height="52" rx="10" fill="url(#resin)"/>
+    <rect x="232" y="40" width="14" height="60" rx="3" fill="url(#gold)"/>
+    <!-- barrel -->
+    <rect x="244" y="32" width="560" height="76" rx="34" fill="url(#lacquer)"/>
+    <rect x="270" y="40" width="500" height="8" rx="4" fill="#fff" opacity=".28"/>
+    <rect x="610" y="30" width="22" height="80" rx="4" fill="url(#gold)"/>
+    <rect x="642" y="30" width="6" height="80" rx="2" fill="url(#gold)"/>
+    <!-- end cap + clip -->
+    <path d="M800 32 h80 a46 38 0 0 1 0 76 h-80Z" fill="url(#lacquer)"/>
+    <rect x="796" y="30" width="10" height="80" rx="3" fill="url(#gold)"/>
+    <path d="M660 14 H880 a10 10 0 0 1 10 10 V36 H870 V28 H672 a12 12 0 0 1 -12 -12Z" fill="url(#gold)" stroke="#7d5a17" stroke-width="1"/>
+    <circle cx="668" cy="24" r="11" fill="url(#gold)" stroke="#7d5a17" stroke-width="1"/>
+  </svg>
+</div>
+
+<div class="stage">
+  <div class="window" id="win">
+    <header>
+      <div class="seal" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M16 3 L24 15 L16 29 L8 15Z" fill="#f7e6c4" opacity=".95"/><path d="M16 9 V22" stroke="#7a1f2b" stroke-width="1.8"/><circle cx="16" cy="23.5" r="2" fill="#7a1f2b"/></svg>
+      </div>
+      <div class="brand"><h1>Sign This</h1><small>Code signing, one click</small></div>
+      <nav role="tablist">
+        <button role="tab" aria-selected="true" data-screen="sign">Sign</button>
+        <button role="tab" aria-selected="false" data-screen="certs">Certificates</button>
+        <button role="tab" aria-selected="false" data-screen="look">Appearance</button>
+        <button role="tab" aria-selected="false" data-screen="help">Help</button>
+        <button role="tab" aria-selected="false" data-screen="guide">Guide</button>
+      </nav>
+    </header>
+    <main>
+      <!-- SIGN -->
+      <section class="screen active" id="screen-sign">
+        <div class="banner" id="banner"></div>
+        <div class="sign-grid">
+          <div class="col">
+            <label class="card drop tilt" id="drop">
+              <svg class="icon" viewBox="0 0 64 64"><path d="M14 6h26l12 12v38a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z" fill="#fffdf6" stroke="#b9ab8e"/><path d="M40 6v12h12" fill="#efe6d0" stroke="#b9ab8e"/><g stroke="#9cc3e6"><path d="M16 28h30M16 34h30M16 40h30M16 46h30"/></g><path d="M20 22 V54" stroke="#e46a6a"/><path d="M22 50 c6-8 9 4 14-3 s5 4 9 0" stroke="#1d2a5a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+              <h2>Drop files here</h2>
+              <p>or click to choose · .exe .dll .msi .msix .ps1 · .app .dmg .pkg · archives</p>
+              <input type="file" id="picker" multiple hidden>
+            </label>
+            <div class="pathrow">
+              <input id="pathbox" placeholder="…or paste a file or folder path to sign it in place" aria-label="File or folder path">
+              <button class="btn" id="addpath">Add</button>
+            </div>
+            <div class="card queue" id="queue"><div class="empty">Nothing queued yet.<br>Files you add will be matched to the right certificate automatically.</div></div>
+          </div>
+          <div class="col">
+            <div class="card action tilt">
+              <div class="toggles">
+                <label class="toggle"><input type="checkbox" id="verify" checked><i></i>Verify after signing</label>
+                <label class="toggle"><input type="checkbox" id="dry"><i></i>Practice run (don't sign)</label>
+                <label class="toggle"><input type="checkbox" id="clear" checked><i></i>Clear list when done</label>
+              </div>
+              <button class="signbtn" id="signbtn" disabled><span>Sign<br>This</span></button>
+            </div>
+            <div class="progress"><div id="bar"></div></div>
+            <div class="console" id="console" aria-live="polite"><span class="h">Ready.</span>
+Drop files on the left, then press the seal.</div>
+            <div class="summary"><span id="summary">&nbsp;</span><a id="openout">Open signed folder</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CERTIFICATES -->
+      <section class="screen" id="screen-certs">
+        <p class="lede">Add each signing account here. When you sign a file, Sign This uses the <b>first switched-on certificate</b> that handles that
+          file type. Use ↑ ↓ to change the order. Passwords are kept in this computer's secure store, never in the settings file.</p>
+        <div class="certs" id="certs"></div>
+      </section>
+
+      <!-- HELP -->
+      <section class="screen" id="screen-help">
+        <div class="help-grid">
+          <div class="card help-card tilt"><span class="step">1</span><h3>Sign files</h3><ol>
+            <li>On <b>Sign</b>, drag files onto <i>Drop files here</i>, click it to pick files, or paste a file/folder path and click <b>Add</b>.</li>
+            <li>Each file is matched to a certificate automatically. Use the drop-down to pick another.</li>
+            <li>Press the red <b>Sign This</b> seal. Green <b>Signed ✓</b> means done.</li></ol>
+            <p class="tip">Dragged or picked files are copied to <i>Signed by Sign This</i> in your home folder. Files added by path, <i>Send to</i>, or the desktop icon are signed in place.</p></div>
+          <div class="card help-card tilt"><span class="step">2</span><h3>Add your accounts</h3><ol>
+            <li>Go to <b>Certificates</b> → <b>Add certificate</b>.</li>
+            <li>Easiest: under <b>Connect an account automatically</b>, pick Azure, Apple, USB token or GPG. Sign in or scan, then pick what it finds and the form fills itself in.</li>
+            <li>Or set one up by hand. Every form has <b>Setup links</b> to sign-up pages and tools. Use <b>Upload…</b> for .pfx / .p12 / .p8 files.</li>
+            <li>Save. A green <b>Ready to sign</b> light means it works; otherwise the card says what's missing.</li></ol>
+            <p class="tip">Passwords go into this computer's secure storage. When editing, leave a password blank to keep it.</p></div>
+          <div class="card help-card tilt"><span class="step">3</span><h3>Which certificate is used?</h3>
+            <p>The <b>highest switched-on card</b> that handles the file type. New certificates are added at the top, so when your Azure account is added it takes over from self-signed automatically. Use <b>↑ ↓</b> to change the order and the switch to turn one off.</p></div>
+          <div class="card help-card tilt"><span class="step">4</span><h3>Azure</h3>
+            <p>In the Azure portal create a Trusted Signing account and certificate profile, and give yourself the <i>Certificate Profile Signer</i> role. Then <b>Add certificate → Connect: Azure Trusted Signing</b> signs you in and lists your profiles.</p></div>
+          <div class="card help-card tilt"><span class="step">5</span><h3>Apple</h3>
+            <p>Needs an Apple Developer membership. On a Mac, <b>Connect: Apple Developer ID</b> finds your certificates in Keychain; then add notarization details. Without a Mac, choose <i>Certificate file</i> and upload your .p12 and API key.</p></div>
+          <div class="card help-card tilt"><span class="step">6</span><h3>Self-signed</h3>
+            <p>Works immediately for internal tools. To make company PCs trust it, click <b>Download .cer</b> on its card and install it in <i>Trusted Root</i> and <i>Trusted Publishers</i> (IT can push it with Intune/Group Policy). Customers' PCs will still warn.</p></div>
+          <div class="card help-card tilt wide"><span class="step">?</span><h3>Troubleshooting</h3><ul>
+            <li><b>Missing tools</b>: install the tool the card names (Azure CLI, jsign, signtool, osslsigncode…).</li>
+            <li><b>Needs settings</b>: click <b>Edit</b>; the message says which field is missing.</li>
+            <li><b>No matching profile</b>: switch a certificate on, or add the file type under <i>Edit → More options → File types</i>.</li>
+            <li><b>Timestamp errors</b>: your network is blocking the timestamp server; ask IT to allow it.</li>
+            <li><b>Practice run</b> on the Sign tab shows what would happen without changing anything.</li></ul></div>
+        </div>
+      </section>
+
+      <!-- GUIDE -->
+      <section class="screen" id="screen-guide">
+        <div class="card guide">
+          <h1 class="guide-title">Setup &amp; instructions</h1>
+
+  
+
+  <p>Sign This puts a digital signature on your files so Windows and macOS know who made them and that nobody changed them. You drop files in, press the seal, and it's done. It signs Windows programs and installers (<code>.exe .dll .msi .msix .ps1</code>), Mac apps (<code>.app .dmg .pkg</code>), and anything else with a separate signature file.</p>
+
+  <section class="demo-only"><h2><span class="n">1</span>Get the app</h2>
+  <p>The files are attached in the Claude conversation where Sign This was built. Ask the person who shared this page for them.</p>
+  <div class="files">
+    <div class="file"><b>SignThis-0.1.0.zip</b><span class="tag status-ok">Ready</span><small>The whole app: double-click launchers, instructions, README, and the scripts that build the Windows .exe and Mac app. Needs Python 3.11 or newer.</small></div>
+    <div class="file"><b>SignThis.pyz</b><span class="tag status-ok">Ready</span><small>One file that runs on Windows, Mac or Linux once Python 3.11+ is installed (python.org). Double-click it, or run <code>python SignThis.pyz</code>.</small></div>
+    <div class="file"><b>SignThis-linux-x64</b><span class="tag status-ok">Ready</span><small>Standalone Linux app. No Python needed.</small></div>
+    <div class="file"><b>SignThis.exe</b><span class="tag status-wait">Build on Windows</span><small>Standalone Windows app with the wax-seal icon. On a Windows PC with Python, unzip the ZIP and double-click <code>packaging\Build SignThis.exe.bat</code>. Or put the folder on GitHub, where the included workflow builds Windows, Mac and Linux apps automatically.</small></div>
+    <div class="file"><b>SignThis.app</b><span class="tag status-wait">Build on a Mac</span><small>Standalone Mac app. On a Mac with Python, run <code>python3 packaging/build_exe.py</code> inside the unzipped folder, or use the GitHub workflow.</small></div>
+    <div class="file"><b>Sign This - Instructions.txt</b><span class="tag status-ok">Ready</span><small>These instructions as a plain text file. Also inside the ZIP.</small></div>
+  </div>
+
+  </section>
+  <h2><span class="n">2</span>Open Sign This</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>You have</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td>Windows / Mac app</td><td>Double-click it.</td></tr>
+      <tr><td>Linux app</td><td>Right-click → Properties → allow running as a program, then double-click it.</td></tr>
+      <tr><td>SignThis.pyz</td><td>Install Python 3.11+ from python.org, then double-click it (or <code>python SignThis.pyz</code>).</td></tr>
+      <tr><td>The ZIP</td><td>Unzip it, open the SignThis folder, double-click <code>Sign This.cmd</code> (Windows) or <code>Sign This.command</code> (Mac/Linux).</td></tr>
+    </tbody>
+  </table></div>
+  <p>The first time, it creates a <b>Sign This</b> folder in your home folder for its settings and a ready-to-use self-signed certificate. To add a desktop icon and a right-click <b>Send to → Sign This</b> entry, run <code>SignThis install-shortcuts</code> once.</p>
+
+  <h2><span class="n">3</span>Sign files</h2>
+  <ol>
+    <li>On the <b>Sign</b> tab, drag files onto <i>Drop files here</i>, click it to pick files, or paste a file or folder path and click <b>Add</b>.</li>
+    <li>Each file is matched to a certificate automatically. Use the drop-down beside a file to pick a different one.</li>
+    <li>Press the red <b>Sign This</b> seal. Green <b>Signed ✓</b> means done; the log on the right shows every step.</li>
+  </ol>
+  <p>Dragged or picked files are copied to <b>Signed by Sign This</b> in your home folder and signed there. Files added by path, <b>Send to</b>, or the desktop icon are signed in place. <b>Practice run</b> shows what would happen without changing anything.</p>
+
+  <h2><span class="n">4</span>Connect your accounts</h2>
+  <p>Go to <b>Certificates → Add certificate</b>. The top of the list connects accounts for you. Sign in or scan, pick what it finds, and the form fills itself in.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Connect</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>Azure Trusted Signing</td><td>A browser window opens to sign in to Azure, then your signing accounts and certificate profiles are listed.</td></tr>
+      <tr><td>Azure Key Vault</td><td>Signs you in, then lists the certificates in your Key Vaults.</td></tr>
+      <tr><td>Apple Developer ID</td><td>On a Mac, lists the Developer ID certificates in Keychain (with the matching installer certificate).</td></tr>
+      <tr><td>EV USB token</td><td>On Windows, plug in the token first. Lists the code signing certificates installed on the PC or the token.</td></tr>
+      <tr><td>GPG</td><td>Lists the GPG keys on the computer.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Or set one up by hand: certificate file (.pfx/.p12), self-signed, cloud or hardware key (AWS KMS, Google Cloud KMS, DigiCert KeyLocker, SSL.com eSigner, YubiKey), or Sigstore. Every form has <b>Setup links</b> at the top. If a card says a tool is missing, the tool name links to its download.</p>
+  <p>Passwords are kept in the computer's secure storage (Windows encryption, macOS Keychain, Linux keyring), never in a file. When editing, leave a password empty to keep the saved one.</p>
+  <p><b>Which certificate is used?</b> The highest switched-on card that handles the file type. New certificates are added at the top, so your Azure account takes over from self-signed automatically. Use ↑ ↓ on the cards to change the order.</p>
+
+  <h3>Before connecting Azure</h3>
+  <ol>
+    <li>In the <a href="https://portal.azure.com" target="_blank" rel="noopener">Azure portal</a>, create a Trusted Signing account and finish identity validation (<a href="https://learn.microsoft.com/azure/trusted-signing/quickstart" target="_blank" rel="noopener">quickstart</a>).</li>
+    <li>Create a certificate profile and give yourself the <i>Trusted Signing Certificate Profile Signer</i> role.</li>
+    <li>Install the <a href="https://aka.ms/installazurecli" target="_blank" rel="noopener">Azure CLI</a>, plus <a href="https://ebourg.github.io/jsign/" target="_blank" rel="noopener">jsign</a> (any computer, needs <a href="https://adoptium.net/" target="_blank" rel="noopener">Java</a>) or signtool with the <a href="https://www.nuget.org/packages/Microsoft.Trusted.Signing.Client" target="_blank" rel="noopener">Trusted Signing dlib</a> (Windows).</li>
+  </ol>
+  <h3>Before connecting Apple</h3>
+  <ol>
+    <li>Join the <a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener">Apple Developer Program</a>.</li>
+    <li><a href="https://developer.apple.com/account/resources/certificates/list" target="_blank" rel="noopener">Create</a> a <i>Developer ID Application</i> certificate (and <i>Developer ID Installer</i> for .pkg), download it, and double-click it on your Mac.</li>
+    <li>For notarization, create an <a href="https://appstoreconnect.apple.com/access/integrations/api" target="_blank" rel="noopener">App Store Connect API key</a> and enter it in the form.</li>
+    <li>No Mac? In the Apple form choose <i>Certificate file</i> and upload your Developer ID .p12 and the API key JSON.</li>
+  </ol>
+
+  <h2><span class="n">5</span>The self-signed certificate</h2>
+  <p>It works right away with no account. Use it for internal tools and testing only, because customers' PCs will still show a warning. To make company PCs trust it, click <b>Download .cer</b> on its card, then on each PC run in PowerShell as administrator:</p>
+  <pre>Import-Certificate -FilePath selfsigned.cer -CertStoreLocation Cert:\LocalMachine\Root
+Import-Certificate -FilePath selfsigned.cer -CertStoreLocation Cert:\LocalMachine\TrustedPublisher</pre>
+  <p>IT can push it to every PC with Intune or Group Policy instead.</p>
+
+  <h2><span class="n">6</span>More</h2>
+  <ul>
+    <li><b>Appearance tab:</b> background (fountain pen &amp; paper, black, white, colors), 3D effects on/off, and General settings for the program name Windows shows, the signed-files folder and the log file.</li>
+    <li><b>Signing log:</b> every signing is recorded in <code>signing-log.jsonl</code> with time, file, SHA-256 fingerprint, certificate, user and computer.</li>
+    <li><b>Watch folder:</b> <code>SignThis watch</code> signs anything copied into <code>to-sign</code> and moves it to <code>signed</code>.</li>
+    <li><b>Command line:</b> <code>SignThis sign &lt;files or folders&gt;</code>, <code>SignThis verify &lt;files&gt;</code>, <code>SignThis check</code>.</li>
+  </ul>
+
+  <h2><span class="n">?</span>Troubleshooting</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>You see</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Missing tools</td><td>Click the tool name on the card to download it, install it, then reopen Sign This.</td></tr>
+      <tr><td>Needs settings</td><td>Click <b>Edit</b>; the message says which field is missing.</td></tr>
+      <tr><td>No matching profile</td><td>Switch a certificate on, or add the file type under Edit → More options → File types.</td></tr>
+      <tr><td>Timestamp errors</td><td>Your network is blocking the timestamp server. Ask IT to allow timestamp.digicert.com and timestamp.acs.microsoft.com.</td></tr>
+      <tr><td>Signed file still warns</td><td>Self-signed certificates are trusted only where the .cer is installed. Public software needs Azure or a purchased certificate; new certificates can also need time to build SmartScreen reputation.</td></tr>
+      <tr><td>Saved secret not found</td><td>The settings were moved to another computer. Edit the certificate and type the password again.</td></tr>
+    </tbody>
+  </table></div>
+
+        </div>
+      </section>
+
+      <!-- APPEARANCE -->
+      <section class="screen" id="screen-look">
+        <p class="lede">Choose a background. Your choice is remembered on this computer.</p>
+        <div class="swatches" id="swatches"></div>
+        <div class="settings-row">
+          <div class="card">
+            <h3>Effects</h3>
+            <label class="toggle"><input type="checkbox" id="fx" checked><i></i>3D tilt &amp; depth effects</label>
+          </div>
+          <div class="card general">
+            <h3>General settings</h3>
+            <div id="general"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+              <button class="btn sm primary" id="savegeneral">Save settings</button>
+              <span class="help" style="font-size:11.5px;color:var(--muted)">Settings file: <code id="kv-config">—</code></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-back" id="modal" hidden>
+  <div class="card modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="modal-head"><h2 id="m-title"></h2><button class="x" id="m-close" title="Close">×</button></div>
+    <div class="modal-body" id="m-body"></div>
+    <div class="modal-foot" id="m-foot"></div>
+  </div>
+</div>
+<input type="file" id="certpicker" hidden>
+
+<script>
+(() => {
+  const token = new URLSearchParams(location.search).get("t") || "";
+  const $ = (s) => document.querySelector(s);
+  const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+                  set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+  /* Demo mode: opened as a plain file (no local server / token) -> sample data, simulated signing. */
+  const DEMO = !token;
+  if (DEMO) document.body.classList.add("demo");
+  const demo = { jobs: {}, n: 0 };
+  const W = ["*.exe","*.dll","*.msi","*.msix","*.ps1","*.cab","*.cat","*.sys"];
+  const DEMO_PROFILES = [
+    { name: "azure-windows", label: "Azure Trusted Signing", provider: "azure-trusted-signing", provider_label: "Azure Trusted Signing / Artifact Signing", status: "disabled", enabled: false, data: { endpoint: "https://eus.codesigning.azure.net" }, actions: ["azure-login"], notes: [], patterns: W },
+    { name: "self-signed", label: "Self-signed (internal / test)", provider: "self-signed", provider_label: "Self-signed certificate", status: "ready", enabled: true, data: { subject: "CN=Cydcor Internal Code Signing", pfx_password: "__SET__" }, actions: ["create-cert", "download-cer"], notes: [], patterns: W },
+    { name: "pfx", label: "PFX certificate file", provider: "pfx", provider_label: "Certificate file (.pfx / .p12)", status: "disabled", enabled: false, data: {}, actions: [], notes: [], patterns: W },
+    { name: "apple", label: "Apple Developer ID", provider: "apple", provider_label: "Apple Developer ID", status: "disabled", enabled: false, data: { notarize: true }, actions: [], notes: [], patterns: ["*.app","*.dmg","*.pkg","*.dylib"] },
+    { name: "gpg", label: "GPG signature", provider: "gpg", provider_label: "GPG signature", status: "disabled", enabled: false, data: {}, actions: [], notes: [], patterns: ["*.zip","*.tar.gz","*.deb","*.rpm"] },
+  ];
+  function demoMatch(name) {
+    const n = name.toLowerCase();
+    const p = DEMO_PROFILES.find(p => p.status === "ready" && p.patterns.some(x => n.endsWith(x.slice(1))));
+    return p ? p.name : null;
+  }
+  async function demoApi(path, body, raw) {
+    await new Promise(r => setTimeout(r, 120));
+    if (path === "/api/state") return { config: "signing.toml (demo)", output_dir: "~/Signed by Sign This", profiles: DEMO_PROFILES,
+      initial: demo.started ? [] : (demo.started = true, ["C:/Builds/CydcorTool.exe", "C:/Builds/Deploy.ps1", "C:/Builds/notes.txt"]), auto: false, general: demo.general || {} };
+    if (path === "/api/add") return { items: body.paths.map(p => ({ path: p, name: p.split(/[\\/]/).pop(), profile: demoMatch(p) })).filter(i => !/\.txt$/i.test(i.name)) };
+    if (path.startsWith("/api/upload")) { const name = decodeURIComponent(path.split("name=")[1]); return { path: "~/Signed by Sign This/" + name, name, profile: demoMatch(name) }; }
+    if (path === "/api/sign") {
+      const id = "demo" + (++demo.n), lines = [], results = [];
+      demo.jobs[id] = { lines, results, done: false };
+      (async () => {
+        for (const it of body.items) {
+          const name = it.path.split(/[\\/]/).pop(), prof = it.profile || demoMatch(name);
+          const say = async (l, ms = 350) => { lines.push(l); await new Promise(r => setTimeout(r, ms)); };
+          await say(`==> ${it.path}  [${prof || "?"}]${body.dry_run ? "  (dry run)" : ""}`);
+          if (!prof) { await say("    FAILED - no enabled profile matches '" + name + "'"); results.push({ path: it.path, ok: false, error: "no matching profile" }); continue; }
+          await say(`    $ osslsigncode sign -pkcs12 certs/selfsigned.pfx -pass '****' -h sha256 -ts http://timestamp.digicert.com -in ${name} -out ${name}.tmp`);
+          await say("      Succeeded", 500);
+          if (body.verify) { await say("    verifying..."); await say(`    $ osslsigncode verify -in ${name}`); await say("      Signature verification: ok", 400); }
+          await say("    OK - signed");
+          results.push({ path: it.path, ok: true, error: "" });
+        }
+        demo.jobs[id].done = true;
+      })();
+      return { job: id };
+    }
+    if (path.startsWith("/api/job/")) {
+      const j = demo.jobs[path.split("/").pop().split("?")[0]], off = +(path.split("offset=")[1] || 0);
+      return { lines: j.lines.slice(off), offset: j.lines.length, results: [...j.results], done: j.done };
+    }
+    if (path === "/api/reveal") { toast("Demo: this would open the signed folder"); return { ok: true }; }
+    const st = () => ({ state: { config: "signing.toml (demo)", output_dir: "~/Signed by Sign This", profiles: DEMO_PROFILES, general: demo.general || {} } });
+    const find = (n) => DEMO_PROFILES.findIndex(p => p.name === n);
+    if (path === "/api/profile/save") {
+      const info = SCHEMA.providers[body.provider], data = {};
+      for (const [k, v] of Object.entries(body.values)) if (v !== "" && v !== null) data[k] = info.fields.some(f => f.key === k && f.type === "password") ? "__SET__" : v;
+      const missing = info.fields.filter(f => f.required && !data[f.key]).map(f => f.label);
+      if (missing.length) throw new Error(`'${missing[0]}' is required`);
+      const name = body.original || (body.label || info.title).toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + (++demo.n);
+      const prof = { name, label: body.label || info.title, provider: body.provider, provider_label: info.title, enabled: true, status: "ready",
+        notes: [], data, actions: info.actions || [], patterns: (data.patterns ? String(data.patterns).split(/\s*,\s*/) : info.default_patterns) };
+      const i = find(name); if (i >= 0) DEMO_PROFILES[i] = { ...DEMO_PROFILES[i], ...prof, enabled: DEMO_PROFILES[i].enabled, status: DEMO_PROFILES[i].enabled ? "ready" : "disabled" }; else DEMO_PROFILES.unshift(prof);
+      return { name, ...st() };
+    }
+    if (path === "/api/profile/delete") { DEMO_PROFILES.splice(find(body.name), 1); return st(); }
+    if (path === "/api/profile/move") { const i = find(body.name), j = Math.max(0, Math.min(DEMO_PROFILES.length - 1, i + body.delta)); DEMO_PROFILES.splice(j, 0, DEMO_PROFILES.splice(i, 1)[0]); return st(); }
+    if (path === "/api/profile/enable") { const p = DEMO_PROFILES[find(body.name)]; p.enabled = body.enabled; p.status = body.enabled ? "ready" : "disabled"; return st(); }
+    if (path === "/api/general/save") { demo.general = body.values; return st(); }
+    if (path === "/api/action") { await new Promise(r => setTimeout(r, 900)); return { message: body.action === "azure-login" ? "Demo: signed in to Azure" : "Demo: certificate created", ...st() }; }
+    if (path === "/api/connect") {
+      await new Promise(r => setTimeout(r, 1400));
+      const samples = {
+        "azure-trusted-signing": { message: "Demo: signed in as you@cydcor.com · subscription Cydcor Production.", options: [
+          { label: "cydcor-signing / cydcor-public", detail: "eastus · PublicTrust Active", suggested_name: "Azure Trusted Signing (cydcor-public)",
+            values: { endpoint: "https://eus.codesigning.azure.net", account: "cydcor-signing", certificate_profile: "cydcor-public" } },
+          { label: "cydcor-signing / cydcor-test", detail: "eastus · PublicTrustTest Active", suggested_name: "Azure Trusted Signing (test)",
+            values: { endpoint: "https://eus.codesigning.azure.net", account: "cydcor-signing", certificate_profile: "cydcor-test" } }] },
+        "azure-key-vault": { message: "Demo: signed in as you@cydcor.com.", options: [
+          { label: "cydcor-vault / codesign-2027", detail: "expires 2027-11-01", suggested_name: "Key Vault (codesign-2027)", values: { vault: "cydcor-vault", certificate: "codesign-2027" } }] },
+        "apple": { message: "Demo: found 1 Developer ID certificate. Next, add notarization details in the form.", options: [
+          { label: "Developer ID Application: Cydcor LLC (AB12CD34EF)", detail: "with installer certificate", suggested_name: "Apple Developer ID",
+            values: { tool: "codesign", identity: "Developer ID Application: Cydcor LLC (AB12CD34EF)", installer_identity: "Developer ID Installer: Cydcor LLC (AB12CD34EF)", team_id: "AB12CD34EF" } }] },
+        "windows-cert-store": { message: "Demo: found 1 code signing certificate.", options: [
+          { label: "Cydcor LLC", detail: "issued by DigiCert Trusted G4 Code Signing · expires 2027-06-30", suggested_name: "EV USB token",
+            values: { thumbprint: "3F2A9C71D0B84E55A1C2D3E4F5061728394A5B6C", machine_store: false } }] },
+        "gpg": { message: "Demo: found 1 key.", options: [
+          { label: "Cydcor Releases <releases@cydcor.com>", detail: "fingerprint …9C2D4E6F8A0B1C3D", suggested_name: "GPG signature", values: { key_id: "5B1A7E2F3C4D9C2D4E6F8A0B1C3D" } }] },
+      };
+      return samples[body.provider];
+    }
+    if (path.startsWith("/api/upload-cert")) return { path: "certs/" + decodeURIComponent(path.split("name=")[1]) };
+    return { ok: true };
+  }
+
+  async function api(path, body, raw) {
+    if (DEMO) return demoApi(path, body, raw);
+    const opts = { method: body === undefined && !raw ? "GET" : "POST", headers: { "X-Token": token } };
+    if (raw) { opts.body = raw; opts.headers["Content-Type"] = "application/octet-stream"; }
+    else if (body !== undefined) { opts.body = JSON.stringify(body); opts.headers["Content-Type"] = "application/json"; }
+    const r = await fetch(path, opts);
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || r.statusText);
+    return data;
+  }
+
+  /* ---------- appearance ---------- */
+  const BGS = [
+    ["pen", "Fountain pen & paper", ""], ["black", "Black", "#050505"], ["white", "White", "#f4f4f2"],
+    ["graphite", "Graphite", "#2c3036"], ["slate", "Soft slate", "#dfe4ea"], ["navy", "Midnight blue", "#0f1c3a"],
+    ["forest", "Forest green", "#173126"], ["burgundy", "Burgundy", "#3a1219"],
+  ];
+  function setBg(id) {
+    document.body.dataset.bg = id; store.set("signthis.bg", id);
+    document.querySelectorAll(".swatch").forEach(s => s.setAttribute("aria-pressed", s.dataset.bg === id));
+  }
+  $("#swatches").innerHTML = BGS.map(([id, name, color]) =>
+    `<button class="card swatch tilt" data-bg="${id}" aria-pressed="false"><div class="prev ${id === "pen" ? "prev-pen" : ""}" style="${color ? `background:${color}` : ""}"></div><b>${name}</b></button>`).join("");
+  $("#swatches").addEventListener("click", e => { const b = e.target.closest(".swatch"); if (b) setBg(b.dataset.bg); });
+  setBg(store.get("signthis.bg", "pen"));
+  const fx = $("#fx");
+  fx.checked = store.get("signthis.fx", "1") === "1";
+  const applyFx = () => { document.body.classList.toggle("flat", !fx.checked); store.set("signthis.fx", fx.checked ? "1" : "0"); };
+  fx.addEventListener("change", applyFx); applyFx();
+
+  /* ---------- 3D tilt ---------- */
+  const win = $("#win"), paper = $("#paper"), pen = $("#pen");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.addEventListener("mousemove", (e) => {
+    if (reduce || !fx.checked) return;
+    const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+    win.style.setProperty("--rx", `${(-y * 3.2).toFixed(2)}deg`);
+    win.style.setProperty("--ry", `${(x * 4.2).toFixed(2)}deg`);
+    document.documentElement.style.setProperty("--lx", `${(-x * 26).toFixed(1)}px`);
+    document.documentElement.style.setProperty("--ly", `${(-y * 18).toFixed(1)}px`);
+    paper.style.transform = `translate(calc(-50% + ${x * -26}px), calc(-46% + ${y * -18}px)) rotateX(24deg) rotateZ(-7deg) translateZ(-120px)`;
+    pen.style.transform = `translate(${x * -40}px, calc(-50% + ${y * -30}px)) rotate(-26deg)`;
+  });
+  document.addEventListener("mousemove", (e) => {
+    if (reduce || !fx.checked) return;
+    document.querySelectorAll(".tilt").forEach(el => {
+      const r = el.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      if (!inside) { el.style.transform = ""; el.classList.remove("lifted"); return; }
+      const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+      el.classList.add("lifted");
+      el.style.setProperty("--tx", `${(-px * 10).toFixed(1)}px`);
+      el.style.setProperty("--ty", `${(-py * 8).toFixed(1)}px`);
+      el.style.transform = `perspective(900px) rotateX(${(-py * 7).toFixed(2)}deg) rotateY(${(px * 9).toFixed(2)}deg) translateZ(14px)`;
+    });
+  });
+
+  /* ---------- tabs ---------- */
+  document.querySelectorAll("nav button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(x => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === "screen-" + b.dataset.screen));
+    if (b.dataset.screen === "certs") loadState();
+  }));
+
+  /* ---------- state ---------- */
+  let profiles = [], queue = [], running = false, outputDir = "";
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
+  function banner(msg) { const b = $("#banner"); b.textContent = msg || ""; b.classList.toggle("show", !!msg); }
+
+  const STATUS_LABEL = { ready: "Ready to sign", disabled: "Switched off", "missing-tools": "Missing tools", "not-configured": "Needs settings" };
+  const ACTION_LABEL = { "azure-login": "Sign in to Azure", "create-cert": "Create certificate now", "download-cer": "Download .cer" };
+  let generalValues = {};
+
+  function applyState(s) {
+    banner(s.error);
+    profiles = s.profiles || [];
+    outputDir = s.output_dir || "";
+    generalValues = s.general || {};
+    $("#kv-config").textContent = s.config || "—";
+    renderCerts(); renderGeneral(); renderQueue();
+    return s;
+  }
+  async function loadState() { return applyState(await api("/api/state")); }
+
+  function renderCerts() {
+    const cards = profiles.map((p, i) => `
+      <div class="card cert tilt ${p.status}" data-name="${esc(p.name)}">
+        <div class="cert-top"><h3>${esc(p.label)}</h3>
+          <label class="toggle small" title="Switch this certificate on or off"><input type="checkbox" data-enable ${p.enabled ? "checked" : ""}><i></i></label></div>
+        <div class="prov">${esc(p.provider_label || p.provider)}</div>
+        <span class="light">${STATUS_LABEL[p.status] || esc(p.status)}</span>
+        ${p.notes.length && p.enabled ? `<ul>${p.notes.map(noteHtml).join("")}</ul>` : ""}
+        <div class="pats">${p.patterns.map(x => `<span>${esc(x)}</span>`).join("")}</div>
+        <div class="cert-actions">
+          <button class="btn sm" data-edit>Edit</button>
+          ${(p.actions || []).map(a => `<button class="btn sm ghost" data-action="${a}">${ACTION_LABEL[a] || a}</button>`).join("")}
+          <span class="spacer"></span>
+          <button class="icon-btn" data-move="-1" ${i === 0 ? "disabled" : ""} title="Use before the ones below">↑</button>
+          <button class="icon-btn" data-move="1" ${i === profiles.length - 1 ? "disabled" : ""} title="Use after the ones above">↓</button>
+          <button class="icon-btn danger" data-delete title="Remove">✕</button>
+        </div>
+      </div>`).join("");
+    $("#certs").innerHTML = `<button class="card add-card tilt" data-add><span>+</span><b>Add certificate</b>
+      <small>Azure, Apple, certificate file, self-signed, USB token, GPG…</small></button>` + cards;
+  }
+
+  $("#certs").addEventListener("click", async (e) => {
+    if (e.target.closest("[data-add]")) return openPicker();
+    const card = e.target.closest(".cert"); if (!card) return;
+    const name = card.dataset.name, p = profiles.find(x => x.name === name);
+    const btn = e.target.closest("button"); if (!btn) return;
+    try {
+      if (btn.hasAttribute("data-edit")) return openForm(p.provider, p);
+      if (btn.dataset.move) return applyState((await api("/api/profile/move", { name, delta: +btn.dataset.move })).state);
+      if (btn.hasAttribute("data-delete")) {
+        // Two-click confirm (pop-up dialogs aren't available everywhere this page runs).
+        if (!btn.dataset.armed) {
+          btn.dataset.armed = "1"; btn.textContent = "Remove?"; btn.style.width = "auto"; btn.style.padding = "0 9px";
+          toast(`Click "Remove?" again to remove ${p.label}. Its saved passwords are deleted; certificate files stay.`);
+          setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = "✕"; btn.style.width = btn.style.padding = ""; } }, 4000);
+          return;
+        }
+        applyState((await api("/api/profile/delete", { name })).state); return toast("Removed");
+      }
+      if (btn.dataset.action === "download-cer") {
+        if (DEMO) return toast("Demo: this would download the .cer file");
+        location.href = `/api/download-cer?t=${encodeURIComponent(token)}&profile=${encodeURIComponent(name)}`; return;
+      }
+      if (btn.dataset.action) {
+        btn.disabled = true; const label = btn.textContent;
+        btn.textContent = btn.dataset.action === "azure-login" ? "Finish signing in in your browser…" : "Working…";
+        try { const r = await api("/api/action", { name, action: btn.dataset.action }); applyState(r.state); toast(r.message); }
+        finally { btn.disabled = false; btn.textContent = label; }
+      }
+    } catch (err) { toast(err.message); }
+  });
+  $("#certs").addEventListener("change", async (e) => {
+    if (!e.target.matches("[data-enable]")) return;
+    const name = e.target.closest(".cert").dataset.name;
+    try { applyState((await api("/api/profile/enable", { name, enabled: e.target.checked })).state); }
+    catch (err) { toast(err.message); }
+  });
+
+  /* ---------- add / edit certificate ---------- */
+  const SCHEMA = window.SIGNTHIS_SCHEMA || {"providers": {"azure-trusted-signing": {"links": [["Trusted Signing quickstart", "https://learn.microsoft.com/azure/trusted-signing/quickstart"], ["Open the Azure portal", "https://portal.azure.com"], ["Install the Azure CLI", "https://aka.ms/installazurecli"], ["Trusted Signing dlib (signtool)", "https://www.nuget.org/packages/Microsoft.Trusted.Signing.Client"]], "title": "Azure Trusted Signing", "group": "windows", "blurb": "Microsoft's managed signing service (also called Artifact Signing). Best choice for software you give to customers.", "fields": [{"key": "endpoint", "label": "Region endpoint", "type": "select", "required": true, "options": [["https://eus.codesigning.azure.net", "East US"], ["https://wus.codesigning.azure.net", "West US"], ["https://wus2.codesigning.azure.net", "West US 2"], ["https://wus3.codesigning.azure.net", "West US 3"], ["https://wcus.codesigning.azure.net", "West Central US"], ["https://neu.codesigning.azure.net", "North Europe"], ["https://weu.codesigning.azure.net", "West Europe"]], "allow_custom": true, "help": "The region your Trusted Signing account was created in."}, {"key": "account", "label": "Signing account name", "type": "text", "required": true, "placeholder": "my-signing-account"}, {"key": "certificate_profile", "label": "Certificate profile name", "type": "text", "required": true, "placeholder": "my-cert-profile"}, {"key": "tool", "label": "Signing tool", "type": "select", "options": [["", "Automatic"], ["jsign", "jsign (any OS)"], ["signtool", "signtool (Windows)"]]}, {"key": "dlib_path", "label": "Trusted Signing dlib", "type": "file", "when": {"tool": ["signtool"]}, "placeholder": "C:/tools/.../Azure.CodeSigning.Dlib.dll", "help": "From the Microsoft.Trusted.Signing.Client package."}, {"key": "access_token", "label": "Access token (CI only)", "type": "password", "advanced": true, "help": "Normally leave empty and use 'Sign in to Azure'."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "actions": ["azure-login"], "connect": "Sign in to Azure and pick your signing account", "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "azure-key-vault": {"links": [["Key Vault certificates guide", "https://learn.microsoft.com/azure/key-vault/certificates/"], ["Open the Azure portal", "https://portal.azure.com"], ["AzureSignTool", "https://github.com/vcsjones/AzureSignTool"]], "title": "Azure Key Vault certificate", "group": "windows", "blurb": "A code signing certificate you bought, kept safely in Azure Key Vault.", "fields": [{"key": "vault", "label": "Key Vault name or URL", "type": "text", "required": true, "placeholder": "my-vault"}, {"key": "certificate", "label": "Certificate name", "type": "text", "required": true, "placeholder": "codesign-cert"}, {"key": "tool", "label": "Signing tool", "type": "select", "options": [["", "Automatic"], ["azuresigntool", "AzureSignTool"], ["jsign", "jsign"]]}, {"key": "managed_identity", "label": "Use managed identity", "type": "bool", "advanced": true}, {"key": "client_id", "label": "Service principal client ID", "type": "text", "advanced": true}, {"key": "client_secret", "label": "Service principal secret", "type": "password", "advanced": true}, {"key": "tenant_id", "label": "Tenant ID", "type": "text", "advanced": true}, {"key": "timestamp_url", "label": "Timestamp server", "type": "text", "advanced": true, "placeholder": "http://timestamp.digicert.com", "help": "Keeps signatures valid after the certificate expires. Leave empty only for offline/internal use."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "actions": ["azure-login"], "connect": "Sign in to Azure and pick a Key Vault certificate", "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "pfx": {"links": [["Buy: DigiCert", "https://www.digicert.com/signing/code-signing-certificates"], ["Buy: Sectigo", "https://www.sectigo.com/ssl-certificates-tls/code-signing"], ["Buy: SSL.com", "https://www.ssl.com/certificates/code-signing/"]], "title": "Certificate file (.pfx / .p12)", "group": "windows", "blurb": "A code signing certificate file from a certificate authority.", "fields": [{"key": "pfx_path", "label": "Certificate file", "type": "file", "required": true, "accept": ".pfx,.p12"}, {"key": "pfx_password", "label": "Certificate password", "type": "password"}, {"key": "tool", "label": "Signing tool", "type": "select", "options": [["", "Automatic"], ["signtool", "signtool"], ["osslsigncode", "osslsigncode"], ["jsign", "jsign"]]}, {"key": "timestamp_url", "label": "Timestamp server", "type": "text", "advanced": true, "placeholder": "http://timestamp.digicert.com", "help": "Keeps signatures valid after the certificate expires. Leave empty only for offline/internal use."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "self-signed": {"title": "Self-signed certificate", "group": "windows", "blurb": "Free, instant, for internal tools and testing. Trusted only on PCs where you install its .cer file.", "fields": [{"key": "subject", "label": "Certificate name", "type": "text", "required": true, "placeholder": "CN=Cydcor Internal Code Signing"}, {"key": "valid_days", "label": "Valid for (days)", "type": "number", "placeholder": "730"}, {"key": "pfx_path", "label": "Certificate file", "type": "file", "advanced": true, "placeholder": "certs/selfsigned.pfx", "help": "Created automatically if it doesn't exist."}, {"key": "pfx_password", "label": "Certificate password", "type": "password", "advanced": true, "help": "Generated automatically if left empty."}, {"key": "timestamp_url", "label": "Timestamp server", "type": "text", "advanced": true, "placeholder": "http://timestamp.digicert.com", "help": "Keeps signatures valid after the certificate expires. Leave empty only for offline/internal use."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "actions": ["create-cert", "download-cer"], "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "windows-cert-store": {"links": [["Windows SDK (signtool)", "https://developer.microsoft.com/windows/downloads/windows-sdk/"]], "title": "EV USB token / Windows store", "group": "windows", "blurb": "A certificate on a USB security key or installed in Windows, picked by thumbprint.", "fields": [{"key": "thumbprint", "label": "Certificate thumbprint", "type": "text", "required": true, "placeholder": "40 hex characters", "help": "certmgr.msc \u2192 Personal \u2192 Certificates \u2192 open it \u2192 Details \u2192 Thumbprint."}, {"key": "machine_store", "label": "Certificate is in the machine store", "type": "bool", "advanced": true}, {"key": "timestamp_url", "label": "Timestamp server", "type": "text", "advanced": true, "placeholder": "http://timestamp.digicert.com", "help": "Keeps signatures valid after the certificate expires. Leave empty only for offline/internal use."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "connect": "Find code signing certificates on this PC (installed or on a USB token)", "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "cloud-key": {"title": "Cloud key or hardware key", "group": "windows", "blurb": "Sign with a key held by AWS KMS, Google Cloud KMS, DigiCert KeyLocker, SSL.com eSigner, or a YubiKey.", "links": [["DigiCert KeyLocker", "https://www.digicert.com/signing/code-signing-certificates"], ["SSL.com eSigner", "https://www.ssl.com/esigner/"], ["AWS KMS", "https://aws.amazon.com/kms/"], ["Google Cloud KMS", "https://cloud.google.com/kms"], ["jsign (needed for these)", "https://ebourg.github.io/jsign/"]], "fields": [{"key": "service", "label": "Service", "type": "select", "required": true, "options": [["aws", "AWS KMS"], ["google", "Google Cloud KMS"], ["digicert", "DigiCert ONE / KeyLocker"], ["esigner", "SSL.com eSigner"], ["yubikey", "YubiKey"]]}, {"key": "aws_region", "label": "AWS region", "type": "text", "placeholder": "us-east-1", "when": {"service": ["aws"]}}, {"key": "aws_key_id", "label": "KMS key ID or alias", "type": "text", "placeholder": "alias/codesign", "when": {"service": ["aws"]}}, {"key": "aws_access_key", "label": "Access key ID", "type": "text", "when": {"service": ["aws"]}, "help": "Leave empty to use the AWS credentials already set up on this PC."}, {"key": "aws_secret_key", "label": "Secret access key", "type": "password", "when": {"service": ["aws"]}}, {"key": "gcp_keyring", "label": "Key ring", "type": "text", "placeholder": "projects/my-project/locations/global/keyRings/codesign", "when": {"service": ["google"]}}, {"key": "gcp_key", "label": "Key version", "type": "text", "placeholder": "mykey/cryptoKeyVersions/1", "when": {"service": ["google"]}}, {"key": "digicert_api_key", "label": "API key", "type": "password", "when": {"service": ["digicert"]}}, {"key": "digicert_client_cert", "label": "Client authentication certificate (.p12)", "type": "file", "accept": ".p12,.pfx", "when": {"service": ["digicert"]}}, {"key": "digicert_client_cert_password", "label": "Client certificate password", "type": "password", "when": {"service": ["digicert"]}}, {"key": "digicert_alias", "label": "Key pair alias", "type": "text", "when": {"service": ["digicert"]}}, {"key": "esigner_username", "label": "SSL.com username", "type": "text", "when": {"service": ["esigner"]}}, {"key": "esigner_password", "label": "SSL.com password", "type": "password", "when": {"service": ["esigner"]}}, {"key": "esigner_credential_id", "label": "Credential ID", "type": "text", "when": {"service": ["esigner"]}}, {"key": "esigner_totp_secret", "label": "TOTP secret (automated signing)", "type": "password", "when": {"service": ["esigner"]}}, {"key": "yubikey_pin", "label": "YubiKey PIN", "type": "password", "when": {"service": ["yubikey"]}}, {"key": "yubikey_alias", "label": "Certificate slot", "type": "text", "advanced": true, "placeholder": "X.509 Certificate for Digital Signature", "when": {"service": ["yubikey"]}}, {"key": "certfile", "label": "Certificate chain (.pem / .crt)", "type": "file", "accept": ".pem,.crt,.cer,.p7b", "when": {"service": ["aws", "google", "digicert"]}, "help": "The public certificate your CA issued for this key."}, {"key": "gcp_access_token", "label": "Access token (CI only)", "type": "password", "advanced": true, "when": {"service": ["google"]}}, {"key": "timestamp_url", "label": "Timestamp server", "type": "text", "advanced": true, "placeholder": "http://timestamp.digicert.com", "help": "Keeps signatures valid after the certificate expires. Leave empty only for offline/internal use."}, {"key": "description", "label": "Program name shown by Windows", "type": "text", "advanced": true, "placeholder": "e.g. Cydcor Field Tools", "help": "Appears in UAC prompts and file properties."}], "default_patterns": ["*.exe", "*.dll", "*.sys", "*.ocx", "*.msi", "*.msix", "*.msixbundle", "*.appx", "*.appxbundle", "*.cab", "*.cat", "*.ps1", "*.psm1", "*.psd1", "*.vbs"]}, "apple": {"links": [["Join the Apple Developer Program", "https://developer.apple.com/programs/enroll/"], ["Create Developer ID certificates", "https://developer.apple.com/account/resources/certificates/list"], ["Create an App Store Connect API key", "https://appstoreconnect.apple.com/access/integrations/api"], ["About notarization", "https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution"]], "title": "Apple Developer ID", "group": "apple", "blurb": "Sign and notarize Mac apps, disk images and installers.", "fields": [{"key": "tool", "label": "Signing method", "type": "select", "options": [["", "Automatic"], ["codesign", "On this Mac (Keychain)"], ["rcodesign", "Certificate file (works on Windows/Linux)"]]}, {"key": "identity", "label": "Developer ID Application", "type": "text", "placeholder": "Developer ID Application: Cydcor LLC (TEAMID)", "when": {"tool": ["", "codesign"]}}, {"key": "installer_identity", "label": "Developer ID Installer (for .pkg)", "type": "text", "placeholder": "Developer ID Installer: Cydcor LLC (TEAMID)", "when": {"tool": ["", "codesign"]}}, {"key": "p12_path", "label": "Developer ID certificate (.p12)", "type": "file", "accept": ".p12,.pfx", "when": {"tool": ["rcodesign"]}}, {"key": "p12_password", "label": "Certificate password", "type": "password", "when": {"tool": ["rcodesign"]}}, {"key": "team_id", "label": "Team ID", "type": "text", "placeholder": "TEAMID1234"}, {"key": "notarize", "label": "Notarize with Apple", "type": "bool", "default": true}, {"key": "keychain_profile", "label": "Notary keychain profile", "type": "text", "when": {"tool": ["", "codesign"]}, "help": "Created once with: xcrun notarytool store-credentials"}, {"key": "api_key_path", "label": "App Store Connect API key (.p8)", "type": "file", "accept": ".p8", "when": {"tool": ["", "codesign"]}}, {"key": "api_key_id", "label": "API key ID", "type": "text", "when": {"tool": ["", "codesign"]}}, {"key": "api_issuer", "label": "API issuer ID", "type": "text", "when": {"tool": ["", "codesign"]}}, {"key": "api_key_json", "label": "API key JSON (rcodesign)", "type": "file", "accept": ".json", "when": {"tool": ["rcodesign"]}}, {"key": "apple_id", "label": "Apple ID (instead of API key)", "type": "text", "advanced": true, "when": {"tool": ["", "codesign"]}}, {"key": "app_password", "label": "App-specific password", "type": "password", "advanced": true, "when": {"tool": ["", "codesign"]}}, {"key": "entitlements", "label": "Entitlements file", "type": "file", "advanced": true, "accept": ".plist,.entitlements,.xml"}, {"key": "hardened_runtime", "label": "Hardened runtime", "type": "bool", "default": true, "advanced": true}], "connect": "Find the Developer ID certificates in this Mac's Keychain", "default_patterns": ["*.app", "*.dmg", "*.pkg", "*.mpkg", "*.dylib", "*.framework", "*.bundle", "*.kext"]}, "gpg": {"links": [["Get GnuPG", "https://gnupg.org/download/"]], "title": "GPG signature", "group": "other", "blurb": "Detached .asc signatures for archives, Linux packages and downloads.", "fields": [{"key": "key_id", "label": "Key ID or email", "type": "text", "required": true, "placeholder": "releases@cydcor.com"}, {"key": "passphrase", "label": "Key passphrase", "type": "password"}, {"key": "armor", "label": "ASCII armor (.asc)", "type": "bool", "default": true, "advanced": true}, {"key": "homedir", "label": "GnuPG home folder", "type": "text", "advanced": true}], "connect": "Find the GPG keys on this computer", "default_patterns": ["*.tar.gz", "*.tgz", "*.tar.xz", "*.zip", "*.deb", "*.rpm", "*.AppImage", "*.iso", "*.jar"]}, "cosign": {"links": [["Install cosign", "https://docs.sigstore.dev/cosign/system_config/installation/"]], "title": "Sigstore (cosign)", "group": "other", "blurb": "Modern open signatures; keys can live in Azure Key Vault (azurekms://\u2026).", "fields": [{"key": "key", "label": "Signing key", "type": "text", "placeholder": "azurekms://vault.vault.azure.net/key  or  cosign.key", "help": "Leave empty for keyless signing."}, {"key": "cosign_password", "label": "Key password", "type": "password"}, {"key": "public_key", "label": "Public key (for verifying)", "type": "text", "advanced": true}, {"key": "certificate_identity", "label": "Keyless identity", "type": "text", "advanced": true}, {"key": "certificate_oidc_issuer", "label": "Keyless OIDC issuer", "type": "text", "advanced": true}], "default_patterns": ["*.tar.gz", "*.tgz", "*.tar.xz", "*.zip", "*.deb", "*.rpm", "*.AppImage", "*.iso", "*.jar"]}}, "common": [{"key": "patterns", "label": "File types", "type": "list", "advanced": true, "help": "Comma separated, e.g. *.exe, *.msi. Leave empty for the defaults."}], "general": [{"key": "output_dir", "label": "Folder for dropped files", "type": "text", "placeholder": "~/Signed by Sign This"}, {"key": "audit_log", "label": "Signing log file", "type": "text", "placeholder": "signing-log.jsonl"}, {"key": "description", "label": "Default program name", "type": "text", "placeholder": "Cydcor Internal Tools"}, {"key": "description_url", "label": "Default program URL", "type": "text", "placeholder": "https://www.cydcor.com"}], "secret_backend": "your computer's secure store", "tool_links": {"az": "https://aka.ms/installazurecli", "jsign": "https://ebourg.github.io/jsign/", "java": "https://adoptium.net/", "signtool": "https://developer.microsoft.com/windows/downloads/windows-sdk/", "osslsigncode": "https://github.com/mtrojnar/osslsigncode", "azuresigntool": "https://github.com/vcsjones/AzureSignTool", "rcodesign": "https://gregoryszorc.com/docs/apple-codesign/stable/apple_codesign_getting_started.html", "codesign": "https://developer.apple.com/xcode/resources/", "xcrun": "https://developer.apple.com/xcode/resources/", "productsign": "https://developer.apple.com/xcode/resources/", "ditto": "https://developer.apple.com/xcode/resources/", "gpg": "https://gnupg.org/download/", "cosign": "https://docs.sigstore.dev/cosign/system_config/installation/", "gcloud": "https://cloud.google.com/sdk/docs/install", "openssl": "https://www.openssl.org/source/"}};
+  const modal = $("#modal");
+  const closeModal = () => { modal.hidden = true; };
+  $("#m-close").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+
+  function linksHtml(info) {
+    if (!info.links || !info.links.length) return "";
+    return `<div class="links"><span>Setup links</span>${info.links.map(([label, url]) =>
+      `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`).join("")}</div>`;
+  }
+  function noteHtml(n) {
+    const m = /^Install: (.+)$/.exec(n);
+    const url = m && SCHEMA && SCHEMA.tool_links[m[1]];
+    return url ? `<li>Install <a href="${esc(url)}" target="_blank" rel="noopener">${esc(m[1])} ↗</a></li>` : `<li>${esc(n)}</li>`;
+  }
+  async function openConnect(provider) {
+    const info = SCHEMA.providers[provider];
+    const azure = provider.startsWith("azure");
+    $("#m-title").textContent = `Connect · ${info.title}`;
+    $("#m-body").innerHTML = `<div class="connecting"><span class="spinner"></span><div><b>${azure ? "Signing in to Azure…" : "Looking for certificates…"}</b>
+      <small>${azure ? "If a browser window opens, sign in there, then come back. This can take a minute." : "This only takes a moment."}</small></div></div>`;
+    $("#m-foot").innerHTML = `<span class="note"></span><button class="btn" data-back>Back</button><button class="btn" data-manual="${provider}">Fill in by hand</button>`;
+    modal.hidden = false;
+    try {
+      const r = await api("/api/connect", { provider });
+      if (modal.hidden || $("#m-title").textContent !== `Connect · ${info.title}`) return;
+      $("#m-body").innerHTML = `<div class="result ${r.options.length ? "ok" : "warn"}">${esc(r.message)}</div>
+        ${r.options.length ? `<div class="found">${r.options.map((o, i) =>
+          `<button class="card type tilt" data-pick="${i}"><b>${esc(o.label)}</b><small>${esc(o.detail || "")}</small></button>`).join("")}</div>` : ""}
+        ${linksHtml(info)}`;
+      $("#m-body").onclick = (e) => { const b = e.target.closest("[data-pick]"); if (b) { $("#m-body").onclick = null; openForm(provider, null, r.options[+b.dataset.pick]); } };
+    } catch (err) {
+      $("#m-body").innerHTML = `<div class="result warn">${esc(err.message)}</div>${linksHtml(info)}`;
+    }
+  }
+
+  function openPicker() {
+    const groups = [["windows", "Windows"], ["apple", "Apple"], ["other", "Everything else"]];
+    $("#m-title").textContent = "Add a certificate";
+    const connectable = Object.entries(SCHEMA.providers).filter(([, v]) => v.connect);
+    $("#m-body").innerHTML = `<div class="types"><h4>Connect an account automatically</h4><div class="connect-grid">${
+      connectable.map(([k, v]) => `<button class="card type connect tilt" data-connect="${k}"><span class="plug">⇄</span><span><b>${esc(v.title)}</b><small>${esc(v.connect)}</small></span></button>`).join("")}</div>
+      <h4 style="margin-top:22px">Or set one up by hand</h4></div><div class="types">${groups.map(([g, title]) => `<h4>${title}</h4><div class="type-grid">${
+      Object.entries(SCHEMA.providers).filter(([, v]) => v.group === g).map(([k, v]) =>
+        `<button class="card type tilt" data-type="${k}"><b>${esc(v.title)}</b><small>${esc(v.blurb)}</small></button>`).join("")}</div>`).join("")}</div>`;
+    $("#m-foot").innerHTML = `<span class="note">You can add as many as you like and switch them on when the account is ready.</span><button class="btn" data-cancel>Cancel</button>`;
+    modal.hidden = false;
+  }
+
+  function fieldHtml(f, v) {
+    const id = `f-${f.key}`, req = f.required ? ` <span class="req">*</span>` : "";
+    const when = f.when ? ` data-when='${esc(JSON.stringify(f.when))}'` : "";
+    const help = f.help ? `<div class="help">${esc(f.help)}</div>` : "";
+    const ph = esc(f.placeholder || "");
+    let input;
+    if (f.type === "bool") {
+      const on = v === undefined || v === null ? !!f.default : !!v;
+      return `<div class="field"${when}><label class="toggle"><input type="checkbox" data-key="${f.key}" ${on ? "checked" : ""}><i></i>${esc(f.label)}</label>${help}</div>`;
+    }
+    if (f.type === "select") {
+      const opts = f.options.slice();
+      if (v && !opts.some(([o]) => o === v)) opts.push([v, v]);
+      input = `<select id="${id}" data-key="${f.key}">${opts.map(([o, l]) => `<option value="${esc(o)}" ${o === (v ?? "") ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+    } else if (f.type === "password") {
+      const saved = v === "__SET__";
+      input = `<input id="${id}" type="password" autocomplete="new-password" data-key="${f.key}" placeholder="${saved ? "Saved securely · leave blank to keep" : ph}">`;
+    } else if (f.type === "file") {
+      input = `<div class="filerow"><input id="${id}" data-key="${f.key}" value="${esc(v ?? "")}" placeholder="${ph || "Path, or upload the file →"}">
+        <button type="button" class="btn sm" data-upload="${f.key}" data-accept="${esc(f.accept || "")}">Upload…</button></div>`;
+    } else if (f.type === "list") {
+      input = `<input id="${id}" data-key="${f.key}" value="${esc((v || []).join(", "))}" placeholder="${esc(ph)}">`;
+    } else {
+      input = `<input id="${id}" ${f.type === "number" ? 'type="number" min="1"' : ""} data-key="${f.key}" value="${esc(v ?? "")}" placeholder="${ph}">`;
+    }
+    return `<div class="field"${when}><label for="${id}">${esc(f.label)}${req}</label>${input}${help}</div>`;
+  }
+
+  function formValues() {
+    const vals = {};
+    $("#m-body").querySelectorAll("[data-key]").forEach(el => {
+      if (el.closest(".field")?.hidden) return;
+      vals[el.dataset.key] = el.type === "checkbox" ? el.checked : el.value;
+    });
+    return vals;
+  }
+  function updateWhen() {
+    const vals = {};
+    $("#m-body").querySelectorAll("[data-key]").forEach(el => vals[el.dataset.key] = el.type === "checkbox" ? el.checked : el.value);
+    $("#m-body").querySelectorAll(".field[data-when]").forEach(fd => {
+      const cond = JSON.parse(fd.dataset.when);
+      fd.hidden = !Object.entries(cond).every(([k, allowed]) => allowed.includes(vals[k] ?? ""));
+    });
+  }
+
+  function openForm(provider, existing, prefill) {
+    const info = SCHEMA.providers[provider];
+    const data = existing ? existing.data : (prefill ? prefill.values : {});
+    const fields = info.fields.concat(SCHEMA.common.map(f => f.key === "patterns" ? { ...f, placeholder: info.default_patterns.join(", ") } : f));
+    const basic = fields.filter(f => !f.advanced), adv = fields.filter(f => f.advanced);
+    $("#m-title").textContent = existing ? `Edit · ${existing.label}` : `Add · ${info.title}`;
+    $("#m-body").innerHTML = `<div class="result" id="m-result" hidden></div>
+      <p class="help" style="margin:0 0 14px;color:var(--muted);font-size:12.5px">${esc(info.blurb)}</p>
+      ${linksHtml(info)}
+      ${prefill ? `<div class="result ok">Filled in from your account. Check the details and click <b>Add certificate</b>.</div>` : ""}
+      ${fieldHtml({ key: "__label", label: "Name shown in Sign This", type: "text", placeholder: info.title }, existing ? existing.label : (prefill ? prefill.suggested_name || "" : ""))}
+      ${basic.map(f => fieldHtml(f, data[f.key])).join("")}
+      ${adv.length ? `<details class="more"><summary>More options</summary>${adv.map(f => fieldHtml(f, data[f.key])).join("")}</details>` : ""}`;
+    $("#m-foot").innerHTML = `<span class="note">🔒 Passwords are saved in ${esc(SCHEMA.secret_backend)}.</span>
+      ${existing ? "" : `<button class="btn" data-back>Back</button>`}
+      <button class="btn" data-cancel>Cancel</button>
+      <button class="btn primary" data-save>${existing ? "Save changes" : "Add certificate"}</button>`;
+    $("#m-body").oninput = $("#m-body").onchange = updateWhen;
+    updateWhen();
+    modal.dataset.provider = provider; modal.dataset.original = existing ? existing.name : "";
+    modal.hidden = false;
+    $("#m-body").querySelector("input:not([type=checkbox])")?.focus();
+  }
+
+  $("#m-foot").addEventListener("click", async (e) => {
+    if (e.target.closest("[data-cancel]")) return closeModal();
+    if (e.target.closest("[data-back]")) return openPicker();
+    const manual = e.target.closest("[data-manual]"); if (manual) return openForm(manual.dataset.manual, null);
+    if (e.target.closest("[data-done]")) return closeModal();
+    const save = e.target.closest("[data-save]"); if (!save) return;
+    const values = formValues(), label = values.__label; delete values.__label;
+    const original = modal.dataset.original || null;
+    save.disabled = true;
+    try {
+      const r = await api("/api/profile/save", { provider: modal.dataset.provider, original, label, values });
+      applyState(r.state);
+      const p = profiles.find(x => x.name === r.name);
+      const res = $("#m-result");
+      if (p && p.status === "ready") { closeModal(); toast(`${p.label} is ready to sign ✓`); return; }
+      res.hidden = false; res.className = "result warn";
+      res.innerHTML = `<b>Saved.</b> ${p && p.status === "disabled" ? "It's switched off; turn it on from its card when you're ready." : "Not ready to sign yet:"}
+        ${p && p.notes.length ? `<ul>${p.notes.map(noteHtml).join("")}</ul>` : ""}`;
+      modal.dataset.original = r.name;
+      $("#m-body").scrollTop = 0;
+      $("#m-foot").querySelector("[data-back]")?.remove();
+      save.textContent = "Save changes";
+    } catch (err) {
+      const res = $("#m-result"); res.hidden = false; res.className = "result warn"; res.textContent = err.message; $("#m-body").scrollTop = 0;
+    } finally { save.disabled = false; }
+  });
+  $("#m-body").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-connect]"); if (c) return openConnect(c.dataset.connect);
+    const t = e.target.closest("[data-type]"); if (t) return openForm(t.dataset.type, null);
+    const up = e.target.closest("[data-upload]"); if (!up) return;
+    const picker = $("#certpicker"); picker.accept = up.dataset.accept || ""; picker.dataset.key = up.dataset.upload; picker.click();
+  });
+  $("#certpicker").addEventListener("change", async (e) => {
+    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+    try {
+      const r = await api(`/api/upload-cert?name=${encodeURIComponent(f.name)}`, undefined, f);
+      $(`#m-body [data-key="${e.target.dataset.key}"]`).value = r.path; toast(`${f.name} uploaded`);
+    } catch (err) { toast(err.message); }
+  });
+
+  /* ---------- general settings ---------- */
+  function renderGeneral() {
+    if (!SCHEMA) return;
+    $("#general").innerHTML = SCHEMA.general.map(f => fieldHtml(f, generalValues[f.key])).join("");
+  }
+  $("#savegeneral").addEventListener("click", async () => {
+    const values = {}; $("#general").querySelectorAll("[data-key]").forEach(el => values[el.dataset.key] = el.value);
+    try { applyState((await api("/api/general/save", { values })).state); toast("Settings saved"); } catch (err) { toast(err.message); }
+  });
+
+  function kind(name) {
+    const ext = (name.match(/\.([^.]+)$/) || [, ""])[1].toLowerCase();
+    if (["exe","dll","sys","msi","msix","msixbundle","appx","appxbundle","cab","cat","ps1","psm1","psd1","vbs","ocx"].includes(ext)) return ["win", ext];
+    if (["app","dmg","pkg","mpkg","dylib","framework","bundle","kext"].includes(ext)) return ["mac", ext];
+    return ["other", ext || "file"];
+  }
+  function renderQueue() {
+    const q = $("#queue");
+    $("#signbtn").disabled = running || !queue.length;
+    if (!queue.length) { q.innerHTML = `<div class="empty">Nothing queued yet.<br>Files you add will be matched to the right certificate automatically.</div>`; return; }
+    const usable = profiles.filter(p => p.status !== "disabled");
+    q.innerHTML = queue.map((it, i) => {
+      const [k, ext] = kind(it.name);
+      const opts = [`<option value="">${it.profile ? "Auto" : "No match: pick one"}</option>`]
+        .concat(usable.map(p => `<option value="${esc(p.name)}" ${it.override === p.name ? "selected" : ""}>${esc(p.label)}</option>`)).join("");
+      const st = it.status === "ok" ? `<span class="status ok">Signed ✓</span>` : it.status === "bad" ? `<span class="status bad" title="${esc(it.error)}">Failed</span>`
+        : it.status === "run" ? `<span class="status run">Signing</span>` : `<select data-i="${i}" title="Certificate">${opts}</select>`;
+      return `<div class="qitem"><div class="ftype ${k}">${esc(ext.slice(0, 5).toUpperCase())}</div>
+        <div class="qname"><b>${esc(it.name)}</b><span>${esc(it.override || it.profile || "no matching profile")} · ${esc(it.path)}</span></div>
+        ${st}<button class="x" data-x="${i}" title="Remove" ${running ? "disabled" : ""}>×</button></div>`;
+    }).join("");
+  }
+  $("#queue").addEventListener("change", e => { const i = e.target.dataset.i; if (i !== undefined) { queue[i].override = e.target.value || null; renderQueue(); } });
+  $("#queue").addEventListener("click", e => { const i = e.target.dataset.x; if (i !== undefined && !running) { queue.splice(+i, 1); renderQueue(); } });
+
+  function enqueue(items) {
+    const have = new Set(queue.map(q => q.path));
+    let added = 0;
+    for (const it of items) if (!have.has(it.path)) { queue.push({ ...it, status: null, override: null }); added++; }
+    renderQueue();
+    if (added) toast(`${added} file${added > 1 ? "s" : ""} added`);
+    else if (!items.length) toast("No signable files found there");
+  }
+  async function addPaths(paths) {
+    try { enqueue((await api("/api/add", { paths })).items); } catch (e) { toast(e.message); }
+  }
+  async function uploadFiles(files) {
+    for (const f of files) {
+      try { enqueue([await api(`/api/upload?name=${encodeURIComponent(f.name)}`, undefined, f)]); }
+      catch (e) { toast(`${f.name}: ${e.message}`); }
+    }
+  }
+
+  const drop = $("#drop");
+  ["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove("over")));
+  drop.addEventListener("drop", e => { e.preventDefault(); uploadFiles([...e.dataTransfer.files].filter(f => f.size > 0 || f.type)); });
+  document.addEventListener("dragover", e => e.preventDefault());
+  document.addEventListener("drop", e => e.preventDefault());
+  $("#picker").addEventListener("change", e => { uploadFiles([...e.target.files]); e.target.value = ""; });
+  $("#addpath").addEventListener("click", () => { const v = $("#pathbox").value.trim().replace(/^"|"$/g, ""); if (v) { addPaths([v]); $("#pathbox").value = ""; } });
+  $("#pathbox").addEventListener("keydown", e => { if (e.key === "Enter") $("#addpath").click(); });
+  $("#openout").addEventListener("click", () => {
+    const last = queue.find(q => q.status === "ok");
+    api("/api/reveal", { path: last ? last.path : outputDir }).catch(e => toast(e.message));
+  });
+
+  /* ---------- signing ---------- */
+  const con = $("#console");
+  function log(line) {
+    const span = document.createElement("span");
+    span.className = line.startsWith("==>") ? "h" : /OK -/.test(line) ? "ok" : /FAILED|error/i.test(line) ? "bad" : /^\s+\$ /.test(line) ? "cmd" : /^ {6}/.test(line) ? "dim" : "";
+    span.textContent = line + "\n";
+    con.appendChild(span); con.scrollTop = con.scrollHeight;
+  }
+  async function signAll() {
+    if (running || !queue.length) return;
+    running = true; con.textContent = "";
+    const todo = queue.filter(q => q.status !== "ok");
+    todo.forEach(q => q.status = "run"); renderQueue();
+    $("#bar").style.width = "4%";
+    let job;
+    try {
+      job = (await api("/api/sign", { items: todo.map(q => ({ path: q.path, profile: q.override })), verify: $("#verify").checked, dry_run: $("#dry").checked })).job;
+    } catch (e) { log("error: " + e.message); running = false; todo.forEach(q => q.status = null); renderQueue(); return; }
+    let offset = 0, done = false, results = [];
+    while (!done) {
+      await new Promise(r => setTimeout(r, 400));
+      const s = await api(`/api/job/${job}?offset=${offset}`);
+      s.lines.forEach(log); offset = s.offset; done = s.done; results = s.results;
+      for (const r of results) { const q = queue.find(x => x.path === r.path); if (q) { q.status = r.ok ? "ok" : "bad"; q.error = r.error; } }
+      $("#bar").style.width = `${Math.max(4, (results.length / todo.length) * 100)}%`;
+      renderQueue();
+    }
+    running = false;
+    const ok = results.filter(r => r.ok).length, bad = results.length - ok;
+    $("#summary").textContent = `${ok} signed${bad ? `, ${bad} failed` : ""}${$("#dry").checked ? " (practice run)" : ""}`;
+    toast(bad ? `${bad} file${bad > 1 ? "s" : ""} need attention` : "All signed ✓");
+    if (!bad && $("#clear").checked) setTimeout(() => { queue = queue.filter(q => q.status !== "ok"); renderQueue(); }, 2500);
+    renderQueue();
+  }
+  $("#signbtn").addEventListener("click", signAll);
+
+  /* ---------- start ---------- */
+  setInterval(() => api("/api/ping").catch(() => {}), 5000);
+  loadState().then(async (s) => {
+    if (s.initial && s.initial.length) { await addPaths(s.initial); if (s.auto) signAll(); }
+  }).catch(e => banner(e.message));
+})();
+</script>
+
+</body></html>

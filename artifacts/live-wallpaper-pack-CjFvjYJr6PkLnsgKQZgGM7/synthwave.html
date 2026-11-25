@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synthwave Drive</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#0b0016}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. synthwave.html?speed=2&grid=%2300e5ff =====
+const CFG = {
+  fps: 60,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  speed: 1,           // grid scroll speed
+  grid: '#ff2bd6',    // grid line color
+  edge: '#22e6ff',    // mountain edge color
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const rand = (a, b) => a + Math.random() * (b - a);
+let W, H, DPR, hz, sky, mtn, sunCv, R, stars = [], t = 0;
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  hz = H * .6; R = Math.min(W, H) * .24;
+  sky = document.createElement('canvas'); sky.width = W; sky.height = H;
+  const g = sky.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, hz);
+  gr.addColorStop(0, '#07001a'); gr.addColorStop(.55, '#2b0a4e'); gr.addColorStop(.85, '#8a1a6e'); gr.addColorStop(1, '#ff6a7a');
+  g.fillStyle = gr; g.fillRect(0, 0, W, hz);
+  for (let i = 0; i < W * H / 5000; i++) { const sy = Math.random() * hz * .7; g.fillStyle = `rgba(255,220,255,${rand(.15, .7) * (1 - sy / hz)})`; g.fillRect(Math.random() * W, sy, DPR, DPR); }
+  stars = Array.from({ length: 50 }, () => ({ x: Math.random() * W, y: Math.random() * hz * .55, ph: Math.random() * 6, s: rand(1.2, 2.4) }));
+  sunCv = document.createElement('canvas'); sunCv.width = sunCv.height = Math.ceil(R * 2);
+  // mountains
+  mtn = document.createElement('canvas'); mtn.width = W; mtn.height = H;
+  const m = mtn.getContext('2d');
+  const ridge = (baseH, rough, fill, alpha, seedOff) => {
+    const pts = []; const n = 60;
+    for (let i = 0; i <= n; i++) {
+      const u = i / n, centerGap = Math.pow(Math.abs(u - .5) * 2, 1.4);
+      const h = baseH * centerGap * (0.55 + .45 * Math.abs(Math.sin(u * 23 + seedOff)) * Math.abs(Math.cos(u * 9 + seedOff * 2))) + rough * Math.random();
+      pts.push([u * W, hz - h]);
+    }
+    m.beginPath(); m.moveTo(0, hz); pts.forEach(p => m.lineTo(p[0], p[1])); m.lineTo(W, hz); m.closePath();
+    m.fillStyle = fill; m.fill();
+    m.save(); m.globalAlpha = alpha; m.strokeStyle = CFG.edge; m.lineWidth = 1.5 * DPR; m.shadowColor = CFG.edge; m.shadowBlur = 8 * DPR;
+    m.beginPath(); pts.forEach((p, i) => i ? m.lineTo(p[0], p[1]) : m.moveTo(p[0], p[1])); m.stroke();
+    // wireframe drops
+    m.globalAlpha = alpha * .35; m.shadowBlur = 0; m.lineWidth = DPR;
+    pts.forEach((p, i) => { if (i % 2 === 0) { m.beginPath(); m.moveTo(p[0], p[1]); m.lineTo(p[0] + (p[0] < W / 2 ? 1 : -1) * W * .01, hz); m.stroke(); } });
+    m.restore();
+  };
+  ridge(H * .2, H * .015, '#1a0630', .6, 1.3);
+  ridge(H * .12, H * .01, '#10021f', 1, 4.1);
+}
+
+function drawSun() {
+  const s = sunCv.getContext('2d'), d = sunCv.width;
+  s.globalCompositeOperation = 'source-over'; s.clearRect(0, 0, d, d);
+  const g = s.createLinearGradient(0, 0, 0, d);
+  g.addColorStop(0, '#fff27a'); g.addColorStop(.45, '#ffa94d'); g.addColorStop(.75, '#ff3d8b'); g.addColorStop(1, '#c42bff');
+  s.fillStyle = g; s.beginPath(); s.arc(d / 2, d / 2, d / 2, 0, 7); s.fill();
+  s.globalCompositeOperation = 'destination-out';
+  const n = 9, ph = (t * .06 * CFG.speed) % 1;
+  for (let i = 0; i < n; i++) {
+    const u = (i + ph) / n, y = d * (.45 + u * .55), th = d * (.004 + u * .045);
+    s.fillRect(0, y, d, th);
+  }
+  const sx = W / 2 - R, sy = hz - R * 1.35;
+  const glow = x.createRadialGradient(W / 2, sy + R, R * .6, W / 2, sy + R, R * 2.6);
+  glow.addColorStop(0, 'rgba(255,80,160,.45)'); glow.addColorStop(1, 'rgba(255,80,160,0)');
+  x.fillStyle = glow; x.fillRect(0, 0, W, hz);
+  x.drawImage(sunCv, sx, sy);
+}
+
+function drawGrid() {
+  const gg = x.createLinearGradient(0, hz, 0, H);
+  gg.addColorStop(0, '#2a0040'); gg.addColorStop(1, '#0b0016');
+  x.fillStyle = gg; x.fillRect(0, hz, W, H - hz);
+  const ph = (t * 1.4 * CFG.speed) % 1, cxp = W / 2, sp = W * .07;
+  x.save(); x.beginPath(); x.rect(0, hz, W, H - hz); x.clip();
+  for (const pass of [[6 * DPR, .18], [1.6 * DPR, 1]]) {
+    x.lineWidth = pass[0]; x.strokeStyle = CFG.grid;
+    for (let i = 0; i < 32; i++) {
+      const z = i + 1 - ph; if (z <= .05) continue;
+      const y = hz + (H - hz) / z;
+      x.globalAlpha = pass[1] * Math.min(1, 1.6 / z);
+      x.beginPath(); x.moveTo(0, y); x.lineTo(W, y); x.stroke();
+    }
+    x.globalAlpha = pass[1] * .9;
+    for (let j = -40; j <= 40; j++) { x.beginPath(); x.moveTo(cxp, hz); x.lineTo(cxp + j * sp * 2.2, H + (H - hz) * 1.2); x.stroke(); }
+  }
+  x.restore(); x.globalAlpha = 1;
+  const fog = x.createLinearGradient(0, hz, 0, hz + (H - hz) * .35);
+  fog.addColorStop(0, 'rgba(255,60,180,.3)'); fog.addColorStop(1, 'rgba(255,60,180,0)');
+  x.fillStyle = fog; x.fillRect(0, hz, W, (H - hz) * .35);
+  x.fillStyle = '#ffd1f4'; x.fillRect(0, hz - DPR, W, 2 * DPR);
+}
+
+function frame(dt) {
+  t += dt;
+  x.drawImage(sky, 0, 0);
+  for (const s of stars) { x.globalAlpha = (Math.sin(t * s.s + s.ph) + 1) / 2; x.fillStyle = '#fff'; x.fillRect(s.x, s.y, 1.8 * DPR, 1.8 * DPR); }
+  x.globalAlpha = 1;
+  drawSun();
+  x.drawImage(mtn, 0, 0);
+  drawGrid();
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

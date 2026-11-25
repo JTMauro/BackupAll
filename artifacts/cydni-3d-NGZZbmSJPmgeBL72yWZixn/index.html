@@ -1,0 +1,653 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CYDNI 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: full-bleed 3D stage, floating title top-left, one control dock along the bottom */
+:root{
+  --bg:#E9EDF1; --stage-a:#F6F8FA; --stage-b:#DDE3E9;
+  --panel:#FFFFFF; --panel-line:#D5DCE3; --fg:#0E1216; --muted:#55606B;
+  --accent:#00A1E0; --on-accent:#000000; --chip:#EEF2F5; --check:#E4E9EE;
+  --font:"Montserrat", "Aspira", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1013; --stage-a:#1A2027; --stage-b:#0D1013;
+  --panel:#161B21; --panel-line:#2A323B; --fg:#EEF2F5; --muted:#9BA6B2;
+  --accent:#00A1E0; --on-accent:#000000; --chip:#20272F; --check:#1E252D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1013; --stage-a:#1A2027; --stage-b:#0D1013;
+  --panel:#161B21; --panel-line:#2A323B; --fg:#EEF2F5; --muted:#9BA6B2;
+  --accent:#00A1E0; --on-accent:#000000; --chip:#20272F; --check:#1E252D; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);overflow:hidden}
+.app{position:relative;height:100%;overflow:hidden}
+.stage{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,var(--stage-a),var(--stage-b))}
+.stage.grid{background-color:var(--stage-a);background-image:
+  linear-gradient(45deg,var(--check) 25%,transparent 25%),linear-gradient(-45deg,var(--check) 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,var(--check) 75%),linear-gradient(-45deg,transparent 75%,var(--check) 75%);
+  background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}
+canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas#gl:active{cursor:grabbing}
+.title{position:absolute;top:16px;left:max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.title h1{margin:0;font-size:28px;font-weight:800;letter-spacing:.04em}
+.title p{margin:0;font-size:13px;color:var(--muted);font-weight:500}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px;font-weight:600}
+.dock{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));
+  width:min(1120px,calc(100% - 32px));max-height:46%;overflow:auto;box-sizing:border-box;
+  background:var(--panel);border:1px solid var(--panel-line);border-radius:12px;padding:8px 12px;
+  display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.group{display:flex;flex-direction:column;gap:3px;min-width:0}
+.label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:2px;background:var(--chip);padding:2px;border-radius:7px}
+.seg button{font:600 11px var(--font);color:var(--fg);background:transparent;border:0;border-radius:5px;padding:4px 8px;min-height:26px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.seg button:focus-visible,.btn:focus-visible,select:focus-visible,.tog input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.toggles{display:flex;gap:10px;flex-wrap:wrap;min-height:30px;align-items:center}
+.tog{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;cursor:pointer}
+.tog input{width:14px;height:14px;accent-color:var(--accent);margin:0}
+.export{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto}
+select{font:600 11px var(--font);color:var(--fg);background:var(--chip);border:1px solid var(--panel-line);border-radius:7px;padding:4px 6px;min-height:30px}
+.btn{font:700 12px var(--font);background:var(--accent);color:var(--on-accent);border:0;border-radius:7px;padding:0 12px;min-height:30px;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.status{font-size:10px;color:var(--muted);min-height:0;flex-basis:100%;text-align:right}
+.status:empty{display:none}
+@media (max-width:640px){.dock{gap:6px 12px;padding:8px}.export{margin-left:0}.status{text-align:left}.title h1{font-size:22px}}
+</style>
+
+<div class="app">
+  <div class="stage" id="stage"></div>
+  <canvas id="gl" aria-label="3D model of CYDNI the robot. Drag to rotate, scroll or pinch to zoom."></canvas>
+  <div class="loading" id="loading">Building CYDNI…</div>
+  <div class="title">
+    <h1>CYDNI</h1>
+    <p>Drag to rotate · Scroll to zoom · Right-drag to pan</p>
+  </div>
+  <div class="dock" role="group" aria-label="Model controls">
+    <div class="group"><span class="label" id="lv">View</span>
+      <div class="seg" data-set="view" aria-labelledby="lv">
+        <button type="button" data-v="front">Front</button>
+        <button type="button" data-v="three" aria-pressed="true">3/4</button>
+        <button type="button" data-v="side">Side</button>
+        <button type="button" data-v="back">Back</button>
+        <button type="button" data-v="top">Top</button>
+        <button type="button" data-v="low">Low</button>
+      </div></div>
+    <div class="group"><span class="label" id="lp">Pose</span>
+      <div class="seg" data-set="pose" aria-labelledby="lp">
+        <button type="button" data-v="idle" aria-pressed="true">Idle</button>
+        <button type="button" data-v="sign">Sign</button>
+        <button type="button" data-v="folder">Folder</button>
+        <button type="button" data-v="wave">Wave</button>
+        <button type="button" data-v="cheer">Cheer</button>
+      </div></div>
+    <div class="group"><span class="label" id="lf">Face</span>
+      <div class="seg" data-set="face" aria-labelledby="lf">
+        <button type="button" data-v="normal" aria-pressed="true">Normal</button>
+        <button type="button" data-v="happy">Happy</button>
+        <button type="button" data-v="wink">Wink</button>
+        <button type="button" data-v="surprised">Surprised</button>
+        <button type="button" data-v="angry">Angry</button>
+        <button type="button" data-v="confused" aria-label="Confused">?</button>
+      </div></div>
+    <div class="group"><span class="label">Motion</span>
+      <div class="toggles">
+        <label class="tog"><input type="checkbox" id="spin"><span>Spin</span></label>
+        <label class="tog"><input type="checkbox" id="float" checked><span>Float</span></label>
+        <label class="tog"><input type="checkbox" id="grid"><span>Transparency grid</span></label>
+      </div></div>
+    <div class="export">
+      <label class="group" for="res"><span class="label">Export PNG (transparent)</span>
+        <select id="res">
+          <option value="3840x2160">4K UHD · 3840×2160</option>
+          <option value="2160x3840">4K Portrait · 2160×3840</option>
+          <option value="4096x4096">4K Square · 4096×4096</option>
+          <option value="1920x1080">HD · 1920×1080</option>
+        </select></label>
+      <button type="button" class="btn" id="dl">Download PNG</button>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('gl');
+const statusEl = document.getElementById('status');
+
+/* ---------- renderer / scene ---------- */
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true, preserveDrawingBuffer:true });
+renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(28, 1, 0.5, 300);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 16;
+controls.maxDistance = 90;
+controls.target.set(0, 8.2, 0);
+controls.autoRotateSpeed = 1.6;
+
+/* lights */
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa6b2, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
+key.position.set(-5, 30, 11);
+key.target.position.set(0, 6, 0);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left:-15, right:15, top:18, bottom:-10, near:2, far:70 });
+key.shadow.radius = 9; key.shadow.blurSamples = 12;
+key.shadow.bias = -0.0006;
+key.shadow.normalBias = 0.06;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight(0xcfeeff, 1.3); rim.position.set(10, 12, -16); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, 0.5); fill.position.set(14, 6, 10); scene.add(fill);
+
+/* ground: transparent, shows only shadows */
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity:0.2 }));
+ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+
+/* soft contact shadow under the robot */
+const blobCanvas = document.createElement('canvas'); blobCanvas.width = blobCanvas.height = 256;
+{ const g = blobCanvas.getContext('2d'); const r = g.createRadialGradient(128,128,0,128,128,128);
+  r.addColorStop(0,'rgba(0,0,0,0.55)'); r.addColorStop(0.5,'rgba(0,0,0,0.22)'); r.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = r; g.fillRect(0,0,256,256); }
+const blob = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({ map:new THREE.CanvasTexture(blobCanvas), transparent:true, depthWrite:false }));
+blob.rotation.x = -Math.PI/2; blob.position.y = 0.01; scene.add(blob);
+
+/* ---------- materials ---------- */
+const M = {
+  shell: new THREE.MeshPhysicalMaterial({ color:0xf1f2f3, roughness:0.32, clearcoat:1, clearcoatRoughness:0.18 }),
+  ring:  new THREE.MeshPhysicalMaterial({ color:0xc9cbcd, roughness:0.38, clearcoat:0.8, clearcoatRoughness:0.25 }),
+  visor: new THREE.MeshPhysicalMaterial({ color:0x1b1c1e, roughness:0.12, metalness:0.1, clearcoat:1, clearcoatRoughness:0.05 }),
+  dark:  new THREE.MeshPhysicalMaterial({ color:0x2a2b2d, roughness:0.35, metalness:0.2, clearcoat:0.6 }),
+  stick: new THREE.MeshStandardMaterial({ color:0xe6e8ea, roughness:0.3, metalness:0.4 }),
+  cyan:  new THREE.MeshPhysicalMaterial({ color:0x0096dc, roughness:0.3, clearcoat:1, clearcoatRoughness:0.12 }),
+  eye:   new THREE.MeshStandardMaterial({ color:0x00e1ff, emissive:0x00e1ff, emissiveIntensity:1.5, toneMapped:false }),
+  eyeRed:new THREE.MeshStandardMaterial({ color:0xff1010, emissive:0xff0a0a, emissiveIntensity:1.4, toneMapped:false }),
+  logo:  new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, roughness:0.35, clearcoat:0.7 }),
+};
+
+/* ---------- helpers ---------- */
+function stadiumShape(w, h){
+  const s = new THREE.Shape(), hw = w/2, hh = h/2;
+  if (w >= h){ const r = hh;
+    // start mid-edge so the outline closes on a straight run, not where an arc ends
+    s.moveTo(0, -hh); s.lineTo(hw-r, -hh); s.absarc(hw-r, 0, r, -Math.PI/2, Math.PI/2, false);
+    s.lineTo(-hw+r, hh); s.absarc(-hw+r, 0, r, Math.PI/2, Math.PI*1.5, false); s.closePath();
+  } else { const r = hw;
+    s.moveTo(hw, 0); s.lineTo(hw, hh-r); s.absarc(0, hh-r, r, 0, Math.PI, false);
+    s.lineTo(-hw, -hh+r); s.absarc(0, -hh+r, r, Math.PI, Math.PI*2, false); s.closePath(); }
+  return s;
+}
+function slab(w, h, depth, b, segs=10){
+  const g = new THREE.ExtrudeGeometry(stadiumShape(w-2*b, h-2*b),
+    { depth:Math.max(0.001, depth-2*b), bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelSegments:segs, curveSegments:64 });
+  g.center(); g.computeVertexNormals(); return g;
+}
+function mesh(geo, mat, parent, x=0, y=0, z=0){
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z);
+  m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
+/* ---------- robot (units = 1/100 of the 2D artwork's pixels; origin at the bottom of the body) ---------- */
+const robot = new THREE.Group(); scene.add(robot);
+const BODY_ZS = 0.72;               // body depth squash
+const bodyR = y => 1.39 + (y - 0.95) / 5.7 * 1.16;   // body radius on the tapered section
+
+// body: lathe of the 2D silhouette
+const prof = [];
+for (let i=0;i<=16;i++){ const a=i/16*Math.PI/2; prof.push(new THREE.Vector2(Math.max(0.001,1.39*Math.sin(a)), 0.95-0.95*Math.cos(a))); }
+for (let i=1;i<=12;i++){ const y=0.95+i/12*5.7; prof.push(new THREE.Vector2(bodyR(y), y)); }
+for (let i=1;i<=18;i++){ const a=i/18*Math.PI/2; prof.push(new THREE.Vector2(1.45+1.1*Math.cos(a), 6.65+1.15*Math.sin(a))); }
+prof.push(new THREE.Vector2(0.001, 7.8));
+const body = mesh(new THREE.LatheGeometry(prof, 128), M.shell, robot);
+body.scale.z = BODY_ZS;
+
+// chest logo (Cydcor swirl), bent onto the body's curve
+const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.06 103"><path d="M51.14,17.19s3.1.02,3.1,2.52c0,2.72-3.1,2.72-3.1,2.72-16.17-.37-30.34,14.89-28.63,30.97.75,16.11,17.65,29.27,32.89,26.3,13.5-2.62,26.63-13.09,27.48-28.43,1.12,15.75-11.53,31.54-28.28,33.76-18.62,2.45-36.92-13.25-37.38-32.03-1.57-18.75,15.11-36.26,33.92-35.81Z"/><path d="M77.23,53.75s-.21,2.43-2.49,2.43-2.61-2.43-2.61-2.43c.25-11.2-10.31-21.02-21.45-19.83-11.16.52-19.22,11.89-18.23,22.79.87,9.5,8.66,18.97,19.7,19.84-11.3,1.02-23.01-7.93-24.83-20.25-1.8-13.7,9.75-27.16,23.56-27.5,13.8-1.15,26.68,11.12,26.34,24.96Z"/><path d="M63.75,45.63s1.97,2.35.33,3.76c-1.63,1.42-3.42-.67-3.42-.67-4.43-4.63-12.67-4.33-16.7.65-4.3,4.72-3.22,13.83,1.19,17.97,4.02,3.77,7.03,4.52,10.29,4.77-4.14,1.17-8.94-.38-12.8-3.11-6.91-5.3-7.76-16.45-1.75-22.76,5.63-6.66,16.85-6.93,22.86-.61Z"/></svg>`;
+{
+  const LOGO_Y = 5.9, S = 0.0276;
+  const data = new SVGLoader().parse(LOGO_SVG);
+  data.paths.forEach(p => SVGLoader.createShapes(p).forEach(shape => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth:5, bevelEnabled:true, bevelThickness:1, bevelSize:0.6, bevelSegments:3, curveSegments:24 });
+    g.translate(-50, -52, 0);
+    g.scale(S, -S, S);
+    const pos = g.attributes.position;
+    for (let i=0;i<pos.count;i+=3){            // y-flip reversed the winding; swap to restore it
+      for (let c=0;c<3;c++){ const a = pos.array[(i+1)*3+c]; pos.array[(i+1)*3+c] = pos.array[(i+2)*3+c]; pos.array[(i+2)*3+c] = a; } }
+    for (let i=0;i<pos.count;i++){              // wrap onto the body surface
+      const x = pos.getX(i), y = pos.getY(i), R = bodyR(LOGO_Y + y);
+      pos.setZ(i, pos.getZ(i) + BODY_ZS*Math.sqrt(Math.max(0, R*R - x*x)) - 0.05);
+    }
+    g.deleteAttribute('normal'); g.deleteAttribute('uv'); g.computeVertexNormals();
+    mesh(g, M.logo, robot, 0, LOGO_Y, 0);
+  }));
+}
+
+// arms (fins) hinged at the shoulders
+function finShape(side){
+  const s = new THREE.Shape(), k = side;   // -1 left, +1 right
+  s.moveTo(0, 0);
+  s.bezierCurveTo(0.62*k, -0.08, 0.52*k, -0.86, 0.42*k, -1.6);
+  s.bezierCurveTo(0.22*k, -2.85, -0.28*k, -3.95, -0.82*k, -4.56);
+  s.lineTo(0, 0);
+  return s;
+}
+function makeArm(side){
+  const pivot = new THREE.Group(); pivot.position.set(2.4*side, 7.0, -0.05); robot.add(pivot);
+  const g = new THREE.ExtrudeGeometry(finShape(side), { depth:0.75, bevelEnabled:true, bevelThickness:0.2, bevelSize:0.16, bevelSegments:8, curveSegments:48 });
+  g.translate(0, 0, -0.375); g.computeVertexNormals();
+  mesh(g, M.cyan, pivot);
+  return pivot;
+}
+const armL = makeArm(-1), armR = makeArm(1);
+
+// manila folder, gripped by CYDNI's left hand (the +x arm)
+const manila = new THREE.MeshPhysicalMaterial({ color:0xcf9d4e, roughness:0.7, side:THREE.DoubleSide });
+const paper  = new THREE.MeshStandardMaterial({ color:0xfbfbf8, roughness:0.9, side:THREE.DoubleSide });
+const ink    = new THREE.MeshStandardMaterial({ color:0xb9bec4, roughness:0.9 });
+const folder = new THREE.Group(); folder.position.set(-0.5, -4.1, 0); armR.add(folder);
+// the hand grips the folder's OUTER edge; the folder reaches back toward the body
+const fIn = new THREE.Group(); folder.add(fIn);
+const FW = 3.0, FH = 3.8, FB = -FH/2;          // width, height, bottom fold line
+fIn.position.set(-FW + 0.18, 0, 0);
+mesh(new RoundedBoxGeometry(FW, FH, 0.035, 2, 0.012), manila, fIn, FW/2, 0, -0.16);              // back panel
+mesh(new RoundedBoxGeometry(0.95, 0.3, 0.035, 2, 0.012), manila, fIn, FW*0.3, FH/2 + 0.13, -0.16); // tab
+{ // a thick stack of files: sheets of different colours, sizes and offsets, plus two tabbed dividers
+  const SHEETS = [ // [colour, dx, dy, rotZ, widthTrim, heightTrim]
+    // back to front: each sheet sits a little lower than the one behind it, so they all peek out
+    [0xf5c542, -0.30, 1.30, 0.10, 0.30, 0.42], [0x6fb3e6, 0.32, 1.18, -0.09, 0.24, 0.30],
+    [0xfbfbf8, -0.16, 1.04, 0.05, 0.14, 0.16], [0x8fca6e, 0.22, 0.92, -0.06, 0.20, 0.22],
+    [0xf6f3ea, -0.10, 0.80, 0.035, 0.18, 0.20], [0xee8e80, 0.14, 0.68, -0.04, 0.22, 0.26],
+    [0xfbfbf8, -0.03, 0.56, 0.015, 0.16, 0.14], [0xfbfbf8, 0.02, 0.46, -0.008, 0.12, 0.16],
+  ];
+  const mats = {};
+  SHEETS.forEach(([c, dx, dy, rz, tw, th], i) => {
+    const m = mats[c] ||= new THREE.MeshStandardMaterial({ color:c, roughness:0.9, side:THREE.DoubleSide });
+    const sh = mesh(new THREE.BoxGeometry(FW - tw, FH - th, 0.012), m, fIn, FW/2 + dx, dy - th/2 + 0.06, -0.135 + i*0.022);
+    sh.rotation.z = rz;
+  });
+  const divider = new THREE.MeshPhysicalMaterial({ color:0xd8ab62, roughness:0.75, side:THREE.DoubleSide });
+  [[0.05, FW*0.55], [0.12, FW*0.82]].forEach(([z, tx]) => {
+    mesh(new THREE.BoxGeometry(FW - 0.1, FH - 0.3, 0.016), divider, fIn, FW/2, 0.05, -0.135 + z*0.9);
+    mesh(new RoundedBoxGeometry(0.62, 0.32, 0.016, 2, 0.01), divider, fIn, tx, FH/2 + 0.32, -0.135 + z*0.9);
+  });
+  // writing on the front-most sheet
+  for (let i=0;i<5;i++) mesh(new THREE.BoxGeometry(FW*(i===4?0.35:0.62), 0.045, 0.004), ink, fIn, 0.3 + FW*(i===4?0.175:0.31), FH/2 + 0.3 - i*0.11, 0.045);
+}
+const front = new THREE.Group(); front.position.set(0, FB, 0.07); front.rotation.x = 0.17; fIn.add(front);   // front cover, hinged at the fold
+mesh(new RoundedBoxGeometry(FW, FH - 0.75, 0.035, 2, 0.012), manila, front, FW/2, (FH - 0.75)/2, 0.03);
+{ // the folded bottom edge: a half tube running along the folder's width, curving under the files
+  const fold = mesh(new THREE.CylinderGeometry(0.115, 0.115, FW, 24, 1, true, Math.PI, Math.PI), manila, fIn, FW/2, FB, -0.045);
+  fold.rotation.z = Math.PI/2; }
+const folderAim = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.1, 0.18, -0.02));
+
+// cloth sign held in both hands
+const SW = 4.6, SH = 2.7;
+function fabricCanvas(){
+  const W = 2048, H = Math.round(W*SH/SW), c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#efe6d2'; g.fillRect(0,0,W,H);
+  // lettering, hand-painted feel: a few slightly offset passes
+  const lines = [['JT is', '#006aa8'], ['AWESOME!!', '#0a0a0a']];
+  const fam = '"Montserrat", "Arial Black", system-ui, sans-serif';
+  lines.forEach(([txt, col], i) => {
+    let size = i === 0 ? 400 : 330;
+    g.font = `800 ${size}px ${fam}`;
+    const maxW = W*0.86; const mw = g.measureText(txt).width; if (mw > maxW){ size *= maxW/mw; g.font = `800 ${size}px ${fam}`; }
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = col;
+    const y = H*(i === 0 ? 0.36 : 0.72);
+    for (let k=0;k<4;k++){ g.globalAlpha = k ? 0.35 : 1; g.fillText(txt, W/2 + (k ? (Math.random()-0.5)*7 : 0), y + (k ? (Math.random()-0.5)*7 : 0)); }
+    g.globalAlpha = 1;
+  });
+  // lime accent underline under JT, brushed
+  g.fillStyle = '#cddb28'; g.globalAlpha = 0.9; g.fillRect(W*0.36, H*0.52, W*0.28, H*0.025); g.globalAlpha = 1;
+  // weave: fine warp and weft threads over everything so the ink sits in the cloth
+  for (let y=0;y<H;y+=3){ g.fillStyle = `rgba(90,70,40,${0.03+Math.random()*0.06})`; g.fillRect(0,y,W,1); }
+  for (let x=0;x<W;x+=3){ g.fillStyle = `rgba(255,250,235,${0.03+Math.random()*0.06})`; g.fillRect(x,0,1,H); }
+  for (let i=0;i<9000;i++){ g.fillStyle = `rgba(80,60,30,${Math.random()*0.12})`; g.fillRect(Math.random()*W, Math.random()*H, 2, 2); }
+  // hem: folded edge shading and stitch line
+  g.strokeStyle = 'rgba(110,85,50,0.35)'; g.lineWidth = 26; g.strokeRect(13,13,W-26,H-26);
+  g.strokeStyle = 'rgba(70,55,35,0.75)'; g.lineWidth = 4; g.setLineDash([22,14]); g.strokeRect(46,46,W-92,H-92); g.setLineDash([]);
+  return c;
+}
+function weaveCanvas(){
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#808080'; g.fillRect(0,0,256,256);
+  for (let y=0;y<256;y+=8) for (let x=0;x<256;x+=8){
+    const over = ((x+y)/8)%2;
+    g.fillStyle = over ? '#d0d0d0' : '#5a5a5a'; g.fillRect(x+1,y+1,6,3);
+    g.fillStyle = over ? '#5a5a5a' : '#d0d0d0'; g.fillRect(x+1,y+4,3,3); }
+  return c;
+}
+const clothTex = new THREE.CanvasTexture(fabricCanvas()); clothTex.colorSpace = THREE.SRGBColorSpace; clothTex.anisotropy = 8;
+const bumpTex = new THREE.CanvasTexture(weaveCanvas()); bumpTex.wrapS = bumpTex.wrapT = THREE.RepeatWrapping; bumpTex.repeat.set(90, 53);
+const clothMat = new THREE.MeshPhysicalMaterial({ map:clothTex, bumpMap:bumpTex, bumpScale:1.2, roughness:0.95, sheen:0.35, sheenRoughness:0.7, sheenColor:0xfff6e0, side:THREE.DoubleSide });
+document.fonts?.load('800 100px Montserrat').then(() => { clothTex.image = fabricCanvas(); clothTex.needsUpdate = true; }).catch(() => {});
+
+// the sign is a small verlet cloth in world space: its top corners are pinned to the hands,
+// the rest has gravity and air drag, so it trails behind when CYDNI turns or bobs
+const NX = 24, NY = 14, NP = (NX+1)*(NY+1);
+const clothGeo = new THREE.PlaneGeometry(1, 1, NX, NY);
+const cloth = mesh(clothGeo, clothMat, scene);
+cloth.frustumCulled = false; cloth.visible = false;
+const GRIP_L = new THREE.Vector3(0.55, -4.15, 0), GRIP_R = new THREE.Vector3(-0.55, -4.15, 0);
+const hL = new THREE.Vector3(), hR = new THREE.Vector3(), tmp = new THREE.Vector3(), inv = new THREE.Matrix4();
+const OVER = 0.55;
+const P = new Float32Array(NP*3), Q = new Float32Array(NP*3), pinT = new Float32Array(NP*3), pin = new Uint8Array(NP);
+let cW = 1, cH = 1;
+const links = [];   // [i, j, rest, stiffness]
+function handsLocal(){
+  robot.updateMatrixWorld(true);
+  robot.worldToLocal(armL.localToWorld(hL.copy(GRIP_L)));
+  robot.worldToLocal(armR.localToWorld(hR.copy(GRIP_R)));
+}
+function layout(u, v, out){        // resting shape in robot space, then to world
+  out.set(hL.x - OVER + u*cW,
+          hL.y + (hR.y - hL.y)*u + 0.16 - 0.16*Math.sin(Math.PI*u) - v*cH,
+          hL.z + (hR.z - hL.z)*u - 0.12);
+  return robot.localToWorld(out);
+}
+function resetCloth(){
+  handsLocal();
+  cW = hR.x - hL.x + OVER*2; cH = cW * SH / SW;
+  for (let iy=0; iy<=NY; iy++) for (let ix=0; ix<=NX; ix++){
+    const i = iy*(NX+1)+ix; layout(ix/NX, iy/NY, tmp);
+    P[i*3]=Q[i*3]=tmp.x; P[i*3+1]=Q[i*3+1]=tmp.y; P[i*3+2]=Q[i*3+2]=tmp.z;
+    pin[i] = (iy === 0 && (ix/NX*cW < OVER*1.7 || ix/NX*cW > cW - OVER*1.7)) ? 1 : 0;
+  }
+  links.length = 0;
+  const dx = cW/NX, dy = cH/NY, dd = Math.hypot(dx, dy);
+  const L = (a, b, r, k) => links.push([a, b, r, k]);
+  for (let iy=0; iy<=NY; iy++) for (let ix=0; ix<=NX; ix++){
+    const i = iy*(NX+1)+ix;
+    if (ix < NX) L(i, i+1, dx, 1);
+    if (iy < NY) L(i, i+NX+1, dy, 1);
+    if (ix < NX && iy < NY){ L(i, i+NX+2, dd, 0.6); L(i+1, i+NX+1, dd, 0.6); }
+    if (ix < NX-1) L(i, i+2, dx*2, 0.25);
+    if (iy < NY-1) L(i, i+2*(NX+1), dy*2, 0.25);
+  }
+}
+const GRAV = 34, DRAG = 0.982, STEP = 1/120;
+let simAcc = 0;
+function simCloth(dt, t){
+  handsLocal();
+  for (let ix=0; ix<=NX; ix++){ if (!pin[ix]) continue; layout(ix/NX, 0, tmp); pinT[ix*3]=tmp.x; pinT[ix*3+1]=tmp.y; pinT[ix*3+2]=tmp.z; }
+  inv.copy(robot.matrixWorld).invert();
+  simAcc = Math.min(simAcc + dt, STEP*6);
+  while (simAcc >= STEP){
+    simAcc -= STEP;
+    const g = GRAV*STEP*STEP, breeze = reduceMotion ? 0 : Math.sin(t*1.7)*0.6*STEP*STEP;
+    for (let i=0;i<NP;i++){
+      const k = i*3;
+      if (pin[i]){ Q[k]=P[k]; Q[k+1]=P[k+1]; Q[k+2]=P[k+2]; P[k]=pinT[k]; P[k+1]=pinT[k+1]; P[k+2]=pinT[k+2]; continue; }
+      const vx=(P[k]-Q[k])*DRAG, vy=(P[k+1]-Q[k+1])*DRAG, vz=(P[k+2]-Q[k+2])*DRAG;
+      Q[k]=P[k]; Q[k+1]=P[k+1]; Q[k+2]=P[k+2];
+      P[k]+=vx; P[k+1]+=vy-g; P[k+2]+=vz+breeze;
+    }
+    for (let it=0; it<10; it++){
+      for (const [a, b, r, s] of links){
+        const ka=a*3, kb=b*3, dx=P[kb]-P[ka], dy=P[kb+1]-P[ka+1], dz=P[kb+2]-P[ka+2];
+        const len = Math.hypot(dx,dy,dz) || 1e-6, wa = pin[a]?0:1, wb = pin[b]?0:1, w = wa+wb;
+        if (!w) continue;
+        const c = (len - r)/len * s / w;
+        P[ka]+=dx*c*wa; P[ka+1]+=dy*c*wa; P[ka+2]+=dz*c*wa;
+        P[kb]-=dx*c*wb; P[kb+1]-=dy*c*wb; P[kb+2]-=dz*c*wb;
+      }
+    }
+    // keep the cloth outside the body (an elliptical column in robot space)
+    for (let i=0;i<NP;i++){
+      if (pin[i]) continue;
+      const k=i*3; tmp.set(P[k],P[k+1],P[k+2]).applyMatrix4(inv);
+      if (tmp.y < 0.2 || tmp.y > 8.2) continue;
+      const rx = bodyR(Math.min(Math.max(tmp.y, 0.95), 6.65)) + 0.2, rz = rx*BODY_ZS + 0.15;
+      const d = Math.hypot(tmp.x/rx, tmp.z/rz);
+      if (d < 1){ tmp.x /= d; tmp.z /= d; tmp.applyMatrix4(robot.matrixWorld); P[k]=tmp.x; P[k+1]=tmp.y; P[k+2]=tmp.z; }
+    }
+  }
+  clothGeo.attributes.position.array.set(P);
+  clothGeo.attributes.position.needsUpdate = true; clothGeo.computeVertexNormals();
+}
+
+
+// neck
+mesh(new THREE.CylinderGeometry(0.52, 0.56, 1.0, 48), M.dark, robot, 0, 7.98, 0);
+
+// head
+const head = new THREE.Group(); head.position.set(0, 10.43, 0); robot.add(head);
+mesh(slab(7.32, 4.5, 4.2, 0.7), M.ring, head);
+mesh(slab(6.66, 3.84, 2.4, 0.22), M.shell, head, 0, 0, 1.11);   // face plate, sunk deep into the shell so its edge never floats
+mesh(slab(5.04, 2.22, 0.5, 0.16), M.visor, head, 0, 0, 2.32);
+// ears
+for (const s of [-1, 1]){ const e = mesh(slab(2.0, 1.62, 0.8, 0.2), M.cyan, head, 3.72*s, 0, 0); e.rotation.y = Math.PI/2; }
+// top cap, knob, antenna
+mesh(new RoundedBoxGeometry(2.36, 0.62, 1.8, 6, 0.22), M.dark, head, 0, 2.38, 0);
+mesh(new THREE.SphereGeometry(0.38, 48, 24, 0, Math.PI*2, 0, Math.PI/2), M.dark, head, 0, 2.62, 0);
+mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.95, 24), M.stick, head, 0, 3.3, 0);
+mesh(new THREE.SphereGeometry(0.37, 48, 32), M.cyan, head, 0, 3.94, 0);
+
+// eyes (one group per expression)
+function domeGeo(){
+  const s = new THREE.Shape();
+  s.moveTo(0.39, 0); s.absarc(0, 0, 0.39, 0, Math.PI, false);
+  s.lineTo(-0.39, -0.14); s.quadraticCurveTo(-0.39, -0.26, -0.27, -0.26);
+  s.lineTo(0.27, -0.26); s.quadraticCurveTo(0.39, -0.26, 0.39, -0.14); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth:0.05, bevelEnabled:true, bevelThickness:0.03, bevelSize:0.025, bevelSegments:3, curveSegments:32 });
+  g.translate(0, -0.06, 0); return g;
+}
+const arcGeo = () => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
+  new THREE.Vector3(-0.36,-0.16,0), new THREE.Vector3(0,0.42,0), new THREE.Vector3(0.36,-0.16,0)), 32, 0.085, 12, false);
+const ringGeo = () => { const g = new THREE.CylinderGeometry(0.31, 0.31, 0.08, 48); g.rotateX(Math.PI/2); return g; };
+const eyesRoot = new THREE.Group(); eyesRoot.position.set(0, 0, 2.6); head.add(eyesRoot);
+const faces = {};
+// angry: half-moon eyes with the top edge slanting down toward the middle
+function angryGeo(side){
+  const s = new THREE.Shape(), k = side;   // +1 left eye, -1 right eye
+  s.moveTo(-0.4*k, 0.3); s.lineTo(0.4*k, -0.06);
+  s.absarc(0, -0.06, 0.4, k > 0 ? 0 : Math.PI, k > 0 ? Math.PI : 0, k > 0);
+  s.closePath();
+  return new THREE.ExtrudeGeometry(s, { depth:0.05, bevelEnabled:true, bevelThickness:0.03, bevelSize:0.025, bevelSegments:3, curveSegments:32 });
+}
+function face(name, left, right, mat = M.eye){
+  const g = new THREE.Group(); g.name = name;
+  const l = new THREE.Mesh(left(), mat); l.position.x = -1.1;
+  const r = new THREE.Mesh(right(), mat); r.position.x = 1.1;
+  g.add(l, r); g.visible = false; eyesRoot.add(g); faces[name] = g;
+}
+face('normal', domeGeo, domeGeo);
+face('happy', arcGeo, arcGeo);
+face('wink', domeGeo, arcGeo);
+face('surprised', ringGeo, ringGeo);
+face('angry', () => angryGeo(1), () => angryGeo(-1), M.eyeRed);
+face('confused', domeGeo, () => { const g = domeGeo(); g.scale(0.72, 0.72, 1); g.translate(0, 0.12, 0); return g; });
+faces.normal.visible = true;
+
+/* frame the robot above the ground */
+const BASE_Y = 0.85;
+robot.position.y = BASE_Y;
+
+/* ---------- state + UI ---------- */
+const state = { pose:'idle', face:'normal', float: !reduceMotion, spin:false };
+const floatBox = document.getElementById('float'); floatBox.checked = state.float;
+const spinBox = document.getElementById('spin');
+
+const VIEWS = { // [azimuth deg, polar deg, distance]
+  front:[0, 86, 42], three:[30, 80, 42], side:[90, 86, 42], back:[180, 84, 42], top:[20, 22, 44], low:[24, 112, 40] };
+let camTween = null;
+function goView(name){
+  const [az, po, d] = VIEWS[name];
+  const sph = new THREE.Spherical(d, THREE.MathUtils.degToRad(po), THREE.MathUtils.degToRad(az));
+  const to = new THREE.Vector3().setFromSpherical(sph).add(controls.target);
+  camTween = { from: camera.position.clone(), to, t:0 };
+}
+{ const [az, po, d] = VIEWS.three;
+  camera.position.setFromSpherical(new THREE.Spherical(d, THREE.MathUtils.degToRad(po), THREE.MathUtils.degToRad(az))).add(controls.target); }
+
+document.querySelectorAll('.seg').forEach(seg => {
+  seg.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    const v = b.dataset.v, set = seg.dataset.set;
+    if (set === 'view'){ goView(v); spinBox.checked = state.spin = false; }
+    if (set === 'pose') state.pose = v;
+    if (set === 'face'){ state.face = v; for (const k in faces) faces[k].visible = (k === v); }
+  });
+});
+floatBox.addEventListener('change', () => state.float = floatBox.checked);
+spinBox.addEventListener('change', () => { state.spin = spinBox.checked; });
+document.getElementById('grid').addEventListener('change', e => document.getElementById('stage').classList.toggle('grid', e.target.checked));
+canvas.addEventListener('pointerdown', () => { camTween = null; });
+
+/* ---------- resize ---------- */
+const dock = document.querySelector('.dock');
+function resize(){
+  // the 3D view fills the area above the control dock
+  const H = innerHeight, dh = Math.min(dock.offsetHeight + 14, H * 0.5);
+  canvas.style.height = (H - dh) + 'px';
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+new ResizeObserver(resize).observe(dock);
+new ResizeObserver(resize).observe(canvas); resize();
+
+/* ---------- animation ---------- */
+const clock = new THREE.Clock();
+let t = 0, spinVel = 0, floatY = 0, blinkT = 2.5, paused = false;
+const lerp = THREE.MathUtils.lerp;
+function tick(){
+  requestAnimationFrame(tick);
+  if (paused) return;
+  const dt = Math.min(clock.getDelta(), 0.05); t += dt;
+
+  // float
+  const fTarget = state.float ? 0.35 + Math.sin(t*1.6)*0.3 : 0;
+  floatY = lerp(floatY, fTarget, 1 - Math.pow(0.001, dt));
+  let hop = 0;
+
+  // pose
+  let lT = 0, rT = 0, tilt = 0, rX = 0, lX = 0, turn = null;
+  if (state.pose === 'idle'){ lT = -0.05 - Math.sin(t*1.6)*0.04; rT = 0.05 + Math.sin(t*1.6)*0.04; }
+  if (state.pose === 'wave'){ lT = -0.08; rT = 2.55 + Math.sin(t*7)*0.32; tilt = -0.07; }
+  if (state.pose === 'folder'){ lT = -0.05 - Math.sin(t*1.6)*0.04; rT = 0.62; rX = -1.55 + Math.sin(t*1.6)*0.03; turn = 0.12; tilt = -0.04; }
+  if (state.pose === 'sign'){ const s = Math.sin(t*1.6)*0.025; lT = -0.32; rT = 0.32; lX = -1.15 + s; rX = -1.15 + s; tilt = 0.03; }
+  if (state.pose === 'cheer'){ lT = -2.6 - Math.sin(t*8)*0.14; rT = 2.6 + Math.sin(t*8)*0.14; hop = Math.abs(Math.sin(t*4))*0.45; }
+  const k = 1 - Math.pow(0.0005, dt);
+  armL.rotation.z = lerp(armL.rotation.z, lT, k);
+  armR.rotation.z = lerp(armR.rotation.z, rT, k);
+  // "?" face: a dog-style head tilt, switching sides every few seconds
+  if (state.face === 'confused') tilt = 0.36 * (Math.sin(t*0.55) >= 0 ? 1 : -1) + Math.sin(t*2.2)*0.015;
+  head.rotation.z = lerp(head.rotation.z, tilt, 1 - Math.pow(0.002, dt));
+  // pivot the tilt at the neck rather than the middle of the head
+  head.position.x = -2.25*Math.sin(head.rotation.z);
+  head.position.y = 10.43 - 2.25*(1 - Math.cos(head.rotation.z));
+  armR.rotation.x = lerp(armR.rotation.x, rX, k);
+  armL.rotation.x = lerp(armL.rotation.x, lX, k);
+  head.rotation.y = lerp(head.rotation.y, turn ?? (state.pose === 'idle' ? Math.sin(t*0.7)*0.06 : 0), k);
+  // folder: pops in for the Folder pose and stays upright whatever the arm does
+  const fs = lerp(folder.scale.x, state.pose === 'folder' ? 1 : 0.001, k);
+  folder.scale.setScalar(fs); folder.visible = fs > 0.01;
+  folder.quaternion.copy(armR.quaternion).invert().multiply(folderAim);
+  robot.position.y = BASE_Y + floatY + hop;
+
+  // spin turns CYDNI itself; when it stops, CYDNI eases back to face front
+  spinVel = lerp(spinVel, state.spin ? 1.4 : 0, 1 - Math.pow(0.08, dt));
+  if (state.spin) robot.rotation.y += spinVel*dt;
+  else { const home = Math.round(robot.rotation.y/(Math.PI*2))*Math.PI*2; robot.rotation.y = lerp(robot.rotation.y, home, 1 - Math.pow(0.03, dt)); }
+
+  // cloth sign
+  const showCloth = state.pose === 'sign' && armL.rotation.x < -0.95 && armR.rotation.x < -0.95;
+  if (showCloth && !cloth.visible) resetCloth();
+  cloth.visible = showCloth;
+  if (showCloth) simCloth(dt, t);
+
+  // contact shadow follows height
+  const hgt = robot.position.y;
+  const sc = 7.2 + hgt*0.9; blob.scale.set(sc, sc*0.55, 1);
+  blob.material.opacity = THREE.MathUtils.clamp(0.95 - hgt*0.28, 0.35, 0.95);
+
+  // blink
+  blinkT -= dt;
+  let ey = 1;
+  if (blinkT < 0.14 && state.face !== 'happy'){ ey = Math.abs(blinkT - 0.07) / 0.07; }
+  if (blinkT <= 0) blinkT = 2.5 + Math.random()*3;
+  eyesRoot.scale.y = Math.max(0.08, ey);
+
+  // camera tween
+  if (camTween){
+    camTween.t = Math.min(1, camTween.t + dt*1.6);
+    const e = 1 - Math.pow(1 - camTween.t, 3);
+    camera.position.lerpVectors(camTween.from, camTween.to, e);
+    if (camTween.t >= 1) camTween = null;
+  }
+  controls.update();
+  renderer.render(scene, camera);
+}
+document.getElementById('loading').remove();
+tick();
+
+/* ---------- 4K export ---------- */
+const dlBtn = document.getElementById('dl');
+let downloads = null;
+(async () => {
+  try { downloads = await window.claude?.use?.('downloads'); } catch { downloads = null; }
+  if (!downloads){ dlBtn.disabled = true; statusEl.textContent = 'Downloading isn’t available in this view.'; }
+})();
+
+dlBtn.addEventListener('click', async () => {
+  if (!downloads) return;
+  const [w, h] = document.getElementById('res').value.split('x').map(Number);
+  dlBtn.disabled = true; statusEl.textContent = `Rendering ${w}×${h}…`;
+  paused = true;
+  const prevPR = renderer.getPixelRatio();
+  let png = null;
+  try {
+    renderer.setPixelRatio(1);
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+    png = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  } finally {
+    renderer.setPixelRatio(prevPR);
+    resize();
+    paused = false; clock.getDelta();
+  }
+  if (!png){ statusEl.textContent = 'This device couldn’t render that size. Try a smaller one.'; dlBtn.disabled = false; return; }
+  try {
+    await downloads.save({ filename:`cydni-3d-${w}x${h}.png`, data: png });
+    statusEl.textContent = `Saved cydni-3d-${w}x${h}.png`;
+  } catch (err) {
+    const c = err?.code;
+    statusEl.textContent = c === 'declined' ? 'Download cancelled.'
+      : c === 'rate_limited' ? 'A download prompt is already open.'
+      : 'The download didn’t go through. Try again.';
+  }
+  dlBtn.disabled = false;
+});
+</script>
+
+</body></html>

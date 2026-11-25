@@ -1,0 +1,63 @@
+{
+ "title": "Builder",
+ "url": "https://claude.ai/artifact/9kXvZweupQE92LDPRjGSUk",
+ "type": "web page",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "app.css",
+   "bytes": 25003,
+   "sha256": "c9b74affece41522f675d7cb948047a8222a8ff0292aa5c48081793d9582ba0a"
+  },
+  {
+   "path": "app.js",
+   "bytes": 33035,
+   "sha256": "93b4ca14c79036e2310c5eadeca22c5f36f37d1e5d4235beee12ecdecc9cd6af"
+  },
+  {
+   "path": "index.html",
+   "bytes": 13777,
+   "sha256": "442008a34d455bd05aba747b638e036feab0be84133c2b23312c9bdbe2c463a2"
+  },
+  {
+   "path": "media/episode_1.mp4",
+   "bytes": 90993,
+   "sha256": "d9dcfcfc9390e1b96d6d44df54f3ec8e5f18b20f5ba66eb4c917b36d649469a5"
+  },
+  {
+   "path": "media/rivet.png",
+   "bytes": 50302,
+   "sha256": "16326f814bac0422640f827e4e4fce60f0159265d88b20acdbb83a2fe54e0f5f"
+  },
+  {
+   "path": "media/rivet_bounce.gif",
+   "bytes": 123876,
+   "sha256": "dd5a0472d2cc9331a0c8edb62cd9a196ed0424d90576253e5ef91ae4b61a853e"
+  },
+  {
+   "path": "media/rivet_bounce.mp4",
+   "bytes": 17265,
+   "sha256": "000fc52b9b32d292ce340a535be7f04b9dca93a8a2adba9868ff32564b46aaec"
+  },
+  {
+   "path": "media/rivet_zoom_in.mp4",
+   "bytes": 61655,
+   "sha256": "b3434da5ef9978bd9338543d097e9263a93493ed669e060cc0a4b4bc34db5830"
+  },
+  {
+   "path": "media/theme.mp3",
+   "bytes": 32618,
+   "sha256": "fd215fb53eec994ac57474e905675d4bde58d68358ffeb8d29c7937c98b349c2"
+  },
+  {
+   "path": "media/theme_waveform.png",
+   "bytes": 778,
+   "sha256": "7b98382d7efe91b007d5fc9c38d73001e5b3a4065406653c10b9aaca3c2f4140"
+  },
+  {
+   "path": "mock.js",
+   "bytes": 22731,
+   "sha256": "8ba5e70a6d4dd9f6503d7c5a7a497fa5efd67f17b33d7dbce5289c45a6834cbd"
+  }
+ ]
+}

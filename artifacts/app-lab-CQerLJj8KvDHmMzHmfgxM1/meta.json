@@ -1,0 +1,18 @@
+{
+ "title": "App Lab",
+ "url": "https://claude.ai/artifact/CQerLJj8KvDHmMzHmfgxM1",
+ "type": "web page",
+ "updated": "2026-11-12",
+ "files": [
+  {
+   "path": "app-lab-desktop.b64.txt",
+   "bytes": 692836,
+   "sha256": "b74f8399bf37c799ca6ab4c24b952e6b1286e8ce073c84e23638430587d81977"
+  },
+  {
+   "path": "index.html",
+   "bytes": 207555,
+   "sha256": "beecd1654e142409e309a6724fe321d3d3be90c996fd2f0f8e7948d7110d04bd"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "title": "VideoBlitz",
+ "url": "https://claude.ai/artifact/34BK8TRwP1o5KJyaQof7pM",
+ "type": "web page",
+ "updated": "2026-10-22",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 170122,
+   "sha256": "8700e4b8d675049b206f0572957dc728a7c003f6bbd77855263e35757926e7d3"
+  }
+ ]
+}

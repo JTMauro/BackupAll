@@ -1,0 +1,493 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ben Bot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a lamp-lit reading room. Ben's living 3D portrait on the left, the chat on the right; under them the expression palette and the map the real chat will use. */
+:root{
+  --bg:#f4eee3; --surface:#fffaf2; --sunk:#efe6d6; --rule:#e0d2bc; --ink:#2a2017; --dim:#6e5e4b; --gold:#9a6b1f; --gold-soft:#f2e4c6; --leather:#5a3a22; --me:#e9f0f7; --meink:#1d3346;
+  --display:"Cormorant Garamond",Georgia,serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#140f0a;--surface:#1e1710;--sunk:#18120c;--rule:#382b1f;--ink:#f1e6d4;--dim:#b9a78d;--gold:#e0b25c;--gold-soft:#33261a;--leather:#c99c6b;--me:#1b2733;--meink:#d7e6f4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#140f0a;--surface:#1e1710;--sunk:#18120c;--rule:#382b1f;--ink:#f1e6d4;--dim:#b9a78d;--gold:#e0b25c;--gold-soft:#33261a;--leather:#c99c6b;--me:#1b2733;--meink:#d7e6f4;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.55 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 56px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.2rem,5vw,3.2rem);line-height:1}
+h2{font-size:1.7rem}
+.kicker{font:600 .76rem/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.dim{color:var(--dim)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.main{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:stretch}
+.stage{position:relative;border-radius:18px;overflow:hidden;background:#24180f;aspect-ratio:1/1;border:1px solid var(--rule);box-shadow:0 20px 50px rgba(30,15,5,.3)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.badge{position:absolute;left:12px;bottom:12px;background:rgba(20,14,8,.72);color:#f6e7c8;border:1px solid rgba(224,178,92,.5);border-radius:999px;padding:5px 12px;font:600 .82rem var(--body);display:flex;gap:8px;align-items:center;backdrop-filter:blur(4px)}
+.badge i{width:8px;height:8px;border-radius:50%;background:#e0b25c;box-shadow:0 0 8px #e0b25c}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:#d9c5a3;font:600 .95rem var(--body)}
+.chat{background:var(--surface);border:1px solid var(--rule);border-radius:18px;display:grid;grid-template-rows:auto 1fr auto auto;min-height:0;min-width:0;overflow:hidden}
+.chathead{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--rule)}
+.chathead b{font-family:var(--display);font-size:1.35rem}
+.log{overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:520px}
+.msg{max-width:88%;padding:9px 13px;border-radius:14px;white-space:pre-wrap;word-wrap:break-word}
+.msg.ben{background:var(--gold-soft);border-top-left-radius:4px;align-self:flex-start}
+.msg.me{background:var(--me);color:var(--meink);border-top-right-radius:4px;align-self:flex-end}
+.msg .tag{display:block;font:500 .72rem var(--mono);color:var(--dim);margin-bottom:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;border-top:1px solid var(--rule)}
+.chip{appearance:none;cursor:pointer;font:500 .82rem var(--body);border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 10px}
+.chip:hover{border-color:var(--gold)}
+form{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--rule)}
+input[type=text]{flex:1;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+button.send{appearance:none;cursor:pointer;font:600 .95rem var(--body);background:var(--leather);color:var(--bg);border:0;border-radius:10px;padding:10px 16px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.palette{display:flex;flex-wrap:wrap;gap:8px}
+.ex{appearance:none;cursor:pointer;font:600 .86rem var(--body);background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:10px;padding:7px 12px}
+.ex[aria-pressed="true"]{background:var(--leather);color:var(--bg);border-color:var(--leather)}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{background:var(--sunk);color:var(--dim);font-weight:600}
+tr:last-child td{border-bottom:0}
+code,pre{font-family:var(--mono);font-size:.84rem}
+pre{background:var(--sunk);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;overflow-x:auto;margin:0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:900px){.main,.two{grid-template-columns:minmax(0,1fr)}.stage{max-width:560px;width:100%;margin:0 auto}}
+@media (prefers-reduced-motion:reduce){.msg{transition:none}}
+</style>
+
+<main class="wrap">
+  <div class="top">
+    <div style="display:grid;gap:8px">
+      <div class="kicker">CydVerse · AI Chat · 3D bot preview</div>
+      <h1>Ben Bot</h1>
+      <p class="dim" style="max-width:62ch">Ask Ben something. He listens for common words (find, search, help, fix, create, delete and more), thinks, and answers with a face to match. The answers here are a scripted demo about CydVerse; when the AI chat is built it will drive the same expressions.</p>
+    </div>
+  </div>
+
+  <section class="main" aria-label="Ben and the chat">
+    <div class="stage" id="stage">
+      <canvas id="gl" aria-label="Ben, a 3D living portrait of an old sage in a brown hood holding a glowing book. His face changes with the conversation. Drag to turn his head."></canvas>
+      <div class="loading" id="loading">Ben is opening his book…</div>
+      <div class="badge" aria-live="polite"><i aria-hidden="true"></i><span id="mood">Idle</span></div>
+    </div>
+    <div class="chat">
+      <div class="chathead"><b>Ben</b><span class="dim" style="font-size:.85rem">CydVerse guide · demo answers</span></div>
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="chips" id="chips" aria-label="Try asking">
+        <button class="chip" type="button">Hi Ben!</button>
+        <button class="chip" type="button">Find the files Acme sent me</button>
+        <button class="chip" type="button">Help me share a file</button>
+        <button class="chip" type="button">I can't log in</button>
+        <button class="chip" type="button">What is Launchpad?</button>
+        <button class="chip" type="button">Check the server status</button>
+        <button class="chip" type="button">Delete all links</button>
+        <button class="chip" type="button">Suspicious upload, urgent!</button>
+        <button class="chip" type="button">How do I create a request?</button>
+        <button class="chip" type="button">This is so frustrating</button>
+        <button class="chip" type="button">Thanks, great job</button>
+      </div>
+      <form id="form" autocomplete="off"><input type="text" id="q" placeholder="Ask Ben about CydVerse" aria-label="Your message" maxlength="300"><button class="send" type="submit">Ask</button></form>
+    </div>
+  </section>
+
+  <section style="display:grid;gap:12px" aria-labelledby="pal-h">
+    <h2 id="pal-h">Expressions</h2>
+    <div class="palette" id="palette"></div>
+    <p class="dim" style="font-size:.9rem">He also blinks, breathes, glances about and keeps the book glowing on his own. Drag his face to turn his head.</p>
+  </section>
+
+  <section class="two" aria-label="How the chat will drive Ben">
+    <div style="display:grid;gap:10px">
+      <h2>Words Ben listens for</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Category</th><th>Common words</th><th>Ben shows</th></tr></thead>
+        <tbody id="catrows"><tr><td>Typing</td><td>(while the message is written)</td><td>Listening</td></tr></tbody>
+      </table></div>
+    </div>
+    <div style="display:grid;gap:10px;align-content:start">
+      <h2>For the chat developers</h2>
+      <p class="dim">Ben's page exposes one object. The AI's reply only needs a category id (find, help, fix, access, delete…) next to its text; without one, Ben reads the words himself.</p>
+<pre>Ben.express('aha')            // set an expression
+Ben.gesture('nod')            // nod, shake, wink, blink
+Ben.react({ intent: 'fix', text })      // a category id: find, help, fix, access...
+Ben.say(text)                 // move the mouth while text appears
+Ben.list()                    // all expression names</pre>
+    </div>
+  </section>
+</main>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+const IW = 1448, IH = 1086;                      // the photo, in pixels
+const canvas = document.getElementById('gl'), stage = document.getElementById('stage');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const Q = new URLSearchParams(location.search);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, preserveDrawingBuffer: Q.has('shot') });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x24180f);
+const camera = new THREE.PerspectiveCamera(24, 1, 0.1, 200);
+
+/* ---------- the living portrait: a depth-shaped mesh with face warps in the shader ---------- */
+const U = {
+  map:{ value:null }, map2:{ value:null }, time:{ value:0 },
+  yaw:{ value:0 }, pitch:{ value:0 }, roll:{ value:0 }, breathe:{ value:0 },
+  smile:{ value:0.12 }, frown:{ value:0 }, jaw:{ value:0 }, browL:{ value:0 }, browR:{ value:0 }, worry:{ value:0 }, anger:{ value:0 },
+  lidL:{ value:0 }, lidR:{ value:0 }, wide:{ value:0 }, squint:{ value:0 }, glow:{ value:0.5 },
+};
+const vert = /* glsl */`
+  uniform float yaw, pitch, roll, breathe;
+  varying vec2 vUv; varying float vShade;
+  float g(vec2 p, vec2 c, float r){ vec2 d = p - c; return exp(-dot(d,d)/(2.0*r*r)); }
+  float ell(vec2 p, vec2 c, vec2 r){ vec2 d = (p - c)/r; return sqrt(max(0.0, 1.0 - dot(d,d))); }
+  float depth(vec2 P){
+    float head = 95.0*ell(P, vec2(708.0,245.0), vec2(178.0,220.0)) + 42.0*g(P, vec2(712.0,268.0), 34.0);
+    float beard = 70.0*ell(P, vec2(712.0,445.0), vec2(160.0,200.0));
+    float hood = 48.0*ell(P, vec2(700.0,250.0), vec2(305.0,335.0));
+    float body = 38.0*ell(P, vec2(720.0,860.0), vec2(680.0,470.0));
+    float book = 34.0*ell(P, vec2(790.0,820.0), vec2(360.0,290.0)) + 18.0;
+    book *= step(560.0, P.y);
+    return max(max(head, beard), max(max(hood, body), book));
+  }
+  void main(){
+    vUv = uv;
+    vec2 P = vec2(uv.x*${IW}.0, (1.0-uv.y)*${IH}.0);
+    float z = depth(P)*0.011;
+    vec3 p = vec3(position.xy, z);
+    // head, hood and beard turn around the neck; the weight fades out into the shoulders
+    vec2 hd = (P - vec2(708.0, 300.0))/vec2(300.0, 360.0);
+    float w = smoothstep(1.15, 0.55, length(hd));
+    vec3 pivot = vec3((708.0/${IW}.0 - 0.5)*14.48, (0.5 - 520.0/${IH}.0)*10.86, 0.2);
+    vec3 q = p - pivot;
+    float a = yaw*w, b = pitch*w, c = roll*w;
+    q = vec3(q.x*cos(a) + q.z*sin(a), q.y, -q.x*sin(a) + q.z*cos(a));
+    q = vec3(q.x, q.y*cos(b) - q.z*sin(b), q.y*sin(b) + q.z*cos(b));
+    q = vec3(q.x*cos(c) - q.y*sin(c), q.x*sin(c) + q.y*cos(c), q.z);
+    p = q + pivot;
+    p.y += breathe*0.02*smoothstep(400.0, 900.0, P.y);
+    vShade = 1.0 - 0.18*w*abs(a)*4.0;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }`;
+const frag = /* glsl */`
+  uniform sampler2D map, map2; uniform float time, smile, frown, jaw, browL, browR, worry, anger, lidL, lidR, wide, squint, glow;
+  varying vec2 vUv; varying float vShade;
+  float g(vec2 p, vec2 c, float r){ vec2 d = p - c; return exp(-dot(d,d)/(2.0*r*r)); }
+  vec3 tex(vec2 P){ return texture2D(map, vec2(clamp(P.x,0.0,${IW-1}.0)/${IW}.0, 1.0 - clamp(P.y,0.0,${IH-1}.0)/${IH}.0)).rgb; }
+  vec3 tex2(vec2 P){ return texture2D(map2, vec2(clamp(P.x,0.0,${IW-1}.0)/${IW}.0, 1.0 - clamp(P.y,0.0,${IH-1}.0)/${IH}.0)).rgb; }
+  vec3 lid(vec3 col, vec2 P, vec2 Pw, vec2 e, float c){
+    if (c < 0.01) return col;
+    vec3 painted = col;
+    vec2 n = (Pw - e)/vec2(31.0,13.0);
+    float inside = clamp((1.25 - length(n))*2.2, 0.0, 1.0);
+    float top = e.y - 13.0, travel = c*26.0;
+    float cover = top + travel + 2.5*cos(clamp(n.x,-1.0,1.0)*1.4)*c;
+    float m = clamp((cover - Pw.y)/2.0, 0.0, 1.0) * clamp((Pw.y - (top - 10.0))/6.0, 0.0, 1.0) * inside;
+    vec3 fold = tex(vec2(P.x, (e.y + 16.0) + (cover - Pw.y)*0.75));
+    col = mix(col, fold, m);
+    float shade = exp(-pow(Pw.y - cover, 2.0)/2.2) * inside * smoothstep(0.35, 1.0, c);
+    painted = mix(col, vec3(0.2,0.12,0.08), 0.6*shade);
+    // nearly closed: use the real closed eye from the second photo, blended softly around the eye
+    vec2 n2 = (Pw - e)/vec2(46.0, 26.0);
+    float m2 = smoothstep(1.0, 0.55, length(n2)) * smoothstep(0.55, 0.95, c);
+    return mix(painted, tex2(Pw), m2);
+  }
+  void main(){
+    vec2 P = vec2(vUv.x*${IW}.0, (1.0-vUv.y)*${IH}.0);
+    vec2 D = vec2(0.0);
+    // brows: up and down per side, inner ends up for worry, down and in for anger
+    D.y += (-12.0*browL)*g(P, vec2(632.0,180.0), 28.0) + (-12.0*browR)*g(P, vec2(760.0,186.0), 28.0);
+    D.y += -11.0*worry*(g(P, vec2(668.0,186.0), 20.0) + g(P, vec2(733.0,190.0), 20.0)) + 3.0*worry*(g(P, vec2(605.0,180.0), 18.0) + g(P, vec2(790.0,186.0), 18.0));
+    D += anger*(vec2(6.0, 9.0)*g(P, vec2(668.0,186.0), 20.0) + vec2(-6.0, 9.0)*g(P, vec2(733.0,190.0), 20.0)) - anger*vec2(0.0, 3.0)*(g(P, vec2(605.0,180.0), 18.0) + g(P, vec2(790.0,186.0), 18.0));
+    // mouth corners: up for a smile, down for a frown; cheeks and lower lids lift with a smile
+    float s = smile, f = frown;
+    D += vec2(-5.0*s, -14.0*s + 13.0*f)*g(P, vec2(668.0,330.0), 28.0) + vec2(5.0*s, -14.0*s + 13.0*f)*g(P, vec2(765.0,333.0), 28.0);
+    D.y += 2.5*s*g(P, vec2(716.0,340.0), 18.0) - 2.5*s*g(P, vec2(716.0,318.0), 40.0);
+    D.y += -9.0*s*(g(P, vec2(615.0,282.0), 44.0) + g(P, vec2(795.0,285.0), 44.0));
+    float sq = s*0.8 + squint;
+    D.y += -4.5*sq*(g(P, vec2(637.0,219.0), 16.0) + g(P, vec2(752.0,226.0), 16.0));
+    // wide eyes lift the upper lids a little
+    D.y += -5.5*wide*(g(P, vec2(637.0,195.0), 15.0) + g(P, vec2(752.0,202.0), 15.0));
+    // jaw: open the mouth by moving the lower lip and beard down
+    float below = smoothstep(326.0, 342.0, P.y) * smoothstep(120.0, 60.0, abs(P.x - 716.0));
+    D.y += 9.0*jaw*below*g(P, vec2(716.0,380.0), 80.0);
+    vec2 Pw = P - D;
+    vec3 col = tex(Pw);
+    float blink = 0.22*s;
+    col = lid(col, P, Pw, vec2(637.0,207.0), max(lidL, blink));
+    col = lid(col, P, Pw, vec2(752.0,214.0), max(lidR, blink));
+    // the dark line of an open mouth
+    float mouthLine = exp(-pow(P.y - (333.0 + 4.0*jaw), 2.0)/(2.0*pow(1.0 + 3.5*jaw, 2.0))) * smoothstep(55.0, 35.0, abs(P.x - 716.0)) * jaw;
+    col = mix(col, vec3(0.16,0.08,0.06), clamp(mouthLine, 0.0, 0.85));
+    // warm light from the book, and a little on the face
+    vec2 b = (P - vec2(985.0,640.0))/vec2(330.0,200.0);
+    col += glow*vec3(1.0,0.72,0.32)*0.32*exp(-dot(b,b)*1.6);
+    vec2 fc = (P - vec2(708.0,330.0))/vec2(220.0,260.0);
+    col += glow*vec3(0.11,0.07,0.03)*exp(-dot(fc,fc)*1.5);
+    gl_FragColor = vec4(col*vShade, 1.0);
+    #include <colorspace_fragment>
+  }`;
+const W = 14.48, H = 10.86;
+const portrait = new THREE.Mesh(new THREE.PlaneGeometry(W, H, 290, 218), new THREE.ShaderMaterial({ uniforms:U, vertexShader:vert, fragmentShader:frag }));
+scene.add(portrait);
+
+// light motes from the book and the "aha" twinkle
+function spriteTex(draw){ const c = document.createElement('canvas'); c.width = c.height = 128; draw(c.getContext('2d')); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const pxToWorld = (x, y, z=0.9) => new THREE.Vector3((x/IW - 0.5)*W, (0.5 - y/IH)*H, z);
+const moteTex = spriteTex(g => { const r = g.createRadialGradient(64,64,0,64,64,64); r.addColorStop(0,'rgba(255,236,180,1)'); r.addColorStop(1,'rgba(255,210,120,0)'); g.fillStyle = r; g.fillRect(0,0,128,128); });
+const motes = [];
+for (let i=0;i<36;i++){ const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:moteTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending })); s.userData = { seed: Math.random(), x: (Math.random()-0.5)*300 }; scene.add(s); motes.push(s); }
+const starTex = spriteTex(g => { g.translate(64,64); g.fillStyle = 'rgba(255,250,230,1)';
+  for (let k=0;k<4;k++){ g.save(); g.rotate(k*Math.PI/2); g.beginPath(); g.moveTo(-4,0); g.lineTo(0,-60); g.lineTo(4,0); g.closePath(); g.fill(); g.restore(); }
+  const r = g.createRadialGradient(0,0,0,0,0,30); r.addColorStop(0,'rgba(255,240,200,0.9)'); r.addColorStop(1,'rgba(255,220,150,0)'); g.fillStyle = r; g.beginPath(); g.arc(0,0,30,0,7); g.fill(); });
+const stars = [[880,150,0.95],[835,195,0.35],[925,110,0.28],[560,140,0.5],[600,95,0.3],[870,250,0.3]].map(([x,y,s], i) => {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map:starTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, opacity:0 }));
+  sp.position.copy(pxToWorld(x, y, 1.6)); sp.userData = { base: s, i }; scene.add(sp); return sp; });
+
+/* ---------- framing: head, shoulders and the top of the book ---------- */
+function frame(){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+  const c = pxToWorld(718, 360, 0), halfH = 3.15;
+  const d = halfH / Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  camera.position.set(c.x, c.y, d); camera.lookAt(c.x, c.y, 0);
+}
+new ResizeObserver(frame).observe(stage);
+
+/* ---------- expressions ---------- */
+const NEUTRAL = { smile:0.12, frown:0, jaw:0, browL:0, browR:0, worry:0, anger:0, lidL:0, lidR:0, wide:0, squint:0, glow:0.5, yaw:0, pitch:0, roll:0, sparkle:0 };
+const EX = {
+  idle:       { label:'Idle' },
+  listening:  { label:'Listening', browL:0.3, browR:0.3, roll:0.035, pitch:0.02, smile:0.18 },
+  thinking:   { label:'Thinking', lidL:1, lidR:1, pitch:-0.07, glow:0.95, smile:0.05 },
+  aha:        { label:'Aha', browL:1.3, browR:1.3, wide:0.7, pitch:-0.04, sparkle:1, glow:0.8, then:['smile', 1.4] },
+  explaining: { label:'Explaining', smile:0.3, browL:0.15, browR:0.15, glow:0.65 },
+  smile:      { label:'Smile', smile:1, browL:0.25, browR:0.25 },
+  laugh:      { label:'Laugh', smile:1, squint:0.7, jaw:0.45, browL:0.35, browR:0.35, bounce:1 },
+  proud:      { label:'Proud', smile:0.9, pitch:-0.05, glow:1, sparkle:0.6, browL:0.2, browR:0.2 },
+  concerned:  { label:'Concerned', worry:1, frown:0.45, roll:-0.035, smile:0 },
+  sorry:      { label:'Sorry', worry:0.8, frown:0.75, pitch:0.06, lidL:0.35, lidR:0.35, smile:0 },
+  surprised:  { label:'Surprised', browL:1.45, browR:1.45, wide:1, jaw:0.55, pitch:-0.03, smile:0 },
+  confused:   { label:'Confused', browL:1.1, browR:-0.35, roll:0.07, frown:0.2, smile:0 },
+  stern:      { label:'Stern', anger:1, browL:-0.45, browR:-0.45, frown:0.45, lidL:0.22, lidR:0.22, smile:0, pitch:0.02 },
+  sleepy:     { label:'Sleepy', lidL:0.62, lidR:0.62, pitch:0.05, roll:-0.03, smile:0.05, glow:0.3 },
+  skeptical:  { label:'Skeptical', browL:-0.35, browR:0.9, lidL:0.25, frown:0.15, yaw:-0.05, smile:0.05 },
+  curious:    { label:'Curious', browL:0.8, browR:0.5, roll:-0.06, yaw:0.05, smile:0.2 },
+  searching:  { label:'Searching', pitch:0.09, lidL:0.5, lidR:0.5, browL:0.25, browR:0.25, glow:1, yaw:0.03, smile:0.1 },
+  helpful:    { label:'Helpful', smile:0.6, browL:0.35, browR:0.35, roll:0.04, pitch:0.02 },
+  careful:    { label:'Careful', worry:0.45, anger:0.3, frown:0.3, browL:-0.1, browR:-0.1, smile:0 },
+  alert:      { label:'Alert', wide:0.7, browL:0.8, browR:0.8, pitch:-0.03, smile:0 },
+};
+const GESTURES = ['nod', 'shake', 'wink', 'blink'];
+const cur = { ...NEUTRAL }, target = { ...NEUTRAL };
+let exName = 'idle', exTimer = null, gesture = null, talk = null, bounce = 0;
+const moodEl = document.getElementById('mood');
+function express(name, hold){
+  const e = EX[name]; if (!e) return;
+  exName = name; Object.assign(target, NEUTRAL);
+  for (const k in e) if (k in NEUTRAL) target[k] = e[k];
+  bounce = e.bounce || 0;
+  moodEl.textContent = e.label;
+  document.querySelectorAll('.ex').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ex === name)));
+  clearTimeout(exTimer);
+  if (e.then) exTimer = setTimeout(() => express(e.then[0]), e.then[1]*1000);
+  else if (hold) exTimer = setTimeout(() => express('idle'), hold*1000);
+}
+function doGesture(name){ gesture = { name, t0: performance.now()/1000 }; }
+function say(text){ talk = { t0: performance.now()/1000, len: Math.max(0.6, text.length*0.035), text }; }
+
+/* ---------- the demo brain: picks an intent and a reply; the real AI will replace this ---------- */
+// Common words people use in chat questions, grouped into categories. Each category has a face and a reply.
+// Order matters: the first categories win when a message matches several.
+const CATS = [
+  { id:'security', label:'Security alert', words:['virus','malware','infected','breach','hacked','suspicious','attack','phishing','ransomware'],
+    plan:[['surprised',0],['concerned',1.2]], reply:'The file never reached anyone: every upload is scanned by Microsoft Defender before it is stored, infected files are deleted, and the name and fingerprint go into the audit log. Look in Admin, Audit log, for file.rejected to see who sent it.' },
+  { id:'urgent', label:'Urgent', words:['urgent','asap','emergency','critical','immediately','right now'],
+    plan:[['alert',0],['nod',0.6]], reply:'Understood, let us move quickly.' },
+  { id:'delete', label:'Delete', words:['delete','remove','erase','wipe','destroy','revoke','cancel','burn'],
+    plan:[['careful',0]], reply:'Deleting is permanent: the file’s key is destroyed and the copy overwritten, so nothing can bring it back. To stop one link, open it and select Burn now. Files on legal hold are kept.' },
+  { id:'access', label:'Sign-in and access', words:['login','log in','sign in','signin','password','locked','lockout','access','permission','unlock','reset','mfa','two-step','code'],
+    plan:[['concerned',0],['thinking',0.9],['aha',2.0],['explaining',3.2]], reply:'Most sign-in trouble is one of three things:\n1. Locked after 5 wrong tries: an admin selects Unlock.\n2. The phone clock is off, so two-step codes fail: set its time to automatic.\n3. The account is disabled: an admin selects Enable.' },
+  { id:'fix', label:'Fix a problem', words:['fix','broken','error','fail','failed','failing','not working','cant','cannot','wont','issue','problem','stuck','bug','crash','slow'],
+    plan:[['concerned',0],['thinking',1.0],['aha',2.2],['explaining',3.4]], reply:'Let me look. Check the Admin page first: the Health and self-heal panel names most problems and says what to do. For anything else, the audit log shows what happened and when.' },
+  { id:'find', label:'Find', words:['find','search','look up','lookup','locate','where','which','show me','list','who has','who sent'],
+    plan:[['searching',0],['aha',1.8],['explaining',3.0]], reply:'Let me search the book. Your own shares and requests are under My files. Administrators can find every link under All links, and every action, by person or file name, in the Audit log.' },
+  { id:'help', label:'Help and how-to', words:['help','how','how do i','how to','guide','steps','tutorial','assist','support','teach','show how'],
+    plan:[['helpful',0],['explaining',1.2]], reply:'Happy to help. Tell me what you want to do, and I will walk you through it step by step.' },
+  { id:'create', label:'Create', words:['create','make','add','new','set up','setup','build','generate','start'],
+    plan:[['helpful',0],['nod',0.4],['explaining',1.4]], reply:'Let us make it. To send files, choose Send files; to collect them, choose Request files. A new person is added by an administrator on the Admin page.' },
+  { id:'change', label:'Change', words:['change','update','edit','rename','move','configure','enable','disable','turn on','turn off','extend'],
+    plan:[['curious',0],['nod',0.8],['explaining',1.6]], reply:'Most settings are in starport.json and the Admin page. Link limits and passwords are set when a link is made; to change a link, burn it and make a new one.' },
+  { id:'send', label:'Send and share', words:['send','share','upload','link','drop','request','give','attach'],
+    plan:[['smile',0],['explaining',1.0]], reply:'Choose Send files, add your files, pick when the link ends, and copy the link. Send any password separately, by text or phone.' },
+  { id:'get', label:'Get and download', words:['download','get','open','retrieve','receive','save'],
+    plan:[['smile',0],['explaining',1.0]], reply:'Open the link and press Download, or Download all as .zip. Opening the page uses nothing; only the button counts.' },
+  { id:'check', label:'Check and status', words:['check','status','health','running','working','online','offline','up','down','ok','is it'],
+    plan:[['curious',0],['thinking',0.8],['smile',2.0]], reply:'The Admin page shows the latest health check: virus scanner, certificate, disk space and the audit chain. Starport checks itself every 5 minutes.' },
+  { id:'explain', label:'Explain', words:['what','why','explain','mean','means','define','tell me','difference','about'],
+    plan:[['thinking',0],['aha',1.2],['explaining',2.4]], reply:'Here is what the book says.' },
+  { id:'greeting', label:'Greeting', words:['hi','hello','hey','good morning','good afternoon','good evening'],
+    plan:[['smile',0],['nod',0.3]], reply:'Hello, friend. I’m Ben, keeper of the CydVerse book. Ask me to find, help, fix or explain something.' },
+  { id:'thanks', label:'Thanks', words:['thanks','thank you','thx','appreciate','cheers'],
+    plan:[['smile',0],['nod',0.2]], reply:'Glad I could help.' },
+  { id:'goodbye', label:'Goodbye', words:['bye','goodbye','see you','later'],
+    plan:[['smile',0],['nod',0.2]], reply:'Until next time. The book stays open.' },
+  { id:'praise', label:'Praise', words:['great','awesome','amazing','brilliant','love','good job','perfect','nice'],
+    plan:[['proud',0],['nod',0.5]], reply:'Kind words. I have studied these pages a long time.' },
+  { id:'upset', label:'Frustration', words:['frustrated','frustrating','angry','annoyed','annoying','hate','terrible','awful','useless','ugh','upset','fed up'],
+    plan:[['sorry',0],['nod',1.2]], reply:'I’m sorry it has been a struggle. Tell me exactly what happened and we will sort it out together.' },
+  { id:'joke', label:'Joke', words:['joke','funny','laugh','lol'],
+    plan:[['laugh',0],['wink',1.6]], reply:'Why did the FTP server stay calm? It never lost its connection. (With Launchpad sync mode, it really doesn’t.)' },
+];
+// topics: added to the reply when the message names part of CydVerse
+const TOPICS = [
+  { re:/\bstarport\b/i, text:'Starport is the external drop and client portal: share links that expire, have download limits, need a password or burn after one download, and upload-only file requests.' },
+  { re:/\blaunchpad\b/i, text:'Launchpad is the FTP and SFTP server module: many FTP servers in one install, each with its own logins and folders. CydFTP is the desktop client that connects to it.' },
+  { re:/\borbit\b/i, text:'Orbit is the internal file share: home folders, team spaces and a drive in File Explorer.' },
+  { re:/\bvault\b/i, text:'Vault is secure storage and archive: per-file encryption, retention, legal hold and files that destroy themselves on schedule.' },
+  { re:/\b(cydverse|control panel)\b/i, text:'CydVerse is the whole platform: one Control Panel and four modules, Orbit, Starport, Launchpad and Vault.' },
+  { re:/\b(secure|security|safe|encrypt\w*)\b/i, text:'Security: TLS 1.2 and 1.3 only, two-step sign-in, every upload scanned, each file encrypted with its own key, and a tamper-evident audit log.' },
+];
+const norm = t => ' ' + t.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9\- ]+/g, ' ').replace(/\s+/g, ' ') + ' ';
+function classify(text){
+  const n = norm(text);
+  const hits = CATS.filter(c => c.words.some(w => n.includes(' ' + w.replace(/'/g, '') + ' ')));
+  const topic = TOPICS.filter(t => t.re.test(text)).map(t => t.text);
+  const all = /\b(all|every|everything)\b/i.test(text);
+  let main = hits[0];
+  if (!main && topic.length) main = CATS.find(c => c.id === 'explain');
+  if (!main) return { intent:'unknown', cats:[], reply:"I don't have that page in my book yet. Try a word like find, help, fix, create, send or check, or name part of CydVerse." };
+  let plan = main.plan, reply = main.reply;
+  if (main.id === 'delete' && all) { plan = [['stern',0],['shake',0.2]]; reply = 'Careful. Stopping every link at once is the emergency switch: an administrator types REVOKE ALL on the Admin page, from the admin network. Files on legal hold are kept. Is this an emergency?'; }
+  const extra = hits.slice(1).filter(c => ['greeting','thanks','urgent'].includes(c.id) === false).slice(0, 1).map(c => c.reply);
+  const lead = hits.find(c => c.id === 'greeting' && c !== main) ? 'Hello. ' : '';
+  const action = hits.find(c => c !== main && !['greeting','thanks','goodbye','praise','explain','help','urgent'].includes(c.id));
+  if ((main.id === 'help' || main.id === 'explain') && action) reply = (main.id === 'help' ? 'Here is how. ' : '') + action.reply + (topic.length ? '\n\n' + topic[0] : '');
+  else if (main.id === 'explain' || main.id === 'help') reply = topic.length ? (main.id === 'help' ? reply + ' ' : '') + topic.join(' ') : reply;
+  else if (topic.length && !(main.id === 'help' || main.id === 'explain')) reply = reply + '\n\n' + topic[0];
+  if (main.id === 'urgent' && extra.length) reply = reply + ' ' + extra[0];
+  return { intent: main.id, cats: hits.map(c => c.label), plan, reply: lead + reply };
+}
+const PLANS = Object.fromEntries(CATS.map(c => [c.id, c.plan]));
+PLANS.unknown = [['confused',0],['sorry',1.4]];
+let planTimers = [];
+function react({ intent, text, plan: custom }){
+  planTimers.forEach(clearTimeout); planTimers = [];
+  const plan = custom || PLANS[intent] || PLANS.unknown;
+  let speakAt = 0;
+  for (const [step, at] of plan){
+    const fn = GESTURES.includes(step) ? () => doGesture(step) : () => express(step);
+    planTimers.push(setTimeout(fn, at*1000)); speakAt = Math.max(speakAt, at);
+  }
+  return speakAt;
+}
+
+/* ---------- chat ---------- */
+const log = document.getElementById('log'), form = document.getElementById('form'), qIn = document.getElementById('q');
+function bubble(who, text){ const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+function typeOut(el, text){
+  say(text); let i = 0;
+  const step = () => { i = Math.min(text.length, i + 2); el.textContent = text.slice(0, i); log.scrollTop = log.scrollHeight; if (i < text.length) setTimeout(step, 28); };
+  step();
+}
+function ask(text){
+  text = text.trim(); if (!text) return;
+  bubble('me', text); qIn.value = '';
+  express('thinking');
+  const k = classify(text);
+  setTimeout(() => {
+    const speakAt = react({ intent: k.intent, text: k.reply, plan: k.plan });
+    setTimeout(() => {
+      const el = bubble('ben', ''); const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = k.cats && k.cats.length ? 'heard: ' + k.cats.join(' + ') : 'heard: nothing I know';
+      el.before(tag); log.insertBefore(tag, el); typeOut(el, k.reply);
+      planTimers.push(setTimeout(() => { if (!['stern','sleepy','sorry','concerned','careful','alert'].includes(exName) || ['fix','access'].includes(k.intent)) express(['fix','access','find','explain','help','check'].includes(k.intent) ? 'smile' : exName, 4); }, (k.reply.length*0.014 + 1.5)*1000));
+    }, Math.min(speakAt, 2.6)*1000 + 300);
+  }, 700);
+}
+form.addEventListener('submit', e => { e.preventDefault(); ask(qIn.value); });
+document.getElementById('chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) ask(b.textContent); });
+let typingTimer = null;
+qIn.addEventListener('input', () => { if (exName !== 'listening') express('listening'); clearTimeout(typingTimer); typingTimer = setTimeout(() => { if (exName === 'listening') express('idle'); }, 2500); });
+
+// category table, built from the same list the brain uses
+{ const tb = document.getElementById('catrows');
+  CATS.forEach(c => { const tr = document.createElement('tr'); const faces = c.plan.map(([x]) => EX[x] ? EX[x].label : x[0].toUpperCase() + x.slice(1)).join(', ');
+    [c.label, c.words.join(', '), faces].forEach((v, i) => { const td = document.createElement('td'); td.textContent = v; if (i === 1) td.style.color = 'var(--dim)'; tr.appendChild(td); }); tb.appendChild(tr); });
+  const tr = document.createElement('tr'); ['Anything else', '(no known words)', 'Confused, Sorry'].forEach(v => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); }); tb.appendChild(tr); }
+// expression palette
+const pal = document.getElementById('palette');
+Object.entries(EX).forEach(([k, e]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.dataset.ex = k; b.textContent = e.label; b.setAttribute('aria-pressed', String(k === 'idle')); b.onclick = () => express(k); pal.appendChild(b); });
+GESTURES.forEach(gname => { const b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.textContent = gname[0].toUpperCase() + gname.slice(1); b.onclick = () => doGesture(gname); pal.appendChild(b); });
+
+// drag to turn his head
+let drag = null, userYaw = 0, userPitch = 0;
+canvas.addEventListener('pointerdown', e => { drag = { x:e.clientX, y:e.clientY }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (!drag) return; userYaw = THREE.MathUtils.clamp(userYaw + (e.clientX - drag.x)*0.002, -0.14, 0.14); userPitch = THREE.MathUtils.clamp(userPitch + (e.clientY - drag.y)*0.0015, -0.08, 0.08); drag = { x:e.clientX, y:e.clientY }; });
+const endDrag = () => { drag = null; }; canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+
+/* ---------- animation loop ---------- */
+let blinkAt = 2, last = performance.now()/1000;
+function update(now, dt){
+  const k = 1 - Math.pow(0.002, dt);
+  for (const key in cur) cur[key] += (target[key] - cur[key]) * k;
+  userYaw *= Math.pow(0.35, dt); userPitch *= Math.pow(0.35, dt);
+  // idle life: breathing, small glances, blinking
+  const idleYaw = reduceMotion ? 0 : Math.sin(now*0.31)*0.03 + Math.sin(now*0.83)*0.012;
+  const idlePitch = reduceMotion ? 0 : Math.sin(now*0.47)*0.015;
+  let gy = 0, gp = 0, wink = 0, blink = 0;
+  if (now > blinkAt){ blinkAt = now + 2.6 + Math.random()*3.4; doGesture('blink'); }
+  if (gesture){
+    const t = now - gesture.t0;
+    if (gesture.name === 'nod'){ if (t < 1.3) gp = Math.sin(t/1.3*Math.PI*2)*0.07*(1 - t/1.3); else gesture = null; }
+    else if (gesture.name === 'shake'){ if (t < 1.4) gy = Math.sin(t/1.4*Math.PI*3)*0.09*(1 - t/1.4); else gesture = null; }
+    else if (gesture.name === 'wink'){ if (t < 0.55) wink = Math.sin(t/0.55*Math.PI); else gesture = null; }
+    else if (gesture.name === 'blink'){ if (t < 0.2) blink = Math.sin(t/0.2*Math.PI); else gesture = null; }
+  }
+  const laughBob = bounce ? Math.abs(Math.sin(now*9))*0.025 : 0;
+  U.yaw.value = cur.yaw + idleYaw + gy + userYaw;
+  U.pitch.value = cur.pitch + idlePitch + gp + userPitch - laughBob;
+  U.roll.value = cur.roll;
+  U.breathe.value = Math.sin(now*1.6);
+  ['smile','frown','browL','browR','worry','anger','wide','squint','glow'].forEach(n => U[n].value = cur[n]);
+  U.lidL.value = Math.max(cur.lidL, blink); U.lidR.value = Math.max(cur.lidR, blink, wink);
+  // talking: the mouth opens and closes while text appears
+  let jaw = cur.jaw;
+  if (talk){ const t = now - talk.t0; if (t < talk.len){ const syl = Math.abs(Math.sin(t*11.0 + Math.sin(t*3.7)*2)); jaw = Math.max(jaw, 0.12 + 0.38*syl*Math.min(1, (talk.len - t)*4)); } else talk = null; }
+  if (bounce) jaw = cur.jaw*(0.6 + 0.4*Math.abs(Math.sin(now*9)));
+  U.jaw.value = jaw;
+  U.time.value = now;
+  // motes rising from the book, and the twinkles
+  motes.forEach(m => { const ph = (now*0.12 + m.userData.seed) % 1; const p = pxToWorld(985 + m.userData.x + Math.sin(ph*6 + m.userData.seed*9)*20, 600 - ph*360, 1.2); m.position.copy(p); const s = 0.05 + 0.05*m.userData.seed; m.scale.set(s, s, 1); m.material.opacity = Math.sin(ph*Math.PI)*cur.glow*0.9; });
+  stars.forEach(s => { const tw = 0.6 + 0.4*Math.sin(now*7 + s.userData.i*2.1); const sz = s.userData.base*0.9*(0.75 + 0.25*tw); s.scale.set(sz, sz, 1); s.material.opacity = cur.sparkle*(s.userData.i === 0 ? 1 : tw*0.9); s.material.rotation = Math.sin(now*1.5 + s.userData.i)*0.2; });
+}
+function loop(){
+  requestAnimationFrame(loop);
+  const now = performance.now()/1000, dt = Math.min(0.05, now - last); last = now;
+  update(now, dt); renderer.render(scene, camera);
+}
+
+// public API for the future AI chat
+window.Ben = { express, gesture: doGesture, say, list: () => Object.keys(EX), react: ({ intent, text } = {}) => { react({ intent: intent || classify(text || '').intent }); if (text) say(text); } };
+
+const loader = new THREE.TextureLoader();
+const prep = t => { t.colorSpace = THREE.SRGBColorSpace; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = 8; return t; };
+Promise.all([loader.loadAsync('ben.jpg'), loader.loadAsync('ben-closed.jpg')]).then(([t, t2]) => {
+  U.map.value = prep(t); U.map2.value = prep(t2);
+  frame(); document.getElementById('loading').remove();
+  if (Q.has('shot')){ // still frames for checks: ?shot=smile&yaw=0.1
+    express(Q.get('shot')); Object.assign(cur, target);
+    if (Q.get('yaw')) userYaw = parseFloat(Q.get('yaw'));
+    blinkAt = 1e9; update(1, 0.016); update(1.016, 0.016); renderer.render(scene, camera); window.__ready = true;
+  } else {
+    bubble('ben', "Hello. I'm Ben, keeper of the CydVerse book. Ask me something, or tap one of the questions below.");
+    express('smile', 3); loop();
+  }
+});
+</script>
+
+</body></html>

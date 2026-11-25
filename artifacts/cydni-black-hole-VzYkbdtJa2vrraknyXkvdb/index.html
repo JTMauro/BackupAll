@@ -1,0 +1,672 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cydni Black Hole</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@500;600&display=swap">
+<style>
+/* Layout: one full-bleed 3D stage in the CydFTP drive-bay look; a small label top-left and a Replay control bottom-centre. Single dark look on purpose, matching CydFTP. */
+:root{
+  --chassis:#0f1319; --chassis-hi:#1c2633; --panel:#18202a; --rule:#2c3644;
+  --text:#e8eef6; --dim:#9fb0c3; --led:#38bdf8; --led-deep:#0c6aa0;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--chassis);color:var(--text);font-family:var(--body);overflow:hidden}
+.app{position:relative;height:100%;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse 80% 70% at 50% 35%,var(--chassis-hi) 0%,var(--chassis) 72%)}
+canvas#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas#gl:active{cursor:grabbing}
+.label{position:absolute;top:16px;left:max(16px,env(safe-area-inset-left,0px));display:grid;gap:2px;pointer-events:none}
+.label b{font:700 18px/1.1 var(--display);letter-spacing:.12em}
+.label span{font:500 12px var(--body);color:var(--dim);display:flex;gap:8px;align-items:center}
+.led{width:8px;height:8px;border-radius:50%;background:var(--led);box-shadow:0 0 8px var(--led)}
+.dock{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:10px;align-items:center}
+.btn{appearance:none;cursor:pointer;font:600 14px var(--body);color:#fff;padding:10px 18px;border-radius:10px;
+  background:linear-gradient(180deg,#5ccbf7,#1d93cf 50%,#12709f);border:1px solid #063149;border-top-color:#9be3ff;
+  box-shadow:0 6px 18px rgba(14,165,233,.3),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid #e0f6ff;outline-offset:3px}
+.hint{font:500 12px var(--body);color:var(--dim)}
+.loading{position:absolute;inset:0;display:grid;place-items:center;font:600 14px var(--body);color:var(--dim)}
+@media (max-width:520px){.hint{display:none}}
+</style>
+
+<div class="app">
+  <canvas id="gl" aria-label="Animated 3D Cydni robot. Cydni spins, then holds out two rolled documents toward the viewer. The letters F U appear above and, after one second, expand to File Universe. Then a black hole opens behind Cydni and pulls the folders off the ground. Drag to turn Cydni."></canvas>
+  <div class="loading" id="loading">Building Cydni…</div>
+  <div class="label"><b>CYDNI</b><span><i class="led" aria-hidden="true"></i>File Universe · black hole</span></div>
+  <div class="dock">
+    <button class="btn" id="replay" type="button">Replay</button>
+    <span class="hint">Drag to turn Cydni</span>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('gl');
+
+/* ---------- renderer / scene ---------- */
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setClearColor(0x000000, 0);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(28, 1, 0.5, 400);
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.enablePan = false; controls.minDistance = 30; controls.maxDistance = 120;
+controls.minPolarAngle = 0.5; controls.maxPolarAngle = 1.75;
+const TARGET = new THREE.Vector3(0, 9.4, 0);
+controls.target.copy(TARGET);
+controls.enabled = false;   // the camera stays fixed; dragging turns Cydni only
+
+scene.add(new THREE.HemisphereLight(0xdff3ff, 0x2a3644, 0.6));
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
+key.position.set(-5, 30, 11); key.target.position.set(0, 6, 0);
+key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left:-15, right:15, top:18, bottom:-10, near:2, far:70 });
+key.shadow.radius = 9; key.shadow.blurSamples = 12; key.shadow.bias = -0.0006; key.shadow.normalBias = 0.06;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight(0x9fdcff, 1.6); rim.position.set(10, 12, -16); scene.add(rim);
+const fill = new THREE.DirectionalLight(0xffffff, 0.55); fill.position.set(14, 6, 10); scene.add(fill);
+
+/* ground: shadow catcher + a hard-drive platter, CydFTP's motif */
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity:0.35 }));
+ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+{
+  const c = document.createElement('canvas'); c.width = c.height = 1024; const g = c.getContext('2d');
+  const R = 512;
+  const grad = g.createRadialGradient(R,R,60,R,R,R);
+  grad.addColorStop(0,'rgba(120,150,180,0.35)'); grad.addColorStop(0.7,'rgba(70,95,125,0.22)'); grad.addColorStop(1,'rgba(40,55,75,0)');
+  g.fillStyle = grad; g.beginPath(); g.arc(R,R,R,0,Math.PI*2); g.fill();
+  for (let r=90; r<500; r+=9){ g.strokeStyle = `rgba(160,200,235,${0.05 + (r%45===0?0.08:0)})`; g.lineWidth = 1.5; g.beginPath(); g.arc(R,R,r,0,Math.PI*2); g.stroke(); }
+  g.strokeStyle = 'rgba(56,189,248,0.55)'; g.lineWidth = 3; g.beginPath(); g.arc(R,R,496,0,Math.PI*2); g.stroke();
+  g.fillStyle = 'rgba(30,40,52,0.9)'; g.beginPath(); g.arc(R,R,70,0,Math.PI*2); g.fill();
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const platter = new THREE.Mesh(new THREE.CircleGeometry(10, 96), new THREE.MeshBasicMaterial({ map:tex, transparent:true, depthWrite:false }));
+  platter.rotation.x = -Math.PI/2; platter.position.y = 0.005; scene.add(platter);
+  var platterMesh = platter;
+}
+
+/* stars: the "universe" */
+{
+  const N = 900, pos = new Float32Array(N*3), col = new Float32Array(N*3);
+  for (let i=0;i<N;i++){
+    const u = Math.random()*2-1, th = Math.random()*Math.PI*2, r = 90 + Math.random()*90;
+    const s = Math.sqrt(1-u*u);
+    pos[i*3] = r*s*Math.cos(th); pos[i*3+1] = Math.abs(r*u)*0.9 + 4; pos[i*3+2] = r*s*Math.sin(th);
+    const cy = Math.random() < 0.3; col[i*3] = cy?0.55:1; col[i*3+1] = cy?0.85:1; col[i*3+2] = 1;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos,3)); g.setAttribute('color', new THREE.BufferAttribute(col,3));
+  var stars = new THREE.Points(g, new THREE.PointsMaterial({ size:0.55, vertexColors:true, transparent:true, opacity:0.75, depthWrite:false }));
+  scene.add(stars);
+}
+
+/* soft contact shadow */
+const blobCanvas = document.createElement('canvas'); blobCanvas.width = blobCanvas.height = 256;
+{ const g = blobCanvas.getContext('2d'); const r = g.createRadialGradient(128,128,0,128,128,128);
+  r.addColorStop(0,'rgba(0,0,0,0.6)'); r.addColorStop(0.5,'rgba(0,0,0,0.25)'); r.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = r; g.fillRect(0,0,256,256); }
+const blob = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({ map:new THREE.CanvasTexture(blobCanvas), transparent:true, depthWrite:false }));
+blob.rotation.x = -Math.PI/2; blob.position.y = 0.012; scene.add(blob);
+
+/* ---------- Cydni materials (same as the CYDNI 3D model) ---------- */
+const M = {
+  shell: new THREE.MeshPhysicalMaterial({ color:0xf1f2f3, roughness:0.32, clearcoat:1, clearcoatRoughness:0.18 }),
+  ring:  new THREE.MeshPhysicalMaterial({ color:0xc9cbcd, roughness:0.38, clearcoat:0.8, clearcoatRoughness:0.25 }),
+  visor: new THREE.MeshPhysicalMaterial({ color:0x1b1c1e, roughness:0.12, metalness:0.1, clearcoat:1, clearcoatRoughness:0.05 }),
+  dark:  new THREE.MeshPhysicalMaterial({ color:0x2a2b2d, roughness:0.35, metalness:0.2, clearcoat:0.6 }),
+  stick: new THREE.MeshStandardMaterial({ color:0xe6e8ea, roughness:0.3, metalness:0.4 }),
+  cyan:  new THREE.MeshPhysicalMaterial({ color:0x0096dc, roughness:0.3, clearcoat:1, clearcoatRoughness:0.12 }),
+  eye:   new THREE.MeshStandardMaterial({ color:0x00e1ff, emissive:0x00e1ff, emissiveIntensity:1.5, toneMapped:false }),
+  logo:  new THREE.MeshPhysicalMaterial({ color:0x0a0a0a, roughness:0.35, clearcoat:0.7 }),
+};
+
+function stadiumShape(w, h){
+  const s = new THREE.Shape(), hw = w/2, hh = h/2;
+  if (w >= h){ const r = hh;
+    s.moveTo(0, -hh); s.lineTo(hw-r, -hh); s.absarc(hw-r, 0, r, -Math.PI/2, Math.PI/2, false);
+    s.lineTo(-hw+r, hh); s.absarc(-hw+r, 0, r, Math.PI/2, Math.PI*1.5, false); s.closePath();
+  } else { const r = hw;
+    s.moveTo(hw, 0); s.lineTo(hw, hh-r); s.absarc(0, hh-r, r, 0, Math.PI, false);
+    s.lineTo(-hw, -hh+r); s.absarc(0, -hh+r, r, Math.PI, Math.PI*2, false); s.closePath(); }
+  return s;
+}
+function slab(w, h, depth, b, segs=10){
+  const g = new THREE.ExtrudeGeometry(stadiumShape(w-2*b, h-2*b),
+    { depth:Math.max(0.001, depth-2*b), bevelEnabled:true, bevelThickness:b, bevelSize:b, bevelSegments:segs, curveSegments:64 });
+  g.center(); g.computeVertexNormals(); return g;
+}
+function mesh(geo, mat, parent, x=0, y=0, z=0){
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z);
+  m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
+/* ---------- Cydni ---------- */
+const robot = new THREE.Group(); scene.add(robot);
+const BODY_ZS = 0.72;
+const bodyR = y => 1.39 + (y - 0.95) / 5.7 * 1.16;
+const prof = [];
+for (let i=0;i<=16;i++){ const a=i/16*Math.PI/2; prof.push(new THREE.Vector2(Math.max(0.001,1.39*Math.sin(a)), 0.95-0.95*Math.cos(a))); }
+for (let i=1;i<=12;i++){ const y=0.95+i/12*5.7; prof.push(new THREE.Vector2(bodyR(y), y)); }
+for (let i=1;i<=18;i++){ const a=i/18*Math.PI/2; prof.push(new THREE.Vector2(1.45+1.1*Math.cos(a), 6.65+1.15*Math.sin(a))); }
+prof.push(new THREE.Vector2(0.001, 7.8));
+const body = mesh(new THREE.LatheGeometry(prof, 128), M.shell, robot);
+body.scale.z = BODY_ZS;
+
+const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.06 103"><path d="M51.14,17.19s3.1.02,3.1,2.52c0,2.72-3.1,2.72-3.1,2.72-16.17-.37-30.34,14.89-28.63,30.97.75,16.11,17.65,29.27,32.89,26.3,13.5-2.62,26.63-13.09,27.48-28.43,1.12,15.75-11.53,31.54-28.28,33.76-18.62,2.45-36.92-13.25-37.38-32.03-1.57-18.75,15.11-36.26,33.92-35.81Z"/><path d="M77.23,53.75s-.21,2.43-2.49,2.43-2.61-2.43-2.61-2.43c.25-11.2-10.31-21.02-21.45-19.83-11.16.52-19.22,11.89-18.23,22.79.87,9.5,8.66,18.97,19.7,19.84-11.3,1.02-23.01-7.93-24.83-20.25-1.8-13.7,9.75-27.16,23.56-27.5,13.8-1.15,26.68,11.12,26.34,24.96Z"/><path d="M63.75,45.63s1.97,2.35.33,3.76c-1.63,1.42-3.42-.67-3.42-.67-4.43-4.63-12.67-4.33-16.7.65-4.3,4.72-3.22,13.83,1.19,17.97,4.02,3.77,7.03,4.52,10.29,4.77-4.14,1.17-8.94-.38-12.8-3.11-6.91-5.3-7.76-16.45-1.75-22.76,5.63-6.66,16.85-6.93,22.86-.61Z"/></svg>`;
+{
+  const LOGO_Y = 5.9, S = 0.0276;
+  const data = new SVGLoader().parse(LOGO_SVG);
+  data.paths.forEach(p => SVGLoader.createShapes(p).forEach(shape => {
+    const g = new THREE.ExtrudeGeometry(shape, { depth:5, bevelEnabled:true, bevelThickness:1, bevelSize:0.6, bevelSegments:3, curveSegments:24 });
+    g.translate(-50, -52, 0); g.scale(S, -S, S);
+    const pos = g.attributes.position;
+    for (let i=0;i<pos.count;i+=3){ for (let c=0;c<3;c++){ const a = pos.array[(i+1)*3+c]; pos.array[(i+1)*3+c] = pos.array[(i+2)*3+c]; pos.array[(i+2)*3+c] = a; } }
+    for (let i=0;i<pos.count;i++){
+      const x = pos.getX(i), y = pos.getY(i), R = bodyR(LOGO_Y + y);
+      pos.setZ(i, pos.getZ(i) + BODY_ZS*Math.sqrt(Math.max(0, R*R - x*x)) - 0.05);
+    }
+    g.deleteAttribute('normal'); g.deleteAttribute('uv'); g.computeVertexNormals();
+    mesh(g, M.logo, robot, 0, LOGO_Y, 0);
+  }));
+}
+
+function finShape(side){
+  const s = new THREE.Shape(), k = side;
+  s.moveTo(0, 0);
+  s.bezierCurveTo(0.62*k, -0.08, 0.52*k, -0.86, 0.42*k, -1.6);
+  s.bezierCurveTo(0.22*k, -2.85, -0.28*k, -3.95, -0.82*k, -4.56);
+  s.lineTo(0, 0);
+  return s;
+}
+function makeArm(side){
+  const pivot = new THREE.Group(); pivot.position.set(2.4*side, 7.0, -0.05); robot.add(pivot);
+  const g = new THREE.ExtrudeGeometry(finShape(side), { depth:0.75, bevelEnabled:true, bevelThickness:0.2, bevelSize:0.16, bevelSegments:8, curveSegments:48 });
+  g.translate(0, 0, -0.375); g.computeVertexNormals();
+  mesh(g, M.cyan, pivot);
+  return pivot;
+}
+const armL = makeArm(-1), armR = makeArm(1);
+
+mesh(new THREE.CylinderGeometry(0.52, 0.56, 1.0, 48), M.dark, robot, 0, 7.98, 0);
+const head = new THREE.Group(); head.position.set(0, 10.43, 0); robot.add(head);
+mesh(slab(7.32, 4.5, 4.2, 0.7), M.ring, head);
+mesh(slab(6.66, 3.84, 2.4, 0.22), M.shell, head, 0, 0, 1.11);
+mesh(slab(5.04, 2.22, 0.5, 0.16), M.visor, head, 0, 0, 2.32);
+for (const s of [-1, 1]){ const e = mesh(slab(2.0, 1.62, 0.8, 0.2), M.cyan, head, 3.72*s, 0, 0); e.rotation.y = Math.PI/2; }
+mesh(new RoundedBoxGeometry(2.36, 0.62, 1.8, 6, 0.22), M.dark, head, 0, 2.38, 0);
+mesh(new THREE.SphereGeometry(0.38, 48, 24, 0, Math.PI*2, 0, Math.PI/2), M.dark, head, 0, 2.62, 0);
+mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.95, 24), M.stick, head, 0, 3.3, 0);
+const antennaBall = mesh(new THREE.SphereGeometry(0.37, 48, 32), M.cyan, head, 0, 3.94, 0);
+
+function domeGeo(){
+  const s = new THREE.Shape();
+  s.moveTo(0.39, 0); s.absarc(0, 0, 0.39, 0, Math.PI, false);
+  s.lineTo(-0.39, -0.14); s.quadraticCurveTo(-0.39, -0.26, -0.27, -0.26);
+  s.lineTo(0.27, -0.26); s.quadraticCurveTo(0.39, -0.26, 0.39, -0.14); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth:0.05, bevelEnabled:true, bevelThickness:0.03, bevelSize:0.025, bevelSegments:3, curveSegments:32 });
+  g.translate(0, -0.06, 0); return g;
+}
+const arcGeo = () => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
+  new THREE.Vector3(-0.36,-0.16,0), new THREE.Vector3(0,0.42,0), new THREE.Vector3(0.36,-0.16,0)), 32, 0.085, 12, false);
+const eyesRoot = new THREE.Group(); eyesRoot.position.set(0, 0, 2.6); head.add(eyesRoot);
+const faces = {};
+function face(name, left, right){
+  const g = new THREE.Group();
+  const l = new THREE.Mesh(left(), M.eye); l.position.x = -1.1;
+  const r = new THREE.Mesh(right(), M.eye); r.position.x = 1.1;
+  g.add(l, r); g.visible = false; eyesRoot.add(g); faces[name] = g;
+}
+face('normal', domeGeo, domeGeo);
+face('happy', arcGeo, arcGeo);
+const ringGeo = () => { const g = new THREE.CylinderGeometry(0.31, 0.31, 0.08, 48); g.rotateX(Math.PI/2); return g; };
+face('surprised', ringGeo, ringGeo);
+function setFace(n){ for (const k in faces) faces[k].visible = (k === n); }
+setFace('normal');
+
+/* ---------- an assortment of files on the ground (scene-level, so they never move with Cydni) ---------- */
+const groundFiles = new THREE.Group(); scene.add(groundFiles);
+const mat = (c, o={}) => new THREE.MeshPhysicalMaterial({ color:c, roughness:0.7, ...o });
+const FM = {
+  manila: mat(0xd3a157), manilaDk: mat(0xb8853d), kraft: mat(0xa9774a), kraftDk: mat(0x8a5c35),
+  blue: mat(0x2f86c9, { roughness:0.5, clearcoat:0.3 }), red: mat(0xc8463a, { roughness:0.5, clearcoat:0.3 }),
+  green: mat(0x3f9b5a, { roughness:0.55 }), hang: mat(0x2f7d4f, { roughness:0.6 }),
+  cyan: mat(0x0096dc, { roughness:0.35, clearcoat:0.8 }), charcoal: mat(0x2b3138, { roughness:0.4, clearcoat:0.6 }),
+  paper: mat(0xfbfaf6, { roughness:0.9 }), paper2: mat(0xf1eee4, { roughness:0.9 }),
+  label: mat(0xffffff, { roughness:0.6 }), metal: new THREE.MeshStandardMaterial({ color:0xc8ced6, metalness:0.9, roughness:0.25 }),
+};
+function place(obj, x, z, rotY=0, y=0){ obj.position.set(x, y, z); obj.rotation.y = rotY; groundFiles.add(obj); return obj; }
+
+// flat folder with a tab and papers peeking out
+function flatFolder(m, w=2.6, d=2.0, papers=2){
+  const g = new THREE.Group();
+  mesh(new RoundedBoxGeometry(w, 0.04, d, 2, 0.015), m, g, 0, 0.02, 0);
+  mesh(new RoundedBoxGeometry(w*0.32, 0.04, 0.32, 2, 0.015), m, g, -w*0.22, 0.02, -d/2 - 0.12);
+  for (let i=0;i<papers;i++){ const pp = mesh(new THREE.BoxGeometry(w*0.94, 0.012, d*0.95), i%2 ? FM.paper2 : FM.paper, g, 0.05*(i%2?1:-1), 0.05 + i*0.014, -0.08 - i*0.03); pp.rotation.y = (i%2?1:-1)*0.04; }
+  mesh(new RoundedBoxGeometry(w, 0.04, d*0.9, 2, 0.015), m, g, 0, 0.09 + papers*0.014, d*0.05);
+  return g;
+}
+// stack of flat folders in different colours
+{
+  const st = new THREE.Group();
+  [[FM.manila, 0, 0.0], [FM.blue, 0.18, 0.12], [FM.red, -0.14, -0.1], [FM.green, 0.1, 0.22]].forEach(([m, dx, ry], i) => {
+    const f = flatFolder(m, 2.6, 2.0, 2); f.position.set(dx, i*0.17, dx*0.6); f.rotation.y = ry; st.add(f);
+  });
+  place(st, -5.4, 3.6, 0.35);
+}
+// open manila folder with papers fanned on it
+{
+  const g = new THREE.Group(), w = 2.4, d = 3.0;
+  mesh(new RoundedBoxGeometry(w, 0.04, d, 2, 0.015), FM.manila, g, w/2, 0.02, 0);
+  mesh(new RoundedBoxGeometry(w, 0.04, d, 2, 0.015), FM.manilaDk, g, -w/2, 0.02, 0);
+  mesh(new RoundedBoxGeometry(0.8, 0.04, 0.3, 2, 0.015), FM.manila, g, w*0.7, 0.02, -d/2 - 0.12);
+  [0.0, 0.14, -0.1].forEach((ry, i) => { const pp = mesh(new THREE.BoxGeometry(w*0.85, 0.012, d*0.88), FM.paper, g, w/2 + 0.05*i, 0.05 + i*0.014, 0.05*i); pp.rotation.y = ry; });
+  for (let i=0;i<6;i++) mesh(new THREE.BoxGeometry(w*(i===5?0.35:0.6), 0.004, 0.06), FM.charcoal, g, w*0.45 - (i===5?0.12:0), 0.1, -d*0.32 + i*0.28);
+  place(g, 3.1, 5.0, -0.45);
+}
+// ring binders standing upright, spines facing out
+function binder(m, label){
+  const g = new THREE.Group(), T = 0.95, H = 3.1, D = 2.5;
+  for (const sx of [-1, 1]) mesh(new RoundedBoxGeometry(0.08, H, D, 2, 0.03), m, g, sx*T/2, H/2, 0);
+  mesh(new RoundedBoxGeometry(T + 0.08, H, 0.1, 2, 0.04), m, g, 0, H/2, D/2);
+  mesh(new THREE.BoxGeometry(T - 0.16, H - 0.25, D - 0.25), FM.paper, g, 0, H/2, -0.08);
+  mesh(new RoundedBoxGeometry(T*0.72, 1.0, 0.02, 2, 0.01), label, g, 0, H*0.62, D/2 + 0.055);
+  const ring = mesh(new THREE.TorusGeometry(0.16, 0.05, 12, 24), FM.metal, g, 0, H*0.2, D/2 + 0.06);
+  return g;
+}
+{
+  // binders lying on their covers, one on top of the other, spines facing out
+  const lay = b => { const w = new THREE.Group(); b.rotation.z = -Math.PI/2; b.position.set(-1.55, 0.53, 0); w.add(b); return w; };
+  place(lay(binder(FM.cyan, FM.label)), 5.2, 1.4, -0.5);
+  place(lay(binder(FM.charcoal, FM.label)), 5.35, 1.3, -0.22, 1.07);
+}
+// expanding (accordion) file with pleats and a closed flap
+{
+  const g = new THREE.Group(), W = 1.5, H = 2.2, D = 3.0, N = 9;
+  for (let i=0;i<N;i++){
+    const t = i/(N-1);
+    mesh(new THREE.BoxGeometry(W/N*0.92, H*(0.94 + 0.06*Math.sin(t*Math.PI)), D), i%2 ? FM.kraftDk : FM.kraft, g, -W/2 + (i+0.5)*W/N, H/2, 0);
+  }
+  const flap = mesh(new RoundedBoxGeometry(W + 0.12, 0.05, D*0.98, 2, 0.02), FM.kraft, g, 0, H + 0.03, 0);
+  const tri = mesh(new RoundedBoxGeometry(W + 0.12, 0.7, 0.05, 2, 0.02), FM.kraft, g, 0, H - 0.3, D/2 + 0.03);
+  mesh(new THREE.BoxGeometry(W + 0.16, 0.07, 0.07), FM.charcoal, g, 0, H - 0.55, D/2 + 0.06);
+  mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.04, 20), FM.charcoal, g, 0, H - 0.35, D/2 + 0.07).rotation.x = Math.PI/2;
+  g.rotation.z = Math.PI/2; g.position.set(1.15, 0.84, 0);
+  const w = new THREE.Group(); w.add(g); place(w, -6.4, 0.4, 0.6);
+}
+// hanging file folder leaning against the accordion file
+{
+  const g = new THREE.Group(), W = 3.0, H = 2.3;
+  const pv = new THREE.Group(); g.add(pv);
+  for (const s of [-1, 1]){ const p = mesh(new THREE.BoxGeometry(W, H, 0.03), FM.hang, pv, 0, H/2, s*0.09); p.rotation.x = s*0.05; }
+  mesh(new THREE.BoxGeometry(W*0.86, H*0.9, 0.06), FM.paper, pv, 0.05, H*0.48, 0);
+  for (const s of [-1, 1]) mesh(new THREE.CylinderGeometry(0.035, 0.035, W + 0.7, 12), FM.metal, pv, 0, H + 0.02, s*0.1).rotation.z = Math.PI/2;
+  mesh(new RoundedBoxGeometry(0.75, 0.32, 0.03, 2, 0.01), FM.label, pv, -0.6, H + 0.2, 0.12);
+  pv.rotation.x = -Math.PI/2; pv.position.set(0, 0.14, 1.2);
+  place(g, -3.5, 1.5, 0.25);
+}
+// loose stack of paper and a blue folder standing at an angle
+{
+  const g = new THREE.Group();
+  for (let i=0;i<14;i++){ const pp = mesh(new THREE.BoxGeometry(2.1, 0.02, 2.7), i%3 ? FM.paper : FM.paper2, g, (Math.random()-0.5)*0.12, 0.012 + i*0.022, (Math.random()-0.5)*0.12); pp.rotation.y = (Math.random()-0.5)*0.12; }
+  place(g, -2.4, 5.6, 0.2);
+  const f = new THREE.Group(), w = 2.4, h = 3.0;
+  mesh(new RoundedBoxGeometry(w, h, 0.04, 2, 0.015), FM.blue, f, 0, h/2, -0.06);
+  mesh(new RoundedBoxGeometry(w*0.3, 0.3, 0.04, 2, 0.015), FM.blue, f, w*0.2, h + 0.12, -0.06);
+  mesh(new THREE.BoxGeometry(w*0.92, h*0.95, 0.05), FM.paper, f, 0.04, h*0.47, 0);
+  mesh(new RoundedBoxGeometry(w, h*0.8, 0.04, 2, 0.015), FM.blue, f, 0, h*0.4, 0.06);
+  f.rotation.x = -Math.PI/2; f.position.set(0, 0.11, h/2);
+  const fw = new THREE.Group(); fw.add(f); place(fw, 7.6, 3.2, -0.9);
+}
+// red and green folders lying askew at the front right
+{
+  const a = flatFolder(FM.red, 2.4, 1.9, 2); place(a, 6.4, 6.0, 0.6);
+  const b = flatFolder(FM.green, 2.4, 1.9, 1); b.position.y = 0.17; b.rotation.y = -0.25; a.add(b);
+}
+
+/* ---------- rolled documents (diplomas), gripped near their lower end ---------- */
+const DL = 4.4, DR = 0.42, GRIP_AT = 0.24;   // length, radius, grip point as a share of the length from the bottom
+function capTexture(){
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#efe7d3'; g.fillRect(0,0,256,256);
+  g.strokeStyle = 'rgba(120,100,70,0.55)'; g.lineWidth = 3; g.beginPath();
+  for (let a=0; a<Math.PI*2*6; a+=0.05){ const r = 4 + a*3.1; const x = 128 + r*Math.cos(a), y = 128 + r*Math.sin(a); a ? g.lineTo(x,y) : g.moveTo(x,y); }
+  g.stroke();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function sideTexture(){
+  const c = document.createElement('canvas'); c.width = 512; c.height = 128; const g = c.getContext('2d');
+  g.fillStyle = '#f7f2e4'; g.fillRect(0,0,512,128);
+  for (let i=0;i<2400;i++){ g.fillStyle = `rgba(120,100,60,${Math.random()*0.06})`; g.fillRect(Math.random()*512, Math.random()*128, 2, 2); }
+  g.strokeStyle = 'rgba(150,125,85,0.35)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, 118); g.lineTo(512, 108); g.stroke();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const paperSide = new THREE.MeshStandardMaterial({ map:sideTexture(), roughness:0.85 });
+const paperCap = new THREE.MeshStandardMaterial({ map:capTexture(), roughness:0.9 });
+function makeDiploma(side){
+  const g = new THREE.Group();
+  const roll = mesh(new THREE.CylinderGeometry(DR, DR, DL, 48, 1, false), [paperSide, paperCap, paperCap], g);
+  roll.position.y = DL*(0.5 - GRIP_AT);
+  g.userData.side = side;
+  return g;
+}
+const GRIP = { L: new THREE.Vector3(0.5, -4.1, 0), R: new THREE.Vector3(-0.5, -4.1, 0) };
+function makeHolder(arm, gripPt, side){
+  const holder = new THREE.Group(); holder.position.copy(gripPt); arm.add(holder);
+  const dip = makeDiploma(side); dip.position.set(0, 0, 0.35); holder.add(dip);
+  holder.scale.setScalar(0.001); holder.visible = false;
+  return holder;
+}
+const holdL = makeHolder(armL, GRIP.L, -1), holdR = makeHolder(armR, GRIP.R, 1);
+const aimQ = new THREE.Quaternion(), tmpE = new THREE.Euler();
+function aimHolder(holder, arm, lean){
+  aimQ.setFromEuler(tmpE.set(0.38, 0, lean));
+  holder.quaternion.copy(arm.quaternion).invert().multiply(aimQ);
+}
+
+/* ---------- 3D letters: layered glyph slices give each letter real depth ---------- */
+const EM = 3.6, PX = 512, PAD = 40, SCALE = EM/PX, LAYERS = 18, LAYER_GAP = 0.034;
+const WORDS = 'File Universe';
+const BASE_Y = 18.9;
+const textRoot = new THREE.Group(); scene.add(textRoot);
+let letters = [];
+const FONT = `700 ${PX}px "Chakra Petch", "Segoe UI", system-ui, sans-serif`;
+function glyphCanvas(ch, w, fillStyle){
+  const c = document.createElement('canvas'); c.width = w; c.height = Math.round(PX*1.25);
+  const g = c.getContext('2d'); g.font = FONT; g.textBaseline = 'alphabetic';
+  if (fillStyle === 'grad-cap'){
+    const gr = g.createLinearGradient(0, PX*0.15, 0, PX); gr.addColorStop(0,'#bdeeff'); gr.addColorStop(0.45,'#38bdf8'); gr.addColorStop(1,'#1288c4'); g.fillStyle = gr;
+  } else if (fillStyle === 'grad-low'){
+    const gr = g.createLinearGradient(0, PX*0.3, 0, PX); gr.addColorStop(0,'#ffffff'); gr.addColorStop(1,'#c9d6e4'); g.fillStyle = gr;
+  } else g.fillStyle = fillStyle;
+  g.fillText(ch, PAD, PX*0.98);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function buildLetters(){
+  textRoot.clear(); letters = [];
+  const m = document.createElement('canvas').getContext('2d'); m.font = FONT;
+  const adv = [...WORDS].map(ch => m.measureText(ch).width);
+  const total = adv.reduce((a,b)=>a+b, 0) * SCALE;
+  let x = -total/2;
+  const iF = 0, iU = WORDS.indexOf('U');
+  [...WORDS].forEach((ch, i) => {
+    const w = adv[i]*SCALE; const cx = x + w/2; x += w;
+    if (ch === ' ') return;
+    const cap = (i === iF || i === iU);
+    const cw = Math.ceil(adv[i]) + PAD*2, ch_ = Math.round(PX*1.25);
+    const geo = new THREE.PlaneGeometry(cw*SCALE, ch_*SCALE);
+    const solid = glyphCanvas(ch, cw, '#ffffff');
+    const front = glyphCanvas(ch, cw, cap ? 'grad-cap' : 'grad-low');
+    const grp = new THREE.Group();
+    const sideA = new THREE.Color(cap ? 0x0f7fb8 : 0x8a9aae), sideB = new THREE.Color(cap ? 0x062a40 : 0x26303c);
+    for (let k=LAYERS; k>=1; k--){
+      const c = sideA.clone().lerp(sideB, k/LAYERS);
+      const mat = new THREE.MeshBasicMaterial({ map:solid, color:c, transparent:true, alphaTest:0.5, toneMapped:false, side:THREE.DoubleSide });
+      const p = new THREE.Mesh(geo, mat); p.position.z = -k*LAYER_GAP; grp.add(p);
+    }
+    const f = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map:front, transparent:true, alphaTest:0.5, toneMapped:false }));
+    f.position.z = 0.002; grp.add(f);
+    // glyph centre sits on the advance box; lift so the baseline lands on BASE_Y
+    const offY = (ch_/2 - PX*0.98) * SCALE;
+    grp.userData = { ch, cap, finalX: cx, y: BASE_Y - offY, word: i < iU ? 0 : 1, order: cap ? 0 : (i < iU ? i - iF : i - iU) };
+    textRoot.add(grp); letters.push(grp);
+  });
+  // where F and U stand before the words open up: a centred "F U"
+  const F = letters.find(l => l.userData.ch === 'F'), U = letters.find(l => l.userData.ch === 'U');
+  const gap = EM*0.55, fw = adv[iF]*SCALE, uw = adv[iU]*SCALE, pair = fw + gap + uw;
+  F.userData.startX = -pair/2 + fw/2; U.userData.startX = pair/2 - uw/2;
+  letters.forEach(l => { if (!l.userData.cap) l.userData.startX = (l.userData.word ? U : F).userData.finalX; });
+  // a soft glow behind each capital
+  const gc = document.createElement('canvas'); gc.width = gc.height = 256; const gg = gc.getContext('2d');
+  const rg = gg.createRadialGradient(128,128,0,128,128,128); rg.addColorStop(0,'rgba(56,189,248,0.55)'); rg.addColorStop(1,'rgba(56,189,248,0)');
+  gg.fillStyle = rg; gg.fillRect(0,0,256,256);
+  const gtex = new THREE.CanvasTexture(gc);
+  for (const L of [F, U]){
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:gtex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
+    s.scale.set(EM*1.6, EM*1.6, 1); s.position.set(0, -0.05*EM, -0.8); L.add(s); L.userData.glow = s;
+  }
+}
+
+
+/* ---------- black hole: opens behind Cydni and pulls every ground file into it ---------- */
+const HOLE = new THREE.Vector3(8.2, 9.8, -11);
+const hole = new THREE.Group(); hole.position.copy(HOLE); scene.add(hole);
+function diskTexture(){
+  const S = 1024, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), R = S/2;
+  const rg = g.createRadialGradient(R,R,R*0.2,R,R,R);
+  rg.addColorStop(0,'rgba(0,0,0,0)'); rg.addColorStop(0.08,'rgba(255,255,255,0.95)'); rg.addColorStop(0.16,'rgba(150,230,255,0.9)');
+  rg.addColorStop(0.38,'rgba(56,150,248,0.55)'); rg.addColorStop(0.65,'rgba(110,70,220,0.22)'); rg.addColorStop(1,'rgba(40,20,90,0)');
+  g.fillStyle = rg; g.fillRect(0,0,S,S);
+  g.globalCompositeOperation = 'lighter';
+  for (let i=0;i<260;i++){            // swirling streaks
+    const rr = R*(0.25 + Math.random()*0.6), a0 = Math.random()*Math.PI*2, len = 0.3 + Math.random()*0.9;
+    g.strokeStyle = `rgba(${170+Math.random()*80|0},${210+Math.random()*45|0},255,${0.04 + Math.random()*0.12})`;
+    g.lineWidth = 1 + Math.random()*4; g.beginPath(); g.arc(R, R, rr, a0, a0 + len); g.stroke();
+  }
+  g.globalCompositeOperation = 'destination-out';
+  const hole = g.createRadialGradient(R,R,0,R,R,R*0.25); hole.addColorStop(0,'rgba(0,0,0,1)'); hole.addColorStop(0.7,'rgba(0,0,0,1)'); hole.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = hole; g.fillRect(0,0,S,S);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function ringTexture(){
+  const S = 512, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), R = S/2;
+  const rg = g.createRadialGradient(R,R,R*0.3,R,R,R);
+  rg.addColorStop(0,'rgba(0,0,0,0)'); rg.addColorStop(0.36,'rgba(0,0,0,0)'); rg.addColorStop(0.42,'rgba(230,248,255,0.95)');
+  rg.addColorStop(0.5,'rgba(90,190,255,0.45)'); rg.addColorStop(0.75,'rgba(60,90,200,0.12)'); rg.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle = rg; g.fillRect(0,0,S,S);
+  return new THREE.CanvasTexture(c);
+}
+const diskTilt = new THREE.Group(); diskTilt.rotation.set(-1.18, 0, 0.22); hole.add(diskTilt);
+const disk = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.MeshBasicMaterial({ map:diskTexture(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide, toneMapped:false }));
+diskTilt.add(disk);
+const horizon = new THREE.Mesh(new THREE.SphereGeometry(2.1, 48, 32), new THREE.MeshBasicMaterial({ color:0x000000 }));
+hole.add(horizon);
+const lens = new THREE.Sprite(new THREE.SpriteMaterial({ map:ringTexture(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false }));
+lens.scale.set(8, 8, 1); hole.add(lens);
+const flash = new THREE.Sprite(new THREE.SpriteMaterial({ map:ringTexture(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, opacity:0 }));
+hole.add(flash);
+hole.scale.setScalar(0.001); hole.visible = false;
+// a tiny point of light that blinks where the hole was, just after it closes
+const blip = new THREE.Sprite(new THREE.SpriteMaterial({ map:(() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const rg = g.createRadialGradient(64,64,0,64,64,64); rg.addColorStop(0,'rgba(255,255,255,1)'); rg.addColorStop(0.18,'rgba(220,245,255,0.95)'); rg.addColorStop(0.45,'rgba(56,189,248,0.35)'); rg.addColorStop(1,'rgba(56,189,248,0)'); g.fillStyle = rg; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c); })(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false, opacity:0 }));
+blip.position.copy(HOLE); blip.visible = false; scene.add(blip);
+
+// remember where each ground file started so Replay can put it back
+const fileStarts = groundFiles.children.map(o => ({ o, p:o.position.clone(), q:o.quaternion.clone(), s:o.scale.clone(),
+  spin:new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize(), order:0 }));
+fileStarts.sort((a, b) => a.p.distanceTo(HOLE) - b.p.distanceTo(HOLE));   // nearest the hole goes first
+fileStarts.forEach((f, i) => { f.order = i; });
+function resetFiles(){ for (const f of fileStarts){ f.o.position.copy(f.p); f.o.quaternion.copy(f.q); f.o.scale.copy(f.s); f.o.visible = true; } }
+const vTmp = new THREE.Vector3(), qTmp = new THREE.Quaternion(), zAxis = new THREE.Vector3(0, 0, 1);
+function updateBlackHole(tl, now){
+  const open = seg(tl, T.holeOpenA, T.holeOpenB), close = seg(tl, T.holeCloseA, T.holeCloseB);
+  const size = easeOutBack(open) * (1 - easeIO(close));
+  hole.visible = size > 0.003; hole.scale.setScalar(Math.max(0.001, size));
+  disk.rotation.z = -now*0.9;
+  lens.material.opacity = 0.75 + Math.sin(now*3)*0.15;
+  const fo = Math.max(1 - Math.abs(tl - T.holeOpenA - 0.25)/0.45, 1 - Math.abs(tl - T.holeCloseB + 0.1)/0.4, 0);
+  flash.material.opacity = fo; flash.scale.setScalar(6 + 14*fo);
+  const bt = seg(tl, T.holeCloseB + 0.05, T.holeCloseB + 0.55);
+  const bv = bt > 0 && bt < 1 ? Math.sin(bt*Math.PI) : 0;
+  blip.visible = bv > 0.001; blip.material.opacity = bv; blip.scale.setScalar(0.25 + 1.1*bv);
+  for (const f of fileStarts){
+    const a = T.pullA + f.order*T.pullStep, u = seg(tl, a, a + T.pullDur);
+    if (u <= 0){ f.o.position.copy(f.p); f.o.quaternion.copy(f.q); f.o.scale.copy(f.s); f.o.visible = true; continue; }
+    if (u >= 1){ f.o.visible = false; continue; }
+    f.o.visible = true;
+    // lift off and shudder, then spiral in, tumbling and shrinking
+    const lift = easeIO(seg(u, 0, 0.3)), pull = Math.pow(seg(u, 0.18, 1), 1.6);
+    vTmp.copy(f.p).sub(HOLE); vTmp.y += lift*2.2;
+    vTmp.applyAxisAngle(zAxis, pull*Math.PI*2.4);
+    vTmp.multiplyScalar(1 - pull);
+    f.o.position.copy(HOLE).add(vTmp);
+    if (u < 0.3) f.o.position.x += Math.sin(now*40 + f.order)*0.05*(1 - lift);
+    qTmp.setFromAxisAngle(f.spin, pull*9 + lift*0.4);
+    f.o.quaternion.copy(f.q).premultiply(qTmp);
+    f.o.scale.copy(f.s).multiplyScalar(Math.max(0.001, 1 - Math.pow(pull, 0.8)*0.97));
+  }
+}
+
+/* ---------- framing ---------- */
+const VIEW_AZ = THREE.MathUtils.degToRad(8), VIEW_PO = THREE.MathUtils.degToRad(77);
+let fitDist = 56;
+function frame(){
+  const halfW = 13.6, halfH = 14.6;
+  const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  fitDist = Math.max(halfH / tv, halfW / (tv * camera.aspect)) + 4;
+  controls.maxDistance = Math.max(120, fitDist*1.6);
+}
+function resetCamera(){
+  camera.position.setFromSpherical(new THREE.Spherical(fitDist, VIEW_PO, VIEW_AZ)).add(TARGET);
+  controls.target.copy(TARGET); controls.update();
+}
+function resize(){
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  const before = fitDist; frame();
+  if (!userMoved) resetCamera(); else if (before !== fitDist) controls.update();
+}
+let userMoved = false;
+// drag sideways to turn Cydni on the spot; nothing else in the scene moves
+let userYaw = 0, dragX = null;
+canvas.addEventListener('pointerdown', e => { dragX = e.clientX; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (dragX === null) return; userYaw += (e.clientX - dragX) * 0.012; dragX = e.clientX; });
+const endDrag = () => { dragX = null; };
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+
+/* ---------- timeline ---------- */
+const easeIO = x => x<0.5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2;
+const easeOutBack = x => { const c1 = 1.70158, c3 = c1+1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+const clamp01 = x => Math.min(1, Math.max(0, x));
+const seg = (t, a, b) => clamp01((t - a)/(b - a));
+// spin first; then both documents come out toward the viewer together; F U appears, holds for 1 second, then opens into File Universe
+const T = { spinA:0.3, spinB:2.2, docsIn:2.2, capsIn:2.35, expandA:4.1, expandB:5.5, end:5.95,
+  holeOpenA:6.6, holeOpenB:7.7, pullA:7.5, pullStep:0.32, pullDur:2.1, holeCloseA:11.4, holeCloseB:12.3, allDone:12.8 };
+const OUT_Z = 0.62, OUT_X = -1.0;        // arms held out in front (radians)
+
+let tl = 0, floatY = 0, blinkT = 2.5, armLz = -0.05, armRz = 0.05, armX = 0;
+function restart(){
+  tl = reduceMotion ? T.end + 1 : 0;
+  robot.rotation.y = 0; userYaw = 0; armLz = -0.05; armRz = 0.05; armX = 0;
+  armL.rotation.set(0, 0, armLz); armR.rotation.set(0, 0, armRz);
+  setFace(reduceMotion ? 'happy' : 'normal');
+  resetFiles();
+}
+
+const clock = new THREE.Clock();
+const lerp = THREE.MathUtils.lerp;
+const BASE = 0.85;
+function tick(){
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), 0.05); tl += dt;
+  const now = clock.elapsedTime;
+
+  // float
+  floatY = lerp(floatY, reduceMotion ? 0.2 : 0.35 + Math.sin(now*1.6)*0.28, 1 - Math.pow(0.001, dt));
+
+  // spin once, with a little hop
+  const sp = easeIO(seg(tl, T.spinA, T.spinB));
+  robot.rotation.y = sp * Math.PI * 2 + userYaw;
+  const hop = Math.sin(sp*Math.PI) * 0.9;
+  robot.position.y = BASE + floatY + hop;
+  head.rotation.z = Math.sin(sp*Math.PI*2) * 0.06;
+
+  // arms: tucked during the spin, then both held out toward the viewer at the same time
+  let tL, tR, tX;
+  if (tl < T.docsIn){ tL = -0.06 - Math.sin(now*1.6)*0.04 - Math.sin(sp*Math.PI)*0.35; tR = -tL; tX = 0; }
+  else { const b = tl > T.end ? Math.sin(now*1.6)*0.03 : 0; tL = -OUT_Z; tR = OUT_Z; tX = OUT_X + b; }
+  const k = 1 - Math.pow(0.0004, dt);
+  armLz = lerp(armLz, tL, k); armRz = lerp(armRz, tR, k); armX = lerp(armX, tX, k);
+  armL.rotation.set(armX, 0, armLz); armR.rotation.set(armX, 0, armRz);
+
+  // documents pop into the hands and stay upright, leaning out a little
+  const ds = tl < T.docsIn ? 0.001 : easeOutBack(seg(tl, T.docsIn, T.docsIn + 0.45));
+  for (const h of [holdL, holdR]){ h.scale.setScalar(Math.max(0.001, ds)); h.visible = ds > 0.01; }
+  aimHolder(holdL, armL, 0.1);
+  aimHolder(holdR, armR, -0.1);
+
+  if (tl >= T.docsIn && tl - dt < T.docsIn) setFace('happy');
+  if (tl >= T.holeOpenA && tl - dt < T.holeOpenA) setFace('surprised');
+  if (tl >= T.allDone && tl - dt < T.allDone) setFace('happy');
+  updateBlackHole(tl, now);
+
+  // letters: F and U drop in, then open up into File Universe
+  const ex = easeIO(seg(tl, T.expandA, T.expandB));
+  for (const L of letters){
+    const u = L.userData;
+    if (u.cap){
+      const inP = easeOutBack(seg(tl, T.capsIn + (u.word ? 0.15 : 0), T.capsIn + (u.word ? 0.15 : 0) + 0.6));
+      const s = Math.max(0.001, inP) * lerp(1.3, 1, ex);
+      L.scale.setScalar(s);
+      L.position.set(lerp(u.startX, u.finalX, ex), u.y + (1 - clamp01(inP))*4 + lerp(-0.7, 0, ex), 0);
+      L.visible = tl >= T.capsIn + (u.word ? 0.15 : 0);
+      if (u.glow) u.glow.material.opacity = lerp(0.8, 0.45, ex) + Math.sin(now*2.4 + u.word)*0.12;
+    } else {
+      const d = T.expandA + 0.2 + u.order*0.08;
+      const p = seg(tl, d, d + 0.55);
+      const s = Math.max(0.001, easeOutBack(p));
+      L.scale.setScalar(s);
+      L.position.set(lerp(u.startX, u.finalX, easeIO(p)), u.y, -0.4*(1-p));
+      L.visible = p > 0;
+    }
+  }
+
+  // ambient
+  const hgt = robot.position.y;
+  const sc = 7.2 + hgt*0.9; blob.scale.set(sc, sc*0.55, 1);
+  blob.material.opacity = THREE.MathUtils.clamp(0.95 - hgt*0.28, 0.35, 0.95);
+
+  // blink
+  blinkT -= dt; let ey = 1;
+  if (blinkT < 0.14 && !faces.happy.visible && !faces.surprised.visible) ey = Math.abs(blinkT - 0.07) / 0.07;
+  if (blinkT <= 0) blinkT = 2.5 + Math.random()*3;
+  eyesRoot.scale.y = Math.max(0.08, ey);
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+addEventListener('resize', resize);
+new ResizeObserver(resize).observe(canvas);
+document.getElementById('replay').addEventListener('click', () => { userMoved = false; resetCamera(); restart(); });
+
+const fontReady = Promise.race([
+  document.fonts ? document.fonts.load(`700 120px "Chakra Petch"`) : Promise.resolve(),
+  new Promise(r => setTimeout(r, 2500)),
+]);
+fontReady.catch(() => {}).finally(() => {
+  buildLetters();
+  resize(); resetCamera(); restart();
+  document.getElementById('loading').remove();
+  tick();
+});
+</script>
+
+</body></html>

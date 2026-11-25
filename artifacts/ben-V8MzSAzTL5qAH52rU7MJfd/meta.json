@@ -1,0 +1,78 @@
+{
+ "title": "Ben",
+ "url": "https://claude.ai/artifact/V8MzSAzTL5qAH52rU7MJfd",
+ "type": "web page",
+ "updated": "2026-11-14",
+ "files": [
+  {
+   "path": "Ben-aha.gif",
+   "bytes": 1287241,
+   "sha256": "d4ce140f651f85bdadc02d2c2d84d69e1dbda1a795bb9f433857742407f3fde0"
+  },
+  {
+   "path": "Ben-aha.webp",
+   "bytes": 1319916,
+   "sha256": "c73953d398bf39e9af0a990031128030636afcaad3f3afaf4e08483b72496ef6"
+  },
+  {
+   "path": "Ben-expressions.mp4",
+   "bytes": 3122352,
+   "sha256": "b002ed5ccdb1264bdbc73fae8d30c468e5dbb19b517326bde92e93a2cb1b51b0"
+  },
+  {
+   "path": "Ben-idle.gif",
+   "bytes": 1355210,
+   "sha256": "35ef10ab877761248a4f1554c7451a530d07ffd255742d30b900661e6500d58e"
+  },
+  {
+   "path": "Ben-idle.webp",
+   "bytes": 1556870,
+   "sha256": "54aa25483990c2bfa0d0fccd334299896dbe0244eec4d4bcd4c83c30bd5bb4c4"
+  },
+  {
+   "path": "Ben-respond.gif",
+   "bytes": 1280539,
+   "sha256": "b73f38fe21cfcb0c85378a29378109eda44e61ab5c622b22869b797d6ee1c69e"
+  },
+  {
+   "path": "Ben-respond.webp",
+   "bytes": 1040256,
+   "sha256": "79a718f2829110fb949b34d099452e07e611502f5766b2fe5b88e442c9fd9e58"
+  },
+  {
+   "path": "Ben-smile.gif",
+   "bytes": 1220906,
+   "sha256": "ccee6aa00a6beaae51d2ad2ab1483621d1973009b2b92585b836a4543767ef3c"
+  },
+  {
+   "path": "Ben-smile.webp",
+   "bytes": 1306328,
+   "sha256": "1f9b635a14db306f46923ee5e0906f7665df8d2caab74f8f2cda315fe94b0811"
+  },
+  {
+   "path": "Ben-thinking.gif",
+   "bytes": 1451864,
+   "sha256": "1f9835614fceaa92ea7b7428fd182b4457997d64068171084340a6931956092d"
+  },
+  {
+   "path": "Ben-thinking.webp",
+   "bytes": 1567526,
+   "sha256": "8745059ab3f41650466274796ea2fe31609380f08a3fdaffc71f670a4bbf711a"
+  },
+  {
+   "path": "ben-still.png",
+   "bytes": 1579495,
+   "sha256": "a50bd6b053a61ea368e78ce43933b946d2764afff91a4c99674485026e56d85d"
+  },
+  {
+   "path": "index.html",
+   "bytes": 10430,
+   "sha256": "92e8004f7a33e8ba974385b11e98378bf17a1335351c40852cf474028824eeb1"
+  },
+  {
+   "path": "poster.jpg",
+   "bytes": 126803,
+   "sha256": "56615b2af09e621330b8c88a3e35b032924dd00aa0f7ded5c02d6446778aa845"
+  }
+ ]
+}

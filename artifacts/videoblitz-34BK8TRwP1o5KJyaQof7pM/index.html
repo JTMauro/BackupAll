@@ -1,0 +1,2146 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>VideoBlitz</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style id="vb-style">
+/* Layout: control-room grid. Big stage left, transport + filmstrip under it, tabbed console on the right. */
+:root{
+  --bg:#0c0e13; --panel:#141720; --panel2:#1b1f2b; --line:#272c3b; --fg:#e8ebf2; --muted:#8d94a8;
+  --amber:#ffb321; --amber-ink:#1b1300; --cyan:#58c7f3; --danger:#ff6b6b; --ok:#5fd39a;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Manrope","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --r:10px; color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--f-body);overflow:hidden}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+#app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 14px}
+
+/* header */
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:700;font-size:19px;letter-spacing:-.01em;white-space:nowrap}
+.logo svg{width:30px;height:30px}
+.logo b{color:var(--amber);font-weight:700}
+#showName{background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 8px;min-width:0;width:220px;color:var(--muted);font-weight:600}
+#showName:hover,#showName:focus{border-color:var(--line);color:var(--fg)}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{background:var(--panel2);border-color:#3a4155}
+.btn svg,.ib svg{width:17px;height:17px;flex:none}
+.btn.pri{background:var(--amber);color:var(--amber-ink);border-color:var(--amber)}
+.btn.pri:hover{background:#ffc24d}
+.btn.sm{height:28px;padding:0 9px;font-size:12.5px}
+.btn.danger{color:var(--danger)}
+.ib{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--fg)}
+.ib:hover{background:var(--panel2)}
+.ib.on{color:var(--amber)}
+.ib.big{width:44px;height:44px;border-radius:50%;background:var(--amber);color:var(--amber-ink)}
+.ib.big:hover{background:#ffc24d}
+.ib.big svg{width:20px;height:20px}
+.menuWrap{position:relative}
+.menu{position:absolute;top:40px;right:0;z-index:50;min-width:270px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.menu button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:9px 10px;border:0;border-radius:8px;background:transparent;cursor:pointer}
+.menu button:hover{background:var(--line)}
+.menu button svg{width:18px;height:18px;color:var(--amber)}
+.menu small{display:block;color:var(--muted);font-size:12px}
+.menu hr{border:0;border-top:1px solid var(--line);margin:5px 4px}
+
+/* main grid */
+main{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px;min-height:0}
+#stageCol{display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:10px;min-height:0;min-width:0}
+#stageWrap{position:relative;background:#000;border-radius:var(--r);overflow:hidden;min-height:200px;user-select:none}
+#stageWrap:fullscreen{border-radius:0}
+#stageWrap.idle{cursor:none}
+#stage{position:absolute;left:50%;top:50%;overflow:hidden;background:var(--stage-bg,#000);transform-origin:center}
+#layers,.layer{position:absolute;inset:0}
+.layer{overflow:hidden;container-type:size;will-change:transform,opacity}
+.layer .main{position:absolute;inset:0;width:100%;height:100%;object-fit:var(--fit,contain)}
+.layer canvas.main{object-fit:contain}
+.blurbg{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;filter:blur(38px) brightness(.5) saturate(1.25)}
+.layer.yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.deckHost{position:absolute;inset:0;overflow:hidden}
+.pslide{position:absolute;left:50%;top:50%;overflow:hidden;transform-origin:center;background:#fff;color:#000}
+.pslide *{box-sizing:border-box}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:2.2cqh;padding:8cqh 9cqw;text-align:var(--al,center)}
+.card h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:min(7.5cqw,15cqh);line-height:1.05;letter-spacing:-.02em;text-wrap:balance}
+.card p{margin:0;font-size:min(2.8cqw,6cqh);opacity:.85;text-wrap:balance;white-space:pre-line}
+.card .cd{font-family:var(--f-mono);font-size:min(20cqw,40cqh);font-weight:500;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.card .kicker{font-size:min(1.6cqw,3.5cqh);text-transform:uppercase;letter-spacing:.2em;opacity:.7;font-weight:700}
+.card canvas.viz{width:100%;height:38cqh}
+.errCard{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:8%;color:#c9cede;background:#161922;font-size:min(2.4cqw,5cqh)}
+.errCard b{display:block;color:var(--danger);margin-bottom:.4em}
+
+/* overlays */
+#ov{position:absolute;inset:0;pointer-events:none;font-family:var(--f-body)}
+.ovChip{position:absolute;background:rgba(0,0,0,.55);color:#fff;padding:.35em .7em;border-radius:.5em;font-size:max(12px,1.6cqw);backdrop-filter:blur(6px);display:flex;gap:.5em;align-items:center;max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ov{container-type:size}
+#ovCaption{left:2.5%;bottom:5%;font-size:max(13px,2cqw);font-weight:600;white-space:normal}
+#ovCounter{right:2.5%;top:4%;font-family:var(--f-mono)}
+#ovClock{font-family:var(--f-mono);font-size:max(14px,2.4cqw);font-variant-numeric:tabular-nums}
+#ovClock.tl{left:2.5%;top:4%}#ovClock.tr{right:2.5%;top:4%}#ovClock.bl{left:2.5%;bottom:5%}#ovClock.br{right:2.5%;bottom:5%}
+#ovNow{left:2.5%;top:4%}
+#ovNow svg{width:1.1em;height:1.1em;color:var(--amber)}
+#ovMark{right:2.5%;bottom:5%;background:none;backdrop-filter:none;opacity:.75;font-weight:700;font-family:var(--f-display);text-shadow:0 1px 6px rgba(0,0,0,.7)}
+#ovTicker{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.72);color:#fff;overflow:hidden;white-space:nowrap;font-size:max(13px,2.1cqw);font-weight:600;padding:.45em 0}
+#ovTicker span{display:inline-block;padding-left:100%;animation:tick var(--tk,20s) linear infinite}
+@keyframes tick{to{transform:translateX(-100%)}}
+#ovProg{position:absolute;left:0;bottom:0;height:4px;background:var(--amber);width:0}
+#blank{position:absolute;inset:0;z-index:5}
+#empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted);padding:24px}
+#empty h2{font-family:var(--f-display);color:var(--fg);font-size:22px;margin:10px 0 6px}
+#dropHint{position:absolute;inset:10px;border:2px dashed var(--amber);border-radius:12px;background:rgba(255,179,33,.08);display:grid;place-items:center;font-family:var(--f-display);font-size:20px;color:var(--amber);z-index:20;pointer-events:none}
+#fsBar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;background:rgba(15,17,24,.82);border:1px solid rgba(255,255,255,.12);padding:6px 10px;border-radius:999px;z-index:10;opacity:0;transition:opacity .25s;backdrop-filter:blur(10px)}
+#stageWrap:hover #fsBar{opacity:1}
+#stageWrap.idle #fsBar{opacity:0}
+#fsBar .ib{color:#fff}
+#fsBar span{font-family:var(--f-mono);font-size:12px;color:#c9cede;padding:0 6px}
+#presenter{position:absolute;inset:0;background:var(--panel);display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:18px;overflow:auto}
+#presenter h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+#presenter .pv{aspect-ratio:16/9;background:#000;border-radius:8px;position:relative;overflow:hidden;max-width:100%}
+#presenter .pv .th{position:absolute;inset:0;width:100%;height:100%}
+#pNotes{white-space:pre-wrap;color:var(--fg);font-size:15px;line-height:1.55}
+#pTimer{font-family:var(--f-mono);font-size:28px;color:var(--amber)}
+
+/* transport */
+#transport{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;flex-wrap:wrap}
+.tGroup{display:flex;align-items:center;gap:2px}
+#tProgWrap{flex:1;display:flex;align-items:center;gap:10px;min-width:160px}
+#tTime,#tCount{font-family:var(--f-mono);font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+input[type=range]{accent-color:var(--amber);width:100%;min-width:0}
+#mini{display:flex;align-items:center;gap:4px;border-left:1px solid var(--line);padding-left:10px;min-width:0;max-width:330px}
+#mini .mmT{min-width:0;flex:1;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+#mini .mmT b{color:var(--cyan);font-weight:600}
+#mini input{width:80px;accent-color:var(--cyan)}
+
+/* filmstrip */
+#strip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;min-height:104px;align-items:flex-start;scrollbar-width:thin}
+.fs{flex:none;width:150px;cursor:pointer;border-radius:8px;padding:3px;border:2px solid transparent;position:relative}
+.fs:hover{background:var(--panel)}
+.fs.sel{border-color:#4b5470}
+.fs.cur{border-color:var(--amber)}
+.fs.skip{opacity:.4}
+.fs .th{width:100%;aspect-ratio:16/9;border-radius:5px}
+.fs .meta{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--muted);padding:3px 2px 0}
+.fs .meta span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fs .num{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.7);color:#fff;font:500 10.5px var(--f-mono);padding:1px 5px;border-radius:4px}
+.fs .badge{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 5px;border-radius:4px;text-transform:uppercase}
+.fs .badge.sample{background:var(--amber);color:var(--amber-ink)}
+.fs.dragover{border-color:var(--cyan)}
+.fsAdd{flex:none;width:110px;aspect-ratio:16/11;display:grid;place-items:center;border:1.5px dashed var(--line);border-radius:8px;color:var(--muted);cursor:pointer;background:none;text-align:center;font-size:12px;padding:6px}
+.fsAdd:hover{border-color:var(--amber);color:var(--amber)}
+.th{position:relative;overflow:hidden;background:#05060a;container-type:size}
+.th>img,.th>canvas{width:100%;height:100%;object-fit:cover;display:block}
+.th .ico{position:absolute;inset:0;display:grid;place-items:center;color:#59607a}
+.th .ico svg{width:30%;height:30%}
+.th .pslide{pointer-events:none}
+
+/* side console */
+aside{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;min-width:0}
+.tabs{display:flex;border-bottom:1px solid var(--line);padding:0 6px}
+.tabs button{flex:1;background:none;border:0;padding:12px 4px 10px;cursor:pointer;color:var(--muted);font-weight:700;font-size:12.5px;letter-spacing:.04em;border-bottom:2px solid transparent;display:flex;gap:6px;align-items:center;justify-content:center}
+.tabs button svg{width:15px;height:15px}
+.tabs button[aria-selected=true]{color:var(--fg);border-color:var(--amber)}
+.tabs button[data-tab=music][aria-selected=true]{border-color:var(--cyan)}
+.pane{overflow:auto;padding:14px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.sec{display:flex;flex-direction:column;gap:9px}
+.sec>h4{margin:0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.row{display:flex;align-items:center;gap:10px;justify-content:space-between;min-width:0}
+.row>label:first-child,.row>span:first-child{color:#c3c8d6;font-size:13px;flex:none}
+.row select,.row input[type=text],.row input[type=number],.row input[type=color]{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 8px;min-width:0}
+.row select{max-width:62%}
+.row input[type=number]{width:84px;font-family:var(--f-mono)}
+.row input[type=text]{flex:1}
+.row input[type=color]{width:44px;height:30px;padding:2px}
+.row input[type=range]{max-width:58%}
+.row .val{font-family:var(--f-mono);font-size:12px;color:var(--muted);width:42px;text-align:right}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12.5px;color:#c3c8d6}
+.field input,.field textarea,.field select{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%}
+.field textarea{resize:vertical;min-height:60px}
+.sw{appearance:none;width:36px;height:20px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#cfd3df;transition:transform .15s}
+.sw:checked{background:var(--amber)}
+.sw:checked::after{transform:translateX(16px);background:var(--amber-ink)}
+.btnRow{display:flex;gap:6px;flex-wrap:wrap}
+.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:2px;gap:2px}
+.seg button{flex:1;border:0;background:none;border-radius:6px;padding:5px 8px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--line);color:var(--fg)}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5}
+.note b{color:var(--fg)}
+.note.warn{color:#ffd27a}
+.hint{font-size:12px;color:var(--muted)}
+
+/* music */
+.np{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;align-items:center}
+.art{width:64px;height:64px;border-radius:10px;background:linear-gradient(140deg,#1f3a4f,#0f1a26);display:grid;place-items:center;color:var(--cyan);overflow:hidden;position:relative}
+.art svg{width:28px;height:28px}
+.npKind{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);font-weight:700}
+.npTitle{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#viz{width:100%;height:56px;display:block}
+.seek{display:flex;gap:8px;align-items:center;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.seek span{white-space:nowrap;min-width:38px}
+.seek span:last-child{text-align:right}
+.seek input{accent-color:var(--cyan)}
+.mctl{display:flex;align-items:center;justify-content:space-between}
+.mctl .ib.big{background:var(--cyan);color:#04131c}
+.volRow{display:flex;gap:8px;align-items:center}
+.volRow input{accent-color:var(--cyan)}
+#ytWrap{border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9;max-width:100%}
+#ytWrap iframe{width:100%;height:100%;border:0;display:block}
+#mQueue{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+#mQueue li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 6px;border-radius:7px;cursor:pointer}
+#mQueue li:hover{background:var(--panel2)}
+#mQueue li.cur{background:rgba(88,199,243,.12)}
+#mQueue li.cur .qt{color:var(--cyan)}
+#mQueue li.dragover{outline:1px solid var(--cyan)}
+#mQueue .qi{color:var(--muted);display:grid;place-items:center}
+#mQueue .qi svg{width:16px;height:16px}
+#mQueue .qt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+#mQueue .qt small{display:block;color:var(--muted);font-size:11px}
+#mQueue .ib{width:26px;height:26px}
+#mQueue .ib svg{width:14px;height:14px}
+.radios{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.radios button{text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;font-size:12.5px;font-weight:600}
+.radios button small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+.radios button:hover{border-color:var(--cyan)}
+details>summary{cursor:pointer;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;list-style:none;display:flex;gap:6px;align-items:center}
+details>summary::before{content:"▸";transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details[open]>summary{margin-bottom:10px}
+.emptyQ{border:1.5px dashed var(--line);border-radius:10px;padding:14px;color:var(--muted);text-align:center;font-size:13px}
+
+/* inspector */
+.insHead{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center}
+.insHead .th{width:120px;aspect-ratio:16/9;border-radius:6px}
+.insHead .t{font-weight:700;overflow-wrap:anywhere}
+.insHead .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.notes{background:var(--panel2);border-radius:8px;padding:10px;white-space:pre-wrap;font-size:13px;max-height:200px;overflow:auto}
+
+/* dialogs */
+.scrim{position:fixed;inset:0;background:rgba(5,6,10,.7);display:grid;place-items:center;z-index:100;padding:16px;backdrop-filter:blur(3px)}
+.dlg{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:min(560px,100%);max-height:90vh;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.dlg h2{margin:0;font-family:var(--f-display);font-size:18px;font-weight:700}
+.dlg .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px}
+kbd{font-family:var(--f-mono);font-size:11.5px;background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);color:var(--fg);padding:10px 16px;border-radius:10px;z-index:200;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:min(560px,calc(100% - 32px));font-size:13.5px}
+#toast.err{border-color:var(--danger)}
+#banner{background:rgba(255,179,33,.1);border:1px solid rgba(255,179,33,.35);color:#ffd88a;border-radius:8px;padding:7px 12px;font-size:12.5px;display:flex;gap:10px;align-items:center}
+#banner button{margin-left:auto}
+
+@media (max-width:980px){
+  body{overflow:auto}
+  #app{height:auto;min-height:100%}
+  main{grid-template-columns:minmax(0,1fr)}
+  #stageWrap{aspect-ratio:16/9;min-height:0}
+  aside{min-height:520px}
+  #mini{border-left:0;padding-left:0;max-width:none;flex-basis:100%}
+  #showName{width:150px}
+}
+@media (max-width:560px){
+  .btn .lbl{display:none}
+  #presenter{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){#ovTicker span{animation-duration:60s}}
+</style>
+
+<div id="app">
+  <header>
+    <div class="logo" aria-label="VideoBlitz">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" fill="#ffb321"/><path d="M17.5 5 8.5 18h6l-1.5 9 10-14h-6.5z" fill="#1b1300"/></svg>
+      <span>Video<b>Blitz</b></span>
+    </div>
+    <input id="showName" type="text" aria-label="Show name" value="My VideoBlitz Show">
+    <div class="spacer"></div>
+    <div class="menuWrap">
+      <button class="btn pri" id="btnAdd" aria-haspopup="true"><span data-i="plus"></span><span class="lbl">Add media</span></button>
+      <div class="menu" id="addMenu" hidden>
+        <button data-add="files"><span data-i="image"></span><div>Pictures, videos, PowerPoint, PDF<small>Choose files from your computer</small></div></button>
+        <button data-add="folder"><span data-i="folder"></span><div>A whole folder<small>Every picture and video inside, in name order</small></div></button>
+        <button data-add="link"><span data-i="link"></span><div>Link<small>YouTube, or a picture or video web address</small></div></button>
+        <hr>
+        <button data-add="text"><span data-i="text"></span><div>Title card<small>Big text on a color background</small></div></button>
+        <button data-add="countdown"><span data-i="timer"></span><div>Countdown<small>"Starting in 5:00" timer slide</small></div></button>
+        <button data-add="nowplaying"><span data-i="wave"></span><div>Now Playing card<small>Shows the current song with a visualizer</small></div></button>
+      </div>
+    </div>
+    <button class="btn" id="btnPresent" title="Play full screen (F)"><span data-i="full"></span><span class="lbl">Present</span></button>
+    <button class="btn" id="btnOutput" title="Send the show to a second screen (O)"><span data-i="screens"></span><span class="lbl">Second screen</span></button>
+    <button class="btn" id="btnSave" title="Save show to a file"><span data-i="save"></span><span class="lbl">Save</span></button>
+    <button class="btn" id="btnOpen" title="Open a saved show"><span data-i="open"></span><span class="lbl">Open</span></button>
+    <button class="ib" id="btnHelp" title="Shortcuts and tips (?)"><span data-i="help"></span></button>
+  </header>
+
+  <main>
+    <section id="stageCol">
+      <div id="stageWrap" tabindex="-1">
+        <div id="stage">
+          <div id="layers"></div>
+          <div id="ov">
+            <div class="ovChip" id="ovNow" hidden><span data-i="wave"></span><span id="ovNowT"></span></div>
+            <div class="ovChip" id="ovClock" hidden></div>
+            <div class="ovChip" id="ovCounter" hidden></div>
+            <div class="ovChip" id="ovCaption" hidden></div>
+            <div class="ovChip" id="ovMark" hidden></div>
+            <div id="ovTicker" hidden><span id="ovTickerT"></span></div>
+            <div id="ovProg" hidden></div>
+          </div>
+          <div id="blank" hidden></div>
+        </div>
+        <div id="empty" hidden>
+          <div>
+            <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#ffb321" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+            <h2>Drop anything here</h2>
+            <div>Pictures, videos, PowerPoint (.pptx), PDF, or music files.<br>Or use <b>Add media</b> above.</div>
+          </div>
+        </div>
+        <div id="presenter" hidden>
+          <div><h3>On screen now</h3><div class="pv" id="pvCur"></div><p class="hint" id="pvCurT"></p><div id="pTimer">0:00</div><p class="hint">Show running time. Double-click the second-screen window to make it full screen.</p></div>
+          <div><h3>Up next</h3><div class="pv" id="pvNext"></div><p class="hint" id="pvNextT"></p><h3 style="margin-top:14px">Speaker notes</h3><div id="pNotes" class="note">No notes on this slide.</div></div>
+        </div>
+        <div id="fsBar">
+          <button class="ib" data-act="prev" title="Previous"><span data-i="prev"></span></button>
+          <button class="ib" data-act="play" title="Play / pause"><span data-i="play" class="playIco"></span></button>
+          <button class="ib" data-act="next" title="Next"><span data-i="next"></span></button>
+          <span class="fsCount"></span>
+          <button class="ib" data-act="mplay" title="Music play / pause"><span data-i="music"></span></button>
+          <button class="ib" data-act="blank" title="Black screen (B)"><span data-i="blank"></span></button>
+          <button class="ib" data-act="fs" title="Exit full screen"><span data-i="full"></span></button>
+        </div>
+        <div id="dropHint" hidden>Drop to add</div>
+      </div>
+
+      <div id="transport">
+        <div class="tGroup">
+          <button class="ib" id="tPrev" title="Previous slide (←)"><span data-i="prev"></span></button>
+          <button class="ib big" id="tPlay" title="Play / pause slideshow (Space)"><span data-i="play" class="playIco"></span></button>
+          <button class="ib" id="tNext" title="Next slide (→)"><span data-i="next"></span></button>
+        </div>
+        <div id="tProgWrap">
+          <span id="tCount">0 / 0</span>
+          <input type="range" id="tProg" min="0" max="1000" value="0" aria-label="Slide progress">
+          <span id="tTime">0:00 / 0:00</span>
+        </div>
+        <div class="tGroup">
+          <button class="ib" id="tShuffle" title="Shuffle slides"><span data-i="shuffle"></span></button>
+          <button class="ib" id="tLoop" title="Loop show"><span data-i="repeat"></span></button>
+          <button class="ib" id="tBlank" title="Black screen (B)"><span data-i="blank"></span></button>
+          <button class="ib" id="tFull" title="Full screen (F)"><span data-i="full"></span></button>
+        </div>
+        <div id="mini">
+          <button class="ib" id="mmPlay" title="Music play / pause (M)"><span data-i="play" class="mPlayIco"></span></button>
+          <button class="ib" id="mmNext" title="Next song (N)"><span data-i="next"></span></button>
+          <div class="mmT" id="mmT"><b>Music</b> · nothing playing</div>
+          <input type="range" id="mmVol" min="0" max="100" aria-label="Music volume">
+        </div>
+      </div>
+
+      <div id="strip" aria-label="Slides"></div>
+    </section>
+
+    <aside>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="music" aria-selected="true"><span data-i="music"></span>Music</button>
+        <button role="tab" data-tab="slide" aria-selected="false"><span data-i="image"></span>Slide</button>
+        <button role="tab" data-tab="show" aria-selected="false"><span data-i="sliders"></span>Show</button>
+        <button role="tab" data-tab="screen" aria-selected="false"><span data-i="monitor"></span>Screen</button>
+      </div>
+
+      <div class="pane" id="pMusic">
+        <div class="np">
+          <div class="art" id="mArt"><span data-i="music"></span></div>
+          <div style="min-width:0"><div class="npKind" id="npKind">Background music</div><div class="npTitle" id="npTitle">Nothing playing</div><div class="hint" id="npSub">Plays on its own, separate from the slides</div></div>
+        </div>
+        <canvas id="viz" height="56"></canvas>
+        <div class="seek"><span id="mCur">0:00</span><input type="range" id="mSeek" min="0" max="1000" value="0" aria-label="Song position"><span id="mDur">--:--</span></div>
+        <div class="mctl">
+          <button class="ib" id="mShuffle" title="Shuffle music"><span data-i="shuffle"></span></button>
+          <button class="ib" id="mPrev" title="Previous song"><span data-i="prev"></span></button>
+          <button class="ib big" id="mPlay" title="Play / pause music (M)"><span data-i="play" class="mPlayIco"></span></button>
+          <button class="ib" id="mNext" title="Next song (N)"><span data-i="next"></span></button>
+          <button class="ib" id="mRepeat" title="Repeat"><span data-i="repeat"></span></button>
+        </div>
+        <div class="volRow"><button class="ib" id="mMute" title="Mute music"><span data-i="vol"></span></button><input type="range" id="mVol" min="0" max="100" aria-label="Music volume"><span class="val" id="mVolV" style="font-family:var(--f-mono);font-size:12px;color:var(--muted);width:34px;text-align:right"></span></div>
+        <div id="ytWrap" hidden><div id="ytMusicEl"></div></div>
+        <div class="btnRow">
+          <button class="btn sm" id="mAddFiles"><span data-i="music"></span>Files</button>
+          <button class="btn sm" id="mAddFolder"><span data-i="folder"></span>Folder</button>
+          <button class="btn sm" id="mAddLink"><span data-i="yt"></span>YouTube / link</button>
+          <button class="btn sm" id="mAddRadio"><span data-i="radio"></span>Radio</button>
+        </div>
+        <div class="radios" id="radioList" hidden></div>
+        <div class="sec">
+          <div class="row"><h4 style="margin:0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Up next</h4><button class="btn sm" id="mClear">Clear</button></div>
+          <ol id="mQueue"></ol>
+        </div>
+        <details>
+          <summary>Sound and mixing</summary>
+          <div class="sec">
+            <div class="row"><label for="s_duck">Lower music when a slide video has sound</label><input class="sw" type="checkbox" id="s_duck" data-s="duck"></div>
+            <div class="row"><label for="s_duckLvl">Lower to</label><input type="range" id="s_duckLvl" data-s="duckLvl" min="0" max="100"><span class="val" data-v="duckLvl" data-unit="%"></span></div>
+            <div class="row"><label for="s_fade">Fade between songs</label><input type="range" id="s_fade" data-s="fade" min="0" max="8" step="0.5"><span class="val" data-v="fade" data-unit="s"></span></div>
+            <div class="row"><label for="s_bass">Bass</label><input type="range" id="s_bass" data-s="bass" min="-12" max="12"><span class="val" data-v="bass" data-unit="dB"></span></div>
+            <div class="row"><label for="s_treble">Treble</label><input type="range" id="s_treble" data-s="treble" min="-12" max="12"><span class="val" data-v="treble" data-unit="dB"></span></div>
+            <div class="row"><label for="s_sleep">Sleep timer</label><select id="s_sleep"><option value="0">Off</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="90">90 minutes</option><option value="120">2 hours</option></select></div>
+            <p class="note">Bass, treble and the live visualizer work on music files from your computer. YouTube and radio play through their own players.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="pane" id="pSlide" hidden></div>
+
+      <div class="pane" id="pShow" hidden>
+        <div class="sec">
+          <h4>Timing</h4>
+          <div class="row"><label for="s_dur">Seconds per slide</label><input type="number" id="s_dur" data-s="dur" min="1" max="3600" step="0.5"></div>
+          <div class="row"><label for="s_videoFull">Play videos to the end</label><input class="sw" type="checkbox" id="s_videoFull" data-s="videoFull"></div>
+          <div class="row"><label for="s_loop">Loop the show</label><input class="sw" type="checkbox" id="s_loop" data-s="loop"></div>
+          <div class="row"><label for="s_shuffle">Shuffle slides</label><input class="sw" type="checkbox" id="s_shuffle" data-s="shuffle"></div>
+          <div class="row"><label for="s_musicWithShow">Start music with the show</label><input class="sw" type="checkbox" id="s_musicWithShow" data-s="musicWithShow"></div>
+          <div class="row"><label for="s_autoStart">Auto-play when opened</label><input class="sw" type="checkbox" id="s_autoStart" data-s="autoStart"></div>
+        </div>
+        <div class="sec">
+          <h4>Transitions</h4>
+          <div class="row"><label for="s_trans">Style</label><select id="s_trans" data-s="trans"></select></div>
+          <div class="row"><label for="s_transMs">Speed</label><input type="range" id="s_transMs" data-s="transMs" min="0" max="3000" step="50"><span class="val" data-v="transMs" data-unit="ms"></span></div>
+          <div class="row"><label for="s_kenBurns">Slow zoom on pictures (Ken Burns)</label><input class="sw" type="checkbox" id="s_kenBurns" data-s="kenBurns"></div>
+        </div>
+        <div class="sec">
+          <h4>This show</h4>
+          <div class="btnRow">
+            <button class="btn sm" id="shApplyAll">Use these timings on every slide</button>
+            <button class="btn sm" id="shRemoveSamples" hidden>Remove sample slides</button>
+            <button class="btn sm danger" id="shClear">Remove all slides</button>
+          </div>
+          <div class="row"><label for="s_remember">Remember my media in this browser</label><input class="sw" type="checkbox" id="s_remember" data-s="remember"></div>
+          <p class="note" id="storageNote">Your slides, music and settings are kept in this browser so they're here next time.</p>
+        </div>
+      </div>
+
+      <div class="pane" id="pScreen" hidden>
+        <div class="sec">
+          <h4>Output</h4>
+          <div class="btnRow">
+            <button class="btn sm" id="scFull"><span data-i="full"></span>Full screen</button>
+            <button class="btn sm" id="scOut"><span data-i="screens"></span>Second screen</button>
+            <button class="btn sm" id="scPip"><span data-i="pip"></span>Picture-in-picture</button>
+          </div>
+          <div class="btnRow">
+            <button class="btn sm" id="scBlack">Black screen</button>
+            <button class="btn sm" id="scWhite">White screen</button>
+          </div>
+          <div class="row"><label for="s_hideCursor">Hide mouse when idle</label><input class="sw" type="checkbox" id="s_hideCursor" data-s="hideCursor"></div>
+          <div class="row"><label for="s_wake">Keep the screen awake</label><input class="sw" type="checkbox" id="s_wake" data-s="wake"></div>
+        </div>
+        <div class="sec">
+          <h4>Picture</h4>
+          <div class="row"><label for="s_fit">Sizing</label><select id="s_fit" data-s="fit"><option value="contain">Fit (show everything)</option><option value="cover">Fill (crop edges)</option><option value="fill">Stretch</option><option value="scale-down">Original size</option></select></div>
+          <div class="row"><label for="s_aspect">Screen shape</label><select id="s_aspect" data-s="aspect"><option value="auto">Use whole window</option><option value="16:9">16:9 widescreen</option><option value="4:3">4:3 classic</option><option value="21:9">21:9 ultrawide</option><option value="9:16">9:16 vertical / kiosk</option><option value="1:1">1:1 square</option><option value="3:2">3:2</option></select></div>
+          <div class="row"><span>Rotate</span><div class="seg" id="segRot"><button data-v="0">0°</button><button data-v="90">90°</button><button data-v="180">180°</button><button data-v="270">270°</button></div></div>
+          <div class="row"><label for="s_mirror">Mirror (rear projection)</label><input class="sw" type="checkbox" id="s_mirror" data-s="mirror"></div>
+          <div class="row"><label for="s_zoom">Zoom</label><input type="range" id="s_zoom" data-s="zoom" min="50" max="200"><span class="val" data-v="zoom" data-unit="%"></span></div>
+          <div class="row"><label for="s_bg">Background color</label><input type="color" id="s_bg" data-s="bg"></div>
+          <div class="row"><label for="s_blurFill">Blurred fill behind pictures</label><input class="sw" type="checkbox" id="s_blurFill" data-s="blurFill"></div>
+        </div>
+        <div class="sec">
+          <h4>Color</h4>
+          <div class="row"><label for="s_bright">Brightness</label><input type="range" id="s_bright" data-s="bright" min="30" max="170"><span class="val" data-v="bright" data-unit="%"></span></div>
+          <div class="row"><label for="s_contrast">Contrast</label><input type="range" id="s_contrast" data-s="contrast" min="30" max="170"><span class="val" data-v="contrast" data-unit="%"></span></div>
+          <div class="row"><label for="s_sat">Saturation</label><input type="range" id="s_sat" data-s="sat" min="0" max="200"><span class="val" data-v="sat" data-unit="%"></span></div>
+          <div class="row"><label for="s_gray">Black and white</label><input type="range" id="s_gray" data-s="gray" min="0" max="100"><span class="val" data-v="gray" data-unit="%"></span></div>
+          <div class="btnRow"><button class="btn sm" id="scResetColor">Reset picture and color</button></div>
+        </div>
+        <div class="sec">
+          <h4>On-screen extras</h4>
+          <div class="row"><label for="s_ovCaption">Captions</label><input class="sw" type="checkbox" id="s_ovCaption" data-s="ovCaption"></div>
+          <div class="row"><label for="s_ovNames">Use file names as captions</label><input class="sw" type="checkbox" id="s_ovNames" data-s="ovNames"></div>
+          <div class="row"><label for="s_ovProgress">Progress bar</label><input class="sw" type="checkbox" id="s_ovProgress" data-s="ovProgress"></div>
+          <div class="row"><label for="s_ovCounter">Slide number</label><input class="sw" type="checkbox" id="s_ovCounter" data-s="ovCounter"></div>
+          <div class="row"><label for="s_ovNow">Song title</label><input class="sw" type="checkbox" id="s_ovNow" data-s="ovNow"></div>
+          <div class="row"><label for="s_ovClock">Clock</label><select id="s_ovClock" data-s="ovClock"><option value="off">Off</option><option value="tl">Top left</option><option value="tr">Top right</option><option value="bl">Bottom left</option><option value="br">Bottom right</option></select></div>
+          <div class="field"><label for="s_watermark">Logo text in the corner</label><input type="text" id="s_watermark" data-s="watermark" placeholder="e.g. Grand Opening 2026"></div>
+          <div class="field"><label for="s_ticker">Scrolling news ticker</label><input type="text" id="s_ticker" data-s="ticker" placeholder="Type a message to scroll along the bottom"></div>
+          <div class="row"><label for="s_tickerSpeed">Ticker speed</label><input type="range" id="s_tickerSpeed" data-s="tickerSpeed" min="5" max="60"><span class="val" data-v="tickerSpeed" data-unit="s"></span></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+  <div id="banner" hidden><span>Preview mode: YouTube, the second screen and saving to a file need the downloaded VideoBlitz. Everything else works here.</span><button class="btn sm" id="bannerX">Got it</button></div>
+</div>
+
+<div class="scrim" id="dlgLink" hidden><div class="dlg" role="dialog" aria-labelledby="dlgLinkH">
+  <h2 id="dlgLinkH">Add from a link</h2>
+  <div class="field"><label for="linkIn">Paste one or more links, one per line</label><textarea id="linkIn" rows="4" placeholder="https://www.youtube.com/watch?v=…&#10;https://example.com/photo.jpg&#10;https://stream.example.com/radio.mp3"></textarea></div>
+  <p class="note" id="linkDetect">YouTube videos and playlists, pictures, videos, music files and internet radio streams all work.</p>
+  <div class="acts"><button class="btn" data-close>Cancel</button><button class="btn" id="linkMusic"><span data-i="music"></span>Add to music</button><button class="btn pri" id="linkSlide"><span data-i="image"></span>Add as slides</button></div>
+</div></div>
+
+<div class="scrim" id="dlgSave" hidden><div class="dlg" role="dialog" aria-labelledby="dlgSaveH">
+  <h2 id="dlgSaveH">Save show</h2>
+  <p class="note">Saves your slide order, timings, music queue and screen settings to a <b>.videoblitz.json</b> file you can open later or on another computer.</p>
+  <div class="row"><label for="saveMedia">Pack my media files inside (bigger file, works anywhere)</label><input class="sw" type="checkbox" id="saveMedia"></div>
+  <p class="note" id="saveSize"></p>
+  <div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="saveGo"><span data-i="save"></span>Save file</button></div>
+</div></div>
+
+<div class="scrim" id="dlgHelp" hidden><div class="dlg" role="dialog" aria-labelledby="dlgHelpH">
+  <h2 id="dlgHelpH">Shortcuts and tips</h2>
+  <div class="keys">
+    <kbd>Space</kbd><span>Play / pause the slideshow</span>
+    <kbd>→ / PgDn</kbd><span>Next slide (presentation clickers work too)</span>
+    <kbd>← / PgUp</kbd><span>Previous slide</span>
+    <kbd>Home / End</kbd><span>First / last slide</span>
+    <kbd>F</kbd><span>Full screen on / off</span>
+    <kbd>O</kbd><span>Send to a second screen</span>
+    <kbd>B</kbd> <span>Black screen (press again to return)</span>
+    <kbd>W</kbd><span>White screen</span>
+    <kbd>H</kbd><span>Hide / show on-screen extras</span>
+    <kbd>M</kbd><span>Music play / pause</span>
+    <kbd>N</kbd><span>Next song</span>
+    <kbd>+ / −</kbd><span>Music volume</span>
+    <kbd>?</kbd><span>This help</span>
+  </div>
+  <p class="note"><b>PowerPoint:</b> .pptx files open right here, with text, pictures, shapes, tables and embedded videos. For a pixel-perfect copy of complicated slides, save from PowerPoint as PDF (File › Export › PDF) and add the PDF instead. Old .ppt and Keynote files need to be saved as .pptx or PDF first.</p>
+  <p class="note"><b>YouTube:</b> works for slides and background music. If a video says it can't play, start VideoBlitz with the <b>Start VideoBlitz</b> launcher in the download folder. Some videos are blocked from playing outside youtube.com by their owners.</p>
+  <p class="note"><b>Two screens:</b> press <b>Second screen</b>, drag the new window to the projector or TV and double-click it for full screen. This window becomes your presenter view, with the next slide and speaker notes.</p>
+  <div class="acts"><button class="btn pri" data-close>Close</button></div>
+</div></div>
+
+<div id="toast" hidden role="status"></div>
+<input type="file" id="fSlides" multiple hidden accept="image/*,video/*,audio/*,.pptx,.ppsx,.potx,.pptm,.ppsm,.pdf,.ppt,.key,.m3u,.m3u8,.pls,.json">
+<input type="file" id="fFolder" multiple hidden webkitdirectory>
+<input type="file" id="fMusic" multiple hidden accept="audio/*,video/*,.m3u,.m3u8,.pls,.flac,.opus,.m4a">
+<input type="file" id="fMusicFolder" multiple hidden webkitdirectory>
+<input type="file" id="fShow" hidden accept=".json,application/json">
+
+<script>
+'use strict';
+/* ============ basics ============ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const $s = s => (stageWrap || document).querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmtT = s => { if (!isFinite(s) || s < 0) return '--:--'; s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const IN_FRAME = (() => { try { return window.top !== window; } catch { return true; } })();
+const CDN = {
+  zip: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+  pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfw: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+};
+const ICONS = {
+  play: '<path d="M7 4.5v15l12.5-7.5z" fill="currentColor" stroke="none"/>',
+  pause: '<path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z" fill="currentColor" stroke="none"/>',
+  prev: '<path d="M6 5v14"/><path d="M19 5 9 12l10 7z" fill="currentColor"/>',
+  next: '<path d="M18 5v14"/><path d="M5 5l10 7-10 7z" fill="currentColor"/>',
+  shuffle: '<path d="M3 7h3c4 0 6 10 10 10h5M3 17h3c1.6 0 2.8-1.6 4-3.5M14 9.5C15 8 16 7 18 7h3M18 4l3 3-3 3M18 14l3 3-3 3"/>',
+  repeat: '<path d="M4 11V9a3 3 0 0 1 3-3h13M17 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H4M7 21l-3-3 3-3"/>',
+  repeat1: '<path d="M4 11V9a3 3 0 0 1 3-3h13M17 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H4M7 21l-3-3 3-3"/><path d="M11 10.5l1.5-1v5"/>',
+  vol: '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',
+  mute: '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  radio: '<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
+  music: '<path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m3 17 5-5 4 4 3-3 6 6"/>',
+  video: '<rect x="2.5" y="6" width="13" height="12" rx="2"/><path d="m15.5 10 6-3.5v11l-6-3.5"/>',
+  deck: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 12l3-3 2 2 4-4"/>',
+  pdf: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+  yt: '<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9v6l5-3z" fill="currentColor"/>',
+  text: '<path d="M5 6h14M12 6v13M9 19h6"/>',
+  timer: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',
+  wave: '<path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>',
+  monitor: '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>',
+  screens: '<rect x="2" y="4" width="12" height="9" rx="1"/><rect x="10" y="10" width="12" height="9" rx="1"/>',
+  full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  up: '<path d="m6 15 6-6 6 6"/>', down: '<path d="m6 9 6 6 6-6"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s4 7 10 7a9.6 9.6 0 0 0 5.3-1.6"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4M12 17h.01"/>',
+  save: '<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7M8 14h8v7H8z"/>',
+  open: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8v3"/><path d="M3 7v11h15l3-8H7l-4 8"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  sliders: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1M15 4v4M9 10v4M17 16v4"/>',
+  blank: '<rect x="3" y="4" width="18" height="14" rx="1.5" fill="currentColor"/>',
+  pip: '<rect x="3" y="5" width="18" height="14" rx="2"/><rect x="12" y="12" width="7" height="5" rx="1" fill="currentColor"/>',
+  play2: '<path d="M8 5v14l11-7z"/>',
+};
+const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+function paintIcons(root = document) { $$('[data-i]', root).forEach(el => { el.innerHTML = ic(el.dataset.i); el.style.display = 'inline-flex'; }); }
+let toastT;
+function toast(msg, kind = '') { const t = $('#toast'); t.textContent = msg; t.className = kind; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, kind === 'err' ? 6500 : 3800); }
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load ' + src.split('/').pop() + '. Check your internet connection.')); document.head.appendChild(s); }); }
+const once = fn => { let p; return () => p || (p = fn().catch(e => { p = null; throw e; })); };
+const libZip = once(async () => { if (!window.JSZip) await loadScript(CDN.zip); });
+const libPdf = once(async () => { if (!window.pdfjsLib) await loadScript(CDN.pdf); if (!window.pdfjsWorker) await loadScript(CDN.pdfw); });
+const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', jfif: 'image/jpeg', gif: 'image/gif', bmp: 'image/bmp', webp: 'image/webp', svg: 'image/svg+xml', avif: 'image/avif', ico: 'image/x-icon',
+  mp4: 'video/mp4', m4v: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm', ogv: 'video/ogg', mkv: 'video/x-matroska',
+  mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', oga: 'audio/ogg', m4a: 'audio/mp4', aac: 'audio/aac', flac: 'audio/flac', opus: 'audio/ogg', weba: 'audio/webm' };
+const extOf = n => (String(n).split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
+const baseName = n => String(n).replace(/\.[^.]+$/, '');
+const natSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+/* ============ state ============ */
+const DEF = {
+  dur: 6, trans: 'fade', transMs: 900, loop: true, shuffle: false, videoFull: true, kenBurns: true, musicWithShow: true, autoStart: false, remember: true,
+  fit: 'contain', aspect: 'auto', rotate: 0, mirror: false, zoom: 100, bg: '#000000', blurFill: true, bright: 100, contrast: 100, sat: 100, gray: 0,
+  ovCaption: true, ovNames: false, ovProgress: true, ovCounter: false, ovNow: true, ovClock: 'off', watermark: '', ticker: '', tickerSpeed: 20, hideCursor: true, wake: true, hideOverlays: false,
+  vol: 70, mShuffle: false, mRepeat: 'all', duck: true, duckLvl: 25, fade: 2, bass: 0, treble: 0,
+};
+const S = { name: 'My VideoBlitz Show', settings: { ...DEF }, slides: [], music: [], sel: -1 };
+const FILES = new Map();
+const TRANS = { fade: 'Crossfade', dip: 'Dip to black', slide: 'Slide left', slideup: 'Slide up', zoom: 'Zoom', flip: 'Flip', blur: 'Blur', wipe: 'Wipe', circle: 'Circle reveal', spin: 'Spin', none: 'Cut (none)', random: 'Random mix' };
+
+/* ============ storage (IndexedDB) ============ */
+const DB = {
+  db: null,
+  async open() { try { this.db = await new Promise((res, rej) => { const r = indexedDB.open('videoblitz', 1); r.onupgradeneeded = () => { r.result.createObjectStore('files', { keyPath: 'id' }); r.result.createObjectStore('kv'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); } catch { this.db = null; } },
+  run(store, mode, fn) { if (!this.db) return Promise.resolve(null); return new Promise(res => { try { const t = this.db.transaction(store, mode); const req = fn(t.objectStore(store)); t.oncomplete = () => res(req ? req.result : null); t.onerror = t.onabort = () => res(null); } catch { res(null); } }); },
+  putFile(f) { return this.run('files', 'readwrite', st => st.put({ id: f.id, name: f.name, type: f.type, blob: f.blob })); },
+  delFile(id) { return this.run('files', 'readwrite', st => st.delete(id)); },
+  allFiles() { return this.run('files', 'readonly', st => st.getAll()); },
+  clearFiles() { return this.run('files', 'readwrite', st => st.clear()); },
+  set(k, v) { return this.run('kv', 'readwrite', st => st.put(v, k)); },
+  get(k) { return this.run('kv', 'readonly', st => st.get(k)); },
+};
+function addFile(blob, name, persist = true) {
+  const id = 'f' + uid();
+  const f = { id, name, type: blob.type || MIME[extOf(name)] || '', blob, url: URL.createObjectURL(blob) };
+  FILES.set(id, f);
+  if (persist && S.settings.remember) DB.putFile(f);
+  return id;
+}
+function gcFiles() {
+  const used = new Set([...S.slides, ...S.music].map(x => x.fileId).filter(Boolean));
+  for (const [id, f] of FILES) if (!used.has(id)) { URL.revokeObjectURL(f.url); FILES.delete(id); DECKS.delete(id); PDFS.delete(id); DB.delFile(id); }
+}
+let saveT;
+function save() { clearTimeout(saveT); saveT = setTimeout(() => { DB.set('state', JSON.parse(JSON.stringify({ name: S.name, settings: S.settings, slides: S.slides, music: S.music, idx: E.idx, midx: Mu.idx }))); }, 400); }
+const srcOf = it => it.fileId ? FILES.get(it.fileId)?.url : it.url;
+
+/* ============ PowerPoint (.pptx) renderer ============ */
+const EMU = 9525;
+const parseXml = s => new DOMParser().parseFromString(s, 'application/xml');
+const kid = (el, n) => { if (!el) return null; for (const c of el.children) if (c.nodeName === n) return c; return null; };
+const kidsOf = (el, n) => el ? [...el.children].filter(c => c.nodeName === n) : [];
+const dsc = (el, n) => el ? el.getElementsByTagName(n)[0] || null : null;
+const pathOf = (el, ...ns) => { let c = el; for (const n of ns) { c = kid(c, n); if (!c) return null; } return c; };
+const num = (el, a, d = null) => { const v = el?.getAttribute(a); return v == null || v === '' ? d : +v; };
+function resolvePath(dir, t) { if (t.startsWith('/')) return t.slice(1); const parts = dir.split('/').filter(Boolean); for (const seg of t.split('/')) { if (seg === '..') parts.pop(); else if (seg && seg !== '.') parts.push(seg); } return parts.join('/'); }
+async function readRels(zip, part) {
+  const i = part.lastIndexOf('/'); const dir = part.slice(0, i), base = part.slice(i + 1);
+  const f = zip.file(dir + '/_rels/' + base + '.rels'); const map = {};
+  if (!f) return map;
+  const d = parseXml(await f.async('string'));
+  for (const r of d.getElementsByTagName('Relationship')) { const ext = r.getAttribute('TargetMode') === 'External'; map[r.getAttribute('Id')] = { type: r.getAttribute('Type') || '', ext, target: ext ? r.getAttribute('Target') : resolvePath(dir, r.getAttribute('Target') || '') }; }
+  return map;
+}
+const PRST = { black: '000000', white: 'FFFFFF', red: 'FF0000', green: '008000', blue: '0000FF', yellow: 'FFFF00', gray: '808080', grey: '808080', orange: 'FFA500', purple: '800080', navy: '000080', darkBlue: '00008B', darkRed: '8B0000', lightGray: 'D3D3D3', silver: 'C0C0C0' };
+function rgb2hsl(r, g, b) { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0; const l = (mx + mn) / 2; if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; } return [h, s, l]; }
+function hsl2rgb(h, s, l) { if (!s) return [l * 255, l * 255, l * 255]; const q = l < .5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q; const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < .5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; }; return [f(h + 1 / 3) * 255, f(h) * 255, f(h - 1 / 3) * 255]; }
+function applyMods(hex, node) {
+  let r = parseInt(hex.slice(0, 2), 16), g = parseInt(hex.slice(2, 4), 16), b = parseInt(hex.slice(4, 6), 16), a = 1;
+  if ([r, g, b].some(isNaN)) return null;
+  for (const m of node.children) {
+    const v = num(m, 'val', 0) / 100000;
+    switch (m.nodeName) {
+      case 'a:lumMod': case 'a:lumOff': case 'a:satMod': { let [h, s, l] = rgb2hsl(r, g, b); if (m.nodeName === 'a:lumMod') l *= v; else if (m.nodeName === 'a:lumOff') l += v; else s *= v; [r, g, b] = hsl2rgb(h, clamp(s, 0, 1), clamp(l, 0, 1)); break; }
+      case 'a:tint': r = r * v + 255 * (1 - v); g = g * v + 255 * (1 - v); b = b * v + 255 * (1 - v); break;
+      case 'a:shade': r *= v; g *= v; b *= v; break;
+      case 'a:alpha': a = v; break;
+    }
+  }
+  r = Math.round(clamp(r, 0, 255)); g = Math.round(clamp(g, 0, 255)); b = Math.round(clamp(b, 0, 255));
+  return a < 1 ? `rgba(${r},${g},${b},${+a.toFixed(3)})` : `rgb(${r},${g},${b})`;
+}
+function colorFrom(parent, T) {
+  if (!parent) return null;
+  for (const c of parent.children) {
+    let hex = null;
+    switch (c.nodeName) {
+      case 'a:srgbClr': hex = c.getAttribute('val'); break;
+      case 'a:schemeClr': { const v = c.getAttribute('val'); const m = T.clrMap[v] || v; hex = T.colors[m] || null; break; }
+      case 'a:sysClr': hex = c.getAttribute('lastClr') || (c.getAttribute('val') === 'window' ? 'FFFFFF' : '000000'); break;
+      case 'a:prstClr': hex = PRST[c.getAttribute('val')] || '000000'; break;
+      case 'a:scrgbClr': hex = ['r', 'g', 'b'].map(k => Math.round(clamp(num(c, k, 0) / 100000, 0, 1) * 255).toString(16).padStart(2, '0')).join(''); break;
+      default: continue;
+    }
+    return hex ? applyMods(hex, c) : null;
+  }
+  return null;
+}
+const DEFAULT_THEME = { colors: { dk1: '000000', lt1: 'FFFFFF', dk2: '44546A', lt2: 'E7E6E6', accent1: '4472C4', accent2: 'ED7D31', accent3: 'A5A5A5', accent4: 'FFC000', accent5: '5B9BD5', accent6: '70AD47', hlink: '0563C1', folHlink: '954F72' }, clrMap: { bg1: 'lt1', tx1: 'dk1', bg2: 'lt2', tx2: 'dk2' }, major: 'Calibri Light', minor: 'Calibri' };
+function fillOf(spPr, T) {
+  if (!spPr) return null;
+  if (kid(spPr, 'a:noFill')) return { none: true };
+  const sf = kid(spPr, 'a:solidFill'); if (sf) return { css: colorFrom(sf, T) };
+  const gf = kid(spPr, 'a:gradFill');
+  if (gf) {
+    const stops = kidsOf(kid(gf, 'a:gsLst'), 'a:gs').map(gs => `${colorFrom(gs, T) || '#888'} ${num(gs, 'pos', 0) / 1000}%`).join(',');
+    const lin = kid(gf, 'a:lin'); const path = kid(gf, 'a:path');
+    if (!stops) return null;
+    return { css: path ? `radial-gradient(circle,${stops})` : `linear-gradient(${(num(lin, 'ang', 0) / 60000 + 90)}deg,${stops})` };
+  }
+  const bf = kid(spPr, 'a:blipFill'); if (bf) return { blip: dsc(bf, 'a:blip')?.getAttribute('r:embed') };
+  if (kid(spPr, 'a:pattFill')) return { css: colorFrom(kid(kid(spPr, 'a:pattFill'), 'a:fgClr'), T) };
+  return null;
+}
+function xfrmOf(el) { const x = el && (kid(el, 'a:xfrm') || kid(el, 'p:xfrm')); if (!x) return null; const off = kid(x, 'a:off'), ext = kid(x, 'a:ext'); if (!off || !ext) return null; return { x: num(off, 'x', 0) / EMU, y: num(off, 'y', 0) / EMU, w: num(ext, 'cx', 0) / EMU, h: num(ext, 'cy', 0) / EMU, rot: num(x, 'rot', 0) / 60000, fh: x.getAttribute('flipH') === '1', fv: x.getAttribute('flipV') === '1', ch: kid(x, 'a:chOff') ? { x: num(kid(x, 'a:chOff'), 'x', 0) / EMU, y: num(kid(x, 'a:chOff'), 'y', 0) / EMU, w: num(kid(x, 'a:chExt'), 'cx', 1) / EMU || 1, h: num(kid(x, 'a:chExt'), 'cy', 1) / EMU || 1 } : null }; }
+const CLIPS = { triangle: 'polygon(50% 0,100% 100%,0 100%)', rtTriangle: 'polygon(0 0,100% 100%,0 100%)', diamond: 'polygon(50% 0,100% 50%,50% 100%,0 50%)', hexagon: 'polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)', octagon: 'polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)', parallelogram: 'polygon(25% 0,100% 0,75% 100%,0 100%)', trapezoid: 'polygon(25% 0,75% 0,100% 100%,0 100%)', chevron: 'polygon(0 0,75% 0,100% 50%,75% 100%,0 100%,25% 50%)', homePlate: 'polygon(0 0,80% 0,100% 50%,80% 100%,0 100%)', rightArrow: 'polygon(0 25%,65% 25%,65% 0,100% 50%,65% 100%,65% 75%,0 75%)', leftArrow: 'polygon(100% 25%,35% 25%,35% 0,0 50%,35% 100%,35% 75%,100% 75%)', upArrow: 'polygon(25% 100%,25% 35%,0 35%,50% 0,100% 35%,75% 35%,75% 100%)', downArrow: 'polygon(25% 0,75% 0,75% 65%,100% 65%,50% 100%,0 65%,25% 65%)', pentagon: 'polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%)', star5: 'polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)', plus: 'polygon(35% 0,65% 0,65% 35%,100% 35%,100% 65%,65% 65%,65% 100%,35% 100%,35% 65%,0 65%,0 35%,35% 35%)' };
+
+async function parsePptx(blob) {
+  await libZip();
+  const zip = await JSZip.loadAsync(blob);
+  const X = async p => { const f = zip.file(p); return f ? parseXml(await f.async('string')) : null; };
+  const pres = await X('ppt/presentation.xml');
+  if (!pres) throw new Error('This file is not a PowerPoint (.pptx) presentation.');
+  const sz = dsc(pres, 'p:sldSz');
+  const W = Math.round(num(sz, 'cx', 12192000) / EMU), H = Math.round(num(sz, 'cy', 6858000) / EMU);
+  const presDefault = dsc(pres, 'p:defaultTextStyle');
+  const prels = await readRels(zip, 'ppt/presentation.xml');
+  const ids = [...pres.getElementsByTagName('p:sldId')].map(e => e.getAttribute('r:id'));
+  const media = new Map();
+  const mediaUrl = async p => {
+    if (!p) return null;
+    if (!media.has(p)) {
+      const f = zip.file(p); const ext = extOf(p); const mt = MIME[ext];
+      if (!f || !mt) media.set(p, null);
+      else media.set(p, URL.createObjectURL(new Blob([await f.async('blob')], { type: mt })));
+    }
+    return media.get(p);
+  };
+  const parts = new Map();
+  const loadPart = async (p, kind) => {
+    if (parts.has(p)) return parts.get(p);
+    const doc = await X(p); if (!doc) return null;
+    const rels = await readRels(zip, p);
+    const phs = [...doc.getElementsByTagName('p:ph')].map(ph => { let sp = ph; while (sp && !['p:sp', 'p:pic', 'p:graphicFrame'].includes(sp.nodeName)) sp = sp.parentNode; return { type: ph.getAttribute('type') || 'body', idx: ph.getAttribute('idx'), sp }; }).filter(x => x.sp);
+    const part = { path: p, doc, rels, kind, phs };
+    parts.set(p, part); return part;
+  };
+  const themes = new Map();
+  const getTheme = async master => {
+    if (themes.has(master.path)) return themes.get(master.path);
+    const T = { colors: { ...DEFAULT_THEME.colors }, clrMap: { ...DEFAULT_THEME.clrMap }, major: DEFAULT_THEME.major, minor: DEFAULT_THEME.minor };
+    const rel = Object.values(master.rels).find(r => r.type.endsWith('/theme'));
+    const th = rel ? await X(rel.target) : null;
+    if (th) {
+      const cs = dsc(th, 'a:clrScheme');
+      for (const c of cs ? cs.children : []) { const k = c.nodeName.replace('a:', ''); const s = kid(c, 'a:srgbClr'), y = kid(c, 'a:sysClr'); T.colors[k] = s ? s.getAttribute('val') : y ? (y.getAttribute('lastClr') || '000000') : T.colors[k]; }
+      T.major = dsc(dsc(th, 'a:majorFont'), 'a:latin')?.getAttribute('typeface') || T.major;
+      T.minor = dsc(dsc(th, 'a:minorFont'), 'a:latin')?.getAttribute('typeface') || T.minor;
+    }
+    const cm = dsc(master.doc, 'p:clrMap');
+    if (cm) for (const a of cm.attributes) T.clrMap[a.name] = a.value;
+    themes.set(master.path, T); return T;
+  };
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-20000px;top:0;visibility:hidden;pointer-events:none';
+  document.body.appendChild(host);
+  const slides = [];
+  try {
+    for (const rid of ids) {
+      const sp = prels[rid]?.target; if (!sp) continue;
+      const slide = await loadPart(sp, 'slide'); if (!slide) continue;
+      const lr = Object.values(slide.rels).find(r => r.type.endsWith('/slideLayout'));
+      const layout = lr ? await loadPart(lr.target, 'layout') : null;
+      const mr = layout && Object.values(layout.rels).find(r => r.type.endsWith('/slideMaster'));
+      const master = mr ? await loadPart(mr.target, 'master') : null;
+      const T = master ? await getTheme(master) : DEFAULT_THEME;
+      const nr = Object.values(slide.rels).find(r => r.type.endsWith('/notesSlide'));
+      let notes = '';
+      if (nr) { const nd = await X(nr.target); if (nd) { for (const s of nd.getElementsByTagName('p:sp')) { const ph = dsc(s, 'p:ph'); if (ph && ph.getAttribute('type') === 'body') notes = [...s.getElementsByTagName('a:p')].map(p => [...p.getElementsByTagName('a:t')].map(t => t.textContent).join('')).join('\n').trim(); } } }
+      const R = { W, H, T, layout, master, mediaUrl, presDefault };
+      const el = document.createElement('div'); el.className = 'pslide'; el.style.width = W + 'px'; el.style.height = H + 'px'; el.dataset.w = W; el.dataset.h = H;
+      // background
+      let bg = null;
+      for (const p of [slide, layout, master]) { if (!p) continue; const b = pathOf(p.doc.documentElement, 'p:cSld', 'p:bg'); if (!b) continue; const bp = kid(b, 'p:bgPr'); bg = bp ? fillOf(bp, T) : (kid(b, 'p:bgRef') ? { css: colorFrom(kid(b, 'p:bgRef'), T) } : null); if (bg) { bg.part = p; break; } }
+      if (bg?.css) el.style.background = bg.css;
+      else if (bg?.blip) { const u = await mediaUrl(bg.part.rels[bg.blip]?.target); if (u) { el.style.background = `center/cover no-repeat url("${u}")`; } }
+      else el.style.background = '#' + (T.colors[T.clrMap.bg1 || 'lt1'] || 'FFFFFF');
+      const showMaster = slide.doc.documentElement.getAttribute('showMasterSp') !== '0';
+      const showMaster2 = !layout || layout.doc.documentElement.getAttribute('showMasterSp') !== '0';
+      const ident = r => r;
+      if (master && showMaster && showMaster2) await renderTree(pathOf(master.doc.documentElement, 'p:cSld', 'p:spTree'), master, R, el, ident);
+      if (layout && showMaster) await renderTree(pathOf(layout.doc.documentElement, 'p:cSld', 'p:spTree'), layout, R, el, ident);
+      await renderTree(pathOf(slide.doc.documentElement, 'p:cSld', 'p:spTree'), slide, R, el, ident);
+      host.appendChild(el); fitTexts(el); el.remove();
+      slides.push({ el, hidden: slide.doc.documentElement.getAttribute('show') === '0', notes });
+    }
+  } finally { host.remove(); }
+  if (!slides.length) throw new Error('No slides were found in this presentation.');
+  return { W, H, slides };
+}
+function fitTexts(root) {
+  for (const box of root.querySelectorAll('[data-fit]')) {
+    const tx = box.firstElementChild; if (!tx) continue;
+    let s = 1;
+    for (let k = 0; k < 10 && box.scrollHeight > box.clientHeight + 1 && s > .3; k++) { s *= .9; tx.style.fontSize = s * 100 + '%'; tx.querySelectorAll('[data-sz]').forEach(sp => sp.style.fontSize = (+sp.dataset.sz * s) + 'px'); }
+  }
+}
+function phInfo(sp) { const ph = dsc(sp, 'p:ph'); return ph ? { type: ph.getAttribute('type') || 'body', idx: ph.getAttribute('idx') } : null; }
+const normT = t => ({ ctrTitle: 'title', subTitle: 'body', obj: 'body' }[t] || t);
+function findPh(part, info) {
+  if (!part || !info) return null;
+  if (info.idx != null) { const m = part.phs.find(p => p.idx === info.idx); if (m) return m.sp; }
+  let m = part.phs.find(p => p.type === info.type); if (m) return m.sp;
+  m = part.phs.find(p => normT(p.type) === normT(info.type)); return m ? m.sp : null;
+}
+async function renderTree(tree, part, R, out, map) {
+  if (!tree) return;
+  for (const c of tree.children) {
+    try {
+      switch (c.nodeName) {
+        case 'mc:AlternateContent': { const alt = kid(c, 'mc:Choice') && kid(kid(c, 'mc:Choice'), 'p:pic') ? kid(c, 'mc:Choice') : (kid(c, 'mc:Fallback') || kid(c, 'mc:Choice')); await renderTree(alt, part, R, out, map); break; }
+        case 'p:sp': await renderSp(c, part, R, out, map); break;
+        case 'p:pic': await renderPic(c, part, R, out, map); break;
+        case 'p:cxnSp': renderCxn(c, part, R, out, map); break;
+        case 'p:graphicFrame': renderFrame(c, part, R, out, map); break;
+        case 'p:grpSp': {
+          const g = xfrmOf(kid(c, 'p:grpSpPr'));
+          let inner = map;
+          if (g && g.ch) { const sx = g.w / g.ch.w, sy = g.h / g.ch.h; inner = r => map({ ...r, x: g.x + (r.x - g.ch.x) * sx, y: g.y + (r.y - g.ch.y) * sy, w: r.w * sx, h: r.h * sy }); }
+          await renderTree(c, part, R, out, inner); break;
+        }
+      }
+    } catch (e) { console.warn('pptx shape skipped', e); }
+  }
+}
+function placeBox(el, xf) {
+  el.style.cssText += `;position:absolute;left:${xf.x}px;top:${xf.y}px;width:${Math.max(xf.w, 0)}px;height:${Math.max(xf.h, 0)}px`;
+  const t = []; if (xf.rot) t.push(`rotate(${xf.rot}deg)`); if (xf.fh) t.push('scaleX(-1)'); if (xf.fv) t.push('scaleY(-1)');
+  if (t.length) el.style.transform = t.join(' ');
+}
+function lineCss(spPr, style, T) {
+  const ln = kid(spPr, 'a:ln');
+  if (ln) { if (kid(ln, 'a:noFill')) return null; const c = colorFrom(kid(ln, 'a:solidFill'), T); const w = Math.max(num(ln, 'w', 12700) / EMU, .75); if (c) return { c, w }; if (!kid(ln, 'a:solidFill') && style) { const lr = kid(style, 'a:lnRef'); if (lr && num(lr, 'idx', 0) > 0) return { c: colorFrom(lr, T), w }; } return null; }
+  if (style) { const lr = kid(style, 'a:lnRef'); if (lr && num(lr, 'idx', 0) > 0) { const c = colorFrom(lr, T); if (c) return { c, w: 1.33 }; } }
+  return null;
+}
+async function renderSp(sp, part, R, out, map) {
+  const info = phInfo(sp);
+  if (info && part.kind !== 'slide') return;
+  const lsp = info ? findPh(R.layout, info) : null;
+  const msp = info ? findPh(R.master, lsp ? phInfo(lsp) || info : info) : null;
+  const spPr = kid(sp, 'p:spPr');
+  const xf0 = xfrmOf(spPr) || xfrmOf(kid(lsp, 'p:spPr')) || xfrmOf(kid(msp, 'p:spPr'));
+  if (!xf0) return;
+  const xf = map(xf0);
+  const T = R.T, style = kid(sp, 'p:style');
+  let fill = fillOf(spPr, T) || (lsp ? fillOf(kid(lsp, 'p:spPr'), T) : null) || (msp ? fillOf(kid(msp, 'p:spPr'), T) : null);
+  if (!fill && style) { const fr = kid(style, 'a:fillRef'); if (fr && num(fr, 'idx', 0) > 0) fill = { css: colorFrom(fr, T) }; }
+  const line = lineCss(spPr, style, T);
+  const txBody = kid(sp, 'p:txBody');
+  const hasText = txBody && [...txBody.getElementsByTagName('a:t')].some(t => t.textContent.trim());
+  if (!hasText && (!fill || fill.none) && !line) return;
+  const el = document.createElement('div');
+  placeBox(el, xf);
+  const prst = kid(spPr, 'a:prstGeom')?.getAttribute('prst') || 'rect';
+  if (fill?.css) el.style.background = fill.css;
+  else if (fill?.blip) { const u = await R.mediaUrl(part.rels[fill.blip]?.target); if (u) el.style.background = `center/cover no-repeat url("${u}")`; }
+  if (line && !CLIPS[prst]) el.style.border = `${line.w}px solid ${line.c}`;
+  if (prst === 'ellipse') el.style.borderRadius = '50%';
+  else if (prst === 'roundRect') el.style.borderRadius = Math.min(xf.w, xf.h) * .1667 + 'px';
+  else if (CLIPS[prst] && fill?.css) el.style.clipPath = CLIPS[prst];
+  if (hasText) {
+    const lstChain = [kid(txBody, 'a:lstStyle'), lsp && kid(kid(lsp, 'p:txBody'), 'a:lstStyle'), msp && kid(kid(msp, 'p:txBody'), 'a:lstStyle')];
+    const ts = R.master && pathOf(R.master.doc.documentElement, 'p:txStyles');
+    if (info) { const t = normT(info.type); lstChain.push(ts && kid(ts, t === 'title' ? 'p:titleStyle' : t === 'body' ? 'p:bodyStyle' : 'p:otherStyle')); }
+    else lstChain.push(R.presDefault, ts && kid(ts, 'p:otherStyle'));
+    const bodyPrs = [kid(txBody, 'a:bodyPr'), lsp && kid(kid(lsp, 'p:txBody'), 'a:bodyPr'), msp && kid(kid(msp, 'p:txBody'), 'a:bodyPr')].filter(Boolean);
+    let defColor = null;
+    if (style) { const fr = kid(style, 'a:fontRef'); if (fr) defColor = colorFrom(fr, T); }
+    renderText(el, txBody, { R, chain: lstChain.filter(Boolean), bodyPrs, defColor, ph: info ? normT(info.type) : null });
+  }
+  out.appendChild(el);
+}
+function renderText(el, txBody, o) {
+  const T = o.R.T;
+  const bp = a => { for (const b of o.bodyPrs) { const v = b.getAttribute(a); if (v != null) return v; } return null; };
+  const anchor = bp('anchor') || (o.ph === 'title' ? 'ctr' : 't');
+  const ins = k => { const v = bp(k); return v == null ? null : +v / EMU; };
+  const L = ins('lIns') ?? 9.6, Rr = ins('rIns') ?? 9.6, Tp = ins('tIns') ?? 4.8, B = ins('bIns') ?? 4.8;
+  let fontScale = 1, lnRed = 0, autofit = false;
+  for (const b of o.bodyPrs) { const na = kid(b, 'a:normAutofit'); if (na) { autofit = true; fontScale = num(na, 'fontScale', 100000) / 100000; lnRed = num(na, 'lnSpcReduction', 0) / 100000; break; } if (kid(b, 'a:spAutoFit') || kid(b, 'a:noAutofit')) break; }
+  el.style.display = 'flex'; el.style.flexDirection = 'column';
+  el.style.justifyContent = anchor === 'ctr' ? 'center' : anchor === 'b' ? 'flex-end' : 'flex-start';
+  el.style.padding = `${Tp}px ${Rr}px ${B}px ${L}px`; el.style.overflow = 'hidden';
+  if (bp('wrap') === 'none') el.style.whiteSpace = 'nowrap';
+  const vert = bp('vert'); if (vert === 'vert' || vert === 'eaVert') el.style.writingMode = 'vertical-rl'; else if (vert === 'vert270') { el.style.writingMode = 'vertical-rl'; el.style.transform = (el.style.transform || '') + ' rotate(180deg)'; }
+  if (autofit) el.dataset.fit = '1';
+  const tx = document.createElement('div'); tx.style.cssText = 'width:100%;overflow-wrap:break-word';
+  const lvlP = (lv, a) => { for (const ls of o.chain) { const v = kid(ls, `a:lvl${lv}pPr`)?.getAttribute(a); if (v != null) return v; } return null; };
+  const lvlKid = (lv, n) => { for (const ls of o.chain) { const k = kid(kid(ls, `a:lvl${lv}pPr`), n); if (k) return k; } return null; };
+  const defSz = o.ph === 'title' ? 44 : o.ph === 'body' ? 24 : 18;
+  const counters = {};
+  for (const p of kidsOf(txBody, 'a:p')) {
+    const pPr = kid(p, 'a:pPr');
+    const lv = (num(pPr, 'lvl', 0) || 0) + 1;
+    const pick = a => pPr?.getAttribute(a) ?? lvlP(lv, a);
+    const pk = n => kid(pPr, n) || lvlKid(lv, n);
+    const pd = document.createElement('div');
+    const algn = pick('algn') || 'l';
+    pd.style.textAlign = { l: 'left', ctr: 'center', r: 'right', just: 'justify', dist: 'justify' }[algn] || 'left';
+    const marL = +(pick('marL') || 0) / EMU, indent = +(pick('indent') || 0) / EMU;
+    if (marL) pd.style.paddingLeft = marL + 'px';
+    if (indent) pd.style.textIndent = indent + 'px';
+    const lnSpc = pk('a:lnSpc'); const pct = dsc(lnSpc, 'a:spcPct'), pts = dsc(lnSpc, 'a:spcPts');
+    if (pct) pd.style.lineHeight = Math.max(.6, num(pct, 'val', 100000) / 100000 * (1 - lnRed) * 1.2);
+    else if (pts) pd.style.lineHeight = num(pts, 'val', 1200) / 100 * 4 / 3 + 'px';
+    else pd.style.lineHeight = 1.2 * (1 - lnRed);
+    const sb = dsc(pk('a:spcBef'), 'a:spcPts'), sa = dsc(pk('a:spcAft'), 'a:spcPts');
+    if (sb) pd.style.marginTop = num(sb, 'val', 0) / 100 * 4 / 3 + 'px';
+    if (sa) pd.style.marginBottom = num(sa, 'val', 0) / 100 * 4 / 3 + 'px';
+    const runStyle = rPr => {
+      const srcs = [rPr, kid(pPr, 'a:defRPr'), ...o.chain.map(ls => kid(kid(ls, `a:lvl${lv}pPr`), 'a:defRPr'))].filter(Boolean);
+      const g = a => { for (const s of srcs) { const v = s.getAttribute(a); if (v != null) return v; } return null; };
+      const gk = n => { for (const s of srcs) { const k = kid(s, n); if (k) return k; } return null; };
+      const sz = (+g('sz') || defSz * 100) / 100 * fontScale * 4 / 3;
+      let color = colorFrom(gk('a:solidFill'), T) || (gk('a:gradFill') ? colorFrom(dsc(gk('a:gradFill'), 'a:gs'), T) : null) || o.defColor || '#' + (T.colors[T.clrMap.tx1 || 'dk1'] || '000000');
+      let face = gk('a:latin')?.getAttribute('typeface') || (o.ph === 'title' ? '+mj-lt' : '+mn-lt');
+      if (face === '+mj-lt') face = T.major; else if (face === '+mn-lt') face = T.minor;
+      const st = { sz, css: `font-size:${sz}px;color:${color};font-family:"${face.replace(/"/g, '')}",Carlito,Calibri,"Segoe UI",Arial,sans-serif` };
+      const b = g('b'), i = g('i'), u = g('u'), s = g('strike'), cap = g('cap'), base = g('baseline');
+      if (b === '1' || b === 'true') st.css += ';font-weight:700';
+      if (i === '1' || i === 'true') st.css += ';font-style:italic';
+      const deco = [u && u !== 'none' ? 'underline' : '', s && s !== 'noStrike' ? 'line-through' : ''].filter(Boolean).join(' ');
+      if (deco) st.css += ';text-decoration:' + deco;
+      if (cap === 'all') st.css += ';text-transform:uppercase'; else if (cap === 'small') st.css += ';font-variant:small-caps';
+      if (base && +base) st.css += `;vertical-align:${+base > 0 ? 'super' : 'sub'};font-size:${sz * .7}px`;
+      const spc = g('spc'); if (spc) st.css += `;letter-spacing:${+spc / 100 * 4 / 3}px`;
+      return st;
+    };
+    const runs = [...p.children].filter(c => ['a:r', 'a:br', 'a:fld'].includes(c.nodeName));
+    const hasRunText = runs.some(r => r.nodeName !== 'a:br' && (dsc(r, 'a:t')?.textContent || ''));
+    // bullets
+    if (hasRunText && !kid(pPr, 'a:buNone')) {
+      const buOf = x => x && (kid(x, 'a:buNone') ? { none: 1 } : kid(x, 'a:buChar') ? { ch: kid(x, 'a:buChar') } : kid(x, 'a:buAutoNum') ? { auto: kid(x, 'a:buAutoNum') } : null);
+      let bu = buOf(pPr); if (!bu) for (const ls of o.chain) { bu = buOf(kid(ls, `a:lvl${lv}pPr`)); if (bu) break; }
+      let bt = null;
+      if (bu?.auto) { const buAuto = bu.auto; counters[lv] = (counters[lv] || num(buAuto, 'startAt', 1) - 1) + 1; const ty = buAuto.getAttribute('type') || ''; const n = counters[lv]; bt = (ty.startsWith('alphaLc') ? String.fromCharCode(96 + n) : ty.startsWith('alphaUc') ? String.fromCharCode(64 + n) : ty.startsWith('romanLc') ? toRoman(n).toLowerCase() : ty.startsWith('romanUc') ? toRoman(n) : n) + (/Paren/.test(ty) ? ')' : '.'); }
+      else if (bu?.ch) bt = bu.ch.getAttribute('char') || '•';
+      if (bt) {
+        const st = runStyle(kid(runs.find(r => r.nodeName === 'a:r'), 'a:rPr'));
+        const bs = document.createElement('span'); bs.style.cssText = st.css + ';text-decoration:none;text-indent:0;display:inline-block;min-width:' + (indent < 0 ? -indent : st.sz * .9) + 'px';
+        const bc = colorFrom(pk('a:buClr'), T); if (bc) bs.style.color = bc;
+        bs.dataset.sz = st.sz; bs.textContent = bt === '' ? '•' : (/[-]/.test(bt) ? '•' : bt);
+        pd.appendChild(bs);
+      }
+    } else counters[lv] = 0;
+    for (const r of runs) {
+      if (r.nodeName === 'a:br') { pd.appendChild(document.createElement('br')); continue; }
+      const t = dsc(r, 'a:t')?.textContent || '';
+      const st = runStyle(kid(r, 'a:rPr'));
+      const s = document.createElement('span'); s.style.cssText = st.css; s.dataset.sz = st.sz; s.textContent = t;
+      s.style.whiteSpace = 'pre-wrap';
+      pd.appendChild(s);
+    }
+    if (!hasRunText) { const st = runStyle(kid(p, 'a:endParaRPr')); const s = document.createElement('span'); s.style.cssText = st.css; s.dataset.sz = st.sz; s.textContent = ' '; pd.appendChild(s); }
+    tx.appendChild(pd);
+  }
+  el.appendChild(tx);
+}
+function toRoman(n) { const m = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; let s = ''; for (const [v, r] of m) while (n >= v) { s += r; n -= v; } return s; }
+async function renderPic(pic, part, R, out, map) {
+  const info = phInfo(pic);
+  if (info && part.kind !== 'slide') return;
+  const lsp = info ? findPh(R.layout, info) : null;
+  const xf0 = xfrmOf(kid(pic, 'p:spPr')) || xfrmOf(kid(lsp, 'p:spPr')); if (!xf0) return;
+  const xf = map(xf0);
+  const nvPr = pathOf(pic, 'p:nvPicPr', 'p:nvPr');
+  const media = dsc(nvPr, 'p14:media'); const vf = kid(nvPr, 'a:videoFile');
+  const el = document.createElement('div'); placeBox(el, xf); el.style.overflow = 'hidden';
+  const prst = kid(kid(pic, 'p:spPr'), 'a:prstGeom')?.getAttribute('prst');
+  if (prst === 'ellipse') el.style.borderRadius = '50%'; else if (prst === 'roundRect') el.style.borderRadius = Math.min(xf.w, xf.h) * .1667 + 'px';
+  const line = lineCss(kid(pic, 'p:spPr'), kid(pic, 'p:style'), R.T); if (line) el.style.border = `${line.w}px solid ${line.c}`;
+  const blipFill = kid(pic, 'p:blipFill'); const blip = dsc(blipFill, 'a:blip');
+  const imgUrl = await R.mediaUrl(part.rels[blip?.getAttribute('r:embed')]?.target);
+  const vrel = part.rels[media?.getAttribute('r:embed')] || part.rels[vf?.getAttribute('r:link')];
+  if (vrel && !vrel.ext && /^(video\/)/.test(MIME[extOf(vrel.target)] || '')) {
+    const vu = await R.mediaUrl(vrel.target);
+    if (vu) { const v = document.createElement('video'); v.src = vu; v.playsInline = true; v.preload = 'metadata'; if (imgUrl) v.poster = imgUrl; v.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000'; v.dataset.deckvid = '1'; el.appendChild(v); out.appendChild(el); return; }
+  }
+  if (!imgUrl) return;
+  const img = document.createElement('img'); img.src = imgUrl; img.alt = ''; img.draggable = false;
+  const sr = kid(blipFill, 'a:srcRect');
+  if (sr) { const l = num(sr, 'l', 0) / 1e5, t = num(sr, 't', 0) / 1e5, r = num(sr, 'r', 0) / 1e5, b = num(sr, 'b', 0) / 1e5; const fw = 1 - l - r || 1, fh = 1 - t - b || 1; img.style.cssText = `position:absolute;max-width:none;width:${100 / fw}%;height:${100 / fh}%;left:${-l / fw * 100}%;top:${-t / fh * 100}%`; }
+  else img.style.cssText = 'width:100%;height:100%;object-fit:fill;max-width:none';
+  el.appendChild(img); out.appendChild(el);
+}
+function renderCxn(c, part, R, out, map) {
+  const spPr = kid(c, 'p:spPr'); const xf0 = xfrmOf(spPr); if (!xf0) return; const xf = map(xf0);
+  const line = lineCss(spPr, kid(c, 'p:style'), R.T) || { c: '#' + R.T.colors.accent1, w: 1.33 };
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('style', `position:absolute;left:${xf.x}px;top:${xf.y}px;width:${Math.max(xf.w, 1)}px;height:${Math.max(xf.h, 1)}px;overflow:visible`);
+  const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  const [x1, x2] = xf.fh ? [xf.w, 0] : [0, xf.w], [y1, y2] = xf.fv ? [xf.h, 0] : [0, xf.h];
+  ln.setAttribute('x1', x1); ln.setAttribute('y1', y1); ln.setAttribute('x2', x2); ln.setAttribute('y2', y2); ln.setAttribute('stroke', line.c); ln.setAttribute('stroke-width', line.w);
+  svg.appendChild(ln); if (xf.rot) svg.style.transform = `rotate(${xf.rot}deg)`; out.appendChild(svg);
+}
+function renderFrame(gf, part, R, out, map) {
+  const xf0 = xfrmOf(gf); if (!xf0) return; const xf = map(xf0);
+  const tbl = dsc(gf, 'a:tbl');
+  const el = document.createElement('div'); placeBox(el, xf);
+  if (!tbl) {
+    const uri = dsc(gf, 'a:graphicData')?.getAttribute('uri') || '';
+    if (/chart|diagram/.test(uri)) { el.style.cssText += ';display:grid;place-items:center;border:1px dashed rgba(128,128,128,.5);color:rgba(110,110,110,.9);font:600 14px Arial,sans-serif'; el.textContent = /chart/.test(uri) ? 'Chart (save as PDF to show)' : 'SmartArt (save as PDF to show)'; out.appendChild(el); }
+    return;
+  }
+  const T = R.T, tp = kid(tbl, 'a:tblPr'); const firstRow = tp?.getAttribute('firstRow') === '1', band = tp?.getAttribute('bandRow') === '1';
+  const t = document.createElement('table'); t.style.cssText = 'width:100%;border-collapse:collapse;table-layout:fixed;height:100%';
+  const cg = document.createElement('colgroup');
+  for (const gc of kidsOf(kid(tbl, 'a:tblGrid'), 'a:gridCol')) { const col = document.createElement('col'); col.style.width = num(gc, 'w', 0) / EMU + 'px'; cg.appendChild(col); }
+  t.appendChild(cg);
+  const acc = '#' + T.colors.accent1;
+  kidsOf(tbl, 'a:tr').forEach((tr, ri) => {
+    const row = document.createElement('tr'); row.style.height = num(tr, 'h', 0) / EMU + 'px';
+    for (const tc of kidsOf(tr, 'a:tc')) {
+      if (tc.getAttribute('hMerge') === '1' || tc.getAttribute('vMerge') === '1') continue;
+      const td = document.createElement('td');
+      if (tc.getAttribute('gridSpan')) td.colSpan = +tc.getAttribute('gridSpan');
+      if (tc.getAttribute('rowSpan')) td.rowSpan = +tc.getAttribute('rowSpan');
+      const tcPr = kid(tc, 'a:tcPr'); const f = fillOf(tcPr, T);
+      const header = firstRow && ri === 0;
+      td.style.cssText = `border:1px solid rgba(255,255,255,.9);vertical-align:${{ ctr: 'middle', b: 'bottom' }[tcPr?.getAttribute('anchor')] || 'top'};padding:0;background:${f?.css || (header ? acc : band && ri % 2 ? '#e9ebf5' : '#cfd5ea')}`;
+      const inner = document.createElement('div'); inner.style.cssText = 'height:100%';
+      renderText(inner, kid(tc, 'a:txBody') || tc, { R, chain: [R.presDefault].filter(Boolean), bodyPrs: [], defColor: header ? '#fff' : null, ph: null });
+      inner.style.padding = '4.8px 9.6px'; inner.style.display = 'block';
+      td.appendChild(inner); row.appendChild(td);
+    }
+    t.appendChild(row);
+  });
+  el.appendChild(t); out.appendChild(el);
+}
+const DECKS = new Map();
+function getDeck(fileId) {
+  if (!DECKS.has(fileId)) {
+    const f = FILES.get(fileId);
+    const p = f ? parsePptx(f.blob) : Promise.reject(new Error('The PowerPoint file is missing. Add it again.'));
+    p.catch(() => DECKS.delete(fileId));
+    DECKS.set(fileId, p);
+  }
+  return DECKS.get(fileId);
+}
+
+/* ============ PDF ============ */
+const PDFS = new Map();
+function getPdf(fileId) {
+  if (!PDFS.has(fileId)) {
+    const p = (async () => { await libPdf(); const f = FILES.get(fileId); if (!f) throw new Error('The PDF file is missing. Add it again.'); const data = new Uint8Array(await f.blob.arrayBuffer()); return pdfjsLib.getDocument({ data, isEvalSupported: false }).promise; })();
+    p.catch(() => PDFS.delete(fileId));
+    PDFS.set(fileId, p);
+  }
+  return PDFS.get(fileId);
+}
+async function pdfCanvas(fileId, pageNo, maxW, maxH) {
+  const doc = await getPdf(fileId); const page = await doc.getPage(pageNo);
+  const v1 = page.getViewport({ scale: 1 }); const s = Math.min(maxW / v1.width, maxH / v1.height);
+  const vp = page.getViewport({ scale: s });
+  const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(vp.width)); c.height = Math.max(1, Math.round(vp.height));
+  await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+  return c;
+}
+
+/* ============ YouTube ============ */
+let ytP = null;
+function ensureYT() {
+  if (window.YT && window.YT.Player) return Promise.resolve();
+  if (!ytP) {
+    ytP = new Promise((res, rej) => {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { prev && prev(); res(); };
+      loadScript('https://www.youtube.com/iframe_api').catch(() => rej(new Error(IN_FRAME ? 'YouTube can\'t play in this preview. Use the downloaded VideoBlitz.' : 'YouTube could not load. Check your internet connection.')));
+      setTimeout(() => rej(new Error('YouTube took too long to load.')), 20000);
+    });
+    ytP.catch(() => { ytP = null; });
+  }
+  return ytP;
+}
+const parseTime = t => { if (!t) return 0; if (/^\d+$/.test(t)) return +t; const m = String(t).match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/); return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0; };
+function parseYouTube(u) {
+  try {
+    const url = new URL(u.trim()); const h = url.hostname.replace(/^(www|m|music)\./, '');
+    let id = null; const list = url.searchParams.get('list');
+    if (h === 'youtu.be') id = url.pathname.slice(1).split('/')[0];
+    else if (h === 'youtube.com' || h === 'youtube-nocookie.com') { if (url.pathname === '/watch') id = url.searchParams.get('v'); else { const m = url.pathname.match(/^\/(?:embed|shorts|live|v)\/([\w-]{6,})/); if (m) id = m[1]; } }
+    else return null;
+    if (!id && !list) return null;
+    return { id, list, start: parseTime(url.searchParams.get('t') || url.searchParams.get('start')) };
+  } catch { return null; }
+}
+function ytErr(code) { return { 2: 'That YouTube link looks wrong.', 5: 'YouTube couldn\'t play this video here.', 100: 'That YouTube video was removed or is private.', 101: 'The owner of this YouTube video doesn\'t allow it to play outside YouTube.', 150: 'The owner of this YouTube video doesn\'t allow it to play outside YouTube.', 152: 'YouTube blocked this video here.', 153: 'YouTube needs VideoBlitz started from the "Start VideoBlitz" launcher to play videos.' }[code] || 'YouTube couldn\'t play this video (error ' + code + ').'; }
+const ytVars = () => (location.protocol.startsWith('http') ? { origin: location.origin } : {});
+
+/* ============ sample art ============ */
+function drawArt(c, seed) {
+  const ctx = c.getContext('2d'), w = c.width, h = c.height;
+  let s = seed * 9301 + 49297; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const pal = [['#0f2027', '#203a43', '#2c5364', '#ffb321'], ['#1a1033', '#3d1d5c', '#ff7a59', '#58c7f3'], ['#04222b', '#0b4f5c', '#7fd1ae', '#ffe08a']][seed % 3];
+  const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, pal[0]); g.addColorStop(.6, pal[1]); g.addColorStop(1, pal[2]);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  for (let i = 0; i < 7; i++) { ctx.globalAlpha = .15 + rnd() * .25; ctx.fillStyle = i % 3 ? pal[2] : pal[3]; ctx.beginPath(); ctx.arc(rnd() * w, rnd() * h, (rnd() * .35 + .05) * Math.max(w, h), 0, Math.PI * 2); ctx.fill(); }
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = pal[3]; ctx.lineWidth = Math.max(2, w / 300);
+  for (let k = 0; k < 3; k++) { ctx.globalAlpha = .5 - k * .12; ctx.beginPath(); for (let x = 0; x <= w; x += w / 80) { const y = h * (.62 + k * .07) + Math.sin(x / w * Math.PI * (2 + k) + seed) * h * .08; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(0,0,0,.45)'; const fs = Math.max(10, h * .035); ctx.font = `700 ${fs}px Manrope, sans-serif`;
+  const label = 'SAMPLE PICTURE'; const tw = ctx.measureText(label).width; ctx.fillRect(w - tw - fs * 2, h - fs * 2.6, tw + fs * 1.4, fs * 1.8);
+  ctx.fillStyle = '#fff'; ctx.fillText(label, w - tw - fs * 1.3, h - fs * 1.25);
+}
+
+/* ============ slideshow engine ============ */
+const E = { idx: -1, cur: null, playing: false, acc: 0, seg: 0, dur: 6, tok: 0, full: false, blank: null, showStart: 0 };
+let stageWrap, stage, layersEl;
+const STAGE = { w: 1280, h: 720 };
+const isFull = it => (it.type === 'video' || it.type === 'youtube') && (it.full === 'on' || (it.full !== 'off' && S.settings.videoFull));
+const durOf = it => it.type === 'countdown' ? (+it.secs || 300) : (+it.dur || +S.settings.dur || 6);
+const elapsed = () => E.acc + (E.playing ? performance.now() - E.seg : 0);
+function layerDiv() { const d = document.createElement('div'); d.className = 'layer'; return d; }
+async function tryPlay(v) {
+  try { await v.play(); }
+  catch (e) { if (e.name === 'NotAllowedError' && !v.muted) { v.muted = true; try { await v.play(); toast('Video started without sound. Click anywhere, then press play again to hear it.'); } catch { } } }
+}
+function fadeMedia(v, ms = 500) { const start = v.volume, t0 = performance.now(); const step = () => { const k = (performance.now() - t0) / ms; if (k >= 1) { v.pause(); return; } try { v.volume = start * (1 - k); } catch { } setTimeout(step, 40); }; step(); }
+
+async function build(item, el) {
+  const S_ = S.settings;
+  const fit = item.fit || S_.fit;
+  el.style.setProperty('--fit', fit);
+  const r = { el };
+  switch (item.type) {
+    case 'image': {
+      const src = srcOf(item); if (!src) throw new Error('This picture is missing. Add it again.');
+      if (S_.blurFill && fit === 'contain') { const bg = new Image(); bg.className = 'blurbg'; bg.src = src; bg.alt = ''; el.appendChild(bg); }
+      const img = new Image(); img.className = 'main'; img.src = src; img.alt = item.name || ''; el.appendChild(img);
+      await Promise.race([img.decode().catch(() => { }), new Promise(r2 => setTimeout(r2, 4000))]);
+      if (!img.naturalWidth) throw new Error('This picture could not be opened.');
+      const kb = item.kb === 'on' || (item.kb !== 'off' && S_.kenBurns);
+      let anim = null;
+      r.show = playing => {
+        if (!kb || reduceMotion) return;
+        const moves = [['scale(1) translate(0,0)', 'scale(1.14) translate(-2%,-1.5%)'], ['scale(1.14) translate(2%,1%)', 'scale(1) translate(0,0)'], ['scale(1.05) translate(-2%,0)', 'scale(1.15) translate(2.5%,-1%)'], ['scale(1.12) translate(0,2%)', 'scale(1.02) translate(0,-1%)']];
+        const m = moves[Math.floor(Math.random() * moves.length)];
+        anim = img.animate([{ transform: m[0] }, { transform: m[1] }], { duration: durOf(item) * 1000 + S_.transMs * 2, fill: 'forwards', easing: 'ease-in-out' });
+        if (!playing) anim.pause();
+      };
+      r.pause = () => anim?.pause(); r.resume = () => anim?.play();
+      break;
+    }
+    case 'video': {
+      const src = srcOf(item); if (!src) throw new Error('This video is missing. Add it again.');
+      const v = document.createElement('video'); v.className = 'main'; v.playsInline = true; v.preload = 'auto'; v.src = src;
+      v.muted = !!item.mute; v.volume = clamp((item.vol ?? 100) / 100, 0, 1);
+      const start = +item.start || 0, end = +item.end || 0;
+      const full = isFull(item); v.loop = !full && !end;
+      el.appendChild(v);
+      await new Promise((res, rej) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', () => rej(new Error('This video format can\'t play in the browser. MP4 (H.264) and WebM work best.')), { once: true }); setTimeout(res, 6000); });
+      if (start) try { v.currentTime = start; } catch { }
+      r.media = v;
+      r.audible = () => !v.muted && v.volume > 0;
+      r.show = playing => { if (playing) tryPlay(v); };
+      r.pause = () => v.pause(); r.resume = () => tryPlay(v);
+      r.hide = () => fadeMedia(v, S_.transMs);
+      r.destroy = () => { v.pause(); v.removeAttribute('src'); v.load(); };
+      r.mediaTime = () => ({ t: Math.max(0, v.currentTime - start), d: Math.max(0, (end || v.duration || 0) - start) });
+      v.addEventListener('ended', () => r.onEnded?.());
+      v.addEventListener('timeupdate', () => { if (end && v.currentTime >= end) { if (full) { v.pause(); r.onEnded?.(); } else v.currentTime = start; } });
+      break;
+    }
+    case 'deck': {
+      const deck = await getDeck(item.fileId); const s = deck.slides[item.slide];
+      if (!s) throw new Error('This slide no longer exists in the presentation.');
+      const hostEl = document.createElement('div'); hostEl.className = 'deckHost';
+      const c = s.el.cloneNode(true); c.dataset.fitmode = fit; hostEl.appendChild(c); el.appendChild(hostEl);
+      scaleDeck(c, STAGE.w, STAGE.h);
+      const vids = [...c.querySelectorAll('video')];
+      vids.forEach(v => { v.controls = false; v.loop = false; });
+      r.audible = () => vids.some(v => !v.paused && !v.muted);
+      r.show = playing => { if (playing) vids.forEach(tryPlay); };
+      r.pause = () => vids.forEach(v => v.pause()); r.resume = () => vids.forEach(tryPlay);
+      r.hide = () => vids.forEach(v => fadeMedia(v, S_.transMs));
+      r.destroy = () => vids.forEach(v => v.pause());
+      break;
+    }
+    case 'pdf': {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const c = await pdfCanvas(item.fileId, item.page, STAGE.w * dpr, STAGE.h * dpr);
+      c.className = 'main'; c.style.background = '#fff'; c.style.objectFit = 'contain';
+      const wrapC = document.createElement('div'); wrapC.style.cssText = 'position:absolute;inset:0;display:grid;place-items:center';
+      c.style.cssText = 'max-width:100%;max-height:100%;width:auto;height:auto;position:static;aspect-ratio:' + c.width + '/' + c.height;
+      if (fit === 'cover' || fit === 'fill') c.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:' + fit;
+      wrapC.appendChild(c); el.appendChild(wrapC);
+      break;
+    }
+    case 'youtube': {
+      await ensureYT();
+      el.classList.add('yt');
+      const h = document.createElement('div'); el.appendChild(h);
+      const full = isFull(item);
+      let player, ready = false;
+      await new Promise(res => {
+        player = new YT.Player(h, {
+          width: '100%', height: '100%', videoId: item.videoId,
+          playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, disablekb: 1, fs: 0, start: Math.floor(+item.start || 0), ...(item.end ? { end: Math.floor(+item.end) } : {}), ...(full ? {} : { loop: 1, playlist: item.videoId }), ...ytVars() },
+          events: {
+            onReady: () => { ready = true; if (item.mute) player.mute(); else { player.unMute(); player.setVolume(item.vol ?? 100); } res(); },
+            onStateChange: e => { if (e.data === 0) r.onEnded?.(); if (e.data === 1 && !r._title) { r._title = player.getVideoData?.().title; if (r._title && !item.name) { item.name = r._title; renderStrip(); save(); } } },
+            onError: e => { toast(ytErr(e.data), 'err'); res(); setTimeout(() => r.onEnded?.(), 1500); },
+          },
+        });
+        setTimeout(res, 8000);
+      });
+      r.audible = () => !item.mute;
+      r.show = playing => { if (playing && ready) player.playVideo(); };
+      r.pause = () => ready && player.pauseVideo(); r.resume = () => ready && player.playVideo();
+      r.hide = () => ready && player.pauseVideo(); r.destroy = () => { try { player.destroy(); } catch { } };
+      r.mediaTime = () => { const st = +item.start || 0; const d = (+item.end || (ready ? player.getDuration() : 0)) - st; return { t: Math.max(0, (ready ? player.getCurrentTime() : 0) - st), d: Math.max(0, d) }; };
+      break;
+    }
+    case 'text': case 'countdown': case 'nowplaying': {
+      const card = document.createElement('div'); card.className = 'card';
+      card.style.background = `linear-gradient(135deg, ${item.c1 || '#151b33'}, ${item.c2 || '#3a1f5c'})`;
+      card.style.color = item.fg || '#ffffff'; card.style.setProperty('--al', item.align || 'center');
+      if (item.type === 'text') {
+        const h1 = document.createElement('h1'); h1.textContent = item.title || ''; const p = document.createElement('p'); p.textContent = item.sub || '';
+        card.append(h1); if (item.sub) card.append(p);
+      } else if (item.type === 'countdown') {
+        const k = document.createElement('div'); k.className = 'kicker'; k.textContent = item.label || 'Starting in';
+        const d = document.createElement('div'); d.className = 'cd'; d.textContent = fmtT(durOf(item));
+        card.append(k, d);
+        r.tick = ms => { d.textContent = fmtT(Math.ceil(Math.max(0, durOf(item) - ms / 1000))); };
+      } else {
+        const k = document.createElement('div'); k.className = 'kicker'; k.textContent = item.label || 'Now playing';
+        const h1 = document.createElement('h1'); h1.className = 'npCardT'; h1.textContent = Mu.title() || 'Music is off';
+        const cv = document.createElement('canvas'); cv.className = 'viz'; cv.width = 1200; cv.height = 300;
+        card.append(k, h1, cv); VIZ.add(cv);
+        r.destroy = () => VIZ.delete(cv);
+      }
+      el.appendChild(card);
+      break;
+    }
+    case 'art': {
+      const c = document.createElement('canvas'); c.className = 'main'; c.width = Math.round(STAGE.w); c.height = Math.round(STAGE.h); c.style.objectFit = 'cover';
+      drawArt(c, item.seed || 1); el.appendChild(c); break;
+    }
+    default: throw new Error('Unknown slide type.');
+  }
+  return r;
+}
+function scaleDeck(c, w, h) {
+  const dw = +c.dataset.w, dh = +c.dataset.h; const mode = c.dataset.fitmode;
+  const s = mode === 'cover' ? Math.max(w / dw, h / dh) : Math.min(w / dw, h / dh);
+  c.style.transform = mode === 'fill' ? `translate(-50%,-50%) scale(${w / dw},${h / dh})` : `translate(-50%,-50%) scale(${s})`;
+}
+function errorLayer(el, item, err) {
+  el.textContent = '';
+  const d = document.createElement('div'); d.className = 'errCard';
+  const inner = document.createElement('div'); const b = document.createElement('b'); b.textContent = 'This slide couldn\'t be shown';
+  inner.append(b, document.createTextNode(err?.message || String(err))); d.appendChild(inner); el.appendChild(d);
+  return { el };
+}
+const TR = {
+  fade: { in: [{ opacity: 0 }, { opacity: 1 }], out: [{ opacity: 1 }, { opacity: 0 }] },
+  dip: { in: [{ opacity: 0, offset: 0 }, { opacity: 0, offset: .5 }, { opacity: 1 }], out: [{ opacity: 1 }, { opacity: 0, offset: .5 }, { opacity: 0 }] },
+  slide: { in: [{ transform: 'translateX(100%)' }, { transform: 'none' }], out: [{ transform: 'none' }, { transform: 'translateX(-100%)' }] },
+  slideup: { in: [{ transform: 'translateY(100%)' }, { transform: 'none' }], out: [{ transform: 'none' }, { transform: 'translateY(-100%)' }] },
+  zoom: { in: [{ opacity: 0, transform: 'scale(1.25)' }, { opacity: 1, transform: 'scale(1)' }], out: [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.85)' }] },
+  flip: { in: [{ opacity: 0, transform: 'perspective(1400px) rotateY(-80deg)' }, { opacity: 1, transform: 'perspective(1400px) rotateY(0)' }], out: [{ opacity: 1, transform: 'perspective(1400px) rotateY(0)' }, { opacity: 0, transform: 'perspective(1400px) rotateY(80deg)' }] },
+  blur: { in: [{ opacity: 0, filter: 'blur(30px)' }, { opacity: 1, filter: 'blur(0)' }], out: [{ opacity: 1, filter: 'blur(0)' }, { opacity: 0, filter: 'blur(30px)' }] },
+  wipe: { in: [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }] },
+  circle: { in: [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }] },
+  spin: { in: [{ opacity: 0, transform: 'rotate(-12deg) scale(.6)' }, { opacity: 1, transform: 'none' }], out: [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'rotate(12deg) scale(1.3)' }] },
+  none: {},
+};
+function pickTrans(item) { let t = item.trans || S.settings.trans; if (t === 'random') { const k = Object.keys(TR).filter(x => x !== 'none'); t = k[Math.floor(Math.random() * k.length)]; } if (reduceMotion && t !== 'none') t = 'fade'; return TR[t] ? t : 'fade'; }
+
+async function showSlide(i, { instant = false } = {}) {
+  if (!S.slides.length) { clearStage(); return; }
+  i = clamp(i, 0, S.slides.length - 1);
+  const tok = ++E.tok, item = S.slides[i];
+  E.loading = true;
+  const el = layerDiv(); el.style.visibility = 'hidden';
+  layersEl.appendChild(el);
+  let r;
+  try { r = await build(item, el); } catch (err) { console.warn(err); r = errorLayer(el, item, err); }
+  if (tok !== E.tok) { r.destroy?.(); el.remove(); return; }
+  E.loading = false;
+  const prev = E.cur;
+  el.style.visibility = '';
+  const name = instant ? 'none' : pickTrans(item);
+  const ms = name === 'none' ? 0 : +S.settings.transMs;
+  if (ms) { el.animate(TR[name].in, { duration: ms, easing: 'cubic-bezier(.25,.7,.25,1)', fill: 'backwards' }); if (prev && TR[name].out) prev.el.animate(TR[name].out, { duration: ms, easing: 'cubic-bezier(.25,.7,.25,1)', fill: 'forwards' }); }
+  E.cur = r; E.idx = i; E.acc = 0; E.seg = performance.now(); E.dur = durOf(item); E.full = isFull(item) && !!r.mediaTime;
+  r.onEnded = () => { if (tok === E.tok && E.playing && E.full) next(true); };
+  r.show?.(E.playing);
+  if (prev) { prev.hide?.(); const pe = prev.el; setTimeout(() => { pe.remove(); prev.destroy?.(); }, ms + 60); }
+  [...layersEl.children].forEach(c => { if (c !== el && c !== prev?.el && !c._dying) { c._dying = true; setTimeout(() => c.remove(), ms + 60); } });
+  S.sel = i;
+  $s('#empty').hidden = true;
+  updateDuck(); updateOverlays(); markStrip(); renderInspector(); updatePresenter(); save();
+  const nx = S.slides[nextIdx(i, 1, false)]; if (nx && nx.type === 'image') { const im = new Image(); im.src = srcOf(nx) || ''; }
+}
+function clearStage() { E.tok++; if (E.cur) { E.cur.destroy?.(); } layersEl.textContent = ''; E.cur = null; E.idx = -1; $s('#empty').hidden = false; updateOverlays(); setPlaying(false); updateDuck(); }
+function nextIdx(from, dir, auto) {
+  const n = S.slides.length; if (!n) return -1;
+  const ok = i => !S.slides[i].skip;
+  if (S.settings.shuffle && dir > 0 && auto) { const c = S.slides.map((_, i) => i).filter(i => ok(i) && i !== from); return c.length ? c[Math.floor(Math.random() * c.length)] : from; }
+  let i = from;
+  for (let k = 0; k < n; k++) { i += dir; if (i >= n) { if (auto && !S.settings.loop) return -1; i = 0; } if (i < 0) i = n - 1; if (ok(i)) return i; }
+  return from;
+}
+function next(auto = false) { const i = nextIdx(E.idx, 1, auto); if (i < 0) { setPlaying(false); toast('End of the show. Press play to start again.'); return; } showSlide(i); }
+function prev() { showSlide(nextIdx(E.idx, -1, false)); }
+function setPlaying(p) {
+  if (E.playing === p) return;
+  if (p && E.idx < 0 && S.slides.length) { E.playing = true; showSlide(0); }
+  else if (p) { E.seg = performance.now(); E.playing = true; E.cur?.resume?.(); }
+  else { E.acc += performance.now() - E.seg; E.playing = false; E.cur?.pause?.(); }
+  if (p && !E.showStart) E.showStart = Date.now();
+  if (p && S.settings.musicWithShow && !Mu.playing && S.music.length) Mu.play(Mu.idx >= 0 ? Mu.idx : 0);
+  updateTransport(); wake(); updateDuck();
+}
+function togglePlay() { if (!S.slides.length) { toast('Add some pictures, videos or slides first.'); return; } if (E.playing) setPlaying(false); else setPlaying(true); }
+function tick() {
+  if (!E.cur) return;
+  const ms = elapsed();
+  let t, d;
+  if (E.full) { ({ t, d } = E.cur.mediaTime()); } else { t = ms / 1000; d = E.dur; }
+  E.cur.tick?.(ms);
+  const f = d ? clamp(t / d, 0, 1) : 0;
+  $s('#ovProg').style.width = (f * 100) + '%';
+  if (!E.dragging) $('#tProg').value = Math.round(f * 1000);
+  $('#tTime').textContent = fmtT(t) + ' / ' + fmtT(d);
+  if (E.playing && !E.full && !E.loading && ms >= E.dur * 1000) next(true);
+  if ((E.tickN = (E.tickN || 0) + 1) % 5 === 0) updateDuck();
+}
+
+/* stage geometry + display settings */
+const ASPECT = { '16:9': 16 / 9, '4:3': 4 / 3, '21:9': 21 / 9, '9:16': 9 / 16, '1:1': 1, '3:2': 1.5 };
+function layoutStage() {
+  if (!stageWrap) return;
+  const W = stageWrap.clientWidth, H = stageWrap.clientHeight; if (!W || !H) return;
+  const st = S.settings, rot = (+st.rotate || 0) % 360, side = rot % 180 !== 0;
+  const aw = side ? H : W, ah = side ? W : H; let w = aw, h = ah;
+  const ar = ASPECT[st.aspect]; if (ar) { if (aw / ah > ar) { h = ah; w = ah * ar; } else { w = aw; h = aw / ar; } }
+  STAGE.w = w; STAGE.h = h;
+  stage.style.width = w + 'px'; stage.style.height = h + 'px';
+  stage.style.transform = `translate(-50%,-50%) rotate(${rot}deg) scale(${st.mirror ? -1 : 1},1) scale(${st.zoom / 100})`;
+  stage.querySelectorAll('.pslide').forEach(c => scaleDeck(c, w, h));
+}
+function applySettings() {
+  const st = S.settings;
+  stageWrap.style.background = st.bg;
+  stage.style.setProperty('--stage-bg', st.bg);
+  stage.style.filter = (st.bright != 100 || st.contrast != 100 || st.sat != 100 || st.gray != 0) ? `brightness(${st.bright}%) contrast(${st.contrast}%) saturate(${st.sat}%) grayscale(${st.gray}%)` : '';
+  layoutStage(); updateOverlays(); updateTransport(); Mu.applyVol(); Mu.applyEq();
+  $$('#segRot button').forEach(b => b.classList.toggle('on', +b.dataset.v === +st.rotate));
+  $$('[data-v]').forEach(sp => { if (sp.dataset.v in st) sp.textContent = st[sp.dataset.v] + (sp.dataset.unit || ''); });
+}
+function updateOverlays() {
+  const st = S.settings, it = S.slides[E.idx], hide = st.hideOverlays || !it;
+  const cap = it ? (it.caption || (st.ovNames && it.type !== 'text' ? it.name : '')) : '';
+  const set = (id, show, text) => { const el = $s(id); el.hidden = !show; if (show && text != null) el.textContent = text; };
+  set('#ovCaption', !hide && st.ovCaption && !!cap, cap);
+  set('#ovCounter', !hide && st.ovCounter, `${E.idx + 1} / ${S.slides.length}`);
+  $s('#ovProg').hidden = hide || !st.ovProgress;
+  set('#ovMark', !hide && !!st.watermark, st.watermark);
+  const tk = $s('#ovTicker'); tk.hidden = !st.ticker || st.hideOverlays; $s('#ovTickerT').textContent = st.ticker; tk.style.setProperty('--tk', st.tickerSpeed + 's');
+  const ck = $s('#ovClock'); ck.hidden = st.ovClock === 'off' || st.hideOverlays; ck.className = 'ovChip ' + st.ovClock;
+  const nowT = Mu.title();
+  const nowEl = $s('#ovNow'); nowEl.hidden = st.hideOverlays || !st.ovNow || !Mu.playing || !nowT || st.ovClock === 'tl'; $s('#ovNowT').textContent = nowT || '';
+  $s('#ovCaption').style.bottom = st.ticker ? 'calc(5% + 2.6em)' : '';
+  $s('#ovMark').style.bottom = st.ticker ? 'calc(5% + 2.6em)' : '';
+  $$('.npCardT', stage.ownerDocument).forEach(h => h.textContent = nowT || 'Music is off');
+  $('#tCount').textContent = `${S.slides.length ? E.idx + 1 : 0} / ${S.slides.length}`;
+  $$('.fsCount', stageWrap).forEach(e => e.textContent = `${E.idx + 1} / ${S.slides.length}`);
+}
+function updateTransport() {
+  $$('.playIco', stageWrap.ownerDocument).concat($$('.playIco')).forEach(e => e.innerHTML = ic(E.playing ? 'pause' : 'play'));
+  $('#tShuffle').classList.toggle('on', S.settings.shuffle);
+  $('#tLoop').classList.toggle('on', S.settings.loop);
+  $('#tBlank').classList.toggle('on', !!E.blank);
+}
+function setBlank(color) {
+  E.blank = E.blank === color ? null : color;
+  const b = $s('#blank'); b.hidden = !E.blank; if (E.blank) b.style.background = E.blank;
+  updateTransport();
+}
+let wakeLock = null;
+async function wake() { try { if (S.settings.wake && (E.playing || Mu.playing) && !wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null); } else if ((!S.settings.wake || (!E.playing && !Mu.playing)) && wakeLock) { await wakeLock.release(); wakeLock = null; } } catch { wakeLock = null; } }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') wake(); });
+function toggleFull() {
+  const doc = stageWrap.ownerDocument;
+  if (doc.fullscreenElement) { doc.exitFullscreen?.(); return; }
+  const p = stageWrap.requestFullscreen?.(); if (p && p.catch) p.catch(() => toast('Full screen isn\'t available here. Try the downloaded VideoBlitz.'));
+  else if (!p) toast('Full screen isn\'t available here.');
+}
+let idleT;
+function poke() { stageWrap.classList.remove('idle'); clearTimeout(idleT); if (S.settings.hideCursor) idleT = setTimeout(() => { if (stageWrap.ownerDocument.fullscreenElement || OUT.win) stageWrap.classList.add('idle'); }, 2500); }
+
+/* ============ second screen (output window) ============ */
+const OUT = { win: null };
+async function openOutput() {
+  if (OUT.win && !OUT.win.closed) { closeOutput(); return; }
+  let feat = 'popup,width=1280,height=720';
+  try { if (window.getScreenDetails) { const sd = await window.getScreenDetails(); const other = sd.screens.find(s => s !== sd.currentScreen); if (other) feat = `popup,left=${other.availLeft},top=${other.availTop},width=${other.availWidth},height=${other.availHeight}`; } } catch { }
+  const w = window.open('', 'videoblitz_output', feat);
+  if (!w) { toast(IN_FRAME ? 'A second screen window can\'t open in this preview. Use the downloaded VideoBlitz.' : 'Your browser blocked the window. Allow pop-ups for VideoBlitz and try again.', 'err'); return; }
+  const d = w.document;
+  d.open(); d.write('<!doctype html><html><head><meta charset="utf-8"><title>VideoBlitz · Output</title></head><body></body></html>'); d.close();
+  d.head.appendChild(d.importNode($('#vb-style'), true));
+  [...document.querySelectorAll('link[rel=stylesheet]')].forEach(l => d.head.appendChild(d.importNode(l, true)));
+  d.body.style.cssText = 'margin:0;height:100vh;background:#000;overflow:hidden';
+  OUT.win = w;
+  const pres = $('#presenter'); $('#stageCol').prepend(pres); pres.hidden = false;
+  stageWrap.style.cssText = 'position:fixed;inset:0;border-radius:0';
+  d.body.appendChild(d.adoptNode(stageWrap));
+  $('#presenter').style.position = 'relative'; $('#presenter').style.gridRow = '1';
+  w.addEventListener('resize', layoutStage);
+  w.addEventListener('keydown', onKey);
+  stageWrap.addEventListener('dblclick', toggleFull);
+  w.addEventListener('pagehide', () => closeOutput());
+  d.addEventListener('fullscreenchange', () => { setTimeout(layoutStage, 50); poke(); });
+  setTimeout(() => { layoutStage(); if (E.idx >= 0) showSlide(E.idx, { instant: true }); }, 50);
+  $('#btnOutput').classList.add('pri');
+  updatePresenter();
+  toast('Drag the new window to your second screen, then double-click it for full screen.');
+}
+function closeOutput() {
+  if (!OUT.win) return;
+  const w = OUT.win; OUT.win = null;
+  stageWrap.removeEventListener('dblclick', toggleFull);
+  stageWrap.style.cssText = '';
+  $('#stageCol').prepend(document.adoptNode(stageWrap));
+  $('#presenter').hidden = true; $('#stageWrap').appendChild($('#presenter'));
+  $('#presenter').style.position = ''; $('#presenter').style.gridRow = '';
+  try { if (!w.closed) w.close(); } catch { }
+  $('#btnOutput').classList.remove('pri');
+  setTimeout(() => { layoutStage(); if (E.idx >= 0) showSlide(E.idx, { instant: true }); }, 50);
+}
+function updatePresenter() {
+  if (!OUT.win) return;
+  const cur = S.slides[E.idx], nx = S.slides[nextIdx(E.idx, 1, false)];
+  const put = (box, it, label) => { const b = $(box); b.textContent = ''; if (it) b.appendChild(thumbEl(it)); $(label).textContent = it ? (it.name || TYPE_LABEL[it.type]) : 'Nothing'; };
+  put('#pvCur', cur, '#pvCurT'); put('#pvNext', nx, '#pvNextT');
+  const notesEl = $('#pNotes');
+  notesEl.textContent = 'No notes on this slide.';
+  if (cur?.type === 'deck') getDeck(cur.fileId).then(d => { const n = d.slides[cur.slide]?.notes; if (n) notesEl.textContent = n; }).catch(() => { });
+  else if (cur?.notes) notesEl.textContent = cur.notes;
+}
+
+/* ============ music engine ============ */
+const aLocal = new Audio(), aRemote = new Audio();
+aLocal.preload = aRemote.preload = 'auto';
+let actx = null, nBass, nTreb, analyser, freq;
+const VIZ = new Set();
+const Mu = {
+  idx: -1, playing: false, kind: null, fade: 1, fadeT: 1, duck: 1, duckT: 1, sleep: 1, yt: null, ytReady: null, fails: 0, sleepAt: 0, muted: false,
+  cur() { return S.music[this.idx]; },
+  title() { const it = this.cur(); return this.playing && it ? it.title : ''; },
+  el() { return this.kind === 'file' ? aLocal : aRemote; },
+  ensureGraph() {
+    if (actx) { if (actx.state === 'suspended') actx.resume(); return; }
+    try {
+      actx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = actx.createMediaElementSource(aLocal);
+      nBass = actx.createBiquadFilter(); nBass.type = 'lowshelf'; nBass.frequency.value = 200;
+      nTreb = actx.createBiquadFilter(); nTreb.type = 'highshelf'; nTreb.frequency.value = 3200;
+      analyser = actx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = .8; freq = new Uint8Array(analyser.frequencyBinCount);
+      src.connect(nBass); nBass.connect(nTreb); nTreb.connect(analyser); analyser.connect(actx.destination);
+      this.applyEq();
+    } catch (e) { console.warn(e); }
+  },
+  applyEq() { if (nBass) { nBass.gain.value = +S.settings.bass; nTreb.gain.value = +S.settings.treble; } },
+  vol() { return this.muted ? 0 : clamp(S.settings.vol / 100 * this.fade * this.duck * this.sleep, 0, 1); },
+  applyVol() {
+    const v = this.vol();
+    try { aLocal.volume = v; aRemote.volume = v; } catch { }
+    if (this.yt && this.kind === 'youtube') try { this.yt.setVolume(Math.round(v * 100)); } catch { }
+  },
+  async ensureYTPlayer() {
+    if (this.ytReady) return this.ytReady;
+    this.ytReady = (async () => {
+      await ensureYT();
+      $('#ytWrap').hidden = false;
+      await new Promise(res => {
+        this.yt = new YT.Player('ytMusicEl', {
+          width: '100%', height: '100%', playerVars: { playsinline: 1, rel: 0, iv_load_policy: 3, ...ytVars() },
+          events: {
+            onReady: res,
+            onStateChange: e => this.onYTState(e.data),
+            onError: e => { toast(ytErr(e.data), 'err'); this.failed(); },
+          },
+        });
+      });
+    })();
+    this.ytReady.catch(() => { this.ytReady = null; $('#ytWrap').hidden = true; });
+    return this.ytReady;
+  },
+  onYTState(s) {
+    if (this.kind !== 'youtube') return;
+    const it = this.cur();
+    if (s === 1) { this.fails = 0; const t = this.yt.getVideoData?.().title; if (t && it && (it.title === it.url || it.autoTitle)) { it.title = t; it.autoTitle = true; renderQueue(); save(); } this.updateUI(); }
+    if (s === 0) {
+      if (it?.list) { setTimeout(() => { if (this.kind === 'youtube' && this.yt.getPlayerState() === 0) this.ended(); }, 1500); }
+      else this.ended();
+    }
+  },
+  async play(i, { fadeIn = true } = {}) {
+    if (!S.music.length) { toast('Add some music first: files, a YouTube link or a radio station.'); return; }
+    i = ((i % S.music.length) + S.music.length) % S.music.length;
+    const it = S.music[i];
+    const tok = this._tok = (this._tok || 0) + 1;
+    if (this.playing && this.kind) await this.fadeTo(0, S.settings.fade * 500);
+    if (tok !== this._tok) return;
+    this.stopAll();
+    this.idx = i; this.playing = true; this.fade = fadeIn && S.settings.fade > 0 ? 0 : 1;
+    try {
+      if (it.kind === 'youtube') {
+        this.kind = 'youtube';
+        await this.ensureYTPlayer();
+        if (tok !== this._tok) return;
+        this.applyVol();
+        if (it.list && !it.videoId) this.yt.loadPlaylist({ list: it.list, listType: 'playlist', index: 0 });
+        else if (it.list) this.yt.loadPlaylist({ list: it.list, listType: 'playlist', index: 0, startSeconds: it.start || 0 });
+        else this.yt.loadVideoById({ videoId: it.videoId, startSeconds: it.start || 0 });
+        this.yt.setShuffle?.(!!S.settings.mShuffle);
+      } else {
+        const local = it.kind === 'file';
+        this.kind = local ? 'file' : 'url';
+        const a = this.el();
+        if (local) this.ensureGraph();
+        a.src = local ? FILES.get(it.fileId)?.url || '' : it.url;
+        if (!a.src) throw new Error('This song file is missing. Add it again.');
+        this.applyVol();
+        this.ok = false;
+        await a.play();
+        this.ok = true;
+      }
+      if (tok !== this._tok) return;
+      this.fadeTo(1, S.settings.fade * 500);
+      this.fails = 0;
+    } catch (e) {
+      if (tok !== this._tok) return;
+      if (e.name === 'NotAllowedError') { this.playing = false; toast('Click play to start the music. Browsers need one click before sound can play.'); }
+      else { toast(e.message && !/no supported source|load failed/i.test(e.message) ? e.message : `Couldn't play "${it.title}". ${it.kind === 'radio' || it.kind === 'url' ? 'The link may be offline or blocked.' : ''}`, 'err'); this.failed(); }
+    }
+    this.updateUI(); renderQueue(); updateOverlays(); wake(); save();
+  },
+  failed() { this.fails++; if (this.fails < Math.min(5, S.music.length)) setTimeout(() => this.next(true), 1200); else { this.stopAll(); this.playing = false; this.updateUI(); } },
+  stopAll() { aLocal.pause(); aRemote.pause(); aRemote.removeAttribute('src'); try { this.yt?.stopVideo(); } catch { } },
+  pause() { this.playing = false; if (this.kind === 'youtube') try { this.yt.pauseVideo(); } catch { } else this.el().pause(); this.updateUI(); updateOverlays(); wake(); },
+  resume() {
+    if (this.idx < 0 || !this.kind) return this.play(this.idx < 0 ? 0 : this.idx);
+    this.playing = true;
+    if (this.kind === 'youtube') try { this.yt.playVideo(); } catch { }
+    else { if (this.kind === 'file') this.ensureGraph(); const a = this.el(); if (this.cur()?.kind === 'radio' && a.src) { a.load(); } a.play().catch(() => this.play(this.idx)); }
+    this.updateUI(); updateOverlays(); wake();
+  },
+  toggle() { this.playing ? this.pause() : this.resume(); },
+  next(auto = false) {
+    if (!S.music.length) return;
+    const it = this.cur();
+    if (!auto && it?.list && this.kind === 'youtube') { try { const pl = this.yt.getPlaylist() || []; if (this.yt.getPlaylistIndex() < pl.length - 1) { this.yt.nextVideo(); return; } } catch { } }
+    let i;
+    if (S.settings.mShuffle && S.music.length > 1) { do { i = Math.floor(Math.random() * S.music.length); } while (i === this.idx); }
+    else { i = this.idx + 1; if (i >= S.music.length) { if (auto && S.settings.mRepeat === 'off') { this.stopAll(); this.playing = false; this.updateUI(); updateOverlays(); return; } i = 0; } }
+    this.play(i);
+  },
+  prev() {
+    const it = this.cur();
+    if (it?.list && this.kind === 'youtube') { try { if (this.yt.getPlaylistIndex() > 0) { this.yt.previousVideo(); return; } } catch { } }
+    const t = this.time().t; if (t > 4 && this.kind !== 'youtube') { this.el().currentTime = 0; return; }
+    this.play(this.idx - 1);
+  },
+  ended() { if (S.settings.mRepeat === 'one') { this.play(this.idx, { fadeIn: false }); } else this.next(true); },
+  time() {
+    if (this.kind === 'youtube' && this.yt?.getCurrentTime) return { t: this.yt.getCurrentTime() || 0, d: this.yt.getDuration() || 0 };
+    if (!this.kind) return { t: 0, d: 0 };
+    const a = this.el(); return { t: a.currentTime || 0, d: isFinite(a.duration) ? a.duration : 0 };
+  },
+  seek(f) { const { d } = this.time(); if (!d) return; if (this.kind === 'youtube') this.yt.seekTo(f * d, true); else this.el().currentTime = f * d; },
+  fadeTo(target, ms) {
+    return new Promise(res => {
+      clearInterval(this._fi);
+      if (!ms) { this.fade = target; this.applyVol(); return res(); }
+      const from = this.fade, t0 = performance.now();
+      this._fi = setInterval(() => { const k = clamp((performance.now() - t0) / ms, 0, 1); this.fade = from + (target - from) * k; this.applyVol(); if (k >= 1) { clearInterval(this._fi); res(); } }, 40);
+    });
+  },
+  updateUI() {
+    const it = this.cur();
+    $('#npTitle').textContent = it ? it.title : 'Nothing playing';
+    $('#npKind').textContent = it ? ({ file: 'Music file', url: 'Web audio', radio: 'Internet radio', youtube: it.list ? 'YouTube playlist' : 'YouTube' }[it.kind]) : 'Background music';
+    $('#npSub').textContent = it ? (this.playing ? 'Playing' : 'Paused') + ` · ${this.idx + 1} of ${S.music.length}` : 'Plays on its own, separate from the slides';
+    $$('.mPlayIco').forEach(e => e.innerHTML = ic(this.playing ? 'pause' : 'play'));
+    $('#mmT').innerHTML = ''; const b = document.createElement('b'); b.textContent = 'Music'; $('#mmT').append(b, document.createTextNode(' · ' + (it && this.playing ? it.title : it ? 'paused' : 'nothing playing')));
+    $('#mShuffle').classList.toggle('on', S.settings.mShuffle);
+    const rp = $('#mRepeat'); rp.classList.toggle('on', S.settings.mRepeat !== 'off'); rp.innerHTML = ic(S.settings.mRepeat === 'one' ? 'repeat1' : 'repeat'); rp.title = { all: 'Repeat all', one: 'Repeat this song', off: 'Repeat off' }[S.settings.mRepeat];
+    $('#mMute').innerHTML = ic(this.muted || S.settings.vol == 0 ? 'mute' : 'vol');
+    $('#ytWrap').hidden = !(this.kind === 'youtube' && this.yt);
+    if ('mediaSession' in navigator && it) { try { navigator.mediaSession.metadata = new MediaMetadata({ title: it.title, artist: 'VideoBlitz', album: S.name }); navigator.mediaSession.playbackState = this.playing ? 'playing' : 'paused'; } catch { } }
+  },
+};
+aLocal.addEventListener('ended', () => Mu.kind === 'file' && Mu.ended());
+aRemote.addEventListener('ended', () => Mu.kind === 'url' && Mu.ended());
+[aLocal, aRemote].forEach(a => a.addEventListener('error', () => { if (Mu.ok && Mu.playing && Mu.el() === a && a.getAttribute('src')) { const it = Mu.cur(); toast(`Couldn't play "${it?.title}". ${IN_FRAME && it?.kind !== 'file' ? 'Web streams need the downloaded VideoBlitz.' : 'The file or link may not be supported.'}`, 'err'); Mu.failed(); } }));
+if ('mediaSession' in navigator) { const ms = navigator.mediaSession; try { ms.setActionHandler('play', () => Mu.resume()); ms.setActionHandler('pause', () => Mu.pause()); ms.setActionHandler('nexttrack', () => Mu.next()); ms.setActionHandler('previoustrack', () => Mu.prev()); } catch { } }
+function updateDuck() {
+  const audible = E.cur?.audible?.() && E.playing;
+  Mu.duckT = S.settings.duck && audible ? S.settings.duckLvl / 100 : 1;
+}
+setInterval(() => {
+  if (Math.abs(Mu.duck - Mu.duckT) > .005) { Mu.duck += (Mu.duckT - Mu.duck) * .2; if (Math.abs(Mu.duck - Mu.duckT) < .01) Mu.duck = Mu.duckT; Mu.applyVol(); }
+  if (Mu.sleepAt) { const left = Mu.sleepAt - Date.now(); if (left <= 0) { Mu.pause(); Mu.sleepAt = 0; Mu.sleep = 1; $('#s_sleep').value = '0'; toast('Sleep timer: music stopped.'); } else if (left < 30000) { Mu.sleep = left / 30000; Mu.applyVol(); } }
+}, 80);
+
+/* visualizers */
+const vizBars = new Float32Array(48);
+function drawViz() {
+  const live = Mu.playing && Mu.kind === 'file' && analyser;
+  if (live) analyser.getByteFrequencyData(freq);
+  const t = performance.now() / 1000;
+  for (let i = 0; i < vizBars.length; i++) {
+    let v;
+    if (live) { const bi = Math.floor(Math.pow(i / vizBars.length, 1.5) * freq.length * .85); v = freq[bi] / 255; }
+    else if (Mu.playing) v = .25 + .2 * Math.sin(t * 2.1 + i * .45) * Math.sin(t * 1.3 + i * .17) + .1 * Math.sin(t * 5 + i);
+    else v = .03;
+    vizBars[i] += (clamp(v, 0, 1) - vizBars[i]) * .35;
+  }
+  const cvs = [$('#viz'), ...VIZ];
+  for (const c of cvs) {
+    if (!c || !c.isConnected) continue;
+    if (c.id === 'viz') { const w = c.clientWidth; if (w && c.width !== w * 2) { c.width = w * 2; c.height = 112; } }
+    const ctx = c.getContext('2d'), w = c.width, h = c.height, n = vizBars.length, gap = w / n * .28, bw = w / n - gap;
+    ctx.clearRect(0, 0, w, h);
+    const g = ctx.createLinearGradient(0, h, 0, 0); g.addColorStop(0, '#58c7f3'); g.addColorStop(1, '#ffb321');
+    ctx.fillStyle = g;
+    for (let i = 0; i < n; i++) { const bh = Math.max(h * .04, vizBars[i] * h); const x = i * (bw + gap) + gap / 2; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, h - bh, bw, bh, Math.min(bw / 2, 6)) : ctx.rect(x, h - bh, bw, bh); ctx.fill(); }
+  }
+}
+setInterval(drawViz, 40);
+setInterval(() => {
+  const { t, d } = Mu.time();
+  if (!E.mDrag) $('#mSeek').value = d ? Math.round(t / d * 1000) : 0;
+  $('#mSeek').disabled = !d;
+  $('#mCur').textContent = fmtT(t); $('#mDur').textContent = d ? fmtT(d) : (Mu.cur()?.kind === 'radio' && Mu.playing ? 'LIVE' : '--:--');
+  const ck = $s('#ovClock'); if (!ck.hidden) ck.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  if (OUT.win && E.showStart) $('#pTimer').textContent = fmtT((Date.now() - E.showStart) / 1000);
+  if (OUT.win && OUT.win.closed) closeOutput();
+}, 500);
+
+/* ============ import ============ */
+const TYPE_LABEL = { image: 'Picture', video: 'Video', deck: 'PowerPoint', pdf: 'PDF', youtube: 'YouTube', text: 'Title card', countdown: 'Countdown', nowplaying: 'Now Playing', art: 'Sample' };
+function kindOf(f) {
+  const e = extOf(f.name), t = f.type || '';
+  if (['pptx', 'ppsx', 'potx', 'pptm', 'ppsm'].includes(e)) return 'deck';
+  if (e === 'pdf' || t === 'application/pdf') return 'pdf';
+  if (['ppt', 'pps', 'key', 'odp'].includes(e)) return 'olddeck';
+  if (e === 'json') return 'show';
+  if (['m3u', 'm3u8', 'pls'].includes(e)) return 'playlist';
+  if (['heic', 'heif', 'tif', 'tiff', 'psd', 'raw', 'cr2', 'nef'].includes(e)) return 'badimage';
+  if (t.startsWith('image/') || MIME[e]?.startsWith('image/')) return 'image';
+  if (t.startsWith('video/') || MIME[e]?.startsWith('video/')) return 'video';
+  if (t.startsWith('audio/') || MIME[e]?.startsWith('audio/')) return 'audio';
+  return 'unknown';
+}
+async function importFiles(list, target = 'auto') {
+  const files = [...list].filter(f => !f.name.startsWith('.')).sort((a, b) => natSort(a.webkitRelativePath || a.name, b.webkitRelativePath || b.name));
+  if (!files.length) return;
+  const insertAt = () => S.sel >= 0 ? S.sel + 1 : S.slides.length;
+  const newSlides = []; let musicAdded = 0; const skipped = [];
+  let n = 0;
+  for (const f of files) {
+    n++; if (files.length > 3) toast(`Adding ${n} of ${files.length}…`);
+    const k = kindOf(f);
+    try {
+      if (target === 'music' || k === 'audio') {
+        if (k === 'audio' || k === 'video') { S.music.push({ id: uid(), kind: 'file', fileId: addFile(f, f.name), title: baseName(f.name) }); musicAdded++; }
+        else if (k === 'playlist') musicAdded += await importPlaylist(f);
+        else skipped.push(f.name);
+        continue;
+      }
+      if (k === 'image' || k === 'video') newSlides.push({ id: uid(), type: k, fileId: addFile(f, f.name), name: baseName(f.name) });
+      else if (k === 'deck') {
+        const fileId = addFile(f, f.name);
+        const deck = await getDeck(fileId);
+        deck.slides.forEach((s, i) => { if (!s.hidden) newSlides.push({ id: uid(), type: 'deck', fileId, slide: i, name: `${baseName(f.name)} · ${i + 1}` }); });
+        toast(`Opened "${f.name}": ${deck.slides.filter(s => !s.hidden).length} slides.`);
+      } else if (k === 'pdf') {
+        const fileId = addFile(f, f.name);
+        const doc = await getPdf(fileId);
+        for (let p = 1; p <= doc.numPages; p++) newSlides.push({ id: uid(), type: 'pdf', fileId, page: p, name: `${baseName(f.name)} · ${p}` });
+      } else if (k === 'olddeck') toast(`"${f.name}" is an older format. Open it in PowerPoint or Keynote and save as .pptx or PDF, then add it here.`, 'err');
+      else if (k === 'badimage') toast(`"${f.name}" can't be shown in a browser. Save it as JPG or PNG first.`, 'err');
+      else if (k === 'show') { await openShowFile(f); return; }
+      else if (k === 'playlist') musicAdded += await importPlaylist(f);
+      else skipped.push(f.name);
+    } catch (e) { console.error(e); toast(`Couldn't add "${f.name}": ${e.message}`, 'err'); }
+  }
+  if (newSlides.length) {
+    const at = insertAt(); const wasEmpty = !S.slides.length;
+    S.slides.splice(at, 0, ...newSlides);
+    renderStrip();
+    if (wasEmpty || E.idx < 0) showSlide(at, { instant: true }); else { S.sel = at; markStrip(); renderInspector(); }
+    if (files.length > 3 || newSlides.length > 1) toast(`Added ${newSlides.length} slide${newSlides.length > 1 ? 's' : ''}.`);
+  }
+  if (musicAdded) { renderQueue(); toast(`Added ${musicAdded} song${musicAdded > 1 ? 's' : ''} to the music.`); selectTab('music'); }
+  if (skipped.length) toast(`Skipped ${skipped.length} file${skipped.length > 1 ? 's' : ''} VideoBlitz can't use: ${skipped.slice(0, 3).join(', ')}${skipped.length > 3 ? '…' : ''}`, 'err');
+  save();
+}
+async function importPlaylist(f) {
+  const txt = await f.text(); const items = []; let title = null;
+  if (extOf(f.name) === 'pls') {
+    const files = {}, titles = {};
+    txt.split(/\r?\n/).forEach(l => { let m = l.match(/^File(\d+)=(.+)$/i); if (m) files[m[1]] = m[2].trim(); m = l.match(/^Title(\d+)=(.+)$/i); if (m) titles[m[1]] = m[2].trim(); });
+    Object.keys(files).forEach(k => items.push({ url: files[k], title: titles[k] }));
+  } else txt.split(/\r?\n/).forEach(l => { l = l.trim(); if (!l) return; if (l.startsWith('#EXTINF')) { title = l.split(',').slice(1).join(',').trim(); return; } if (l.startsWith('#')) return; items.push({ url: l, title }); title = null; });
+  let n = 0;
+  for (const it of items) { if (!/^https?:/i.test(it.url)) continue; addMusicLink(it.url, it.title); n++; }
+  if (!n && items.length) toast('That playlist points to files on your computer. Add those music files directly instead.', 'err');
+  return n;
+}
+function addMusicLink(u, title) {
+  const y = parseYouTube(u);
+  if (y) S.music.push({ id: uid(), kind: 'youtube', videoId: y.id, list: y.list, start: y.start, url: u, title: title || (y.list && !y.id ? 'YouTube playlist' : 'YouTube video'), autoTitle: !title });
+  else { const e = extOf(u); const isFile = ['mp3', 'm4a', 'aac', 'ogg', 'oga', 'opus', 'wav', 'flac', 'weba', 'mp4', 'webm'].includes(e); S.music.push({ id: uid(), kind: isFile ? 'url' : 'radio', url: u, title: title || decodeURIComponent(u.split(/[?#]/)[0].split('/').filter(Boolean).pop() || u) }); }
+}
+function addSlideLink(u) {
+  const y = parseYouTube(u);
+  if (y && y.id) return { id: uid(), type: 'youtube', videoId: y.id, start: y.start || 0, name: '', url: u };
+  if (y && !y.id) { toast('YouTube playlists go in the music. Add a single video link as a slide.', 'err'); return null; }
+  const e = extOf(u);
+  if (MIME[e]?.startsWith('video/')) return { id: uid(), type: 'video', url: u, name: decodeURIComponent(u.split(/[?#]/)[0].split('/').pop()) };
+  return { id: uid(), type: 'image', url: u, name: decodeURIComponent(u.split(/[?#]/)[0].split('/').pop() || 'Web picture') };
+}
+function newCard(type) {
+  const base = { id: uid(), type };
+  if (type === 'text') Object.assign(base, { title: 'Your headline here', sub: 'Add a line underneath, or leave it blank', c1: '#151b33', c2: '#3a1f5c', fg: '#ffffff', name: 'Title card' });
+  if (type === 'countdown') Object.assign(base, { secs: 300, label: 'Starting in', c1: '#0e1a24', c2: '#0f3b4f', fg: '#ffffff', name: 'Countdown' });
+  if (type === 'nowplaying') Object.assign(base, { label: 'Now playing', c1: '#0c0e13', c2: '#1d2333', fg: '#ffffff', name: 'Now Playing' });
+  const at = S.sel >= 0 ? S.sel + 1 : S.slides.length;
+  S.slides.splice(at, 0, base); renderStrip(); showSlide(at, { instant: true }); selectTab('slide'); save();
+}
+
+/* ============ thumbnails / filmstrip ============ */
+const THUMB = new Map();
+function iconThumb(box, name) { const d = document.createElement('div'); d.className = 'ico'; d.innerHTML = ic(name); box.appendChild(d); }
+function thumbEl(it) {
+  const box = document.createElement('div'); box.className = 'th';
+  const img = url => { const im = new Image(); im.alt = ''; im.loading = 'lazy'; im.src = url; im.onerror = () => { im.remove(); iconThumb(box, it.type === 'youtube' ? 'yt' : 'image'); }; box.appendChild(im); };
+  switch (it.type) {
+    case 'image': { const u = srcOf(it); u ? img(u) : iconThumb(box, 'image'); break; }
+    case 'video': {
+      if (THUMB.has(it.id)) { img(THUMB.get(it.id)); break; }
+      iconThumb(box, 'video');
+      const u = srcOf(it); if (!u) break;
+      const v = document.createElement('video'); v.muted = true; v.preload = 'metadata'; v.src = u; v.crossOrigin = it.url ? 'anonymous' : null;
+      v.addEventListener('loadedmetadata', () => { v.currentTime = Math.min(1.5, (v.duration || 2) / 3); }, { once: true });
+      v.addEventListener('seeked', () => { try { const c = document.createElement('canvas'); c.width = 320; c.height = 180; const ctx = c.getContext('2d'); const s = Math.max(320 / v.videoWidth, 180 / v.videoHeight); ctx.drawImage(v, (320 - v.videoWidth * s) / 2, (180 - v.videoHeight * s) / 2, v.videoWidth * s, v.videoHeight * s); const d = c.toDataURL('image/jpeg', .75); THUMB.set(it.id, d); box.textContent = ''; img(d); } catch { } v.removeAttribute('src'); v.load(); }, { once: true });
+      break;
+    }
+    case 'deck': {
+      iconThumb(box, 'deck');
+      getDeck(it.fileId).then(d => { const s = d.slides[it.slide]; if (!s) return; const c = s.el.cloneNode(true); c.querySelectorAll('video').forEach(v => { v.preload = 'none'; }); box.textContent = ''; box.appendChild(c); const fit = () => { const w = box.clientWidth || 150, h = box.clientHeight || 84; c.dataset.fitmode = 'contain'; scaleDeck(c, w, h); }; fit(); requestAnimationFrame(fit); }).catch(() => { });
+      break;
+    }
+    case 'pdf': {
+      const key = it.fileId + ':' + it.page;
+      if (THUMB.has(key)) { img(THUMB.get(key)); break; }
+      iconThumb(box, 'pdf');
+      pdfCanvas(it.fileId, it.page, 320, 180).then(c => { const d = c.toDataURL('image/jpeg', .8); THUMB.set(key, d); box.textContent = ''; box.style.background = '#2a2f3d'; img(d); box.lastChild.style.objectFit = 'contain'; }).catch(() => { });
+      break;
+    }
+    case 'youtube': img(`https://i.ytimg.com/vi/${encodeURIComponent(it.videoId)}/mqdefault.jpg`); break;
+    case 'art': { const c = document.createElement('canvas'); c.width = 320; c.height = 180; drawArt(c, it.seed || 1); box.appendChild(c); break; }
+    default: {
+      const card = document.createElement('div'); card.className = 'card'; card.style.background = `linear-gradient(135deg, ${it.c1 || '#151b33'}, ${it.c2 || '#3a1f5c'})`; card.style.color = it.fg || '#fff'; card.style.setProperty('--al', it.align || 'center');
+      if (it.type === 'text') { const h = document.createElement('h1'); h.textContent = it.title || ''; card.appendChild(h); }
+      else if (it.type === 'countdown') { const d = document.createElement('div'); d.className = 'cd'; d.textContent = fmtT(durOf(it)); card.appendChild(d); }
+      else { const d = document.createElement('div'); d.className = 'ico'; d.style.color = '#ffb321'; d.innerHTML = ic('wave'); card.appendChild(d); }
+      box.appendChild(card);
+    }
+  }
+  return box;
+}
+let dragFrom = -1;
+function renderStrip() {
+  const strip = $('#strip'); strip.textContent = '';
+  S.slides.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'fs'; d.draggable = true; d.dataset.i = i; d.tabIndex = 0;
+    d.title = 'Click to select, double-click to show now. Drag to reorder.';
+    d.appendChild(thumbEl(it));
+    const n = document.createElement('span'); n.className = 'num'; n.textContent = i + 1; d.appendChild(n);
+    const b = document.createElement('span'); b.className = 'badge' + (it.sample ? ' sample' : ''); b.textContent = it.sample ? 'Sample' : (it.type === 'deck' ? 'PPT' : it.type === 'pdf' ? 'PDF' : it.type === 'youtube' ? 'YT' : it.type === 'video' ? 'Video' : ''); if (b.textContent) d.appendChild(b);
+    const m = document.createElement('div'); m.className = 'meta';
+    const a = document.createElement('span'); a.textContent = it.name || it.title || TYPE_LABEL[it.type];
+    const t = document.createElement('span'); t.textContent = isFull(it) ? 'full' : durOf(it) + 's'; t.style.fontFamily = 'var(--f-mono)';
+    m.append(a, t); d.appendChild(m);
+    d.addEventListener('click', () => { S.sel = i; markStrip(); renderInspector(); selectTab('slide'); });
+    d.addEventListener('dblclick', () => showSlide(i));
+    d.addEventListener('keydown', e => { if (e.key === 'Enter') showSlide(i); if (e.key === 'Delete' || e.key === 'Backspace') { removeSlide(i); e.preventDefault(); e.stopPropagation(); } });
+    d.addEventListener('dragstart', e => { dragFrom = i; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/x-vb', String(i)); });
+    d.addEventListener('dragover', e => { if (dragFrom >= 0) { e.preventDefault(); d.classList.add('dragover'); } });
+    d.addEventListener('dragleave', () => d.classList.remove('dragover'));
+    d.addEventListener('drop', e => { if (dragFrom < 0) return; e.preventDefault(); e.stopPropagation(); d.classList.remove('dragover'); moveSlide(dragFrom, i); dragFrom = -1; });
+    d.addEventListener('dragend', () => { dragFrom = -1; });
+    if (it.skip) d.classList.add('skip');
+    strip.appendChild(d);
+  });
+  const add = document.createElement('button'); add.className = 'fsAdd'; add.innerHTML = ic('plus'); add.querySelector('svg').style.cssText = 'width:22px;height:22px;display:block;margin:0 auto 4px';
+  add.append('Add media'); add.addEventListener('click', () => $('#fSlides').click()); strip.appendChild(add);
+  $('#shRemoveSamples').hidden = !S.slides.some(s => s.sample);
+  markStrip(); updateOverlays();
+}
+function markStrip() { $$('#strip .fs').forEach(d => { const i = +d.dataset.i; d.classList.toggle('cur', i === E.idx); d.classList.toggle('sel', i === S.sel && i !== E.idx); }); const c = $(`#strip .fs[data-i="${E.idx}"]`); if (c) c.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' }); }
+function moveSlide(from, to) {
+  if (from === to || from < 0) return;
+  const curId = S.slides[E.idx]?.id;
+  const [it] = S.slides.splice(from, 1); S.slides.splice(to, 0, it);
+  E.idx = S.slides.findIndex(s => s.id === curId); S.sel = to;
+  renderStrip(); renderInspector(); save();
+}
+function removeSlide(i) {
+  const wasCur = i === E.idx;
+  S.slides.splice(i, 1);
+  if (E.idx > i) E.idx--;
+  S.sel = Math.min(i, S.slides.length - 1);
+  gcFiles(); renderStrip();
+  if (!S.slides.length) clearStage(); else if (wasCur) showSlide(Math.min(i, S.slides.length - 1), { instant: true });
+  renderInspector(); save();
+}
+
+/* ============ inspector ============ */
+function renderInspector() {
+  const p = $('#pSlide'); p.textContent = '';
+  const it = S.slides[S.sel];
+  if (!it) { p.innerHTML = '<div class="emptyQ">Pick a slide in the strip below the screen to change its timing, transition and look.</div>'; return; }
+  const head = document.createElement('div'); head.className = 'insHead';
+  head.appendChild(thumbEl(it));
+  const tt = document.createElement('div'); const k = document.createElement('div'); k.className = 'k'; k.textContent = `Slide ${S.sel + 1} · ${TYPE_LABEL[it.type]}`; const t = document.createElement('div'); t.className = 't'; t.textContent = it.name || it.title || ''; tt.append(k, t); head.appendChild(tt);
+  p.appendChild(head);
+  const acts = document.createElement('div'); acts.className = 'btnRow';
+  const mk = (icon, label, fn, cls = '') => { const b = document.createElement('button'); b.className = 'btn sm ' + cls; b.innerHTML = ic(icon); b.append(label); b.addEventListener('click', fn); acts.appendChild(b); return b; };
+  mk('play2', 'Show now', () => showSlide(S.sel));
+  mk('up', 'Earlier', () => S.sel > 0 && moveSlide(S.sel, S.sel - 1));
+  mk('down', 'Later', () => S.sel < S.slides.length - 1 && moveSlide(S.sel, S.sel + 1));
+  mk('copy', 'Duplicate', () => { const c = { ...JSON.parse(JSON.stringify(it)), id: uid(), sample: false }; S.slides.splice(S.sel + 1, 0, c); S.sel++; renderStrip(); renderInspector(); save(); });
+  mk(it.skip ? 'eye' : 'eyeoff', it.skip ? 'Include' : 'Skip', () => { it.skip = !it.skip; renderStrip(); renderInspector(); save(); });
+  mk('trash', 'Remove', () => removeSlide(S.sel), 'danger');
+  p.appendChild(acts);
+  const sec = (title) => { const s = document.createElement('div'); s.className = 'sec'; const h = document.createElement('h4'); h.textContent = title; s.appendChild(h); p.appendChild(s); return s; };
+  const refresh = (rebuild) => { renderStrip(); save(); if (rebuild && S.sel === E.idx) showSlide(E.idx, { instant: true }); };
+  const row = (s, label, input) => { const r = document.createElement('div'); r.className = 'row'; const l = document.createElement('label'); l.textContent = label; l.htmlFor = input.id; r.append(l, input); s.appendChild(r); return r; };
+  const field = (s, label, input) => { const r = document.createElement('div'); r.className = 'field'; const l = document.createElement('label'); l.textContent = label; l.htmlFor = input.id; r.append(l, input); s.appendChild(r); };
+  const sel = (id, key, opts, rebuild = true) => { const x = document.createElement('select'); x.id = id; for (const [v, l] of opts) { const o = document.createElement('option'); o.value = v; o.textContent = l; x.appendChild(o); } x.value = it[key] ?? ''; x.addEventListener('change', () => { if (x.value === '') delete it[key]; else it[key] = x.value; refresh(rebuild); }); return x; };
+  const numIn = (id, key, ph, rebuild = false, min = 0) => { const x = document.createElement('input'); x.type = 'number'; x.id = id; x.min = min; x.step = '0.5'; x.placeholder = ph; x.value = it[key] ?? ''; x.addEventListener('change', () => { if (x.value === '') delete it[key]; else it[key] = +x.value; if (S.sel === E.idx) { E.dur = durOf(it); E.full = isFull(it) && !!E.cur?.mediaTime; } refresh(rebuild); }); return x; };
+  const txt = (id, key, ph, area = false, rebuild = true) => { const x = document.createElement(area ? 'textarea' : 'input'); if (!area) x.type = 'text'; x.id = id; x.placeholder = ph; x.value = it[key] ?? ''; let tm; x.addEventListener('input', () => { it[key] = x.value; clearTimeout(tm); tm = setTimeout(() => refresh(rebuild), 350); }); return x; };
+  const col = (id, key, def) => { const x = document.createElement('input'); x.type = 'color'; x.id = id; x.value = it[key] || def; x.addEventListener('input', () => { it[key] = x.value; clearTimeout(x._t); x._t = setTimeout(() => refresh(true), 200); }); return x; };
+  const sw = (id, key) => { const x = document.createElement('input'); x.type = 'checkbox'; x.className = 'sw'; x.id = id; x.checked = !!it[key]; x.addEventListener('change', () => { it[key] = x.checked; if (S.sel === E.idx && E.cur?.media && key === 'mute') { E.cur.media.muted = x.checked; updateDuck(); } refresh(key !== 'mute'); }); return x; };
+  if (it.type === 'text') {
+    const s = sec('Words');
+    field(s, 'Headline', txt('i_title', 'title', 'Headline'));
+    field(s, 'Smaller line', txt('i_sub', 'sub', 'Optional', true));
+    row(s, 'Line up text', sel('i_align', 'align', [['', 'Center'], ['left', 'Left'], ['right', 'Right']]));
+  }
+  if (it.type === 'countdown') {
+    const s = sec('Countdown');
+    field(s, 'Label above the timer', txt('i_label', 'label', 'Starting in'));
+    const mins = document.createElement('input'); mins.type = 'number'; mins.id = 'i_mins'; mins.min = '0.1'; mins.step = '0.5'; mins.value = (durOf(it) / 60).toString();
+    mins.addEventListener('change', () => { it.secs = Math.max(5, Math.round(+mins.value * 60)); if (S.sel === E.idx) E.dur = durOf(it); refresh(true); });
+    row(s, 'Minutes', mins);
+  }
+  if (it.type === 'nowplaying') { const s = sec('Card'); field(s, 'Label', txt('i_label', 'label', 'Now playing')); }
+  if (['text', 'countdown', 'nowplaying'].includes(it.type)) {
+    const s = sec('Colors');
+    row(s, 'Background start', col('i_c1', 'c1', '#151b33')); row(s, 'Background end', col('i_c2', 'c2', '#3a1f5c')); row(s, 'Text', col('i_fg', 'fg', '#ffffff'));
+  }
+  const s1 = sec('Timing');
+  if (it.type === 'video' || it.type === 'youtube') {
+    row(s1, 'Play to the end', sel('i_full', 'full', [['', `Show default (${S.settings.videoFull ? 'yes' : 'no'})`], ['on', 'Yes'], ['off', 'No, use seconds below']]));
+    row(s1, 'Start at (seconds)', numIn('i_start', 'start', '0', true));
+    row(s1, 'Stop at (seconds)', numIn('i_end', 'end', 'end', true));
+  }
+  if (it.type !== 'countdown') row(s1, 'Seconds on screen', numIn('i_dur', 'dur', String(S.settings.dur), false, 1));
+  row(s1, 'Transition in', sel('i_trans', 'trans', [['', `Show default (${TRANS[S.settings.trans]})`], ...Object.entries(TRANS)], false));
+  const s2 = sec('Look');
+  if (['image', 'video', 'deck', 'pdf'].includes(it.type)) row(s2, 'Sizing', sel('i_fit', 'fit', [['', 'Show default'], ['contain', 'Fit'], ['cover', 'Fill (crop)'], ['fill', 'Stretch'], ['scale-down', 'Original size']]));
+  if (it.type === 'image') row(s2, 'Slow zoom', sel('i_kb', 'kb', [['', `Show default (${S.settings.kenBurns ? 'on' : 'off'})`], ['on', 'On'], ['off', 'Off']]));
+  field(s2, 'Caption', txt('i_caption', 'caption', 'Text shown at the bottom (optional)', false, false));
+  if (it.type === 'video' || it.type === 'youtube') {
+    const s3 = sec('Sound');
+    row(s3, 'Mute this video', sw('i_mute', 'mute'));
+    const vol = document.createElement('input'); vol.type = 'range'; vol.min = 0; vol.max = 100; vol.id = 'i_vol'; vol.value = it.vol ?? 100;
+    vol.addEventListener('input', () => { it.vol = +vol.value; if (S.sel === E.idx && E.cur?.media) E.cur.media.volume = it.vol / 100; save(); });
+    row(s3, 'Video volume', vol);
+  }
+  if (it.type === 'deck') {
+    const s4 = sec('Speaker notes'); const n = document.createElement('div'); n.className = 'notes'; n.textContent = 'Loading…'; s4.appendChild(n);
+    getDeck(it.fileId).then(d => { n.textContent = d.slides[it.slide]?.notes || 'No notes on this slide.'; }).catch(() => n.textContent = 'Notes unavailable.');
+  } else { const s4 = sec('Speaker notes'); field(s4, 'Notes for the presenter view', txt('i_notes', 'notes', 'Only you see these, on the second-screen presenter view', true, false)); }
+}
+
+/* ============ music UI ============ */
+const RADIO = [
+  ['Groove Salad', 'Chilled ambient beats', 'https://ice1.somafm.com/groovesalad-128-mp3'],
+  ['Drone Zone', 'Atmospheric ambient', 'https://ice1.somafm.com/dronezone-128-mp3'],
+  ['Lush', 'Mellow vocal electronica', 'https://ice1.somafm.com/lush-128-mp3'],
+  ['Indie Pop Rocks', 'Indie pop and rock', 'https://ice1.somafm.com/indiepop-128-mp3'],
+  ['Secret Agent', 'Lounge and spy jazz', 'https://ice1.somafm.com/secretagent-128-mp3'],
+  ['Beat Blender', 'Deep house, downtempo', 'https://ice1.somafm.com/beatblender-128-mp3'],
+  ['Christmas Lounge', 'Holiday chill', 'https://ice1.somafm.com/christmas-128-mp3'],
+  ['Boot Liquor', 'Americana roots', 'https://ice1.somafm.com/bootliquor-128-mp3'],
+];
+const MKIND_ICON = { file: 'music', url: 'link', radio: 'radio', youtube: 'yt' };
+function renderQueue() {
+  const q = $('#mQueue'); q.textContent = '';
+  if (!S.music.length) { const li = document.createElement('li'); li.className = 'emptyQ'; li.style.display = 'block'; li.textContent = 'No music yet. Add files or a folder, paste a YouTube link, or pick a radio station.'; q.appendChild(li); return; }
+  S.music.forEach((m, i) => {
+    const li = document.createElement('li'); li.draggable = true; if (i === Mu.idx) li.classList.add('cur');
+    const ico = document.createElement('span'); ico.className = 'qi'; ico.innerHTML = ic(i === Mu.idx && Mu.playing ? 'wave' : MKIND_ICON[m.kind]);
+    const t = document.createElement('div'); t.className = 'qt'; t.textContent = m.title; const sm = document.createElement('small'); sm.textContent = { file: 'File', url: 'Web audio', radio: 'Internet radio', youtube: m.list ? 'YouTube playlist' : 'YouTube' }[m.kind] + (m.sample ? ' · sample' : ''); t.appendChild(sm);
+    const del = document.createElement('button'); del.className = 'ib'; del.title = 'Remove'; del.innerHTML = ic('x');
+    del.addEventListener('click', e => { e.stopPropagation(); const wasCur = i === Mu.idx; S.music.splice(i, 1); if (wasCur) { Mu.stopAll(); Mu.playing = false; Mu.kind = null; Mu.idx = -1; } else if (Mu.idx > i) Mu.idx--; gcFiles(); renderQueue(); Mu.updateUI(); updateOverlays(); save(); });
+    li.append(ico, t, del);
+    li.addEventListener('click', () => Mu.play(i));
+    li.addEventListener('dragstart', e => { e.dataTransfer.setData('text/x-vbm', String(i)); e.dataTransfer.effectAllowed = 'move'; });
+    li.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('text/x-vbm')) { e.preventDefault(); li.classList.add('dragover'); } });
+    li.addEventListener('dragleave', () => li.classList.remove('dragover'));
+    li.addEventListener('drop', e => { const from = +e.dataTransfer.getData('text/x-vbm'); if (isNaN(from) || !e.dataTransfer.types.includes('text/x-vbm')) return; e.preventDefault(); e.stopPropagation(); const curId = S.music[Mu.idx]?.id; const [x] = S.music.splice(from, 1); S.music.splice(i, 0, x); Mu.idx = S.music.findIndex(z => z.id === curId); renderQueue(); save(); });
+    q.appendChild(li);
+  });
+}
+function renderRadios() {
+  const r = $('#radioList'); r.textContent = '';
+  RADIO.forEach(([n, d, u]) => { const b = document.createElement('button'); b.textContent = n; const s = document.createElement('small'); s.textContent = d; b.appendChild(s); b.addEventListener('click', () => { S.music.push({ id: uid(), kind: 'radio', url: u, title: 'SomaFM · ' + n }); renderQueue(); Mu.play(S.music.length - 1); save(); }); r.appendChild(b); });
+  const own = document.createElement('button'); own.textContent = 'Your own station'; const s = document.createElement('small'); s.textContent = 'Paste any stream link'; own.appendChild(s); own.addEventListener('click', () => openLink('music')); r.appendChild(own);
+}
+
+/* ============ dialogs ============ */
+function openDlg(id) { const d = $(id); d.hidden = false; setTimeout(() => d.querySelector('textarea,input,button.pri')?.focus(), 30); }
+function closeDlgs() { $$('.scrim').forEach(d => d.hidden = true); }
+let linkPref = 'slide';
+function openLink(pref = 'slide') { linkPref = pref; $('#linkIn').value = ''; $('#linkSlide').classList.toggle('pri', pref === 'slide'); $('#linkMusic').classList.toggle('pri', pref === 'music'); detectLinks(); openDlg('#dlgLink'); }
+function linkLines() { return $('#linkIn').value.split(/\s+/).map(s => s.trim()).filter(s => /^https?:\/\//i.test(s)); }
+function detectLinks() {
+  const ls = linkLines(); const el = $('#linkDetect');
+  if (!ls.length) { el.textContent = 'YouTube videos and playlists, pictures, videos, music files and internet radio streams all work.'; return; }
+  const kinds = ls.map(u => { const y = parseYouTube(u); if (y) return y.id ? 'YouTube video' : 'YouTube playlist'; const e = extOf(u); if (MIME[e]?.startsWith('image/')) return 'picture'; if (MIME[e]?.startsWith('video/')) return 'video'; if (MIME[e]?.startsWith('audio/')) return 'music file'; return 'web link (picture or stream)'; });
+  const counts = {}; kinds.forEach(k => counts[k] = (counts[k] || 0) + 1);
+  el.textContent = 'Found: ' + Object.entries(counts).map(([k, n]) => `${n} ${k}${n > 1 ? 's' : ''}`).join(', ') + '.';
+}
+function bindSettings() {
+  $$('[data-s]').forEach(el => {
+    const k = el.dataset.s; const v = S.settings[k];
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+    const h = () => {
+      let val = el.type === 'checkbox' ? el.checked : (el.type === 'range' || el.type === 'number') ? +el.value : el.value;
+      if (k === 'dur') val = clamp(val || 6, 1, 3600);
+      S.settings[k] = val;
+      if (k === 'remember') { if (!val) { DB.clearFiles(); $('#storageNote').textContent = 'Media won\'t be kept after you close VideoBlitz. Slide order and settings are still saved.'; } else { FILES.forEach(f => DB.putFile(f)); $('#storageNote').textContent = 'Your slides, music and settings are kept in this browser so they\'re here next time.'; } }
+      applySettings();
+      if (['dur', 'videoFull', 'trans', 'kenBurns'].includes(k)) { renderStrip(); renderInspector(); if (E.cur && S.slides[E.idx]) { E.dur = durOf(S.slides[E.idx]); E.full = isFull(S.slides[E.idx]) && !!E.cur.mediaTime; } }
+      if (['fit', 'blurFill'].includes(k) && E.idx >= 0) showSlide(E.idx, { instant: true });
+      if (k === 'duck' || k === 'duckLvl') updateDuck();
+      save();
+    };
+    el.addEventListener(el.type === 'range' || el.type === 'text' || el.type === 'color' ? 'input' : 'change', h);
+  });
+}
+function selectTab(t) { $$('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); ['music', 'slide', 'show', 'screen'].forEach(x => $('#p' + x[0].toUpperCase() + x.slice(1)).hidden = x !== t); if (t === 'slide') renderInspector(); }
+
+/* ============ save / open show files ============ */
+function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 30000); }
+const blobToDataURL = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
+function dataURLToBlob(d) { const [h, b64] = d.split(','); const type = (h.match(/data:([^;]+)/) || [])[1] || ''; const bin = atob(b64); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type }); }
+async function saveShow() {
+  const withMedia = $('#saveMedia').checked;
+  const out = { app: 'VideoBlitz', version: 1, name: S.name, settings: S.settings, slides: S.slides, music: S.music, files: {} };
+  const used = new Set([...S.slides, ...S.music].map(x => x.fileId).filter(Boolean));
+  for (const id of used) { const f = FILES.get(id); if (!f) continue; out.files[id] = { name: f.name, type: f.type }; if (withMedia) { toast(`Packing ${f.name}…`); out.files[id].data = await blobToDataURL(f.blob); } }
+  download(new Blob([JSON.stringify(out)], { type: 'application/json' }), (S.name || 'show').replace(/[\\/:*?"<>|]+/g, '-') + '.videoblitz.json');
+  closeDlgs(); toast(IN_FRAME ? 'Saving files isn\'t available in this preview. Use the downloaded VideoBlitz.' : 'Show saved to your Downloads folder.');
+}
+async function openShowFile(f) {
+  let data; try { data = JSON.parse(await f.text()); } catch { toast('That file isn\'t a VideoBlitz show.', 'err'); return; }
+  if (data.app !== 'VideoBlitz') { toast('That file isn\'t a VideoBlitz show.', 'err'); return; }
+  const missing = [];
+  for (const [id, meta] of Object.entries(data.files || {})) {
+    if (FILES.has(id)) continue;
+    if (meta.data) { const blob = dataURLToBlob(meta.data); const nf = { id, name: meta.name, type: meta.type, blob, url: URL.createObjectURL(blob) }; FILES.set(id, nf); if (S.settings.remember) DB.putFile(nf); }
+    else missing.push(meta.name);
+  }
+  clearStage(); Mu.stopAll(); Mu.playing = false; Mu.idx = -1; Mu.kind = null;
+  S.name = data.name || 'Show'; S.settings = { ...DEF, ...data.settings };
+  S.slides = (data.slides || []).filter(s => !s.fileId || FILES.has(s.fileId));
+  S.music = (data.music || []).filter(m => !m.fileId || FILES.has(m.fileId));
+  $('#showName').value = S.name; bindSettingsValues(); applySettings(); renderStrip(); renderQueue(); Mu.updateUI();
+  if (S.slides.length) showSlide(0, { instant: true });
+  toast(missing.length ? `Opened "${S.name}". ${missing.length} file${missing.length > 1 ? 's weren\'t' : ' wasn\'t'} packed in the show (${missing.slice(0, 2).join(', ')}${missing.length > 2 ? '…' : ''}). Add them again.` : `Opened "${S.name}".`, missing.length ? 'err' : '');
+  save();
+}
+
+/* ============ keyboard ============ */
+function onKey(e) {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (e.key === 'Escape') { if (!$('#dlgLink').hidden || !$('#dlgSave').hidden || !$('#dlgHelp').hidden) { closeDlgs(); return; } if (E.blank) { setBlank(E.blank); return; } $('#addMenu').hidden = true; return; }
+  if (['input', 'textarea', 'select'].includes(tag) || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!$('#dlgLink').hidden || !$('#dlgSave').hidden) return;
+  const k = e.key;
+  const map = {
+    ' ': togglePlay, k: togglePlay, ArrowRight: () => next(), PageDown: () => next(), ArrowLeft: prev, PageUp: prev,
+    Home: () => showSlide(nextIdx(-1, 1, false)), End: () => showSlide(S.slides.length - 1),
+    f: toggleFull, F: toggleFull, b: () => setBlank('#000'), B: () => setBlank('#000'), '.': () => setBlank('#000'), w: () => setBlank('#fff'), W: () => setBlank('#fff'),
+    h: () => { S.settings.hideOverlays = !S.settings.hideOverlays; updateOverlays(); save(); }, m: () => Mu.toggle(), M: () => Mu.toggle(), n: () => Mu.next(), N: () => Mu.prev(),
+    '+': () => setVol(S.settings.vol + 5), '=': () => setVol(S.settings.vol + 5), '-': () => setVol(S.settings.vol - 5), o: openOutput, O: openOutput, '?': () => openDlg('#dlgHelp'),
+  };
+  if (map[k]) { e.preventDefault(); map[k](); poke(); }
+}
+function setVol(v) { S.settings.vol = clamp(Math.round(v), 0, 100); Mu.muted = false; $('#mVol').value = $('#mmVol').value = S.settings.vol; $('#mVolV').textContent = S.settings.vol + '%'; Mu.applyVol(); Mu.updateUI(); save(); }
+
+/* ============ samples ============ */
+function sampleShow() {
+  S.slides = [
+    { id: uid(), type: 'text', sample: true, name: 'Welcome', title: 'VideoBlitz', sub: 'Pictures, videos, PowerPoint and PDF in one show.\nMusic plays underneath on its own.', c1: '#10142a', c2: '#3b1d5e', fg: '#ffffff' },
+    { id: uid(), type: 'art', seed: 1, sample: true, name: 'Sample picture 1', caption: 'Pictures get a slow zoom and a blurred fill' },
+    { id: uid(), type: 'art', seed: 2, sample: true, name: 'Sample picture 2', caption: 'Change transitions on the Show tab' },
+    { id: uid(), type: 'text', sample: true, name: 'How to start', title: 'Drop your files anywhere', sub: 'Or use Add media. Press F for full screen and Space to pause.', c1: '#0b2230', c2: '#124a5c', fg: '#ffffff' },
+    { id: uid(), type: 'art', seed: 3, sample: true, name: 'Sample picture 3' },
+    { id: uid(), type: 'countdown', sample: true, name: 'Countdown', secs: 15, label: 'The show starts in', c1: '#0e1a24', c2: '#0f3b4f', fg: '#ffffff' },
+    { id: uid(), type: 'nowplaying', sample: true, name: 'Now Playing', label: 'Now playing', c1: '#0c0e13', c2: '#1d2333', fg: '#ffffff' },
+  ];
+  S.music = [{ id: uid(), kind: 'radio', url: RADIO[0][2], title: 'SomaFM · Groove Salad', sample: true }];
+}
+
+/* ============ boot ============ */
+async function boot() {
+  paintIcons();
+  stageWrap = $('#stageWrap'); stage = $('#stage'); layersEl = $('#layers');
+  $('#stageWrap').appendChild($('#presenter'));
+  const ts = $('#s_trans'); Object.entries(TRANS).forEach(([v, l]) => { const o = document.createElement('option'); o.value = v; o.textContent = l; ts.appendChild(o); });
+  await DB.open();
+  let state = null;
+  try {
+    const files = await DB.allFiles();
+    (files || []).forEach(f => FILES.set(f.id, { ...f, url: URL.createObjectURL(f.blob) }));
+    state = await DB.get('state');
+  } catch { }
+  if (state) {
+    S.name = state.name || S.name; S.settings = { ...DEF, ...state.settings };
+    S.slides = (state.slides || []).filter(s => !s.fileId || FILES.has(s.fileId));
+    S.music = (state.music || []).filter(m => !m.fileId || FILES.has(m.fileId));
+  } else sampleShow();
+  $('#showName').value = S.name;
+  bindSettings();
+  $('#mVol').value = $('#mmVol').value = S.settings.vol; $('#mVolV').textContent = S.settings.vol + '%';
+  new ResizeObserver(layoutStage).observe(stageWrap);
+  applySettings(); renderStrip(); renderQueue(); renderRadios(); Mu.updateUI();
+  if (state && S.music[state.midx]) { Mu.idx = state.midx; Mu.updateUI(); renderQueue(); }
+  if (S.slides.length) await showSlide(clamp(state?.idx ?? 0, 0, S.slides.length - 1), { instant: true }); else clearStage();
+  if (S.settings.autoStart && S.slides.length) setPlaying(true);
+  setInterval(tick, 100);
+  if (IN_FRAME) { $('#banner').hidden = false; $('#btnSave').hidden = true; }
+  wire();
+}
+function wire() {
+  $('#showName').addEventListener('input', e => { S.name = e.target.value; save(); });
+  $('#btnAdd').addEventListener('click', e => { e.stopPropagation(); $('#addMenu').hidden = !$('#addMenu').hidden; });
+  document.addEventListener('click', e => { if (!e.target.closest('.menuWrap')) $('#addMenu').hidden = true; });
+  $$('#addMenu [data-add]').forEach(b => b.addEventListener('click', () => {
+    $('#addMenu').hidden = true;
+    const a = b.dataset.add;
+    if (a === 'files') $('#fSlides').click(); else if (a === 'folder') $('#fFolder').click(); else if (a === 'link') openLink('slide'); else newCard(a);
+  }));
+  $('#fSlides').addEventListener('change', e => { importFiles(e.target.files); e.target.value = ''; });
+  $('#fFolder').addEventListener('change', e => { importFiles([...e.target.files].filter(f => ['image', 'video', 'deck', 'pdf'].includes(kindOf(f)))); e.target.value = ''; });
+  $('#fMusic').addEventListener('change', e => { importFiles(e.target.files, 'music'); e.target.value = ''; });
+  $('#fMusicFolder').addEventListener('change', e => { importFiles([...e.target.files].filter(f => kindOf(f) === 'audio'), 'music'); e.target.value = ''; });
+  $('#fShow').addEventListener('change', e => { if (e.target.files[0]) openShowFile(e.target.files[0]); e.target.value = ''; });
+  $('#btnPresent').addEventListener('click', () => { if (!S.slides.length) { toast('Add some pictures, videos or slides first.'); return; } toggleFull(); if (!E.playing) setPlaying(true); });
+  $('#btnOutput').addEventListener('click', openOutput);
+  $('#btnSave').addEventListener('click', () => { const tot = [...new Set([...S.slides, ...S.music].map(x => x.fileId).filter(Boolean))].reduce((a, id) => a + (FILES.get(id)?.blob.size || 0), 0); $('#saveSize').textContent = tot ? `Your media adds up to ${(tot / 1048576).toFixed(1)} MB.` : 'This show has no media files from your computer.'; openDlg('#dlgSave'); });
+  $('#saveGo').addEventListener('click', saveShow);
+  $('#btnOpen').addEventListener('click', () => $('#fShow').click());
+  $('#btnHelp').addEventListener('click', () => openDlg('#dlgHelp'));
+  $$('[data-close]').forEach(b => b.addEventListener('click', closeDlgs));
+  $$('.scrim').forEach(s => s.addEventListener('click', e => { if (e.target === s) closeDlgs(); }));
+  $('#bannerX').addEventListener('click', () => $('#banner').hidden = true);
+  // transport
+  $('#tPlay').addEventListener('click', togglePlay); $('#tNext').addEventListener('click', () => next()); $('#tPrev').addEventListener('click', prev);
+  $('#tShuffle').addEventListener('click', () => { S.settings.shuffle = !S.settings.shuffle; bindSettingsValues(); updateTransport(); save(); toast(S.settings.shuffle ? 'Slides will play in random order.' : 'Slides play in order.'); });
+  $('#tLoop').addEventListener('click', () => { S.settings.loop = !S.settings.loop; bindSettingsValues(); updateTransport(); save(); toast(S.settings.loop ? 'The show will loop.' : 'The show stops after the last slide.'); });
+  $('#tBlank').addEventListener('click', () => setBlank('#000'));
+  $('#tFull').addEventListener('click', toggleFull);
+  const tp = $('#tProg');
+  tp.addEventListener('input', () => { E.dragging = true; });
+  tp.addEventListener('change', () => { E.dragging = false; const f = tp.value / 1000; if (E.full && E.cur?.media) { const it = S.slides[E.idx]; const st = +it.start || 0; const { d } = E.cur.mediaTime(); E.cur.media.currentTime = st + f * d; } else if (E.full && E.cur?.mediaTime) { /* youtube seeking not exposed */ } else { E.acc = f * E.dur * 1000; E.seg = performance.now(); } });
+  $$('#fsBar [data-act]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); ({ prev, next: () => next(), play: togglePlay, mplay: () => Mu.toggle(), blank: () => setBlank('#000'), fs: toggleFull })[b.dataset.act](); }));
+  stageWrap.addEventListener('mousemove', poke);
+  stageWrap.addEventListener('click', e => { if (e.target.closest('#fsBar,#presenter,#empty')) return; if (stageWrap.ownerDocument.fullscreenElement) next(); });
+  document.addEventListener('fullscreenchange', () => { setTimeout(layoutStage, 50); poke(); });
+  // music
+  $('#mPlay').addEventListener('click', () => Mu.toggle()); $('#mmPlay').addEventListener('click', () => Mu.toggle());
+  $('#mNext').addEventListener('click', () => Mu.next()); $('#mmNext').addEventListener('click', () => Mu.next()); $('#mPrev').addEventListener('click', () => Mu.prev());
+  $('#mShuffle').addEventListener('click', () => { S.settings.mShuffle = !S.settings.mShuffle; try { Mu.yt?.setShuffle(S.settings.mShuffle); } catch { } Mu.updateUI(); save(); });
+  $('#mRepeat').addEventListener('click', () => { S.settings.mRepeat = { all: 'one', one: 'off', off: 'all' }[S.settings.mRepeat]; Mu.updateUI(); save(); });
+  $('#mMute').addEventListener('click', () => { Mu.muted = !Mu.muted; Mu.applyVol(); Mu.updateUI(); });
+  $('#mVol').addEventListener('input', e => setVol(+e.target.value)); $('#mmVol').addEventListener('input', e => setVol(+e.target.value));
+  const ms = $('#mSeek'); ms.addEventListener('input', () => E.mDrag = true); ms.addEventListener('change', () => { E.mDrag = false; Mu.seek(ms.value / 1000); });
+  $('#mAddFiles').addEventListener('click', () => $('#fMusic').click());
+  $('#mAddFolder').addEventListener('click', () => $('#fMusicFolder').click());
+  $('#mAddLink').addEventListener('click', () => openLink('music'));
+  $('#mAddRadio').addEventListener('click', () => { $('#radioList').hidden = !$('#radioList').hidden; });
+  let clearArm = 0;
+  $('#mClear').addEventListener('click', e => { if (!S.music.length) return; if (Date.now() - clearArm > 3000) { clearArm = Date.now(); e.target.textContent = 'Click again to clear'; setTimeout(() => e.target.textContent = 'Clear', 3000); return; } Mu.stopAll(); Mu.playing = false; Mu.idx = -1; Mu.kind = null; S.music = []; gcFiles(); renderQueue(); Mu.updateUI(); updateOverlays(); save(); e.target.textContent = 'Clear'; });
+  $('#s_sleep').addEventListener('change', e => { const m = +e.target.value; Mu.sleepAt = m ? Date.now() + m * 60000 : 0; Mu.sleep = 1; Mu.applyVol(); if (m) toast(`Music will fade out and stop in ${m} minutes.`); });
+  // link dialog
+  $('#linkIn').addEventListener('input', detectLinks);
+  $('#linkSlide').addEventListener('click', () => { const ls = linkLines(); if (!ls.length) { toast('Paste a link that starts with http:// or https://', 'err'); return; } const items = ls.map(addSlideLink).filter(Boolean); if (!items.length) return; const at = S.sel >= 0 ? S.sel + 1 : S.slides.length; S.slides.splice(at, 0, ...items); renderStrip(); showSlide(at); closeDlgs(); save(); });
+  $('#linkMusic').addEventListener('click', () => { const ls = linkLines(); if (!ls.length) { toast('Paste a link that starts with http:// or https://', 'err'); return; } const start = S.music.length; ls.forEach(u => addMusicLink(u)); renderQueue(); closeDlgs(); selectTab('music'); if (!Mu.playing) Mu.play(start); save(); });
+  // tabs
+  $$('.tabs button').forEach(b => b.addEventListener('click', () => selectTab(b.dataset.tab)));
+  // show tab
+  $('#shApplyAll').addEventListener('click', () => { S.slides.forEach(s => { delete s.dur; delete s.trans; }); renderStrip(); renderInspector(); save(); toast('Every slide now uses the show timing and transition.'); });
+  $('#shRemoveSamples').addEventListener('click', () => { const cur = S.slides[E.idx]; S.slides = S.slides.filter(s => !s.sample); const mWasSample = Mu.cur()?.sample; S.music = S.music.filter(m => !m.sample); if (mWasSample) { Mu.stopAll(); Mu.playing = false; Mu.idx = -1; Mu.kind = null; } else if (Mu.idx >= 0) Mu.idx = S.music.findIndex(m => m.id === Mu.cur()?.id); renderStrip(); renderQueue(); Mu.updateUI(); S.sel = -1; if (!S.slides.length) clearStage(); else if (cur?.sample) showSlide(0, { instant: true }); renderInspector(); save(); });
+  let clearS = 0;
+  $('#shClear').addEventListener('click', e => { if (!S.slides.length) return; if (Date.now() - clearS > 3000) { clearS = Date.now(); e.target.textContent = 'Click again to remove all'; setTimeout(() => e.target.textContent = 'Remove all slides', 3000); return; } S.slides = []; S.sel = -1; gcFiles(); clearStage(); renderStrip(); renderInspector(); save(); e.target.textContent = 'Remove all slides'; });
+  // screen tab
+  $('#scFull').addEventListener('click', toggleFull); $('#scOut').addEventListener('click', openOutput);
+  $('#scBlack').addEventListener('click', () => setBlank('#000')); $('#scWhite').addEventListener('click', () => setBlank('#fff'));
+  $('#scPip').addEventListener('click', async () => {
+    const v = E.cur?.media; if (!v) { toast('Picture-in-picture works while a video slide is showing.'); return; }
+    try { if (document.pictureInPictureElement) await document.exitPictureInPicture(); else await v.requestPictureInPicture(); } catch { toast('Picture-in-picture isn\'t available here.'); }
+  });
+  $$('#segRot button').forEach(b => b.addEventListener('click', () => { S.settings.rotate = +b.dataset.v; applySettings(); save(); }));
+  $('#scResetColor').addEventListener('click', () => { Object.assign(S.settings, { bright: 100, contrast: 100, sat: 100, gray: 0, zoom: 100, rotate: 0, mirror: false }); bindSettingsValues(); applySettings(); save(); });
+  // keyboard + drag/drop
+  document.addEventListener('keydown', onKey);
+  let dragDepth = 0;
+  window.addEventListener('dragenter', e => { if (e.dataTransfer.types.includes('Files')) { dragDepth++; $s('#dropHint').hidden = false; } });
+  window.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $s('#dropHint').hidden = true; });
+  window.addEventListener('dragover', e => { if (e.dataTransfer.types.includes('Files') || e.dataTransfer.types.includes('text/uri-list')) e.preventDefault(); });
+  window.addEventListener('drop', e => {
+    dragDepth = 0; $s('#dropHint').hidden = true;
+    if (e.dataTransfer.files.length) { e.preventDefault(); const toMusic = !!e.target.closest?.('#pMusic'); importFiles(e.dataTransfer.files, toMusic ? 'music' : 'auto'); return; }
+    const u = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+    if (u && /^https?:/i.test(u.trim())) { e.preventDefault(); if (e.target.closest?.('#pMusic')) { addMusicLink(u.trim()); renderQueue(); } else { const it = addSlideLink(u.trim()); if (it) { S.slides.push(it); renderStrip(); showSlide(S.slides.length - 1); } } save(); }
+  });
+  document.addEventListener('paste', e => { if (['input', 'textarea'].includes((e.target.tagName || '').toLowerCase())) return; const t = e.clipboardData?.getData('text') || ''; if (/^https?:\/\//i.test(t.trim())) { openLink(parseYouTube(t) ? 'music' : 'slide'); $('#linkIn').value = t.trim(); detectLinks(); } else if (e.clipboardData?.files?.length) importFiles(e.clipboardData.files); });
+  document.addEventListener('pointerdown', () => { if (actx?.state === 'suspended') actx.resume(); }, { capture: true });
+  window.addEventListener('beforeunload', () => { try { OUT.win?.close(); } catch { } });
+}
+function bindSettingsValues() { $$('[data-s]').forEach(el => { const v = S.settings[el.dataset.s]; if (el.type === 'checkbox') el.checked = !!v; else el.value = v; }); }
+boot();
+</script>
+
+</body></html>

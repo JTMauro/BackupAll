@@ -1,0 +1,13 @@
+{
+ "title": "Architect Review",
+ "url": "https://claude.ai/artifact/P5bGKfxbGjapMLvidqagzp",
+ "type": "web page",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 31700,
+   "sha256": "06a144f977d67b29319c88ff15a378fddebdceed3e36831212ee8755049a93b4"
+  }
+ ]
+}

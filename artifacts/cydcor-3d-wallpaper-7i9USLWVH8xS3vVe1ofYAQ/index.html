@@ -1,0 +1,284 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cydcor 3D Wallpaper</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Layout: live desktop + phone previews on top, a Right/Left switch, then a download shelf per device. Single dark look to match the wallpaper. */
+  :root {
+    color-scheme: dark;
+    --bg: #0d0e10;
+    --surface: #16181c;
+    --line: #2a2e35;
+    --fg: #e8ecf1;
+    --muted: #9aa3ae;
+    --azure: #8fd0ff;
+    --azure-deep: #2f86d0;
+    --display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+    --body: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 56px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 32px; }
+  header { display: grid; gap: 10px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--azure); }
+  h1 { font-family: var(--display); font-weight: 600; font-size: clamp(26px, 4.4vw, 42px); line-height: 1.1; margin: 0; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 64ch; margin: 0; }
+
+  .previews { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; }
+  .stage { position: relative; max-width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #050505; }
+  .stage.desk { aspect-ratio: 16 / 9; }
+  .stage.phone { aspect-ratio: 9 / 19.5; width: clamp(120px, 18vw, 200px); border-radius: 22px; }
+  .stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  @media (max-width: 560px) { .previews { grid-template-columns: 1fr; } .stage.phone { display: none; } }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; }
+  .ctl-group { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 3px; background: var(--surface); }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 7px 16px; border-radius: 999px; font-weight: 600; }
+  .seg button[aria-pressed="true"] { background: var(--azure); color: #06223b; }
+  .ctl { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+  .ctl input[type=range] { accent-color: var(--azure); width: 160px; max-width: 42vw; }
+  .ctl output { font-family: var(--mono); color: var(--fg); min-width: 4ch; font-variant-numeric: tabular-nums; }
+
+  button {
+    font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--fg); padding: 9px 14px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  button:hover { border-color: var(--azure-deep); }
+  .seg button:hover { color: var(--fg); }
+  button:focus-visible { outline: 2px solid var(--azure); outline-offset: 2px; }
+  button.primary { background: var(--azure); color: #06223b; border-color: var(--azure); font-weight: 700; padding: 12px 20px; }
+  button.primary:hover { background: #a9dcff; }
+  button[disabled] { opacity: .5; cursor: default; }
+
+  .platforms { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
+  section.platform { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 16px; align-content: start; min-width: 0; }
+  h2 { font-family: var(--display); font-weight: 500; font-size: 18px; margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  h2 .dirtag { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--azure); font-weight: 400; }
+  h3 { font-size: 12px; font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin: 0; }
+  .group { display: grid; gap: 6px; }
+  ul.files { list-style: none; margin: 0; padding: 0; display: grid; }
+  ul.files li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 9px 0; border-top: 1px solid var(--line); min-width: 0; }
+  ul.files li:first-child { border-top: 0; }
+  .fname { min-width: 0; }
+  .fname b { font-weight: 500; display: block; }
+  .fname span { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  ul.files button { padding: 6px 12px; font-size: 13px; flex-shrink: 0; }
+  ol.steps { margin: 0; padding-left: 20px; color: var(--muted); display: grid; gap: 4px; font-size: 14px; }
+  ol.steps b { color: var(--fg); font-weight: 500; }
+  .note { font-size: 13px; color: var(--muted); border-left: 2px solid var(--azure-deep); padding-left: 12px; margin: 0; max-width: 80ch; }
+  #status { min-height: 1.4em; font-size: 14px; color: var(--azure); margin-top: -18px; }
+  @media (prefers-reduced-motion: reduce) { .stage iframe { display: none; } .stage.desk { background: center / cover no-repeat url("Cydcor-Right-Windows-1920x1080.jpg"); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Desktop · Lock screen · Screensaver · Phone</div>
+    <h1>Cydcor 3D Wallpaper</h1>
+    <p class="lede">The Cydcor C in light azure, as one solid 3D piece with soft shadows, turning slowly on a gray and black background. Every file comes in two versions: turning right or turning left. Pick a direction and every download below follows it.</p>
+  </header>
+
+  <div class="previews">
+    <div class="stage desk"><iframe id="liveDesk" src="Cydcor-3D-Wallpaper-Right.html?controls=0" title="Live desktop preview of the turning Cydcor logo"></iframe></div>
+    <div class="stage phone"><iframe id="livePhone" src="Cydcor-3D-Wallpaper-Right.html?period=15&amp;controls=0" title="Live phone preview of the turning Cydcor logo"></iframe></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctl-group">
+      <div class="seg" role="group" aria-label="Turning direction">
+        <button id="dirRight" type="button" aria-pressed="true">Turning right ⟳</button>
+        <button id="dirLeft" type="button" aria-pressed="false">Turning left ⟲</button>
+      </div>
+      <div class="ctl">
+        <label for="size">Preview size</label>
+        <input id="size" type="range" min="20" max="90" value="60">
+        <output id="sizeOut" for="size">60%</output>
+      </div>
+    </div>
+    <button class="primary" data-file="Cydcor-Wallpaper-{D}.zip">Download all, <span class="dirname">Right</span> (.zip)</button>
+  </div>
+  <div id="status" role="status"></div>
+
+  <div class="platforms">
+    <section class="platform">
+      <h2>Windows 11 <span class="dirtag">Turning <span class="dirname">Right</span></span></h2>
+      <div class="group">
+        <h3>Lock screen &amp; desktop stills</h3>
+        <ul class="files">
+          <li><div class="fname"><b>4K</b><span>3840 × 2160</span></div><button data-file="Cydcor-{D}-Windows-4K-3840x2160.jpg">Download</button></li>
+          <li><div class="fname"><b>1440p</b><span>2560 × 1440</span></div><button data-file="Cydcor-{D}-Windows-2560x1440.jpg">Download</button></li>
+          <li><div class="fname"><b>1080p</b><span>1920 × 1080</span></div><button data-file="Cydcor-{D}-Windows-1920x1080.jpg">Download</button></li>
+          <li><div class="fname"><b>Surface (3:2)</b><span>2880 × 1920</span></div><button data-file="Cydcor-{D}-Windows-Surface-2880x1920.jpg">Download</button></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3>Animated background &amp; screensaver</h3>
+        <ul class="files">
+          <li><div class="fname"><b>Lively package</b><span>direction · size · speed</span></div><button data-file="Cydcor-3D-{D}-Lively.zip">Download</button></li>
+          <li><div class="fname"><b>Looping video</b><span>1920 × 1080 · 24 s loop</span></div><button data-file="Cydcor-{D}-Desktop-1080p.mp4">Download</button></li>
+        </ul>
+      </div>
+      <ol class="steps">
+        <li><b>Lock screen:</b> Settings → Personalization → Lock screen → Picture → pick the 4K image.</li>
+        <li><b>Animated desktop:</b> install Lively Wallpaper from the Microsoft Store, then drag the Lively package into it.</li>
+        <li><b>Direction and size:</b> right-click the tile in Lively → Customize.</li>
+        <li><b>Screensaver:</b> turn on Lively's screensaver option, then set the wait time under Lock screen → Screen saver.</li>
+      </ol>
+    </section>
+
+    <section class="platform">
+      <h2>Mac <span class="dirtag">Turning <span class="dirname">Right</span></span></h2>
+      <div class="group">
+        <h3>Desktop &amp; lock screen stills</h3>
+        <ul class="files">
+          <li><div class="fname"><b>5K iMac / Studio Display</b><span>5120 × 2880</span></div><button data-file="Cydcor-{D}-Mac-5K-5120x2880.jpg">Download</button></li>
+          <li><div class="fname"><b>MacBook Pro 16″</b><span>3456 × 2234</span></div><button data-file="Cydcor-{D}-Mac-MacBookPro16-3456x2234.jpg">Download</button></li>
+          <li><div class="fname"><b>MacBook Pro 14″</b><span>3024 × 1964</span></div><button data-file="Cydcor-{D}-Mac-MacBookPro14-3024x1964.jpg">Download</button></li>
+        </ul>
+      </div>
+      <div class="group">
+        <h3>Animated background &amp; screensaver</h3>
+        <ul class="files">
+          <li><div class="fname"><b>Live 3D wallpaper (HTML)</b><span>works offline · on-screen controls</span></div><button data-file="Cydcor-3D-Wallpaper-{D}.html">Download</button></li>
+          <li><div class="fname"><b>Looping video</b><span>1920 × 1080 · 24 s loop</span></div><button data-file="Cydcor-{D}-Desktop-1080p.mp4">Download</button></li>
+        </ul>
+      </div>
+      <ol class="steps">
+        <li><b>Still:</b> System Settings → Wallpaper → Add Photo. The lock screen uses it automatically.</li>
+        <li><b>Animated desktop:</b> install Plash (free, Mac App Store) and add the live 3D wallpaper file.</li>
+        <li><b>Screensaver:</b> install WebViewScreenSaver and point it at the same file.</li>
+      </ol>
+    </section>
+
+    <section class="platform">
+      <h2>iPhone <span class="dirtag">Turning <span class="dirname">Right</span></span></h2>
+      <div class="group">
+        <h3>Lock &amp; home screen</h3>
+        <ul class="files">
+          <li><div class="fname"><b>Still</b><span>1290 × 2796</span></div><button data-file="Cydcor-{D}-iPhone-1290x2796.jpg">Download</button></li>
+          <li><div class="fname"><b>Live video</b><span>1080 × 2340 · 15 s loop</span></div><button data-file="Cydcor-{D}-Phone-15s.mp4">Download</button></li>
+        </ul>
+      </div>
+      <ol class="steps">
+        <li><b>Still:</b> Settings → Wallpaper → Add New Wallpaper → Photos → pick the image.</li>
+        <li><b>Animated:</b> save the video to Photos, turn it into a Live Photo with a free app such as intoLive, then pick it as the wallpaper with Live Photo turned on.</li>
+      </ol>
+      <p class="note">iOS plays a Live Photo wallpaper for a few seconds when you wake the phone. It can't loop continuously; that's an Apple limit.</p>
+    </section>
+
+    <section class="platform">
+      <h2>Android <span class="dirtag">Turning <span class="dirname">Right</span></span></h2>
+      <div class="group">
+        <h3>Lock &amp; home screen</h3>
+        <ul class="files">
+          <li><div class="fname"><b>Still</b><span>1440 × 3120</span></div><button data-file="Cydcor-{D}-Android-1440x3120.jpg">Download</button></li>
+          <li><div class="fname"><b>Live video</b><span>1080 × 2340 · 15 s loop</span></div><button data-file="Cydcor-{D}-Phone-15s.mp4">Download</button></li>
+        </ul>
+      </div>
+      <ol class="steps">
+        <li><b>Samsung Galaxy:</b> open the video in Gallery → ⋮ → Set as wallpaper → Lock screen. Samsung allows videos up to 15 seconds, so this loop is exactly 15.</li>
+        <li><b>Pixel and others:</b> install a free video live wallpaper app from the Play Store and choose the video.</li>
+        <li><b>Still:</b> long-press the home screen → Wallpaper &amp; style → pick the image.</li>
+      </ol>
+    </section>
+  </div>
+
+  <p class="note">The animated GIFs and GIF viewer are too large to host on this page; they're in the zip that came with this link. Windows 11 and macOS only allow still images on the lock screen, so the computer lock screen uses the matching JPG.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+  let D = 'Right';
+  const STILLS = ['Windows-4K-3840x2160', 'Windows-2560x1440', 'Windows-1920x1080', 'Windows-Surface-2880x1920',
+    'Mac-5K-5120x2880', 'Mac-MacBookPro16-3456x2234', 'Mac-MacBookPro14-3024x1964'];
+  const PHONES = ['iPhone-1290x2796', 'Android-1440x3120'];
+  const LIVELY = ['index.html', 'LivelyInfo.json', 'LivelyProperties.json'];
+
+  async function get(path) {
+    const res = await fetch(path);
+    if (!res.ok) throw { code: 'missing' };
+    return res.blob();
+  }
+  async function livelyZip(dir) {
+    const z = new JSZip();
+    for (const f of LIVELY) z.file(f, await get(`lively-${dir.toLowerCase()}/${f}`));
+    return z.generateAsync({ type: 'blob' });
+  }
+  async function allZip(dir) {
+    const z = new JSZip(), root = z.folder(`Rotate-${dir}`);
+    for (const s of STILLS) root.file(`Desktop-JPG/Cydcor-${dir}-${s}.jpg`, await get(`Cydcor-${dir}-${s}.jpg`));
+    for (const s of PHONES) root.file(`Phone-JPG/Cydcor-${dir}-${s}.jpg`, await get(`Cydcor-${dir}-${s}.jpg`));
+    for (const v of ['Desktop-1080p', 'Phone-15s']) root.file(`Video/Cydcor-${dir}-${v}.mp4`, await get(`Cydcor-${dir}-${v}.mp4`));
+    root.file(`Live-Wallpaper/Cydcor-3D-Wallpaper-${dir}.html`, await get(`Cydcor-3D-Wallpaper-${dir}.html`));
+    root.file(`Windows-Lively/Cydcor-3D-${dir}-Lively.zip`, await livelyZip(dir));
+    z.file('README.md', await get('README.md'));
+    return z.generateAsync({ type: 'blob' });
+  }
+  function resolve(name) { return name.replaceAll('{D}', D); }
+  function build(name) {
+    if (/^Cydcor-3D-(Right|Left)-Lively\.zip$/.test(name)) return livelyZip(D);
+    if (/^Cydcor-Wallpaper-(Right|Left)\.zip$/.test(name)) return allZip(D);
+    return get(name);
+  }
+
+  // Direction switch: previews and every download follow it
+  const frames = [document.getElementById('liveDesk'), document.getElementById('livePhone')];
+  const rightBtn = document.getElementById('dirRight'), leftBtn = document.getElementById('dirLeft');
+  function setDir(dir) {
+    D = dir;
+    rightBtn.setAttribute('aria-pressed', String(dir === 'Right'));
+    leftBtn.setAttribute('aria-pressed', String(dir === 'Left'));
+    document.querySelectorAll('.dirname').forEach(el => { el.textContent = dir; });
+    frames.forEach(f => { try { f.contentWindow.livelyPropertyListener('dir', dir === 'Left' ? 1 : 0); } catch {} });
+  }
+  rightBtn.addEventListener('click', () => setDir('Right'));
+  leftBtn.addEventListener('click', () => setDir('Left'));
+
+  const size = document.getElementById('size'), sizeOut = document.getElementById('sizeOut');
+  let t;
+  size.addEventListener('input', () => {
+    sizeOut.textContent = size.value + '%';
+    clearTimeout(t);
+    t = setTimeout(() => frames.forEach(f => { try { f.contentWindow.livelyPropertyListener('size', size.value); } catch {} }), 100);
+  });
+
+  const status = document.getElementById('status');
+  const downloadsReady = window.claude?.use ? window.claude.use('downloads') : Promise.resolve(null);
+  downloadsReady.then(d => {
+    if (!d) {
+      document.querySelectorAll('button[data-file]').forEach(b => { b.disabled = true; });
+      status.textContent = 'Downloads are not available in this view. Open the page in claude.ai to save the files.';
+    }
+  });
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('button[data-file]');
+    if (!btn) return;
+    const name = resolve(btn.dataset.file);
+    const downloads = await downloadsReady;
+    if (!downloads) return;
+    btn.disabled = true;
+    status.textContent = 'Preparing ' + name + '…';
+    try {
+      await downloads.save({ filename: name, data: await build(name) });
+      status.textContent = 'Saved ' + name + '.';
+    } catch (err) {
+      status.textContent =
+        err?.code === 'declined' ? 'Download cancelled.' :
+        err?.code === 'rate_limited' ? 'Another download prompt is open. Finish that one, then try again.' :
+        err?.code === 'missing' ? name + ' could not be loaded. Reload the page and try again.' :
+        'This file could not be saved here (' + (err?.code || 'error') + ').';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body></html>

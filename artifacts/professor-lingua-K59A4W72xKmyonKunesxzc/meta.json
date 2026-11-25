@@ -1,0 +1,13 @@
+{
+ "title": "Professor Lingua",
+ "url": "https://claude.ai/artifact/K59A4W72xKmyonKunesxzc",
+ "type": "web page",
+ "updated": "2026-10-19",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 44828,
+   "sha256": "289e3c80ed119c66b75ff030357eae669087eeade0852600e07bc457faf02bbd"
+  }
+ ]
+}

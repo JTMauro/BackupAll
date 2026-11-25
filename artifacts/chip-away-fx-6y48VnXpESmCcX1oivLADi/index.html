@@ -1,0 +1,309 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chip Away FX</title>
+<style>
+  :root { --bg:#05060c; --panel:rgba(14,16,28,.82); --line:rgba(255,255,255,.12); --text:#e9ecf5; --muted:#98a0b8; --accent:#ff7a2a; --teal:#38d6c8; }
+  :root[data-theme="light"] { --panel:rgba(14,16,28,.82); }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --panel:rgba(14,16,28,.82); } }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; overflow:hidden; }
+  canvas { display:block; }
+  #ui { position:fixed; left:16px; top:16px; width:min(340px, calc(100vw - 32px)); max-height:calc(100vh - 32px); overflow:auto;
+        background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 14px 12px; backdrop-filter:blur(8px); }
+  h1 { margin:0 0 2px; font-size:18px; letter-spacing:.3px; } h1 b { color:var(--accent); }
+  .sub { color:var(--muted); font-size:12.5px; margin:0 0 10px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .tabs button, .row button { font:inherit; font-size:13px; color:var(--text); background:rgba(255,255,255,.06); border:1px solid var(--line); border-radius:9px; padding:6px 10px; cursor:pointer; }
+  .tabs button.on { background:var(--accent); border-color:var(--accent); color:#160800; font-weight:600; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:6px 0; }
+  .row button:hover, .tabs button:hover { border-color:var(--teal); }
+  label { color:var(--muted); font-size:12.5px; display:flex; gap:6px; align-items:center; }
+  input[type=range] { width:140px; accent-color:var(--accent); }
+  .sec { display:none; } .sec.on { display:block; }
+  .note { color:var(--muted); font-size:12px; margin-top:8px; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:12px; color:#ffd2b0; }
+  #stats { position:fixed; right:12px; bottom:10px; color:var(--muted); font:12px ui-monospace,Consolas,monospace; }
+  @media (max-width:520px) { #ui { top:auto; bottom:12px; max-height:46vh; } }
+</style>
+</head>
+<body>
+<div id="ui">
+  <h1>Chip Away <b>FX</b></h1>
+  <p class="sub">builder-fx.js 2.1 + builder-sfx.js + builder-music.js. Everything is procedural: three.js r128, HalfFloat + UnrealBloom (1.05) + gamma; Web Audio.</p>
+  <div class="tabs" id="tabs">
+    <button data-tab="play" class="on">Gameplay</button><button data-tab="hero">Hero ship</button><button data-tab="ship">Ship</button><button data-tab="drone">Drone</button>
+    <button data-tab="planet">Planet</button><button data-tab="islands">Islands</button><button data-tab="belt">Belt</button><button data-tab="fx">Cubes &amp; effects</button><button data-tab="sound">Sound</button><button data-tab="music">Music</button>
+  </div>
+  <div class="sec on" data-sec="play">
+    <div class="row"><label><input type="checkbox" id="auto" checked> Auto-fire</label><button id="reloadAll">Reload guns</button></div>
+    <div class="note">Guns fire their colour at matching cubes. The drone carries a cube around the sculpture and fires it.</div>
+  </div>
+  <div class="sec" data-sec="hero">
+    <div class="row"><button id="heroFire">Fire all</button><label>Thrust <input type="range" id="thrust2" min="0" max="150" value="100"></label></div>
+    <div class="note">The game's camera: large, from behind, front half visible. Above 1.15 thrust the engines go to afterburner.</div>
+  </div>
+  <div class="sec" data-sec="islands">
+    <div class="note">makeIsland({ radius, seed, biome }): rock, grass, ice, lava, crystal. The flat centre sits at y = 0. Each island is under 20k triangles.</div>
+    <div class="row"><button id="reseed">New seeds</button></div>
+  </div>
+  <div class="sec" data-sec="belt">
+    <div class="note">makeAsteroidBelt({ count, inner, outer, clearInner, clearOuter }): about 2,400 instanced rocks tumbling on the GPU, plus 6 big hero asteroids. Here it's centred on the planet, with the clear ring widened to 120–260 so the gameplay area stays open. The game uses 120–215.</div>
+  </div>
+  <div class="sec" data-sec="sound">
+    <div class="row"><button id="sndOn">Enable sound</button><label><input type="checkbox" id="sndMute"> Mute</label></div>
+    <div class="row"><label>Volume <input type="range" id="sndVol" min="0" max="100" value="85"></label></div>
+    <div class="row"><button id="engOn">Engine on</button><button id="engOff">Engine off</button><label>Throttle <input type="range" id="sndThr" min="0" max="150" value="35"></label></div>
+    <div class="row" id="sndButtons"></div>
+    <div class="note">Once sound is on, the gameplay plays its sounds too: lasers, pops, hammer, purge, drone and the planet explosion.</div>
+  </div>
+  <div class="sec" data-sec="music">
+    <div class="row"><select id="musStyle" style="font:inherit;padding:5px 8px;border-radius:8px;background:#1b1e2c;color:inherit;border:1px solid rgba(255,255,255,.15)"></select><button id="musPlay">Play</button><button id="musStop">Stop</button></div>
+    <div class="row"><label>Volume <input type="range" id="musVol" min="0" max="100" value="70"></label><label><input type="checkbox" id="musMute"> Mute</label></div>
+    <div class="row"><label>Intensity <input type="range" id="musInt" min="0" max="100" value="80"></label></div>
+    <div class="note">builder-music.js: eight procedural styles with their own volume and mute, separate from the sound effects. Intensity 0.4 for the map, 0.8 in levels.</div>
+  </div>
+  <div class="sec" data-sec="ship">
+    <div class="row">Guns: <button data-guns="3">3</button><button data-guns="4">4</button><button data-guns="5">5</button></div>
+    <div class="row"><button id="load">Load colours</button><button id="empty">Empty all</button><button id="fireAll">Fire all</button></div>
+    <div class="row"><label>Thrust <input type="range" id="thrust" min="0" max="150" value="100"></label></div>
+  </div>
+  <div class="sec" data-sec="drone">
+    <div class="row"><button id="cargo">Give cargo</button><button id="drop">Drop cargo</button><button id="dfire">Fire</button></div>
+  </div>
+  <div class="sec" data-sec="planet">
+    <div class="row"><label>Crack <input type="range" id="crack" min="0" max="100" value="0"></label></div>
+    <div class="row"><button id="buildup">Crack build-up</button><button id="boom">Detonate</button><button id="preset">Reset</button></div>
+  </div>
+  <div class="sec" data-sec="fx">
+    <div class="row"><button id="fxTracer">Tracer + impact</button><button id="fxHammer">Hammer shot</button><button id="fxPurge">Purge beam</button><button id="fxRestore">Restore cubes</button></div>
+    <div class="note">1,000 instanced cubes: <code>roundedBoxGeometry()</code> + <code>makeCubeMaterial()</code> + <code>setColorAt</code>.</div>
+  </div>
+  <div class="note">Drag to orbit, scroll to zoom.</div>
+</div>
+<div id="stats"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="builder-fx.js"></script>
+<script src="builder-sfx.js"></script>
+<script src="builder-music.js"></script>
+<script>
+(function () {
+  const W = () => innerWidth, H = () => innerHeight;
+  const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); renderer.setSize(W(), H());
+  document.body.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, W() / H(), 0.1, 6000);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+
+  // The pipeline Chip Away uses: linear HalfFloat target -> bloom -> gamma
+  const rt = new THREE.WebGLRenderTarget(W(), H(), { type: THREE.HalfFloatType });
+  const composer = new THREE.EffectComposer(renderer, rt);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(W(), H()), 0.9, 0.55, 1.05); composer.addPass(bloom);
+  composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
+
+  if (!location.search.includes("noenv")) BuilderFX.applyEnvironment(renderer, scene);
+  scene.add(BuilderFX.makeLights());
+  scene.add(BuilderFX.makeSpaceBackdrop());
+  [[1, { radius: 130, type: "gas", ring: true }, [-950, 260, -1500]], [2, { radius: 55, type: "rocky" }, [1500, -160, -300]], [3, { radius: 32, type: "ice" }, [-1300, 420, -650]]]
+    .forEach(([seed, o, p]) => { const dp = BuilderFX.makeDistantPlanet(Object.assign({ seed }, o)); dp.position.set(...p); scene.add(dp); });
+  let islands = [];
+  function buildIslands(base) {
+    islands.forEach(i => { scene.remove(i); i.userData.dispose(); });
+    islands = ["rock", "grass", "ice", "lava", "crystal"].map((biome, k) => {
+      const isl = BuilderFX.makeIsland({ radius: 9, seed: base + k, biome }); isl.position.set(260 + k * 30, 0, 0); scene.add(isl); return isl;
+    });
+  }
+  buildIslands(1);
+
+  // ------------------------------------------------------------ the pieces
+  const PALETTE = [new THREE.Color(0.9, 0.06, 0.04), new THREE.Color(0.04, 0.28, 0.95), new THREE.Color(0.85, 0.5, 0.02), new THREE.Color(0.08, 0.75, 0.2)];
+  let ship = null;
+  function buildShip(n) {
+    if (ship) { scene.remove(ship); ship.userData.dispose(); }
+    ship = BuilderFX.makeShip({ guns: n }); scene.add(ship);
+    for (let i = 0; i < n; i++) ship.userData.setGunColor(i, PALETTE[i % PALETTE.length]);
+  }
+  buildShip(4);
+
+  const planet = BuilderFX.makeExplodingPlanet({ radius: 14 });
+  planet.position.set(70, -6, -230); scene.add(planet);
+  const belt = BuilderFX.makeAsteroidBelt({ count: 2400, inner: 40, outer: 375, clearInner: 120, clearOuter: 260 });
+  belt.position.copy(planet.position); scene.add(belt);
+
+  // Voxel sculpture: ~1000 beveled cubes in a lumpy sphere, four colours
+  const sculpt = new THREE.Group(); sculpt.position.set(0, 1.5, -34); scene.add(sculpt);
+  const cubeGeo = BuilderFX.roundedBoxGeometry(1, 0.12, 3), cubeMat = BuilderFX.makeCubeMaterial();
+  const cells = [];
+  for (let x = -7; x <= 7; x++) for (let y = -7; y <= 7; y++) for (let z = -7; z <= 7; z++) {
+    const r = Math.sqrt(x * x + y * y * 1.3 + z * z) + 0.9 * Math.sin(x * 0.9) * Math.cos(z * 0.7);
+    if (r < 6.9 && r > 4.25) cells.push([x, y, z]);
+  }
+  const N = cells.length;
+  const cubes = new THREE.InstancedMesh(cubeGeo, cubeMat, N);
+  const m4 = new THREE.Matrix4(), alive = new Uint8Array(N), cubeCol = [];
+  function placeCube(i, on) {
+    const [x, y, z] = cells[i]; m4.makeScale(on ? 1 : 0.0001, on ? 1 : 0.0001, on ? 1 : 0.0001); m4.setPosition(x * 1.04, y * 1.04, z * 1.04);
+    cubes.setMatrixAt(i, m4); alive[i] = on ? 1 : 0;
+  }
+  for (let i = 0; i < N; i++) {
+    const [x, y, z] = cells[i]; const band = Math.floor(((Math.atan2(z, x) + Math.PI) / (Math.PI * 2)) * 4 + (y > 2 ? 1 : 0)) % 4;
+    cubeCol[i] = band; cubes.setColorAt(i, PALETTE[band]); placeCube(i, true);
+  }
+  cubes.instanceMatrix.needsUpdate = true; cubes.instanceColor.needsUpdate = true; sculpt.add(cubes);
+  const cubeWorld = (i, out = new THREE.Vector3()) => { const [x, y, z] = cells[i]; return out.set(x * 1.04, y * 1.04, z * 1.04).applyMatrix4(sculpt.matrixWorld); };
+  function randomCube(colorIdx) {
+    const pool = []; for (let i = 0; i < N; i++) if (alive[i] && (colorIdx == null || cubeCol[i] === colorIdx)) pool.push(i);
+    return pool.length ? pool[(Math.random() * pool.length) | 0] : -1;
+  }
+  function popCube(i) { placeCube(i, false); cubes.instanceMatrix.needsUpdate = true; }
+  function restoreCubes() { for (let i = 0; i < N; i++) placeCube(i, true); cubes.instanceMatrix.needsUpdate = true; }
+
+  const drone = BuilderFX.makeDrone(); scene.add(drone); drone.userData.setCargo(PALETTE[1]);
+
+  // ------------------------------------------------------------ actions
+  const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+  function shoot(fromObj, colorIdx, onHit) {
+    const i = randomCube(colorIdx); if (i < 0) { restoreCubes(); return; }
+    fromObj.getWorldPosition(tmpA); const to = cubeWorld(i);
+    const tr = BuilderFX.makeTracer(PALETTE[colorIdx]); scene.add(tr);
+    tr.userData.onArrive = (p) => { popCube(i); if (SND) SND.cubePop(); const im = BuilderFX.makeImpact(PALETTE[colorIdx]); scene.add(im); im.userData.play(tmpA.clone(), p); if (onHit) onHit(); };
+    tr.userData.play(tmpA, to);
+  }
+  let SND = null;   // set once sound is enabled
+  function fireGun(g) {
+    const c = g % PALETTE.length; ship.userData.fireGun(g); shoot(ship.userData.gunTips[g], c);
+    if (SND) SND.laser(g);
+  }
+  function hammer() {
+    const i = randomCube(); if (i < 0) return;
+    ship.userData.gunTips[0].getWorldPosition(tmpA); const to = cubeWorld(i);
+    const hs = BuilderFX.makeHammerShot(); scene.add(hs);
+    if (SND) SND.hammerLaunch();
+    hs.userData.onImpact = (p) => { if (SND) SND.hammerImpact(); for (let k = 0; k < N; k++) if (alive[k] && cubeWorld(k, tmpB).distanceTo(p) < 2.6) placeCube(k, false); cubes.instanceMatrix.needsUpdate = true; };
+    hs.userData.play(tmpA, to);
+  }
+  function purge() {
+    const c = (Math.random() * 4) | 0; const pts = [];
+    for (let i = 0; i < N; i++) if (alive[i] && cubeCol[i] === c) pts.push({ i, p: cubeWorld(i) });
+    if (!pts.length) return;
+    pts.sort((a, b) => Math.atan2(a.p.y - 1.5, a.p.x) - Math.atan2(b.p.y - 1.5, b.p.x));
+    ship.userData.gunTips[Math.min(c, ship.userData.gunTips.length - 1)].getWorldPosition(tmpA);
+    const beam = BuilderFX.makePurgeBeam(PALETTE[c]); scene.add(beam); beam.userData.play(tmpA, pts.map(o => o.p));
+    if (SND) SND.purgeBeam(Math.max(0.6, pts.length * 0.05) + 0.2);
+    pts.forEach((o, k) => setTimeout(() => popCube(o.i), 180 + k * Math.max(600, pts.length * 50) / pts.length));
+  }
+
+  // ------------------------------------------------------------ tabs and camera spots
+  const spots = {
+    play:   { pos: [0, 4.2, 10.5], target: [0, 0.6, -14] },
+    hero:   { pos: [0, 1.9, 4.6], target: [0, 0.2, -6] },
+    islands:{ pos: [320, 34, 98], target: [320, -4, 0] },
+    belt:   { pos: [70 + 330, 210, -230 + 380], target: [70, -6, -230] },
+    sound:  { pos: [0, 4.2, 10.5], target: [0, 0.6, -14] },
+    music:  { pos: [0, 4.2, 10.5], target: [0, 0.6, -14] },
+    ship:   { pos: [6.5, 3.2, 7.5], target: [0, 0, 0] },
+    drone:  { pos: [0, 0, 0], target: [0, 0, 0], follow: true },
+    planet: { pos: [70 + 40, 22, -230 + 95], target: [70, -6, -230] },
+    fx:     { pos: [16, 9, -14], target: [0, 1.5, -34] },
+  };
+  let tab = "play";
+  function go(name) {
+    tab = name;
+    document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+    document.querySelectorAll(".sec").forEach(s => s.classList.toggle("on", s.dataset.sec === name));
+    const s = spots[name];
+    if (!s.follow) { camera.position.set(...s.pos); controls.target.set(...s.target); }
+  }
+  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => go(b.dataset.tab));
+  document.querySelectorAll("[data-guns]").forEach(b => b.onclick = () => buildShip(+b.dataset.guns));
+  $ = (id) => document.getElementById(id);
+  $("load").onclick = $("reloadAll").onclick = () => ship.userData.gunTips.forEach((_, i) => ship.userData.setGunColor(i, PALETTE[(i + ((Math.random() * 4) | 0)) % 4]));
+  $("empty").onclick = () => ship.userData.gunTips.forEach((_, i) => ship.userData.setGunColor(i, null));
+  $("fireAll").onclick = () => ship.userData.gunTips.forEach((_, i) => setTimeout(() => fireGun(i), i * 70));
+  $("thrust").oninput = (e) => ship.userData.setThrust(e.target.value / 100);
+  $("cargo").onclick = () => drone.userData.setCargo(PALETTE[(Math.random() * 4) | 0]);
+  $("drop").onclick = () => drone.userData.setCargo(null);
+  $("dfire").onclick = () => droneFire();
+  $("crack").oninput = (e) => planet.userData.setCrack(e.target.value / 100);
+  let buildup = false;
+  $("buildup").onclick = () => { buildup = true; };
+  $("boom").onclick = () => { if (planet.userData.state === "intact" && SND) SND.planetExplosion(); planet.userData.detonate(); };
+  $("preset").onclick = () => { buildup = false; $("crack").value = 0; planet.userData.reset(); };
+  $("fxTracer").onclick = () => fireGun((Math.random() * ship.userData.gunTips.length) | 0);
+  $("fxHammer").onclick = hammer; $("fxPurge").onclick = purge; $("fxRestore").onclick = restoreCubes;
+
+  let droneCargo = 1;
+  function droneFire() {
+    if (droneCargo == null) return;
+    drone.userData.fire(); shoot(drone.userData.cargoAnchor, droneCargo); if (SND) SND.droneShot();
+  }
+  $("heroFire").onclick = () => ship.userData.gunTips.forEach((_, i) => setTimeout(() => fireGun(i), i * 70));
+  $("thrust2").oninput = (e) => { ship.userData.setThrust(e.target.value / 100); if (SND) SND.setThrottle(e.target.value / 100); };
+  $("reseed").onclick = () => buildIslands((Math.random() * 1000) | 0);
+  $("sndOn").onclick = () => { BuilderSFX.init(); SND = BuilderSFX; SND.startEngine(); SND.setThrottle(+$("sndThr").value / 100); $("sndOn").textContent = "Sound on ✓"; };
+  $("sndMute").onchange = (e) => BuilderSFX.mute(e.target.checked);
+  $("sndVol").oninput = (e) => BuilderSFX.setMasterVolume(e.target.value / 100);
+  $("engOn").onclick = () => { BuilderSFX.init(); SND = BuilderSFX; SND.startEngine(); SND.setThrottle(+$("sndThr").value / 100); };
+  $("engOff").onclick = () => BuilderSFX.stopEngine();
+  $("sndThr").oninput = (e) => { BuilderSFX.setThrottle(e.target.value / 100); ship.userData.setThrust(e.target.value / 100); };
+  [["Laser", s => s.laser((Math.random() * 5) | 0)], ["Cube pop", s => s.cubePop()], ["Hammer launch", s => s.hammerLaunch()], ["Hammer impact", s => s.hammerImpact()],
+   ["Purge beam", s => s.purgeBeam(1.2)], ["Drone deploy", s => s.droneDeploy()], ["Drone shot", s => s.droneShot()], ["Stack chime", s => s.stackChime()],
+   ["UI click", s => s.uiClick()], ["Load click", s => s.loadClick()], ["Jam warning", s => s.jamWarning()], ["Level clear", s => s.levelClear()],
+   ["Planet explosion", s => s.planetExplosion()], ["Laser burst 12/s", s => { for (let i = 0; i < 24; i++) setTimeout(() => s.laser(i % 5), i * 83); }]]
+    .forEach(([label, fn]) => { const b = document.createElement("button"); b.textContent = label; b.onclick = () => { BuilderSFX.init(); SND = BuilderSFX; fn(BuilderSFX); }; $("sndButtons").appendChild(b); });
+  BuilderMusic.styles.forEach(st => { const o = document.createElement("option"); o.value = st.id; o.textContent = st.label; $("musStyle").appendChild(o); });
+  $("musPlay").onclick = () => { if (window.BuilderSFX) BuilderSFX.init(); BuilderMusic.init(); BuilderMusic.setIntensity(+$("musInt").value / 100); BuilderMusic.play($("musStyle").value); };
+  $("musStyle").onchange = () => { if (BuilderMusic.current()) BuilderMusic.play($("musStyle").value); };
+  $("musStop").onclick = () => BuilderMusic.stop(1.2);
+  $("musVol").oninput = (e) => BuilderMusic.setVolume(e.target.value / 100);
+  $("musMute").onchange = (e) => BuilderMusic.mute(e.target.checked);
+  $("musInt").oninput = (e) => BuilderMusic.setIntensity(e.target.value / 100);
+  go("play");
+
+  // ------------------------------------------------------------ loop
+  let last = performance.now(), t = 0, nextShot = 0, nextDrone = 2, frames = 0, fpsT = 0;
+  addEventListener("resize", () => {
+    camera.aspect = W() / H(); camera.updateProjectionMatrix(); renderer.setSize(W(), H()); composer.setSize(W(), H());
+  });
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    // drone orbits the sculpture
+    const a = t * 0.35; drone.position.set(Math.cos(a) * 11, 2.2 + Math.sin(t * 0.8) * 1.5, -34 + Math.sin(a) * 11);
+    drone.lookAt(0, 1.5, -34);
+    if (spots[tab].follow) { controls.target.copy(drone.position); if (camera.position.distanceTo(drone.position) > 6 || camera.position.distanceTo(drone.position) < 1.5) camera.position.copy(drone.position).add(new THREE.Vector3(2.2, 1.0, 2.2)); }
+    if ($("auto").checked && tab !== "planet") {
+      if (t > nextShot) { fireGun((Math.random() * ship.userData.gunTips.length) | 0); nextShot = t + 0.28 + Math.random() * 0.3; }
+      if (t > nextDrone) { droneFire(); nextDrone = t + 1.4 + Math.random(); if (Math.random() < 0.3) { droneCargo = (Math.random() * 4) | 0; drone.userData.setCargo(PALETTE[droneCargo]); } }
+    }
+    if (buildup && planet.userData.state === "intact") {
+      const c = Math.min(1, +$("crack").value / 100 + dt * 0.25); $("crack").value = c * 100; planet.userData.setCrack(c);
+      if (c >= 1) { buildup = false; if (SND) SND.planetExplosion(); planet.userData.detonate(); }
+    }
+    BuilderFX.update(dt, t);
+    controls.update();
+    composer.render();
+    frames++; fpsT += dt;
+    if (fpsT > 0.5) { $("stats").textContent = `${Math.round(frames / fpsT)} fps · ${N} cubes · ${BuilderFX.liveCount()} live objects`; frames = 0; fpsT = 0; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  window.__demo = { ship, planet, drone, go, fireGun, hammer, purge, scene, cubes: () => N, islands: () => islands, belt };
+})();
+</script>
+</body>
+</html>
+
+</body></html>

@@ -1,0 +1,288 @@
+{
+ "title": "CydVerse Release Kit",
+ "url": "https://claude.ai/artifact/LiBB8Q3w9vQtdrhwaWftyw",
+ "type": "web page",
+ "updated": "2026-11-16",
+ "files": [
+  {
+   "path": "CydVerse-0.1-source.zip.b64.txt",
+   "bytes": 725784,
+   "sha256": "cfa73acf980f192942195a0d878ff0ef5d3a7fc6c86496b583ebdbdad1fb3637"
+  },
+  {
+   "path": "CydVerse-How-It-Works.png.b64.txt",
+   "bytes": 439748,
+   "sha256": "9348c81a91a3898753eae06c281810ee5a9d734c1dd97b05885572c227814b56"
+  },
+  {
+   "path": "CydVerse-Infrastructure-Guide.docx.b64.txt",
+   "bytes": 1748252,
+   "sha256": "ea10a98f69b97eefcfe8a1a4f2655631d793edce5e8f63e152dcc7415f5f9c99"
+  },
+  {
+   "path": "CydVerse-Layout-Azure-IPS.png.b64.txt",
+   "bytes": 778688,
+   "sha256": "436eec4356a4eeb47d88a887db8b2036d03bc279c58425cfe8a8d39609b0e2b5"
+  },
+  {
+   "path": "CydVerse-Layout-OnPrem-DMZ.png.b64.txt",
+   "bytes": 582832,
+   "sha256": "25288e2b685b0949d29adc9e088260bf695d35c78acdc4fe81aa6404e474e9b9"
+  },
+  {
+   "path": "CydVerse-Orbit-Installation-Guide.docx.b64.txt",
+   "bytes": 22744,
+   "sha256": "484626c1b0f43f6f7b05743b77c89cedadf4f22c49ae1d9d9af3e93efbe339b4"
+  },
+  {
+   "path": "CydVerse-Orbit-Manual.docx.b64.txt",
+   "bytes": 8260320,
+   "sha256": "dd361f2c75ff954c0fc8287bb260951cca31bdac8d8f557663aff964069b58c6"
+  },
+  {
+   "path": "CydVerse-Overview.pptx.b64.txt",
+   "bytes": 6395724,
+   "sha256": "637f29c95fbe4e68f1194271950f7875bbacb7421c3d0051b1e6be71d9e800aa"
+  },
+  {
+   "path": "CydVerse-Trailer.mp4",
+   "bytes": 14143491,
+   "sha256": "e553fecbb97072d98b6b6f091ee95df0221b52173e3e6bbf687c8802994ee522"
+  },
+  {
+   "path": "CydVerse-Vault-Installation-Guide.docx.b64.txt",
+   "bytes": 22216,
+   "sha256": "4843838879faf0e12970ea158693dc54e46edc376d72c74bbb4df07a8f17a98c"
+  },
+  {
+   "path": "CydVerse-Vault-Manual.docx.b64.txt",
+   "bytes": 15869160,
+   "sha256": "a502e4afeab4561f63ed93c5825cd68b742aa8e2a5e641fffe64245d0fef0436"
+  },
+  {
+   "path": "File-Drop-Features-with-Starport-Status.xlsx.b64.txt",
+   "bytes": 62920,
+   "sha256": "ad85de0d2066672c378b10f10fa6c79ab5463c2a75a57ef4236011cc412c1460"
+  },
+  {
+   "path": "Launchpad-Installation-Guide.docx.b64.txt",
+   "bytes": 662624,
+   "sha256": "5b8c90f28b9a61fdbc6d65eec7342b1cd89f95775da8a71d264db482359f91f7"
+  },
+  {
+   "path": "Launchpad-Manual.docx.b64.txt",
+   "bytes": 2764564,
+   "sha256": "35ba05f811831fb1d48e330a4b8b26c51997bc90c30729fbeeeb515751ea2772"
+  },
+  {
+   "path": "Launchpad.pptx.b64.txt",
+   "bytes": 1492220,
+   "sha256": "f08509a4af96547989f30bd0f363de8375229963c3574b476d01eb3fff93ff49"
+  },
+  {
+   "path": "Orbit-0.1-fips-windows-x64.zip.b64.txt",
+   "bytes": 6364312,
+   "sha256": "a836989435aa2231aa2285fa1c04fec3df7db392797563e6b67fd52cce7a24a0"
+  },
+  {
+   "path": "Orbit-0.1-windows-x64.zip.b64.txt",
+   "bytes": 11650756,
+   "sha256": "7c2fec27851dc37234be95cddf61c78127df616b1b073efe42a845a93f91ad69"
+  },
+  {
+   "path": "Orbit.pptx.b64.txt",
+   "bytes": 2541556,
+   "sha256": "a8a8369f7123a84954392de683683f9372f4cdc9bf071624e9434262ae892ae2"
+  },
+  {
+   "path": "Relay-0.3-source.zip.b64.txt",
+   "bytes": 10906972,
+   "sha256": "2a25b978876a01de289b1a04c1bb2d20c10fc5cbfd7fc81147def522cb659f7e"
+  },
+  {
+   "path": "Relay-Installation-Guide.docx.b64.txt",
+   "bytes": 2190924,
+   "sha256": "93bf0f9e0fe22a7b6af469c644fd3fd40dfe226b088711a0f917cae88cf0c8b3"
+  },
+  {
+   "path": "Relay-Overview.pptx.b64.txt",
+   "bytes": 6547424,
+   "sha256": "938b0344d35a0d251be6bbc31cf2a20e359b0b594ce1cbc9eeafa5466d5ac251"
+  },
+  {
+   "path": "Relay-User-and-Admin-Manual.docx.b64.txt",
+   "bytes": 4211788,
+   "sha256": "41861a77fb2f85ec95a9ea4ca5157c473e357aa84b8a758669413da721ff9994"
+  },
+  {
+   "path": "Relay-Walkthrough.mp4",
+   "bytes": 11180691,
+   "sha256": "0734c686b64b556c3b36c56cabb68d8d8ad77aaaa855f7f63f57f2fb042d7b2e"
+  },
+  {
+   "path": "Starport-0.1-source.zip.b64.txt",
+   "bytes": 176764,
+   "sha256": "7c709c6952315b79f92e9fb9b06e831cb0ff539f2c14eccc0dfa0025000b4522"
+  },
+  {
+   "path": "Starport-0.1-windows-x64.zip.b64.txt",
+   "bytes": 5878020,
+   "sha256": "e612a80fbd92a5399b92eb948cb2d64127c7957028703d5bdf7c65097d3c69db"
+  },
+  {
+   "path": "Starport-Installation-Guide.docx.b64.txt",
+   "bytes": 649204,
+   "sha256": "f00cc88c904647b55d10cce9d6db4cff74ab3bea41ad37e63988030176cf9793"
+  },
+  {
+   "path": "Starport-Manual.docx.b64.txt",
+   "bytes": 7930916,
+   "sha256": "f2a343d641e2e972e4cef5cd95fcee05216418046d06088a7df6320c67536f83"
+  },
+  {
+   "path": "Starport.pptx.b64.txt",
+   "bytes": 2815616,
+   "sha256": "e22675fe7d0437b8a05e5a44fca715c6727db20a24e786a8cd8a20fd0220f423"
+  },
+  {
+   "path": "Vault-0.1-fips-windows-x64.zip.b64.txt",
+   "bytes": 6141480,
+   "sha256": "2d2e4d7a6234b0b066026f5477705c7a27cea0f7c4ab2ab1f0262b810d0c0ec7"
+  },
+  {
+   "path": "Vault-0.1-windows-x64.zip.b64.txt",
+   "bytes": 11427456,
+   "sha256": "c84fa00f446e05cb05179cd88e18ac4776bed35b621c728394812d8ce0c735f8"
+  },
+  {
+   "path": "Vault.pptx.b64.txt",
+   "bytes": 3321292,
+   "sha256": "1f297481341897429a9f57c618bc1fc959e00150a8ffa8acd01821dd01b02f28"
+  },
+  {
+   "path": "img/05-share-created.jpg",
+   "bytes": 72054,
+   "sha256": "a01aa7476722cb88a334663247a5bd1034269822958ae93ddb036ef347845961"
+  },
+  {
+   "path": "img/12-receipt.jpg",
+   "bytes": 52759,
+   "sha256": "383e7f7583b5e20a399dc52d9869dfca5869d360dc5206e9f45b59a6ef43ee63"
+  },
+  {
+   "path": "img/arch-azure-ips.jpg",
+   "bytes": 243483,
+   "sha256": "f8c971794db87054fadffe0fa27d1ab01fa126cc13f2770a1de8296dcd1c4d30"
+  },
+  {
+   "path": "img/arch-onprem-dmz.jpg",
+   "bytes": 177837,
+   "sha256": "cac12857c5b4c59ba00d4e6bf35765a507b433ae986f115193d6180981f09f48"
+  },
+  {
+   "path": "img/cv-howitworks.jpg",
+   "bytes": 190714,
+   "sha256": "f1d3197fa0719e9d99c4e2f673417842af27abbc1c473d20427e308c372b3ffc"
+  },
+  {
+   "path": "img/o03-explorer.jpg",
+   "bytes": 115781,
+   "sha256": "de38f5b376c2233f7c0418e4fbedc6ad075f2974245a3a4cf493e62f820c41bf"
+  },
+  {
+   "path": "img/o09-drive-maps.jpg",
+   "bytes": 83822,
+   "sha256": "1d2ee8b112a3e8bf33c68575fb66dee8bdc277a8e2a1d15c5e6c81484eb8af66"
+  },
+  {
+   "path": "img/o11-activity.jpg",
+   "bytes": 89907,
+   "sha256": "c09b44ebec2b6a4c03afac5ead63fea7c4e399dadc236e4c8dbf78eb56a58ec7"
+  },
+  {
+   "path": "img/o12-portal.jpg",
+   "bytes": 65552,
+   "sha256": "88b653e419bcf126c6f9cf3fccef55db9e638ed6d8b11ffd751dd4bc307d0a35"
+  },
+  {
+   "path": "img/o18-locations.jpg",
+   "bytes": 160396,
+   "sha256": "9f69d6ae774e326ed98e89be3d16f3975a50cff511e3d839747df00df8591c5a"
+  },
+  {
+   "path": "img/o19-agent-form.jpg",
+   "bytes": 84869,
+   "sha256": "9235f7ab36eac64686033e31596ddbab09ceb872f702bdead44e776255664b72"
+  },
+  {
+   "path": "img/poster-v4.jpg",
+   "bytes": 88528,
+   "sha256": "18392d88297fa901f261d07fffbe8d18895b77d8f5c326b24ebeb15a5bde7cf4"
+  },
+  {
+   "path": "img/poster-v5.jpg",
+   "bytes": 44749,
+   "sha256": "842d27c5e361183a6acb362508273fbb157ded8442f31478a840a7b0969aa39f"
+  },
+  {
+   "path": "img/poster-v7.jpg",
+   "bytes": 57469,
+   "sha256": "c27ddc68851738ac372f5ab8addddb43a62a3ff3037e42e98ea127d24374cc7e"
+  },
+  {
+   "path": "img/relay-architecture.jpg",
+   "bytes": 188578,
+   "sha256": "e87875f4a00e47b9816c461e312b8d5a336bc3002bb4ee03356d6ab86d24c6f5"
+  },
+  {
+   "path": "img/relay-poster.jpg",
+   "bytes": 42417,
+   "sha256": "59f939b512535e2a4254ed927c31109521ba765581ecca338b2984248f888a08"
+  },
+  {
+   "path": "img/sp-arch.jpg",
+   "bytes": 178906,
+   "sha256": "7514f7258b0dd21e8bdf188493c3c06b2dfaa487f678a3b5b184f54d49c1c68e"
+  },
+  {
+   "path": "img/sp-pipeline.jpg",
+   "bytes": 85034,
+   "sha256": "921f628841257bddb1112fe38f701146ba40f9637d53bbb71e76ab92cc4283ea"
+  },
+  {
+   "path": "img/v03-home.jpg",
+   "bytes": 69485,
+   "sha256": "20a5aba15c1daf394cec097077bbdda1a2cd81e5380d88fc58e63ac00549380a"
+  },
+  {
+   "path": "img/v10-dashboard.jpg",
+   "bytes": 86603,
+   "sha256": "c73235714c6d82a55abed26f6765fe5f9811b099189737b2ca90d49321c82838"
+  },
+  {
+   "path": "img/v14-deploy.jpg",
+   "bytes": 104573,
+   "sha256": "064401add9a38240827e34d8205bd43e31c5f90e39cd3354429fedd228cefabc"
+  },
+  {
+   "path": "img/v17-policies.jpg",
+   "bytes": 102105,
+   "sha256": "a9e1543b718923d4a9e30a054e4e89b365eb0f0da034196b0b8f627b487c3dcd"
+  },
+  {
+   "path": "img/v18-blocking.jpg",
+   "bytes": 84874,
+   "sha256": "8368b911229d2f3e96aad2372cc32d101ba2f6b2a9736c60ac0814b933f10852"
+  },
+  {
+   "path": "img/v19-bad-actors.jpg",
+   "bytes": 73183,
+   "sha256": "43d30b5848ed8faf29c1d9a4ea3f277fd539ae8c5cc0a4923aacf8808be92582"
+  },
+  {
+   "path": "index.html",
+   "bytes": 47200,
+   "sha256": "e97df53ddc1add2ad8b68e018e783482741f7ae3c4d92ff664448288ca715bad"
+  }
+ ]
+}

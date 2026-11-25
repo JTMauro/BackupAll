@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Event Horizon</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}canvas{position:fixed;inset:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// ===== SETTINGS — edit here, or add URL params, e.g. black-hole.html?size=1.3&spin=0.5 =====
+const CFG = {
+  fps: 40,
+  pace: 0.5,        // overall animation speed: 1 = original, 0.5 = half speed, 0.25 = very calm
+  size: 1.3,      // black hole size
+  spin: 1,        // disk rotation speed
+  particles: 22000,
+  tilt: 0.2,      // viewing angle above the disk (0 = edge-on)
+  bloom: 1,       // glow strength
+};
+for (const [k, v] of new URLSearchParams(location.search)) if (k in CFG) CFG[k] = typeof CFG[k] === 'number' ? +v : v;
+
+// Lively Wallpaper "Customise" panel sends slider changes here
+window.livelyPropertyListener = (name, val) => { if (name in CFG) CFG[name] = val; };
+
+const c = document.getElementById('c'), x = c.getContext('2d');
+const TAU = Math.PI * 2, rand = (a, b) => a + Math.random() * (b - a);
+let W, H, DPR, cx, cy, Rs, neb, buf, bctx, img, acc, BW, BH, P = [], stars = [], t = 0;
+const LUT = new Uint8ClampedArray(2048); for (let i = 0; i < 2048; i++) LUT[i] = 255 * (1 - Math.exp(-i / 256));
+const RIN = 1.6, ROUT = 4.6;
+
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = c.width = Math.floor(innerWidth * DPR); H = c.height = Math.floor(innerHeight * DPR);
+  cx = W / 2; cy = H / 2; Rs = Math.min(W, H) * .1 * CFG.size;
+  BW = Math.ceil(W / 2); BH = Math.ceil(H / 2);
+  buf = document.createElement('canvas'); buf.width = BW; buf.height = BH; bctx = buf.getContext('2d');
+  img = bctx.createImageData(BW, BH); acc = new Float32Array(BW * BH * 3);
+  for (let i = 3; i < img.data.length; i += 4) img.data[i] = 255;
+  neb = document.createElement('canvas'); neb.width = W; neb.height = H;
+  const g = neb.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 7; i++) {
+    const nx = Math.random() * W, ny = Math.random() * H, nr = rand(.2, .5) * Math.max(W, H);
+    const rg = g.createRadialGradient(nx, ny, 0, nx, ny, nr), hue = [220, 260, 200, 20][i % 4];
+    rg.addColorStop(0, `hsla(${hue},60%,30%,.09)`); rg.addColorStop(1, 'hsla(0,0%,0%,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, W, H);
+  }
+  const N = CFG.particles | 0; P = [];
+  for (let i = 0; i < N; i++) {
+    const r = RIN + Math.pow(Math.random(), 1.8) * (ROUT - RIN);
+    const a = Math.random() * TAU, clump = .5 + .5 * Math.pow(Math.sin(a * 7 + r * 9) * .5 + .5, 3);
+    P.push({ r, a, w: 0, h: (Math.random() - .5) * .07 * r, b: rand(.4, 1) * clump * (1.4 - (r - RIN) / (ROUT - RIN)) });
+  }
+  const k = TAU / 7 * Math.pow(RIN, 1.5); for (const p of P) p.w = k / Math.pow(p.r, 1.5);
+  stars = Array.from({ length: Math.round(W * H / 1400) }, () => ({ x: rand(-1, 1) * W * .7, y: rand(-1, 1) * H * .7, b: Math.pow(Math.random(), 3), s: Math.random() < .05 ? 2 : 1 }));
+}
+
+function splat(px, py, r, g, b) {
+  const ix = px | 0, iy = py | 0;
+  if (ix < 0 || iy < 0 || ix >= BW - 1 || iy >= BH - 1) return;
+  const fx = px - ix, fy = py - iy, w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
+  let o = (iy * BW + ix) * 3;
+  acc[o] += r * w00; acc[o + 1] += g * w00; acc[o + 2] += b * w00;
+  acc[o + 3] += r * w10; acc[o + 4] += g * w10; acc[o + 5] += b * w10;
+  o += BW * 3;
+  acc[o] += r * w01; acc[o + 1] += g * w01; acc[o + 2] += b * w01;
+  acc[o + 3] += r * w11; acc[o + 4] += g * w11; acc[o + 5] += b * w11;
+}
+
+function color(p, out) {
+  // temperature: inner white-hot → outer deep orange; doppler beaming brightens the approaching (left) side
+  const u = (p.r - RIN) / (ROUT - RIN), ca = Math.cos(p.a);
+  const dop = 1 - .55 * ca / Math.sqrt(p.r / RIN), D = dop * dop * dop;
+  const I = p.b * D * .7;
+  const wht = Math.max(0, Math.min(1, 1 - u * 2.2 + (dop - 1) * .8));
+  out[0] = I * (1); out[1] = I * (.45 + .5 * wht); out[2] = I * (.12 + .78 * wht * wht);
+}
+
+function frame(dt) {
+  t += dt;
+  acc.fill(0);
+  const bs = .5, bx = cx * bs, by = cy * bs, R = Rs * bs, inc = Math.sin(CFG.tilt), col = [0, 0, 0];
+  for (const p of P) p.a += p.w * dt * CFG.spin;
+  // pass 1: far side of the disk (behind the hole)
+  for (const p of P) {
+    const Z = Math.sin(p.a); if (Z <= 0) continue;
+    color(p, col);
+    splat(bx + Math.cos(p.a) * p.r * R, by - (Z * p.r * inc + p.h) * R, col[0], col[1], col[2]);
+  }
+  // the shadow hides whatever is directly behind it
+  const R2 = R * 1.0;
+  for (let yy = Math.max(0, by - R2 | 0); yy < Math.min(BH, by + R2 + 1); yy++) {
+    const hw = Math.sqrt(Math.max(0, R2 * R2 - (yy - by) * (yy - by)));
+    const x0 = Math.max(0, bx - hw | 0), x1 = Math.min(BW, bx + hw + 1 | 0);
+    acc.fill(0, (yy * BW + x0) * 3, (yy * BW + x1) * 3);
+  }
+  // pass 2: lensed images + near side of the disk
+  for (const p of P) {
+    const Z = Math.sin(p.a), X = Math.cos(p.a);
+    color(p, col);
+    if (Z > 0) {
+      const rho = R * (1.06 + (p.r - RIN) * .3), sth = Math.sqrt(Math.max(0, 1 - X * X));
+      splat(bx + X * rho, by - sth * rho, col[0] * .8, col[1] * .8, col[2] * .8);
+    } else {
+      splat(bx + X * p.r * R, by - (Z * p.r * inc + p.h) * R, col[0], col[1], col[2]);
+      const rho = R * (1.03 + (p.r - RIN) * .1), sth = Math.sqrt(Math.max(0, 1 - X * X));
+      splat(bx + X * rho, by + sth * rho, col[0] * .35, col[1] * .35, col[2] * .35);
+    }
+  }
+  // photon ring
+  for (let i = 0; i < 900; i++) { const a = i / 900 * TAU, fl = .5 + .5 * Math.sin(a * 3 - t); splat(bx + Math.cos(a) * R * 1.015, by + Math.sin(a) * R * 1.015, .55 * fl + .2, .42 * fl + .15, .3 * fl + .1); }
+  const d = img.data;
+  for (let i = 0, j = 0; i < acc.length; i += 3, j += 4) {
+    d[j] = LUT[Math.min(2047, acc[i] * 256 | 0)]; d[j + 1] = LUT[Math.min(2047, acc[i + 1] * 256 | 0)]; d[j + 2] = LUT[Math.min(2047, acc[i + 2] * 256 | 0)];
+  }
+  bctx.putImageData(img, 0, 0);
+
+  x.globalCompositeOperation = 'source-over';
+  x.drawImage(neb, 0, 0);
+  // gravitationally lensed starfield, drifting slowly
+  const thE = Rs * 1.7, th2 = thE * thE * 4;
+  x.fillStyle = '#fff';
+  for (const s of stars) {
+    s.x += dt * 6 * DPR; if (s.x > W * .7) s.x -= W * 1.4;
+    const dd = Math.hypot(s.x, s.y) || 1, sq = Math.sqrt(dd * dd + th2);
+    const d1 = (dd + sq) / 2, d2 = (dd - sq) / 2;
+    if (d1 > Rs * 1.05) { x.globalAlpha = Math.min(1, s.b * (1 + thE * thE / (dd * dd)) + .05); x.fillRect(cx + s.x / dd * d1, cy + s.y / dd * d1, s.s * DPR, s.s * DPR); }
+    if (-d2 > Rs * 1.05) { x.globalAlpha = Math.min(1, s.b * .6 * thE * thE / (dd * dd)); x.fillRect(cx + s.x / dd * d2, cy + s.y / dd * d2, DPR, DPR); }
+  }
+  x.globalAlpha = 1;
+  x.fillStyle = '#000'; x.beginPath(); x.arc(cx, cy, Rs, 0, TAU); x.fill();
+  x.globalCompositeOperation = 'lighter';
+  x.drawImage(buf, 0, 0, W, H);
+  if (CFG.bloom) {
+    x.globalAlpha = .9 * CFG.bloom; x.filter = `blur(${10 * DPR}px)`; x.drawImage(buf, 0, 0, W, H);
+    x.globalAlpha = .5 * CFG.bloom; x.filter = `blur(${28 * DPR}px)`; x.drawImage(buf, 0, 0, W, H);
+    x.filter = 'none'; x.globalAlpha = 1;
+  }
+  x.globalCompositeOperation = 'source-over';
+}
+
+let last = 0;
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (now - last < 1000 / CFG.fps - 1) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  frame(dt * CFG.pace);
+}
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>

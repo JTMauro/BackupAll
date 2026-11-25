@@ -1,0 +1,235 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MetaHuman Bridge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+  /* Layout: one centered console column — character stage on top, conversation below, settings drawer between. */
+  :root {
+    --bg: #f3f5f8; --panel: #ffffff; --fg: #1b2230; --muted: #5d6878; --line: #d9dee6;
+    --accent: #2f5bd3; --accent-fg: #ffffff; --skin: #e9c3a5; --skin-line: #b9876a; --warn: #a3450f;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161d; --panel: #1b212b; --fg: #e6e9ef; --muted: #9aa5b5; --line: #2c3442;
+      --accent: #7f9dff; --accent-fg: #0f1420; --skin: #d6ad8f; --skin-line: #8f6650; --warn: #f0a27a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161d; --panel: #1b212b; --fg: #e6e9ef; --muted: #9aa5b5; --line: #2c3442;
+    --accent: #7f9dff; --accent-fg: #0f1420; --skin: #d6ad8f; --skin-line: #8f6650; --warn: #f0a27a;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body); }
+  main {
+    max-width: 760px; margin: 0 auto; display: grid; gap: 16px;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  h1 { font: 600 24px/1.2 var(--font-display); margin: 0; text-wrap: balance; }
+  h2 { font: 600 17px/1.3 var(--font-display); margin: 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .notice { font-size: 13px; color: var(--warn); border: 1px solid var(--line); background: var(--panel);
+    border-radius: 10px; padding: 10px 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  select, input, button { font: inherit; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--fg); }
+  input { flex: 1; min-width: 0; }
+  button { cursor: pointer; }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .stage { display: grid; grid-template-columns: 140px 1fr; gap: 16px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .stage svg { width: 140px; max-width: 100%; height: auto; }
+  .stage .meta { display: grid; gap: 6px; min-width: 0; }
+  .chip { display: inline-block; font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+  .chip.live { color: var(--accent); border-color: var(--accent); }
+  #subtitle { font-size: 17px; min-height: 2.6em; }
+  @media (max-width: 480px) { .stage { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+  #settings { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; }
+  .grid { display: grid; grid-template-columns: minmax(130px, 190px) 1fr; gap: 8px 12px; align-items: center; }
+  .grid label { font-size: 14px; }
+  .grid input, .grid select { width: 100%; }
+  .group { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  #log { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+    min-height: 200px; max-height: 46vh; overflow: auto; display: grid; gap: 6px; align-content: start; }
+  #log p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+  .you { color: var(--accent); }
+  .sys { color: var(--muted); font-size: 13px; }
+  .mouth, .brow { transition: d .18s ease; }
+  @media (prefers-reduced-motion: reduce) { .mouth, .brow { transition: none; } }
+</style>
+
+<main>
+  <header class="row" style="justify-content: space-between">
+    <div>
+      <h1>MetaHuman Bridge</h1>
+      <div class="muted" id="status">Preview mode: sample replies with your browser's voice</div>
+    </div>
+    <div class="row">
+      <select id="persona" aria-label="Character">
+        <option value="secretary">Ava · secretary</option>
+        <option value="teacher" selected>Professor Lee · teacher</option>
+        <option value="action_hero">Rex · action hero</option>
+      </select>
+      <button id="gear" aria-expanded="false" aria-controls="settings">Settings</button>
+    </div>
+  </header>
+
+  <div class="notice">This is a preview. Real Claude conversations, your Voice Studio voice and the microphone work
+    in the app on your PC (double-click <b>start-windows.bat</b>). There you add your API keys under Settings.</div>
+
+  <form id="settings" hidden autocomplete="off">
+    <h2>Settings</h2>
+    <div class="muted">In the app on your PC, these fields save your keys. In this preview they are for show and save nothing.</div>
+    <div class="group">Brain (Claude)</div>
+    <div class="grid">
+      <label for="k_claude">Claude API key</label><input type="password" id="k_claude" placeholder="sk-ant-…">
+      <label for="k_mode">Mode</label>
+      <select id="k_mode"><option>Claude</option><option selected>Test mode (no key needed)</option></select>
+      <label for="k_speed">Reply speed</label>
+      <select id="k_speed"><option>Fast (best for conversation)</option><option>Balanced</option><option>Careful</option></select>
+    </div>
+    <div class="group">Voice</div>
+    <div class="grid">
+      <label for="k_engine">Voice engine</label>
+      <select id="k_engine"><option>Test hum</option><option selected>My Voice Studio</option><option>ElevenLabs</option><option>Custom program</option></select>
+      <label for="k_vsurl">Voice Studio address</label><input id="k_vsurl" value="http://localhost:8000">
+      <label for="k_vskey">Voice Studio key</label><input type="password" id="k_vskey" placeholder="dev-key">
+      <label for="k_el">ElevenLabs key</label><input type="password" id="k_el" placeholder="Not set">
+    </div>
+    <div class="group">Voice capture</div>
+    <div class="grid">
+      <label for="k_stt">Speech recognition</label>
+      <select id="k_stt"><option>Off</option><option>Tiny (fastest)</option><option selected>Base (recommended)</option><option>Small (more accurate)</option></select>
+    </div>
+    <div class="row"><button class="primary" type="submit">Save</button><span class="muted" id="saveMsg"></span></div>
+  </form>
+
+  <section class="stage" aria-label="Character">
+    <svg viewBox="0 0 140 160" role="img" aria-label="Character face">
+      <ellipse cx="70" cy="82" rx="52" ry="64" fill="var(--skin)" stroke="var(--skin-line)" stroke-width="2"/>
+      <path id="browL" class="brow" d="M38 62 Q50 56 60 62" fill="none" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+      <path id="browR" class="brow" d="M80 62 Q90 56 102 62" fill="none" stroke="var(--fg)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="50" cy="76" r="5" fill="var(--fg)"/><circle cx="90" cy="76" r="5" fill="var(--fg)"/>
+      <path d="M70 84 L65 104 L74 104" fill="none" stroke="var(--skin-line)" stroke-width="2" stroke-linecap="round"/>
+      <path id="mouth" class="mouth" d="M52 120 Q70 128 88 120 Q70 126 52 120 Z" fill="var(--fg)"/>
+    </svg>
+    <div class="meta">
+      <div class="row"><span class="chip" id="emotion">neutral</span><span class="chip" id="state">idle</span></div>
+      <div id="subtitle" aria-live="polite">Say hello to start.</div>
+    </div>
+  </section>
+
+  <div class="row">
+    <input id="text" placeholder="Type a message and press Enter" aria-label="Message">
+    <button class="primary" id="send">Send</button>
+    <button id="stop">Stop talking</button>
+    <button id="mic" disabled title="The microphone works in the app on your PC">Hold to talk</button>
+  </div>
+
+  <div id="log" aria-label="Conversation"><p class="sys">Example conversation. Type below to try it.</p></div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const PERSONAS = {
+  secretary: { name: "Ava", pitch: 1.15, rate: 1.02, female: true },
+  teacher: { name: "Professor Lee", pitch: 0.95, rate: 0.95, female: false },
+  action_hero: { name: "Rex", pitch: 0.75, rate: 1.05, female: false },
+};
+// Mouth and brow shapes per emotion: [mouth closed, mouth open, browL, browR]
+const FACES = {
+  neutral:  ["M52 120 Q70 124 88 120 Q70 123 52 120 Z", "M54 118 Q70 132 86 118 Q70 124 54 118 Z", "M38 62 Q50 58 60 62", "M80 62 Q90 58 102 62"],
+  happy:    ["M50 116 Q70 134 90 116 Q70 124 50 116 Z", "M50 114 Q70 140 90 114 Q70 122 50 114 Z", "M38 58 Q50 52 60 58", "M80 58 Q90 52 102 58"],
+  serious:  ["M54 122 Q70 121 86 122 Q70 123 54 122 Z", "M56 120 Q70 130 84 120 Q70 123 56 120 Z", "M38 62 Q50 62 60 60", "M80 60 Q90 62 102 62"],
+  excited:  ["M50 114 Q70 138 90 114 Q70 120 50 114 Z", "M50 112 Q70 144 90 112 Q70 118 50 112 Z", "M38 54 Q50 46 60 54", "M80 54 Q90 46 102 54"],
+  concerned:["M54 124 Q70 116 86 124 Q70 121 54 124 Z", "M56 122 Q70 130 84 122 Q70 120 56 122 Z", "M38 60 Q50 56 60 54", "M80 54 Q90 56 102 60"],
+};
+const REPLIES = {
+  secretary: [
+    ["happy", "Good morning! I've got your calendar open. You have a team check-in at ten and a client call at two. Want me to set a reminder for either one?"],
+    ["serious", "Got it. I'll draft that message and read it back to you before anything goes out."],
+  ],
+  teacher: [
+    ["excited", "Great question! Think of a volcano like a shaken soda bottle. Pressure builds up underground until the melted rock, called magma, pushes its way out. Can you guess what we call magma once it reaches the surface?"],
+    ["happy", "Exactly right, that's lava! You're picking this up fast. Want to try a harder one?"],
+  ],
+  action_hero: [
+    ["serious", "Stay low and stay close. We've got ninety seconds before that door seals. Ready?"],
+    ["happy", "Told you we'd make it. Next time, you pick the escape route. Maybe one without sharks."],
+  ],
+};
+let turn = 0, speaking = false, flap = null, faceNow = "neutral";
+
+function log(cls, text) { const p = document.createElement("p"); p.className = cls; p.textContent = text; $("log").append(p); $("log").scrollTop = 1e9; }
+function setFace(emotion, open = false) {
+  faceNow = emotion; const f = FACES[emotion] || FACES.neutral;
+  $("mouth").setAttribute("d", open ? f[1] : f[0]); $("browL").setAttribute("d", f[2]); $("browR").setAttribute("d", f[3]);
+  $("emotion").textContent = emotion;
+}
+function setState(s) { $("state").textContent = s; $("state").classList.toggle("live", s !== "idle"); }
+
+function pickVoice(p) {
+  const voices = speechSynthesis.getVoices().filter((v) => v.lang.startsWith("en"));
+  const want = p.female ? /female|samantha|zira|aria|jenny|victoria|karen/i : /male|daniel|david|guy|alex|fred|mark/i;
+  return voices.find((v) => want.test(v.name)) || voices[0] || null;
+}
+
+function stopTalking() {
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  clearInterval(flap); flap = null; speaking = false; setFace(faceNow); setState("idle");
+}
+
+function speak(emotion, text) {
+  const p = PERSONAS[$("persona").value];
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  setFace(emotion);
+  if (!("speechSynthesis" in window)) { sentences.forEach((s) => log("", s)); $("subtitle").textContent = text; return; }
+  speaking = true; setState("speaking");
+  let open = false;
+  flap = setInterval(() => { open = !open; setFace(faceNow, open); }, 140);  // stand-in for real lip sync
+  sentences.forEach((s, i) => {
+    const u = new SpeechSynthesisUtterance(s.trim());
+    u.voice = pickVoice(p); u.pitch = p.pitch; u.rate = p.rate;
+    u.onstart = () => { $("subtitle").textContent = s.trim(); log("", s.trim()); };
+    if (i === sentences.length - 1) u.onend = u.onerror = stopTalking;
+    speechSynthesis.speak(u);
+  });
+}
+
+function send() {
+  const text = $("text").value.trim(); if (!text) return;
+  stopTalking(); log("you", "You: " + text); $("text").value = "";
+  setState("thinking"); log("sys", "thinking…");
+  const replies = REPLIES[$("persona").value];
+  const [emotion, reply] = replies[turn++ % replies.length];
+  setTimeout(() => speak(emotion, reply), 600);
+}
+
+$("send").onclick = send;
+$("text").onkeydown = (e) => { if (e.key === "Enter") send(); };
+$("stop").onclick = stopTalking;
+$("persona").onchange = () => {
+  stopTalking(); turn = 0; $("log").replaceChildren(); setFace("neutral");
+  log("sys", `Now talking to ${PERSONAS[$("persona").value].name}.`); $("subtitle").textContent = "Say hello to start.";
+};
+$("gear").onclick = () => { const s = $("settings"); s.hidden = !s.hidden; $("gear").setAttribute("aria-expanded", String(!s.hidden)); };
+$("settings").onsubmit = (e) => { e.preventDefault(); $("saveMsg").textContent = "Preview only: nothing was saved. Use the app on your PC to save keys."; };
+if ("speechSynthesis" in window) speechSynthesis.onvoiceschanged = () => {};
+
+// Opening example so the page shows what it does at rest.
+log("you", "You: Can you explain how volcanoes work?");
+log("", REPLIES.teacher[0][1]);
+setFace("excited"); $("subtitle").textContent = "Think of a volcano like a shaken soda bottle.";
+</script>
+
+</body></html>
