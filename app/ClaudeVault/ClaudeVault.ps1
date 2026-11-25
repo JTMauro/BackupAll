@@ -13,11 +13,11 @@
     ClaudeVault.ps1               opens the window
     ClaudeVault.ps1 -RunBackup    runs a backup with no window (used by the scheduled task)
 #>
-param([switch]$RunBackup)
+param([switch]$RunBackup, [switch]$Review)
 
 $ErrorActionPreference = 'Stop'
 $AppName    = 'Claude Vault'
-$AppVersion = '1.0.0'
+$AppVersion = '1.1.0'
 $AppDir     = Join-Path $env:APPDATA 'ClaudeVault'
 $ConfigPath = Join-Path $AppDir 'config.json'
 $LogPath    = Join-Path $AppDir 'ClaudeVault.log'
@@ -53,7 +53,9 @@ function Get-Config {
         ScheduleDay        = 'Sunday'
         ScheduleTime       = '20:13'
         ExportReminderDays = 30
-        KeepSnapshots      = 8
+        ReviewReminderDays = 30                # monthly list of backups to review and delete
+        KeepSnapshots      = 0                 # 0 = keep forever
+        StopAutoDelete     = $true             # raise Claude Code's cleanupPeriodDays so old sessions stay on the PC
     }
     if (Test-Path $ConfigPath) {
         try {
@@ -117,6 +119,7 @@ function Invoke-Git([string]$repo, [string[]]$gitArgs) {
 function Backup-ClaudeCode($stage) {
     $src = Join-Path $env:USERPROFILE '.claude'
     if (-not (Test-Path $src)) { Write-Log 'Claude Code: no .claude folder on this PC, skipped.'; return }
+    if ((Get-Config).StopAutoDelete) { Set-NoAutoDelete }
     $dst = Join-Path $stage 'local-claude-code\.claude'
     # Caches and logs are skipped; sessions (projects), todos, settings, skills, agents, plugins and CLAUDE.md are kept.
     # Sign-in tokens (.credentials.json) are never copied anywhere.
@@ -125,6 +128,19 @@ function Backup-ClaudeCode($stage) {
     if (Test-Path $cfg) { Copy-Item $cfg (Join-Path $stage 'local-claude-code\.claude.json') -Force }
     $n = (Get-ChildItem (Join-Path $dst 'projects') -Recurse -Filter *.jsonl -ErrorAction SilentlyContinue | Measure-Object).Count
     Write-Log "Claude Code: copied .claude ($n session transcripts)."
+}
+
+function Set-NoAutoDelete {
+    # Claude Code deletes sessions older than cleanupPeriodDays (default 30). Raise it to about 10 years.
+    $sf = Join-Path $env:USERPROFILE '.claude\settings.json'
+    try {
+        $j = if (Test-Path $sf) { Get-Content $sf -Raw -Encoding UTF8 | ConvertFrom-Json } else { [pscustomobject]@{} }
+        if ($j.cleanupPeriodDays -ge 3650) { return }
+        Copy-Item $sf "$sf.bak" -Force -ErrorAction SilentlyContinue
+        $j | Add-Member -NotePropertyName cleanupPeriodDays -NotePropertyValue 3650 -Force
+        $j | ConvertTo-Json -Depth 30 | Set-Content $sf -Encoding UTF8
+        Write-Log 'Claude Code: auto-delete of old sessions turned off (cleanupPeriodDays = 3650). Old settings saved as settings.json.bak.'
+    } catch { Write-Log "Could not update Claude Code settings.json: $_" }
 }
 
 function Backup-Desktop($stage) {
@@ -257,7 +273,8 @@ function Publish-ToGit($cfg, $stage, $repo) {
 }
 
 function Remove-OldSnapshots($root, [int]$keep) {
-    $snaps = Get-ChildItem (Join-Path $root 'snapshots') -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending
+    if ($keep -le 0) { return }   # 0 = keep forever
+    $snaps = Get-ChildItem (Join-Path $root 'snapshots') -ErrorAction SilentlyContinue | Sort-Object Name -Descending
     $snaps | Select-Object -Skip $keep | ForEach-Object { Remove-Item $_.FullName -Recurse -Force; Write-Log "Removed old snapshot $($_.Name)." }
 }
 
@@ -293,8 +310,12 @@ function Invoke-Backup {
     # Dated snapshot of this PC's files, so an accidental deletion can be undone.
     if ($cfg.Destination -in @('Folder', 'Both')) {
         try {
-            $snap = Join-Path $root ('snapshots\' + (Get-Date -Format 'yyyy-MM-dd_HHmm'))
-            Copy-Tree $stage $snap @() @()
+            $snapDir = Join-Path $root 'snapshots'
+            New-Item -ItemType Directory -Force -Path $snapDir | Out-Null
+            $zip = Join-Path $snapDir ((Get-Date -Format 'yyyy-MM-dd_HHmm') + '.zip')
+            Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+            [IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [IO.Compression.CompressionLevel]::Optimal, $false)
+            Write-Log ('Snapshot saved: ' + $zip)
             Remove-OldSnapshots $root ([int]$cfg.KeepSnapshots)
         } catch { $errors += "Snapshot: $_"; Write-Log "ERROR snapshot: $_" }
     } else {
@@ -307,6 +328,7 @@ function Invoke-Backup {
     Write-ReadMe $root
     if ($errors.Count) { Write-Log "=== Finished with $($errors.Count) problem(s) ===" } else { Write-Log '=== Finished OK ===' }
     Test-ExportReminder $cfg $state
+    Test-ReviewReminder $cfg $state
     return $errors
 }
 
@@ -342,6 +364,34 @@ function Test-ExportReminder($cfg, $state) {
     Write-Log "Reminder: no claude.ai export in $days days. Opening the export page."
     Show-Toast 'Time to export your claude.ai chats' 'Click "Export data". When the zip lands in Downloads, Claude Vault files it on the next run.'
     Start-Process $ExportPage
+}
+
+function Test-ReviewReminder($cfg, $state) {
+    $days = [int]$cfg.ReviewReminderDays
+    if ($days -le 0) { return }
+    $last = if ($state.LastReview) { [datetime]$state.LastReview } else { [datetime]::MinValue }
+    if (((Get-Date) - $last).TotalDays -lt $days) { return }
+    $state | Add-Member -NotePropertyName LastReview -NotePropertyValue (Get-Date).ToString('o') -Force
+    Save-State $state
+    Write-Log 'Monthly review: opening the list of backups so you can choose what to delete.'
+    if ($RunBackup) {
+        $ps = Join-Path $PSHOME 'powershell.exe'
+        Start-Process $ps -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" -Review"
+    }
+}
+
+function Get-ReviewItems($cfg) {
+    $root = $cfg.BackupFolder; $items = @()
+    foreach ($f in Get-ChildItem (Join-Path $root 'snapshots') -File -ErrorAction SilentlyContinue) {
+        $items += [pscustomobject]@{ Kind = 'Snapshot'; Name = $f.Name; Date = $f.LastWriteTime; Size = $f.Length; Path = $f.FullName }
+    }
+    foreach ($f in Get-ChildItem (Join-Path $root 'latest\local-claude-code\.claude\projects') -Recurse -Filter *.jsonl -ErrorAction SilentlyContinue) {
+        $items += [pscustomobject]@{ Kind = 'Claude Code session'; Name = "$($f.Directory.Name)\$($f.Name)"; Date = $f.LastWriteTime; Size = $f.Length; Path = $f.FullName }
+    }
+    foreach ($f in Get-ChildItem (Join-Path $root 'latest\claude-ai-exports') -Recurse -Filter *.md -ErrorAction SilentlyContinue | Where-Object { $_.Directory.Name -eq 'chats' }) {
+        $items += [pscustomobject]@{ Kind = 'claude.ai chat'; Name = $f.BaseName; Date = $f.LastWriteTime; Size = $f.Length; Path = $f.FullName }
+    }
+    return ($items | Sort-Object Date -Descending)
 }
 
 function Show-Toast($title, $text) {
@@ -507,7 +557,7 @@ $tTime = Add-Text $tS $cfg.ScheduleTime 525 319 70
 Add-Label $tS 'Remind me to export every' 12 358 | Out-Null
 $tRemind = Add-Text $tS $cfg.ExportReminderDays 180 355 50
 Add-Label $tS 'days (0 = off)' 236 358 | Out-Null
-Add-Label $tS 'Keep dated snapshots' 12 394 | Out-Null
+Add-Label $tS 'Keep snapshots (0 = forever)' 12 394 | Out-Null
 $tKeep = Add-Text $tS $cfg.KeepSnapshots 180 391 50
 
 $btnSave = Add-Button $tS 'Save and set schedule' 12 440 220
@@ -557,5 +607,44 @@ $r4.Add_Click({
     if (Test-Path $p) { Start-Process explorer.exe $p } else { [System.Windows.Forms.MessageBox]::Show('No claude.ai export filed yet. Export from claude.ai, then run a backup.', $AppName) | Out-Null }
 })
 $r5.Add_Click({ Start-Process 'https://claude.ai/artifact/QBahUjAzjftw6EFWWAo5jv' })
+
+# --- Review tab: everything in the backup, tick what to delete
+$tV = New-Tab 'Review and delete'
+$vInfo = Add-Label $tV 'Nothing is ever deleted automatically. Tick items you no longer want and click Delete. A Claude Code session that still exists on this PC is copied back on the next backup.' 12 10 710
+$vInfo.Height = 36
+$lv = New-Object System.Windows.Forms.ListView
+$lv.View = 'Details'; $lv.CheckBoxes = $true; $lv.FullRowSelect = $true
+$lv.Location = (Pt 12 52); $lv.Size = (Sz 710 450); $lv.Anchor = 'Top,Bottom,Left,Right'
+[void]$lv.Columns.Add('Type', 150); [void]$lv.Columns.Add('Name', 330); [void]$lv.Columns.Add('Date', 130); [void]$lv.Columns.Add('Size', 80)
+$tV.Controls.Add($lv)
+function Fill-Review {
+    $lv.Items.Clear()
+    foreach ($i in Get-ReviewItems (Get-Config)) {
+        $row = New-Object System.Windows.Forms.ListViewItem($i.Kind)
+        [void]$row.SubItems.Add($i.Name); [void]$row.SubItems.Add($i.Date.ToString('yyyy-MM-dd HH:mm'))
+        [void]$row.SubItems.Add(('{0:N1} MB' -f ($i.Size / 1MB))); $row.Tag = $i.Path
+        [void]$lv.Items.Add($row)
+    }
+}
+$vRefresh = Add-Button $tV 'Refresh list' 12 512 140; $vRefresh.Anchor = 'Bottom,Left'
+$vDelete = Add-Button $tV 'Delete ticked items' 162 512 180; $vDelete.Anchor = 'Bottom,Left'
+$vDone = Add-Button $tV 'Reviewed - remind me next month' 352 512 260; $vDone.Anchor = 'Bottom,Left'
+$vRefresh.Add_Click({ Fill-Review })
+$vDelete.Add_Click({
+    $ticked = @($lv.CheckedItems)
+    if (-not $ticked.Count) { return }
+    $ok = [System.Windows.Forms.MessageBox]::Show("Permanently delete $($ticked.Count) item(s) from the backup?", $AppName, 'YesNo', 'Warning')
+    if ($ok -ne 'Yes') { return }
+    foreach ($it in $ticked) {
+        try { Remove-Item -LiteralPath $it.Tag -Force; Write-Log "Deleted from backup: $($it.Tag)" } catch { Write-Log "Could not delete $($it.Tag): $_" }
+    }
+    Fill-Review
+})
+$vDone.Add_Click({
+    $st = Get-State; $st | Add-Member -NotePropertyName LastReview -NotePropertyValue (Get-Date).ToString('o') -Force; Save-State $st
+    [System.Windows.Forms.MessageBox]::Show('Thanks. The next review reminder comes in a month.', $AppName) | Out-Null
+})
+$tabs.Add_SelectedIndexChanged({ if ($tabs.SelectedTab -eq $tV -and $lv.Items.Count -eq 0) { Fill-Review } })
+if ($Review) { $tabs.SelectedTab = $tV; Fill-Review }
 
 [void]$form.ShowDialog()

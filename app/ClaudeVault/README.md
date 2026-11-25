@@ -1,4 +1,4 @@
-# Claude Vault 1.0.0
+# Claude Vault 1.1.0
 
 Claude Vault backs up everything Claude-related on your PC on a schedule. It sends the backup to a folder you choose (such as OneDrive), to Git, or to both.
 
@@ -25,7 +25,11 @@ You need **Git for Windows** (https://git-scm.com) for the Git and cloud-backup 
 | claude.ai exports | Downloads folder | Each export zip is filed by date. Every chat becomes a Markdown file, and each Project gets its instructions and knowledge files. |
 | Cloud backup | GitHub `JTMauro/backupall` | All artifact sources, every cloud Claude Code session, and the memory pack. A weekly Claude session updates it. |
 
-Every run also keeps a dated copy in `snapshots\`; the newest 8 are kept by default. Files deleted on your PC are never deleted from the backup.
+Every run also saves a dated zip in `snapshots\`. Snapshots are **kept forever**, and nothing is deleted from the backup automatically.
+
+**Monthly review:** once a month the app opens a **Review and delete** list. It shows every snapshot, backed-up Claude Code session and exported chat, with date and size. Tick the items you don't want, then click **Delete ticked items**, or click **Reviewed** to be reminded again next month. You can open the list any time from the **Review and delete** tab.
+
+**Auto-delete turned off:** Claude Code normally deletes sessions older than 30 days from your PC. Claude Vault raises that limit (`cleanupPeriodDays`) to about 10 years. Your old settings file is saved as `settings.json.bak`. You can turn this off in the config.
 
 ## The one manual step
 
