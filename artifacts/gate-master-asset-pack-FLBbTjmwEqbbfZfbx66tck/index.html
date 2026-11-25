@@ -1,0 +1,350 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gate Master Asset Pack</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: a live test chamber fills the screen; one clean lab-panel rail on the left with views, animation and the sound bank. */
+  :root {
+    color-scheme: dark;
+    --void: #0b0d10;
+    --panel: rgba(236, 239, 242, 0.93);   /* white lab panel */
+    --panel-ink: #1b1f24;
+    --panel-dim: #5d6670;
+    --rule: rgba(27, 31, 36, 0.12);
+    --signal: #e8742a;                    /* jumpsuit orange: the one accent */
+    --signal-ink: #ffffff;
+    --cool: #2fb6c9;
+    --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--void); color: var(--panel-ink); font-family: var(--font-body); overflow: hidden; }
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .rail {
+    position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+    width: min(350px, calc(100% - 32px)); max-height: calc(100% - 28px); overflow-y: auto;
+    background: var(--panel); border-radius: 6px; box-shadow: 0 18px 50px rgba(0,0,0,.45);
+    padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  h1 { margin: 0; font: 700 26px/1 var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; text-wrap: balance; }
+  h1 span { color: var(--signal); }
+  .sub { margin: 6px 0 0; color: var(--panel-dim); font-size: 13px; line-height: 1.45; }
+  .label { font: 500 10.5px/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--panel-dim); margin: 0 0 7px; display: flex; justify-content: space-between; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  button {
+    font: 600 13px/1 var(--font-body); color: var(--panel-ink); background: #fff; border: 1px solid var(--rule);
+    border-radius: 4px; padding: 8px 10px; cursor: pointer;
+  }
+  button:hover { border-color: var(--panel-dim); }
+  button[aria-pressed="true"] { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+  button:focus-visible { outline: 2px solid var(--cool); outline-offset: 2px; }
+  .sounds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+  .sounds button { text-align: left; font: 500 11.5px/1.2 var(--font-mono); padding: 7px 8px; display: flex; justify-content: space-between; gap: 6px; min-width: 0; }
+  .sounds button span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sounds button small { color: var(--panel-dim); font-variant-numeric: tabular-nums; flex: none; }
+  .sounds button.playing { border-color: var(--cool); box-shadow: inset 3px 0 0 var(--cool); }
+  .stats { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 12.5px; }
+  .stats dt { color: var(--panel-dim); font-family: var(--font-mono); font-size: 11.5px; }
+  .stats dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .note { font: 400 11.5px/1.45 var(--font-mono); color: var(--panel-dim); margin: 0; }
+  @media (max-width: 640px) {
+    .rail { top: auto; bottom: max(12px, env(safe-area-inset-bottom, 0px)); max-height: 50%; width: calc(100% - 32px); }
+  }
+</style>
+
+<canvas id="stage" aria-label="Test chamber showing the Gate Master textures, characters, items and effects"></canvas>
+<aside class="rail" aria-label="Asset review controls">
+  <div>
+    <h1>Gate Master <span>asset pack</span></h1>
+    <p class="sub">Every texture, model, effect and sound in one test chamber, for review before it goes into the game. Drag to orbit.</p>
+  </div>
+  <div>
+    <p class="label"><span>Look at</span></p>
+    <div class="chips" id="views">
+      <button type="button" data-view="crew" aria-pressed="true">Characters</button>
+      <button type="button" data-view="items" aria-pressed="false">Items</button>
+      <button type="button" data-view="pit" aria-pressed="false">Goo pit</button>
+      <button type="button" data-view="fx" aria-pressed="false">Moon &amp; lift</button>
+      <button type="button" data-view="exit" aria-pressed="false">Exit</button>
+      <button type="button" data-view="room" aria-pressed="false">Whole room</button>
+    </div>
+  </div>
+  <div>
+    <p class="label"><span>Animation</span><span>player · guard · robot</span></p>
+    <div class="chips" id="anims">
+      <button type="button" data-clip="Idle" aria-pressed="true">Idle</button>
+      <button type="button" data-clip="Walk" aria-pressed="false">Walk</button>
+      <button type="button" data-clip="Run" aria-pressed="false">Run</button>
+    </div>
+  </div>
+  <div>
+    <p class="label"><span>Sound bank</span><span id="sound-count">33</span></p>
+    <div class="sounds" id="sounds"></div>
+  </div>
+  <dl class="stats" id="stats"><dt>Pack size</dt><dd id="size">3.1 MB · 69 files</dd><dt>Textures</dt><dd>6 sets · 512 px · albedo/normal/rough</dd><dt>Models</dt><dd id="models">–</dd></dl>
+  <p class="note" id="status">Loading three r147…</p>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const renderer = new THREE.WebGLRenderer({ canvas: $('stage'), antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0b0d10);
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  // ---------------- textures
+  const tl = new THREE.TextureLoader();
+  const tex = (name, kind, repeat) => {
+    const t = tl.load(`tex/${name}_${kind}.jpg`);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(repeat[0], repeat[1]);
+    t.anisotropy = 8;
+    if (kind === 'albedo') t.encoding = THREE.sRGBEncoding;
+    return t;
+  };
+  const pbr = (name, repeat, opts = {}) => new THREE.MeshStandardMaterial({
+    map: tex(name, 'albedo', repeat), normalMap: tex(name, 'normal', repeat), roughnessMap: tex(name, 'rough', repeat),
+    metalness: opts.metalness ?? 0, roughness: 1, normalScale: new THREE.Vector2(opts.normal ?? 1, opts.normal ?? 1), ...opts.extra,
+  });
+
+  // ---------------- the chamber (24 x 24 m, 8 m high); 1 texture tile = 2 m
+  const W = 24, H = 8;
+  // the goo pit is a real opening in the floor (6 x 4 m), so the sludge and pit walls show through
+  const PIT = { x: -6, z: 6, w: 6, d: 4, depth: 1.6 };
+  const floorShape = new THREE.Shape();
+  floorShape.moveTo(-W / 2, -W / 2); floorShape.lineTo(W / 2, -W / 2); floorShape.lineTo(W / 2, W / 2); floorShape.lineTo(-W / 2, W / 2); floorShape.closePath();
+  const holePath = new THREE.Path();
+  holePath.moveTo(PIT.x - PIT.w / 2, -(PIT.z - PIT.d / 2)); holePath.lineTo(PIT.x - PIT.w / 2, -(PIT.z + PIT.d / 2));
+  holePath.lineTo(PIT.x + PIT.w / 2, -(PIT.z + PIT.d / 2)); holePath.lineTo(PIT.x + PIT.w / 2, -(PIT.z - PIT.d / 2)); holePath.closePath();
+  floorShape.holes.push(holePath);
+  const floorMat = pbr('floor_plate', [0.5, 0.5], { metalness: 0.6, normal: 1.2 }); // ShapeGeometry UVs are metres: 1 tile = 2 m
+  const floor = new THREE.Mesh(new THREE.ShapeGeometry(floorShape), floorMat);
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+  scene.add(floor);
+  const pitFloor = new THREE.Mesh(new THREE.PlaneGeometry(PIT.w, PIT.d), new THREE.MeshStandardMaterial({ color: 0x0b1206, roughness: 1 }));
+  pitFloor.rotation.x = -Math.PI / 2; pitFloor.position.set(PIT.x, -PIT.depth, PIT.z); scene.add(pitFloor);
+  const wall = (mat, w, h, pos, rotY) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); m.position.set(...pos); m.rotation.y = rotY; m.receiveShadow = true; scene.add(m); return m; };
+  wall(pbr('back_wall', [W / 4, H / 4]), W, H, [0, H / 2, -W / 2], 0);
+  wall(pbr('wall_white', [W / 2, H / 2]), W, H, [-W / 2, H / 2, 0], Math.PI / 2);
+  wall(pbr('wall_metal', [W / 2, H / 2], { metalness: 0.45, normal: 1.2 }), W, H, [W / 2, H / 2, 0], -Math.PI / 2); // use ~0.85 with an envMap in game
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W, W), pbr('back_wall', [W / 4, W / 4]));
+  ceil.rotation.x = Math.PI / 2; ceil.position.y = H; scene.add(ceil);
+
+  // goo pit: a hole in the floor (6 x 4 m, 1.6 m deep), concrete pit walls, sludge surface
+  const pitMat = pbr('pit_wall', [1, 1]);
+  for (const [w, pos, ry] of [[PIT.w, [PIT.x, -PIT.depth / 2, PIT.z - PIT.d / 2], 0], [PIT.w, [PIT.x, -PIT.depth / 2, PIT.z + PIT.d / 2], Math.PI],
+                              [PIT.d, [PIT.x - PIT.w / 2, -PIT.depth / 2, PIT.z], Math.PI / 2], [PIT.d, [PIT.x + PIT.w / 2, -PIT.depth / 2, PIT.z], -Math.PI / 2]]) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, PIT.depth), pitMat.clone());
+    m.material.map = pitMat.map.clone(); m.material.map.repeat.set(w / 2, PIT.depth / 2); m.material.map.needsUpdate = true;
+    m.position.set(pos[0], pos[1] + 0.002, pos[2]); m.rotation.y = ry; scene.add(m);
+  }
+  // lip: a metal kerb around the hole
+  const lipMat = new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: 0.5, roughness: 0.5 });
+  for (const [sx, sz, lx, lz] of [[0, -1, PIT.w + 0.3, 0.15], [0, 1, PIT.w + 0.3, 0.15], [-1, 0, 0.15, PIT.d], [1, 0, 0.15, PIT.d]]) {
+    const k = new THREE.Mesh(new THREE.BoxGeometry(lx, 0.1, lz), lipMat);
+    k.position.set(PIT.x + sx * (PIT.w / 2 + 0.07), 0.05, PIT.z + sz * (PIT.d / 2 + 0.07)); k.castShadow = true; scene.add(k);
+  }
+  const gooMat = pbr('goo', [2, 1.4], { normal: 1.6, extra: { emissive: new THREE.Color(0x1a3a05), emissiveIntensity: 0.2 } });
+  const goo = new THREE.Mesh(new THREE.PlaneGeometry(PIT.w, PIT.d), gooMat);
+  goo.rotation.x = -Math.PI / 2; goo.position.set(PIT.x, -0.55, PIT.z); scene.add(goo);
+  const gooGlow = new THREE.PointLight(0x7aff3a, 0.6, 7, 2); gooGlow.position.set(PIT.x, 0.2, PIT.z); scene.add(gooGlow);
+  const bubbleTex = tl.load('fx/goo_bubble.png');
+  const bubbles = [];
+  for (let i = 0; i < 6; i++) {
+    const b = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.6), new THREE.MeshBasicMaterial({ map: bubbleTex, transparent: true, depthWrite: false }));
+    b.rotation.x = -Math.PI / 2; b.position.set(PIT.x + (Math.random() - 0.5) * 5, -0.54, PIT.z + (Math.random() - 0.5) * 3);
+    b.userData.phase = Math.random(); scene.add(b); bubbles.push(b);
+  }
+
+  // ---------------- lights: cool overhead strips, warm exit spill
+  scene.add(new THREE.HemisphereLight(0xdfe8f2, 0x3a3f46, 0.55));
+  const key = new THREE.DirectionalLight(0xffffff, 1.4);
+  key.position.set(6, 14, 8); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 40 });
+  key.shadow.bias = -0.0005;
+  scene.add(key);
+  for (const x of [-6, 0, 6]) {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.06, 16), new THREE.MeshBasicMaterial({ color: 0xf2f7ff }));
+    strip.position.set(x, H - 0.05, 0); scene.add(strip);
+  }
+
+  // ---------------- models
+  const loader = new THREE.GLTFLoader();
+  const load = (n) => new Promise((res, rej) => loader.load(`models/${n}.gltf.json`, res, undefined, rej));
+  const boostGlow = (root) => root.traverse((o) => {
+    if (o.isMesh) {
+      o.castShadow = true; o.receiveShadow = true;
+      if (o.material.emissive && o.material.emissive.getHex() > 0) o.material.emissiveIntensity = 2.5; // glTF caps emissive at 1
+    }
+  });
+  const names = ['player', 'guard', 'robot_friend', 'weighted_cube', 'floor_button', 'door_shutter', 'laser_emitter', 'laser_receiver', 'launch_pad', 'ladder', 'cube_dispenser', 'exit_frame'];
+  const gl = {};
+  await Promise.all(names.map(async (n) => { gl[n] = await load(n); boostGlow(gl[n].scene); }));
+  const mixers = [];
+  const actors = [];
+  const place = (n, pos, ry = 0) => { const s = gl[n].scene; s.position.set(...pos); s.rotation.y = ry; scene.add(s); return s; };
+  for (const [n, pos] of [['player', [-1.4, 0, 1.5]], ['guard', [0.4, 0, 1.5]], ['robot_friend', [2.0, 0, 1.6]]]) {
+    const s = place(n, pos, -0.25);
+    const mixer = new THREE.AnimationMixer(s);
+    mixers.push(mixer);
+    actors.push({ n, mixer, clips: gl[n].animations, current: null });
+  }
+  function play(clipName) {
+    for (const a of actors) {
+      const clip = a.clips.find((c) => c.name === clipName) || a.clips.find((c) => c.name === 'Walk') || a.clips[0];
+      const next = a.mixer.clipAction(clip);
+      if (a.current && a.current !== next) a.current.fadeOut(0.25);
+      next.reset().fadeIn(0.25).play();
+      a.current = next;
+    }
+  }
+  play('Idle');
+  document.querySelectorAll('#anims button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('#anims button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    play(b.dataset.clip);
+  }));
+  // a bone-name check (what the game will look up after GLTFLoader)
+  const hips = gl.player.scene.getObjectByName('mixamorigHips');
+
+  // items along the back of the room
+  place('weighted_cube', [-7.5, 0.36, -6]);
+  place('floor_button', [-5.0, 0, -6]);
+  place('door_shutter', [0, 0, -W / 2 + 0.3]);
+  const em = place('laser_emitter', [-W / 2 + 0.05, 2.0, -3], Math.PI / 2);
+  const rc = place('laser_receiver', [W / 2 - 0.05, 2.0, -3], -Math.PI / 2);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, W - 1.1, 8), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 0.35, 0.25), toneMapped: false }));
+  beam.rotation.z = Math.PI / 2; beam.position.set(0, 2.0, -3); scene.add(beam);
+  place('launch_pad', [5.0, 0, -6]);
+  place('ladder', [W / 2 - 0.2, 0, 6], -Math.PI / 2);
+  place('cube_dispenser', [-7.5, H - 3.3, -6]);
+  const exitFrame = place('exit_frame', [6.5, 0, -W / 2 + 0.35]);
+
+  // ---------------- effects
+  const add = (map, opacity) => new THREE.MeshBasicMaterial({ map, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  // moon (low-gravity) zone: soft see-through haze billboards + floating motes, never washing out
+  const MOON = new THREE.Vector3(7, 0, 4);
+  const moonTex = tl.load('fx/moon_glow.png');
+  const moonPlanes = [];
+  for (let i = 0; i < 5; i++) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), add(moonTex, 0.3));
+    p.position.set(MOON.x + (Math.random() - 0.5) * 1.5, 1.6 + i * 0.6, MOON.z + (Math.random() - 0.5) * 1.5);
+    scene.add(p); moonPlanes.push(p);
+  }
+  const moteGeo = new THREE.BufferGeometry();
+  const motePos = new Float32Array(160 * 3);
+  for (let i = 0; i < 160; i++) motePos.set([MOON.x + (Math.random() - 0.5) * 4, Math.random() * 5, MOON.z + (Math.random() - 0.5) * 4], i * 3);
+  moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
+  const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({ map: tl.load('fx/moon_mote.png'), size: 0.12, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xcfe4ff }));
+  scene.add(motes);
+  const moonRing = new THREE.Mesh(new THREE.RingGeometry(2.0, 2.15, 64), new THREE.MeshBasicMaterial({ color: 0x9fd0ff, transparent: true, opacity: 0.5 }));
+  moonRing.rotation.x = -Math.PI / 2; moonRing.position.set(MOON.x, 0.01, MOON.z); scene.add(moonRing);
+  // lift column: scrolling streak texture on an open cylinder
+  const liftTex = tl.load('fx/lift_column.png'); liftTex.wrapS = liftTex.wrapT = THREE.RepeatWrapping; liftTex.repeat.set(3, 1.5);
+  const lift = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, H, 32, 1, true), add(liftTex, 0.9));
+  lift.position.set(2.5, H / 2, -5); scene.add(lift);
+  const liftBase = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 48), new THREE.MeshBasicMaterial({ color: 0x8ff0ff }));
+  liftBase.rotation.x = -Math.PI / 2; liftBase.position.set(2.5, 0.01, -5); scene.add(liftBase);
+  // exit: warm "stairway" glow + light shafts behind the doorway
+  const exitGlow = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), add(tl.load('fx/exit_glow.png'), 1));
+  exitGlow.position.set(6.5, 1.8, -W / 2 + 0.2); scene.add(exitGlow);
+  const shafts = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 6), add(tl.load('fx/exit_shafts.png'), 0.8));
+  shafts.position.set(6.5, 3.3, -W / 2 + 0.6); scene.add(shafts);
+  const exitLight = new THREE.PointLight(0xfff0d0, 1.6, 9, 2); exitLight.position.set(6.5, 2.2, -W / 2 + 1.5); scene.add(exitLight);
+
+  // ---------------- camera views
+  const views = {
+    crew: [[1.2, 2.2, 6.4], [0.2, 1.0, 1.5]],
+    items: [[-1, 4.2, 1.5], [-1, 1.4, -7]],
+    pit: [[-6, 4.2, 12.5], [-6, -0.4, 6]],
+    fx: [[7.5, 3.8, 9.5], [4.5, 2.4, -1]],
+    exit: [[5.2, 2.2, -4.5], [6.5, 1.9, -W / 2]],
+    room: [[9, 7, 11.5], [-1, 1.5, -2]],
+  };
+  let tween = null;
+  const setView = (k, instant) => {
+    const [p, t] = views[k];
+    if (instant) { camera.position.set(...p); controls.target.set(...t); return; }
+    tween = { a: camera.position.clone(), b: new THREE.Vector3(...p), ta: controls.target.clone(), tb: new THREE.Vector3(...t), t: 0 };
+  };
+  setView('crew', true);
+  document.querySelectorAll('#views button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('#views button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    setView(b.dataset.view);
+  }));
+
+  // ---------------- sound bank
+  const sounds = ['portal_fire_blue', 'portal_fire_orange', 'portal_open', 'teleport_whoosh', 'footstep_1', 'footstep_2', 'footstep_3', 'footstep_4',
+    'jump', 'land', 'ledge_grab', 'ladder_climb_1', 'ladder_climb_2', 'cube_pickup', 'cube_drop', 'button_press', 'button_release', 'door_open', 'door_close',
+    'laser_hum_loop', 'laser_burn', 'guard_alert', 'guard_shot', 'guard_knockover', 'robot_beep_1', 'robot_beep_2', 'robot_beep_3', 'launch_pad',
+    'goo_death', 'fizzler_erase', 'exit_choir', 'ambient_hum_loop', 'level_complete'];
+  const grid = $('sounds');
+  const playing = new Map();
+  for (const s of sounds) {
+    const loop = s.endsWith('_loop');
+    const url = `audio/${s}.${loop ? 'wav' : 'mp3'}`;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<span>${s.replace(/_/g, ' ')}</span><small>${loop ? 'loop' : '▶'}</small>`;
+    b.addEventListener('click', () => {
+      if (playing.has(s)) { playing.get(s).pause(); playing.delete(s); b.classList.remove('playing'); return; }
+      const a = new Audio(url); a.loop = loop; a.play().catch(() => {});
+      playing.set(s, a); b.classList.add('playing');
+      a.addEventListener('ended', () => { playing.delete(s); b.classList.remove('playing'); });
+    });
+    grid.appendChild(b);
+  }
+  $('sound-count').textContent = `${sounds.length} sounds`;
+  $('models').textContent = `${names.length} GLB · player/guard ${gl.player.animations.map((c) => c.name).join('/')}`;
+
+  function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', resize); resize();
+
+  const clock = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+    mixers.forEach((m) => m.update(dt));
+    if (tween) {
+      tween.t = Math.min(1, tween.t + dt * 1.3); const e = tween.t * tween.t * (3 - 2 * tween.t);
+      camera.position.lerpVectors(tween.a, tween.b, e); controls.target.lerpVectors(tween.ta, tween.tb, e);
+      if (tween.t >= 1) tween = null;
+    }
+    controls.update();
+    // goo: slow flowing normals + bubbles that swell and pop
+    gooMat.normalMap.offset.set(t * 0.012, t * 0.007);
+    gooMat.map.offset.set(t * 0.006, t * 0.004);
+    for (const b of bubbles) {
+      const p = (t * 0.45 + b.userData.phase) % 1;
+      b.scale.setScalar(0.3 + p * 1.2); b.material.opacity = (1 - p) * 0.9;
+      if (p < 0.01) b.position.set(PIT.x + (Math.random() - 0.5) * 5, -0.54, PIT.z + (Math.random() - 0.5) * 3);
+    }
+    liftTex.offset.y = -t * 0.35;
+    moonPlanes.forEach((p, i) => { p.quaternion.copy(camera.quaternion); p.material.opacity = 0.26 + 0.06 * Math.sin(t * 0.6 + i); });
+    const mp = moteGeo.attributes.position.array;
+    for (let i = 0; i < 160; i++) { mp[i * 3 + 1] += dt * 0.25; if (mp[i * 3 + 1] > 5.5) mp[i * 3 + 1] = 0; }
+    moteGeo.attributes.position.needsUpdate = true;
+    shafts.material.opacity = 0.7 + 0.1 * Math.sin(t * 0.8);
+    beam.material.color.setRGB(3 + 0.4 * Math.sin(t * 40), 0.35, 0.25);
+    renderer.render(scene, camera);
+  });
+  $('status').textContent = `Ready · three r${THREE.REVISION} · bone check: ${hips ? 'mixamorigHips found' : 'Hips not found'}`;
+  window.__gm = { gl, scene, setView, play };
+})().catch((e) => { document.getElementById('status').textContent = 'Could not load: ' + e.message; console.error(e); });
+</script>
+
+</body></html>

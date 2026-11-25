@@ -5,9 +5,359 @@
  "updated": "2026-11-18",
  "files": [
   {
+   "path": "audio/boom_distant_1.mp3",
+   "bytes": 52707,
+   "sha256": "8bcdd076f9b62dc673ebf781ea4135c61656552f8defea663ecaded53b42b181"
+  },
+  {
+   "path": "audio/boom_distant_2.mp3",
+   "bytes": 58193,
+   "sha256": "b21301743dbea8732b87ac5b03454da517cdebb70655c7f09a519d96af98a829"
+  },
+  {
+   "path": "audio/boom_huge_1.mp3",
+   "bytes": 83427,
+   "sha256": "5b36de376818851ed653d25042ee970bccc3307922c4cb57e7ea958a9e813e38"
+  },
+  {
+   "path": "audio/boom_large_1.mp3",
+   "bytes": 54170,
+   "sha256": "2001f8607490fb38bb4da19a85e2e86ed8be449c7fe7b4d788002ec8c4dbbbdf"
+  },
+  {
+   "path": "audio/boom_large_2.mp3",
+   "bytes": 59655,
+   "sha256": "82ea8ab01bfc1cf71d982493b9b53c2df416986947eacc2fda45884fa1b1edf3"
+  },
+  {
+   "path": "audio/boom_large_3.mp3",
+   "bytes": 48684,
+   "sha256": "18b3f2e3bdca34a943a265daa1d68ca1bfe8cddfceb396b0b3f789b0a9a8965e"
+  },
+  {
+   "path": "audio/boom_small_1.mp3",
+   "bytes": 31861,
+   "sha256": "409639cc238b7f1ecbf4f31e4bdbe21a33c9514f59ab95d698d52b33db3593a6"
+  },
+  {
+   "path": "audio/boom_small_2.mp3",
+   "bytes": 35884,
+   "sha256": "1dd1fe9cb27f12a2f445c2eaa04af19fe534a3065ba485cb92d009411f5cf52d"
+  },
+  {
+   "path": "audio/boom_small_3.mp3",
+   "bytes": 30398,
+   "sha256": "3c23c9de9e8b821bd63c21c2ac88a922cefa1fc406eb0bfd38f8a1f8f08e354e"
+  },
+  {
+   "path": "audio/reload_clicks.mp3",
+   "bytes": 17598,
+   "sha256": "6c7e84b85a0eed8d19aaf4d8174a2cf409c5070d6b1ca45dc3493f729bd0ef43"
+  },
+  {
+   "path": "audio/rifle_shot.mp3",
+   "bytes": 13941,
+   "sha256": "aa40f49a7e3995380fec1229752d653eae84e95d807538b358f152b85ab8ce65"
+  },
+  {
+   "path": "audio/rocket_launch.mp3",
+   "bytes": 34421,
+   "sha256": "46836f22b026ccef437dd55b8d5778a46aa16e2285e2ef2cb6cb323cf38edd92"
+  },
+  {
+   "path": "audio/shotgun_blast.mp3",
+   "bytes": 21255,
+   "sha256": "bd925829993c80416db7b1e95e7d7f7641e39f6e0785bd2c2dd60ad6665f056d"
+  },
+  {
+   "path": "fx/fx_fireball_8x8.png",
+   "bytes": 1106384,
+   "sha256": "d90e6785db0156b2f28ff1b865cacd36a65765cbe13e542b8916e5427187ef14"
+  },
+  {
+   "path": "fx/fx_smoke_8x8.png",
+   "bytes": 770727,
+   "sha256": "b7457c8976cbf1dd69a1e0773cb18e0258136fd1204ef63dddd1bf87a3ff5642"
+  },
+  {
+   "path": "fx/fx_sparks_8x8.png",
+   "bytes": 337495,
+   "sha256": "6ca71561c7ec111d884e0015472e76e7d389ede37288b1aec2574eda4736741d"
+  },
+  {
    "path": "index.html",
    "bytes": 13468,
    "sha256": "d5b278b162eb868fcb7cafad9104a02d4b0e2c08be63a344a709ee144e1c6d8b"
+  },
+  {
+   "path": "tex/tex_asphalt_color.jpg",
+   "bytes": 125120,
+   "sha256": "75c6f38bd9870a6b2c3e7fa0791411e5994219dec2d59822062fd9d3c583acda"
+  },
+  {
+   "path": "tex/tex_asphalt_normal.jpg",
+   "bytes": 425905,
+   "sha256": "be3f72bcb02daacdf93091cbf1a7f477fa201855b375abebdf4c948c33cc27f1"
+  },
+  {
+   "path": "tex/tex_brick_color.jpg",
+   "bytes": 100847,
+   "sha256": "73e91eb9247b148c598d8578438a6eb26a15921415d4a62553d6ff4af5c3611a"
+  },
+  {
+   "path": "tex/tex_brick_emissive.png",
+   "bytes": 8490,
+   "sha256": "8bdfc810c206762b6799ce8988e12cc030ce00a9983dca06ceb3051b0091e1c3"
+  },
+  {
+   "path": "tex/tex_brick_normal.jpg",
+   "bytes": 232198,
+   "sha256": "9bdc9db9ea3062221b3afc13179bdde3181e4f30dc57b344d68e35fe6cdd9c0c"
+  },
+  {
+   "path": "tex/tex_concrete_color.jpg",
+   "bytes": 136690,
+   "sha256": "701a2cab409cf2dbbe1b65ef18c2ae02654293d9861edff08899ad8447e8b20d"
+  },
+  {
+   "path": "tex/tex_concrete_normal.jpg",
+   "bytes": 260886,
+   "sha256": "f2174874fb6cef0a1a80083b59b15a8648e3d6024a6a67ea672bcd20e1990d79"
+  },
+  {
+   "path": "tex/tex_corrugated_color.jpg",
+   "bytes": 68482,
+   "sha256": "59df3eee93e0759a3daf46e5ee0d7b6a83d0b3f1b402392d25e4eeda31b70282"
+  },
+  {
+   "path": "tex/tex_corrugated_normal.jpg",
+   "bytes": 113513,
+   "sha256": "53e0b7727cf5ad3e313c6c1e100fb48b20278efded31332c16d2e76123373417"
+  },
+  {
+   "path": "tex/tex_sand_color.jpg",
+   "bytes": 72353,
+   "sha256": "244453137726cedc1d43f03be6d2c16d7502c26140f3d4fdf56ff55e4b6b83ff"
+  },
+  {
+   "path": "tex/tex_sand_normal.jpg",
+   "bytes": 349850,
+   "sha256": "5b4a6d2e98461e5f8547f57fb8f2ed5de505ab52d7076f2a121d4c9a5991a657"
+  },
+  {
+   "path": "tex/tex_sandbag_color.jpg",
+   "bytes": 237940,
+   "sha256": "411220f072dbb607fcba0e3e6e0fd8679609eba7d3d5893ef0d9da27f8c21200"
+  },
+  {
+   "path": "tex/tex_sandbag_normal.jpg",
+   "bytes": 749062,
+   "sha256": "b8027d934b08d552db22b955eb91f61a29c78a4fa56de1ac917837cc44c61e47"
+  },
+  {
+   "path": "voice/contact_0.mp3",
+   "bytes": 11016,
+   "sha256": "144c49187ab1491b71badd939ab3e3d3b35a3e7310d22557f6d9ccd5950b30ff"
+  },
+  {
+   "path": "voice/contact_1.mp3",
+   "bytes": 13210,
+   "sha256": "3aee4bbaaa50d4e6cc16273c3a3b53407ea0bafa0b46326c1d72880bf161fb94"
+  },
+  {
+   "path": "voice/contact_2.mp3",
+   "bytes": 14778,
+   "sha256": "00a9cfe93048970e2c4dc0d02d61ae314ef3598b024f234d518bd2156db48fec"
+  },
+  {
+   "path": "voice/contact_3.mp3",
+   "bytes": 23241,
+   "sha256": "e2b3b7d86267d7a8bcc4e5fb192978440c8a56b15e62feae615f797f9de73c7e"
+  },
+  {
+   "path": "voice/contact_4.mp3",
+   "bytes": 13524,
+   "sha256": "6803206048dda9e5868cd49f0d6d04acf85abdd9a0babad1b6c4585ecf6079c9"
+  },
+  {
+   "path": "voice/death_0.mp3",
+   "bytes": 7568,
+   "sha256": "d23c17de3073d52e3469cb410478c7e76920705645282b6b9feade34bffb0023"
+  },
+  {
+   "path": "voice/death_1.mp3",
+   "bytes": 5374,
+   "sha256": "98f37832e6d51ffc41f5ffc3c25c4b2b232e90dde611a4066437c0fe1d5759e8"
+  },
+  {
+   "path": "voice/death_2.mp3",
+   "bytes": 7568,
+   "sha256": "a96cc294500a8fc4a8e2fcb7d75a25bd93c718257686e16f9cf368b8842ebdb4"
+  },
+  {
+   "path": "voice/death_3.mp3",
+   "bytes": 8195,
+   "sha256": "748b7cc93ce6585ce6d3f2f908f8f0a62e3bc42e18aa9663e397a52c31d0c345"
+  },
+  {
+   "path": "voice/death_4.mp3",
+   "bytes": 6627,
+   "sha256": "9d5544c5356397c0d40c6c4d67b3687f96ae8097a18802e8c0faced9c3ac9210"
+  },
+  {
+   "path": "voice/death_5.mp3",
+   "bytes": 16972,
+   "sha256": "92e2ce329e50c7915d3fda79e173de863ce8efcff805f77e6b9909eaf827f651"
+  },
+  {
+   "path": "voice/death_6.mp3",
+   "bytes": 6314,
+   "sha256": "14f059f5370ba41af27e0cc6f2c71ced7ce0d9e01cbc14c05dec36cf327ce53b"
+  },
+  {
+   "path": "voice/death_7.mp3",
+   "bytes": 7568,
+   "sha256": "3135bafcbf00c5d4b1037dc8bed1eaac18e0a3f697fc497d46db8287d62e0c8d"
+  },
+  {
+   "path": "voice/down_0.mp3",
+   "bytes": 11329,
+   "sha256": "6f556522b83270a0e098265653f56fc1e8be4f464b70ac86159a79f604f8dde4"
+  },
+  {
+   "path": "voice/down_1.mp3",
+   "bytes": 11329,
+   "sha256": "f8f15b187f40edc5bef73d0a87861c17e1e84fe349ce8dcbef8ce7ff1f528247"
+  },
+  {
+   "path": "voice/down_2.mp3",
+   "bytes": 12897,
+   "sha256": "925708ba1abab9c1becad16397e37bc4f4101c0485b88e28036fff6209e3a6ce"
+  },
+  {
+   "path": "voice/flank_0.mp3",
+   "bytes": 11016,
+   "sha256": "35c6e6bd53d10942d7333afc6802920538f4c0df5a73a05cece93e6885a02633"
+  },
+  {
+   "path": "voice/flank_1.mp3",
+   "bytes": 7568,
+   "sha256": "9c9c24091154c950ad30559805b9a7d4d9abed2e83a477a85e1fb49f12203b05"
+  },
+  {
+   "path": "voice/flank_2.mp3",
+   "bytes": 14151,
+   "sha256": "e0e92eb99878cc4566a0721e0722e87c5518762168d9af53c68b858eae9c44dc"
+  },
+  {
+   "path": "voice/frag_0.mp3",
+   "bytes": 11643,
+   "sha256": "f1b1a158bd39ce41601eeb7bd1ead355ec907013fd130d370e5d9104d6ae06f5"
+  },
+  {
+   "path": "voice/frag_1.mp3",
+   "bytes": 17912,
+   "sha256": "b1eec1a489b8aec3a7db075ed4cd987baab9a187e521c5336e86c1eb7b4aea7f"
+  },
+  {
+   "path": "voice/frag_2.mp3",
+   "bytes": 10389,
+   "sha256": "6e15d9d3ca16a2851aff194995d179b7d9b8b6ea7351b3531602c832960b9d7d"
+  },
+  {
+   "path": "voice/frag_3.mp3",
+   "bytes": 20734,
+   "sha256": "9599af6357d851e4e16ec4e5df7ded1409c1e7fe2511a9ac39771c53755889de"
+  },
+  {
+   "path": "voice/grenade_0.mp3",
+   "bytes": 16658,
+   "sha256": "e666d48c0e311731e0ba1fe92ca5d5c94f58015cf5c24e383a824437b3154207"
+  },
+  {
+   "path": "voice/grenade_1.mp3",
+   "bytes": 13837,
+   "sha256": "624ba428191e30239c79e3fd4bb6ced2afb0024962c12d47a85e033fb872e9ea"
+  },
+  {
+   "path": "voice/grenade_2.mp3",
+   "bytes": 10389,
+   "sha256": "6b534249c16605aaa8bce356ea39358cc2bb35117fbd87f4a3ed5b9f7af34938"
+  },
+  {
+   "path": "voice/hit_0.mp3",
+   "bytes": 6941,
+   "sha256": "ce0bf745b27b101a5603ba4d0d38159e2b67ba3a9a2ec26fcb638565047c09e1"
+  },
+  {
+   "path": "voice/hit_1.mp3",
+   "bytes": 10076,
+   "sha256": "bf03e39a962b93c2c2da0acb1a15b4637d1fe3e9f3f67afed4ef672dd66f8418"
+  },
+  {
+   "path": "voice/hit_2.mp3",
+   "bytes": 13837,
+   "sha256": "b690ccfd640a2eb978b7f4ccc57ca89e026f315e535825a80934f4bd8a9cd207"
+  },
+  {
+   "path": "voice/lost_0.mp3",
+   "bytes": 12270,
+   "sha256": "e958b6bb342e4d8f6283c808d41f1a0f81fec7417956b6228e657ed1e3e246f3"
+  },
+  {
+   "path": "voice/lost_1.mp3",
+   "bytes": 8508,
+   "sha256": "35e9f2d794cb4a9012def06a0ecdcfc5bd42ce31f6f5f49915b47968a68a899c"
+  },
+  {
+   "path": "voice/lost_2.mp3",
+   "bytes": 14464,
+   "sha256": "b9be9a21b7a79efba6d4fef9fd07c1ee0981fc3cd932b025f9e567c5f12ac78e"
+  },
+  {
+   "path": "voice/pain_0.mp3",
+   "bytes": 5374,
+   "sha256": "1c59d6dee77f364fc92d1dbc8d74079f2e2916842c0216f2caad81ab183fb30b"
+  },
+  {
+   "path": "voice/pain_1.mp3",
+   "bytes": 4120,
+   "sha256": "c9676124cd138766c45afec6d45ac761b1cbb95c83f4dff7aa8dd93fc78ffef8"
+  },
+  {
+   "path": "voice/pain_2.mp3",
+   "bytes": 11643,
+   "sha256": "3c86d50f2b548b825d557913e2aa8ec5f28dd6df467fd661bd2be231294a4175"
+  },
+  {
+   "path": "voice/pain_3.mp3",
+   "bytes": 5687,
+   "sha256": "fe5307c69548a50a0e0f5b114a501374c549b0cdcc63e60f363641ca2bd29e1a"
+  },
+  {
+   "path": "voice/pain_4.mp3",
+   "bytes": 5687,
+   "sha256": "1d3f3c0c75f9376580bbab02516b5fc00191edba5d821b8f81fda21b69301577"
+  },
+  {
+   "path": "voice/pain_5.mp3",
+   "bytes": 5060,
+   "sha256": "e5654e3434544c7812619ee960bcb74041f737fbe2f2c0810f8e3f82648b8011"
+  },
+  {
+   "path": "voice/reload_0.mp3",
+   "bytes": 7254,
+   "sha256": "362fe035ff098ee8c1c4ceba744f8c4fdc3413bf178cb10d3046efe626d5321d"
+  },
+  {
+   "path": "voice/reload_1.mp3",
+   "bytes": 20734,
+   "sha256": "e6154f0281e74ba30e659b6f2d9f1185e390d2e52fdeba8a5e7d752f8a076982"
+  },
+  {
+   "path": "voice/reload_2.mp3",
+   "bytes": 9449,
+   "sha256": "923d9a159bbe2100583cfd4f73c9fd2de7d07c393ebed052cce448ecb648b944"
   }
  ]
 }

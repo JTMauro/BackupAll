@@ -1,0 +1,310 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MuchSmarter Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a TV set. The hero is the screen (channel buttons flip the 3D themes);
+   below it, a guide-style tour of each screen, the phone layout, then the downloads list. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0a1a;          /* deep indigo, the app's own background family */
+  --panel: #15132e;
+  --panel-2: #1d1a3d;
+  --line: #2c2856;
+  --fg: #eeecff;
+  --muted: #a7a3d3;
+  --bulb: #ffd23f;        /* the lightbulb in the icon */
+  --violet: #8a6cff;
+  --live: #ff4d6d;        /* the LIVE / REC red */
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.6 var(--body);
+  margin: 0;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); font-weight: 800; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font: 600 0.75rem/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--bulb); }
+.muted { color: var(--muted); }
+img { display: block; max-width: 100%; height: auto; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--bulb); outline-offset: 3px; }
+
+/* ---- Header ---- */
+.top { padding-block: 28px 10px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.top img { width: 48px; height: 48px; border-radius: 12px; }
+.brand { font: 800 1.35rem/1 var(--display); letter-spacing: 0.02em; }
+.brand small { display: block; font: 600 0.7rem/1.4 var(--mono); letter-spacing: 0.3em; color: var(--muted); }
+.platforms { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.platforms span { font: 600 0.72rem/1 var(--mono); padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+
+/* ---- Hero: the TV ---- */
+.hero { padding-block: 22px 56px; display: grid; gap: 28px; }
+.hero-copy { display: grid; gap: 14px; max-width: 62ch; }
+.hero h1 { font-size: clamp(2.3rem, 6vw, 4.4rem); font-weight: 800; letter-spacing: -0.02em; }
+.hero h1 em { font-style: normal; color: var(--bulb); }
+.tv {
+  background: linear-gradient(160deg, #24204a, #110f26);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: clamp(8px, 1.4vw, 16px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 210, 63, 0.05) inset;
+}
+.screen { position: relative; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 16 / 10; }
+.screen img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.35s ease; }
+.osd {
+  position: absolute; top: 14px; right: 14px;
+  font: 600 clamp(0.7rem, 1.3vw, 0.95rem)/1 var(--mono);
+  background: rgba(0, 0, 0, 0.6); color: var(--bulb);
+  padding: 8px 11px; border-radius: 8px; letter-spacing: 0.06em;
+}
+.remote { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 14px; }
+.remote .label { font: 600 0.72rem/1 var(--mono); color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-right: 4px; }
+.ch {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); background: var(--panel);
+  padding: 8px 12px; border-radius: 10px; cursor: pointer;
+}
+.ch b { font: 600 0.75rem/1 var(--mono); color: var(--muted); }
+.ch[aria-pressed="true"] { border-color: var(--bulb); background: var(--panel-2); }
+.ch[aria-pressed="true"] b { color: var(--bulb); }
+.ch:hover { border-color: var(--violet); }
+
+/* ---- Feature strip ---- */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.fact { background: var(--panel); padding: 20px; display: grid; gap: 6px; align-content: start; }
+.fact h3 { color: var(--fg); }
+.fact p { color: var(--muted); font-size: 0.95rem; }
+
+section { padding-block: 60px 0; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 24px; max-width: 70ch; }
+
+/* ---- Tour (guide-style tabs) ---- */
+.tour { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 18px; align-items: start; }
+.tabs { display: grid; gap: 4px; }
+.tab {
+  display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center;
+  text-align: left; padding: 11px 12px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; cursor: pointer;
+}
+.tab .num { font: 600 0.78rem/1 var(--mono); color: var(--muted); }
+.tab .name { font-weight: 700; }
+.tab:hover { background: var(--panel); }
+.tab[aria-selected="true"] { background: var(--panel-2); border-color: var(--line); }
+.tab[aria-selected="true"] .num { color: var(--bulb); }
+.view { display: grid; gap: 14px; min-width: 0; }
+.view .frame { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: #000; }
+.view .caption { display: grid; gap: 6px; }
+.view .caption p { color: var(--muted); max-width: 72ch; }
+
+/* ---- Phones ---- */
+.phones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.phone { display: grid; gap: 10px; justify-items: center; }
+.phone .body {
+  width: 100%; max-width: 230px; border-radius: 30px; padding: 8px;
+  background: #050410; border: 1px solid var(--line);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.phone .body img { border-radius: 23px; width: 100%; aspect-ratio: 393 / 852; object-fit: cover; }
+.phone span { font: 600 0.78rem/1 var(--mono); color: var(--muted); }
+
+/* ---- Downloads table ---- */
+.files { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; }
+th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 0.72rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: var(--panel); }
+td.file { font: 0.85rem/1.4 var(--mono); color: var(--fg); overflow-wrap: anywhere; }
+td.size { font: 0.85rem/1.4 var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.note { margin-top: 14px; color: var(--muted); font-size: 0.95rem; max-width: 80ch; }
+.note b { color: var(--fg); }
+
+footer { padding-block: 60px 40px; color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 860px) {
+  .tour { grid-template-columns: minmax(0, 1fr); }
+  .tabs { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .phones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .platforms { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .screen img { transition: none; } }
+</style>
+
+<header class="wrap top">
+  <img src="shots/icon.png" alt="MuchSmarter icon: a glowing lightbulb inside a TV">
+  <div class="brand">MuchSmarter<small>IPTV PLAYER</small></div>
+  <div class="platforms" aria-label="Platforms">
+    <span>Windows</span><span>macOS</span><span>Linux</span><span>Android</span><span>Android TV</span><span>iPhone</span>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Version 1.0.0 preview</span>
+      <h1>Every channel, movie and series. <em>One smart remote.</em></h1>
+      <p class="muted">An IPTV player for Xtream Codes, M3U playlists and Stalker portals, with a TV guide, catch-up, recording, downloads, casting and fully styled closed captions. The home screen is a live 3D scene; flip through the themes below.</p>
+    </div>
+
+    <div class="tv">
+      <div class="screen">
+        <img id="tvImg" src="shots/home-standard.jpg" alt="MuchSmarter 3D home screen, Standard theme" width="1440" height="900">
+        <div class="osd" id="tvOsd" aria-live="polite">CH 01 · STANDARD</div>
+      </div>
+      <div class="remote" role="group" aria-label="Home screen themes">
+        <span class="label">Themes</span>
+        <button class="ch" type="button" id="ch-1" aria-pressed="true" data-n="01" data-name="Standard" data-src="shots/home-standard.jpg"><b>01</b>Standard</button>
+        <button class="ch" type="button" id="ch-2" aria-pressed="false" data-n="02" data-name="Techno" data-src="shots/home-techno.jpg"><b>02</b>Techno</button>
+        <button class="ch" type="button" id="ch-3" aria-pressed="false" data-n="03" data-name="Paleolithic" data-src="shots/home-paleolithic.jpg"><b>03</b>Paleolithic</button>
+        <button class="ch" type="button" id="ch-4" aria-pressed="false" data-n="04" data-name="Futuristic" data-src="shots/home-futuristic.jpg"><b>04</b>Futuristic</button>
+        <button class="ch" type="button" id="ch-5" aria-pressed="false" data-n="05" data-name="Sunset Beach" data-src="shots/home-sunset.jpg"><b>05</b>Sunset Beach <span class="muted">(imported)</span></button>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><h3>Any IPTV login</h3><p>Xtream Codes, M3U and M3U8 by link or file, Stalker/MAC portals, and XMLTV guides.</p></div>
+      <div class="fact"><h3>Record and catch up</h3><p>Record now, schedule from the guide, repeat daily or weekly, or follow a whole series. Watch past shows from the archive.</p></div>
+      <div class="fact"><h3>Every screen size</h3><p>Inline, full screen, picture-in-picture, a draggable mini player, pop-out windows and Multi-View with up to 9 channels.</p></div>
+      <div class="fact"><h3>Captions your way</h3><p>Closed captions (CEA-608/708) and subtitles with your own size, font, colours, background and edge style.</p></div>
+    </div>
+  </div>
+
+  <section class="wrap" aria-labelledby="tour-h">
+    <div class="sec-head">
+      <span class="eyebrow">Inside the app</span>
+      <h2 id="tour-h">A tour of the main screens</h2>
+      <p class="muted">Real screenshots of version 1.0.0, connected to a demo provider.</p>
+    </div>
+    <div class="tour">
+      <div class="tabs" role="tablist" aria-label="Screens">
+        <button class="tab" role="tab" id="t-live" aria-selected="true" aria-controls="tourView" data-i="0"><span class="num">101</span><span class="name">Live TV</span></button>
+        <button class="tab" role="tab" id="t-guide" aria-selected="false" aria-controls="tourView" data-i="1"><span class="num">102</span><span class="name">TV Guide</span></button>
+        <button class="tab" role="tab" id="t-movies" aria-selected="false" aria-controls="tourView" data-i="2"><span class="num">103</span><span class="name">Movies</span></button>
+        <button class="tab" role="tab" id="t-series" aria-selected="false" aria-controls="tourView" data-i="3"><span class="num">104</span><span class="name">Series</span></button>
+        <button class="tab" role="tab" id="t-dl" aria-selected="false" aria-controls="tourView" data-i="4"><span class="num">105</span><span class="name">Downloads</span></button>
+        <button class="tab" role="tab" id="t-fav" aria-selected="false" aria-controls="tourView" data-i="5"><span class="num">106</span><span class="name">Favorites</span></button>
+        <button class="tab" role="tab" id="t-cc" aria-selected="false" aria-controls="tourView" data-i="6"><span class="num">107</span><span class="name">Captions</span></button>
+        <button class="tab" role="tab" id="t-themes" aria-selected="false" aria-controls="tourView" data-i="7"><span class="num">108</span><span class="name">Themes</span></button>
+      </div>
+      <div class="view" id="tourView" role="tabpanel" aria-labelledby="t-live">
+        <div class="frame"><img id="tourImg" src="shots/live.jpg" alt="" width="1440" height="900"></div>
+        <div class="caption">
+          <h3 id="tourTitle">Live TV</h3>
+          <p id="tourText"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="phone-h">
+    <div class="sec-head">
+      <span class="eyebrow">Android and iPhone</span>
+      <h2 id="phone-h">The same app, sized for your phone</h2>
+      <p class="muted">A bottom tab bar, swipeable categories, and the player pinned above the channel list. Turn the phone sideways to go full screen.</p>
+    </div>
+    <div class="phones">
+      <figure class="phone"><div class="body"><img src="shots/phone-home.jpg" alt="Phone home screen with 3D tiles" width="393" height="852" loading="lazy"></div><span>Home</span></figure>
+      <figure class="phone"><div class="body"><img src="shots/phone-live.jpg" alt="Phone Live TV with player on top" width="393" height="852" loading="lazy"></div><span>Live TV</span></figure>
+      <figure class="phone"><div class="body"><img src="shots/phone-movies.jpg" alt="Phone movie posters" width="393" height="852" loading="lazy"></div><span>Movies</span></figure>
+      <figure class="phone"><div class="body"><img src="shots/phone-guide.jpg" alt="Phone TV guide" width="393" height="852" loading="lazy"></div><span>TV Guide</span></figure>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="dl-h">
+    <div class="sec-head">
+      <span class="eyebrow">Downloads</span>
+      <h2 id="dl-h">What to install on each device</h2>
+    </div>
+    <div class="files">
+      <table>
+        <thead><tr><th>Device</th><th>File</th><th>Size</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td class="file">MuchSmarter-1.0.0-Windows-Build-Kit.zip</td><td class="size">151 MB</td><td>Run BUILD MUCHSMARTER.cmd on the Cydcor build PC. Deploy the signed Setup.exe from its Output folder.</td></tr>
+          <tr><td>Mac (Apple chip)</td><td class="file">MuchSmarter-1.0.0-mac-apple-silicon.zip</td><td class="size">125 MB</td><td>Unzip, drag to Applications, right-click &gt; Open the first time.</td></tr>
+          <tr><td>Mac (Intel)</td><td class="file">MuchSmarter-1.0.0-mac-intel.zip</td><td class="size">137 MB</td><td>Same as above.</td></tr>
+          <tr><td>Linux</td><td class="file">MuchSmarter-1.0.0.AppImage</td><td class="size">144 MB</td><td>Make it executable and run it. Or install muchsmarter_1.0.0_amd64.deb (96 MB).</td></tr>
+          <tr><td>Android, Android TV, Fire TV</td><td class="file">MuchSmarter-1.0.0.apk</td><td class="size">1 MB</td><td>Copy to the device and tap it (Android 8 or newer).</td></tr>
+          <tr><td>iPhone, iPad</td><td class="file">MuchSmarter-mobile-project.zip</td><td class="size">5 MB</td><td>Build on a Mac with Xcode. Steps in mobile/BUILD-PHONE-APPS.md.</td></tr>
+          <tr><td>Everything</td><td class="file">MuchSmarter-1.0.0-All-part1/2/3-of-3.zip</td><td class="size">660 MB</td><td>All of the above in three parts. Extract them into the same place.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">The files are attached in the Claude chat where this preview was made; this page shows the app and doesn't host the downloads. <b>On Windows</b>, the Cydcor signature is trusted on Cydcor-managed PCs. Personal PCs with Smart App Control on need a publicly trusted certificate.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  MuchSmarter is a player only and provides no channels or content. You need your own IPTV subscription or playlist.
+</footer>
+
+<script>
+(() => {
+  // Hero: theme "channels"
+  const img = document.getElementById('tvImg');
+  const osd = document.getElementById('tvOsd');
+  const chs = [...document.querySelectorAll('.ch')];
+  for (const b of chs) b.addEventListener('click', () => {
+    chs.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    img.style.opacity = '0.25';
+    const next = new Image();
+    next.onload = () => { img.src = b.dataset.src; img.alt = 'MuchSmarter 3D home screen, ' + b.dataset.name + ' theme'; img.style.opacity = '1'; };
+    next.src = b.dataset.src;
+    osd.textContent = 'CH ' + b.dataset.n + ' · ' + b.dataset.name.toUpperCase();
+  });
+  // Preload theme images so switching is instant.
+  chs.slice(1).forEach((b) => { const p = new Image(); p.src = b.dataset.src; });
+
+  // Tour tabs
+  const tour = [
+    ['Live TV', 'shots/live.jpg', 'Categories, channels with what is on now, and the player with its programme list. Shows from the past few days play from the archive (catch-up). Tap the record button on anything coming up.'],
+    ['TV Guide', 'shots/guide.jpg', 'A grid of every channel against time, with a red line for now. Pick a programme to watch it, record it once, or record the whole series. The player keeps going in a mini window you can drag anywhere.'],
+    ['Movies', 'shots/movies.jpg', 'Posters with ratings, sorted by recently added, name or rating. Pick up where you left off, download for offline viewing, or watch the trailer.'],
+    ['Series', 'shots/series.jpg', 'Seasons and episodes with watched markers. Play continues to the next episode, and you can download a single episode, a season or the whole series.'],
+    ['Downloads', 'shots/downloads.jpg', 'Pause and resume, rename, move into folders, drag to reorder the queue, filter, search and work on many at once.'],
+    ['Favorites', 'shots/favorites.jpg', 'Channels, movies and series in one list. Remove any single entry, group them, reorder them or clear by type. Recently Viewed works the same way.'],
+    ['Captions', 'shots/settings.jpg', 'Closed captions and subtitles, on by default if you like, styled your way: size, font, text and background colours, opacity, edge and position.'],
+    ['Themes', 'shots/themes.jpg', 'Eight built-in 3D backgrounds, your own design from a picture or video, and installable .smartertheme packages to share. Switch to a standard screen any time.'],
+  ];
+  const tabs = [...document.querySelectorAll('.tab')];
+  const view = document.getElementById('tourView');
+  const tImg = document.getElementById('tourImg');
+  const tTitle = document.getElementById('tourTitle');
+  const tText = document.getElementById('tourText');
+  function show(i, focus) {
+    const [title, src, text] = tour[i];
+    tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === i)); t.tabIndex = j === i ? 0 : -1; });
+    view.setAttribute('aria-labelledby', tabs[i].id);
+    tImg.src = src; tImg.alt = 'MuchSmarter ' + title + ' screen';
+    tTitle.textContent = title; tText.textContent = text;
+    if (focus) tabs[i].focus();
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => show(i));
+    t.addEventListener('keydown', (e) => {
+      const k = e.key;
+      if (k === 'ArrowDown' || k === 'ArrowRight') { e.preventDefault(); show((i + 1) % tabs.length, true); }
+      if (k === 'ArrowUp' || k === 'ArrowLeft') { e.preventDefault(); show((i - 1 + tabs.length) % tabs.length, true); }
+    });
+  });
+  show(0);
+  tour.slice(1).forEach(([, src]) => { const p = new Image(); p.src = src; });
+})();
+</script>
+
+</body></html>

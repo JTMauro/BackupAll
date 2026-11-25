@@ -1,0 +1,1 @@
+- 2026-11-25: first full backup: 69 sessions, 120 artifacts

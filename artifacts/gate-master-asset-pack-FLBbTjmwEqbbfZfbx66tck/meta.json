@@ -1,0 +1,363 @@
+{
+ "title": "Gate Master Asset Pack",
+ "url": "https://claude.ai/artifact/FLBbTjmwEqbbfZfbx66tck",
+ "type": "web page",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "INTEGRATION.txt",
+   "bytes": 3895,
+   "sha256": "15f45d6f999389068d4de0f7039018804c0a2e66a9d9feb28dbde74749a52897"
+  },
+  {
+   "path": "audio/ambient_hum_loop.wav",
+   "bytes": 352878,
+   "sha256": "851ba9a36f700315e5e52976d6984971f14abde08b86b647e2819dbd848fa69f"
+  },
+  {
+   "path": "audio/button_press.mp3",
+   "bytes": 5060,
+   "sha256": "17453e2c448c6293f89b46ce16a5f9894612a98029573ebeba894cf75ee13203"
+  },
+  {
+   "path": "audio/button_release.mp3",
+   "bytes": 4120,
+   "sha256": "85fe2c6a8e221f45e23f391d301b10ba6b957fbe2e6f3a4ea10e5b27626faa2a"
+  },
+  {
+   "path": "audio/cube_drop.mp3",
+   "bytes": 18539,
+   "sha256": "f2299638083559649ce903cf4c15c8f67cabf0697e0591d20b199cd43c63d19f"
+  },
+  {
+   "path": "audio/cube_pickup.mp3",
+   "bytes": 7881,
+   "sha256": "4141ba37d9ed23499ab35a7e62d3e52617168154d16a965a5a941cd6013175ec"
+  },
+  {
+   "path": "audio/door_close.mp3",
+   "bytes": 27316,
+   "sha256": "25a97af0a61c2a954a9aa6ef7acdd33010b00c8ea9fe75c5dbdda20f65ff0940"
+  },
+  {
+   "path": "audio/door_open.mp3",
+   "bytes": 26063,
+   "sha256": "416f90b637cf0cc88a3485fc1fd9a7ebdce6c462fb263b06fee386436f01c654"
+  },
+  {
+   "path": "audio/exit_choir.mp3",
+   "bytes": 100041,
+   "sha256": "ce79b65172753918fc8e8bd5b21b04a2b9cd271101545127d2c12f19757f15da"
+  },
+  {
+   "path": "audio/fizzler_erase.mp3",
+   "bytes": 11643,
+   "sha256": "75a03a5e492010d2c6d2aabc1a2b98894425497052da7c9d729a1585ee7f7508"
+  },
+  {
+   "path": "audio/footstep_1.mp3",
+   "bytes": 3806,
+   "sha256": "f0dbd08896e030cd4dc3a12463cf54f28ecbf2cefea2b163d5f29eb8f3d678a6"
+  },
+  {
+   "path": "audio/footstep_2.mp3",
+   "bytes": 3806,
+   "sha256": "71036086db18487b48ba5af407a8aa0c75814cc7a4095f6d38191865f45c0fda"
+  },
+  {
+   "path": "audio/footstep_3.mp3",
+   "bytes": 3806,
+   "sha256": "d8a1bfeb46d6597a126b0a268bda3407f516dae2fc3c6de553dc246c4463deaf"
+  },
+  {
+   "path": "audio/footstep_4.mp3",
+   "bytes": 3806,
+   "sha256": "20794a6503962ad5f34e3581883d74f2aea857c02f4278070b5cf02abcab582a"
+  },
+  {
+   "path": "audio/goo_death.mp3",
+   "bytes": 20107,
+   "sha256": "06402ef4e5dbf8e5efd1cd9aeb22e6775526776d9742e12cf9b9a4fb97d8ae62"
+  },
+  {
+   "path": "audio/guard_alert.mp3",
+   "bytes": 9135,
+   "sha256": "5ad1f17ba3a1622deac082f97728c13d0ca4c20819cd344706a9fcefe4b3f3da"
+  },
+  {
+   "path": "audio/guard_knockover.mp3",
+   "bytes": 16658,
+   "sha256": "49c7cd67321a75f666a2ef408db966538266d7291538aea520e4fd29966b72d2"
+  },
+  {
+   "path": "audio/guard_shot.mp3",
+   "bytes": 15091,
+   "sha256": "ec1a3b3beba6728e0aca66bb997c1979caf4874d5d837b22cd098e79459c1e54"
+  },
+  {
+   "path": "audio/jump.mp3",
+   "bytes": 6314,
+   "sha256": "8bd8a4fe1a56b5968219df01d615d2cdf873428a6f72d5db0f671a8688d0dd5e"
+  },
+  {
+   "path": "audio/ladder_climb_1.mp3",
+   "bytes": 6941,
+   "sha256": "31819cb7a270823bb829a923c4341fcaad8eff06ce7ccb99eb8e4fa91e7de1b7"
+  },
+  {
+   "path": "audio/ladder_climb_2.mp3",
+   "bytes": 6941,
+   "sha256": "9f603c0912b1ee0c29e684ccb7b1c99f3ac6b67d8eea6d54c28df22fbfe518cc"
+  },
+  {
+   "path": "audio/land.mp3",
+   "bytes": 6941,
+   "sha256": "b7a9c21ad88a8a67756c7dbdab9fdae90930027d5ec1c5266a37562a93bb47f1"
+  },
+  {
+   "path": "audio/laser_burn.mp3",
+   "bytes": 10389,
+   "sha256": "4b70520da1edbfeccd97c70a25a117f2f43a9b7ee1576c74c03549b4d3398636"
+  },
+  {
+   "path": "audio/laser_hum_loop.wav",
+   "bytes": 176478,
+   "sha256": "07f4afa890c5b3750b8e41c459d5f2bf08a17049ba733ec98e22853e7ea24ef4"
+  },
+  {
+   "path": "audio/launch_pad.mp3",
+   "bytes": 22614,
+   "sha256": "3d7120aeeb3dc6c5f9d7d03db60765e7cd86f4993e7c9039794ccb8bf9cdbdc9"
+  },
+  {
+   "path": "audio/ledge_grab.mp3",
+   "bytes": 5687,
+   "sha256": "efe33811d78e9da04f3bc2ba57fa2c9363411f4a0fe3d298e619057141b87ff5"
+  },
+  {
+   "path": "audio/level_complete.mp3",
+   "bytes": 36094,
+   "sha256": "d48d2c5907d1ae6125c8bbbdd57babb65fcd733c147ba6a4b9ec05c33e3b268a"
+  },
+  {
+   "path": "audio/portal_fire_blue.mp3",
+   "bytes": 13524,
+   "sha256": "c6af5518f00f2156ce9dd76dd9466cfaa5bee9e0c3ef8de81d3be18b5f3d830e"
+  },
+  {
+   "path": "audio/portal_fire_orange.mp3",
+   "bytes": 13524,
+   "sha256": "7e103d54acda85bddce35b2d1fe7dd7a899d46d2f0d9a319ca7f20a8eccf56d6"
+  },
+  {
+   "path": "audio/portal_open.mp3",
+   "bytes": 29824,
+   "sha256": "1cd2758c892f519bfd1e9b002d4ff3a472a600ca35cee026774e6a827e9fb629"
+  },
+  {
+   "path": "audio/robot_beep_1.mp3",
+   "bytes": 3493,
+   "sha256": "a7dde3bb8b0eb07aae6dc09b15d1d0e8e4581db9bc3cd767b2e2446e3149348c"
+  },
+  {
+   "path": "audio/robot_beep_2.mp3",
+   "bytes": 4747,
+   "sha256": "c6b8661e56ac567a91bacf0e977f4a4edadad33391f466a2502ca3ad12810ca8"
+  },
+  {
+   "path": "audio/robot_beep_3.mp3",
+   "bytes": 5687,
+   "sha256": "83e457b6fbe22d79838066b5e0724c41926b6941e08911329b04e56626ca53b9"
+  },
+  {
+   "path": "audio/teleport_whoosh.mp3",
+   "bytes": 19166,
+   "sha256": "208456d4579e520c0e86d6084a9ba3a7060e81bb513986d2531b54f343202622"
+  },
+  {
+   "path": "fx/exit_glow.png",
+   "bytes": 27788,
+   "sha256": "00df731d18f4c7599199984d3b5dfd85a60999fcd9ac14fc604c015d750f6c00"
+  },
+  {
+   "path": "fx/exit_shafts.png",
+   "bytes": 47373,
+   "sha256": "5254b8a4f910be617046709a1468bf1c1e3306854ef64fde9fb377d022f24db4"
+  },
+  {
+   "path": "fx/goo_bubble.png",
+   "bytes": 5012,
+   "sha256": "cc9ddaffe26d5d9dc16d0aee82f3bd3ef300d4eda13cb947c7cdf5dd1403ecdc"
+  },
+  {
+   "path": "fx/lift_column.png",
+   "bytes": 10331,
+   "sha256": "5815942dfbb32da9331510f8f2cfcaff4e88c5588a6c3b71d69eacf10db61754"
+  },
+  {
+   "path": "fx/moon_glow.png",
+   "bytes": 6660,
+   "sha256": "54e0b4bea828c12994590ca1510376153c4922033083351e3abbc533b7a1a8d9"
+  },
+  {
+   "path": "fx/moon_mote.png",
+   "bytes": 1387,
+   "sha256": "eac9875f91c89fd2f4d48bc9290d80dd97af54daa6b5174e646077318f4559cc"
+  },
+  {
+   "path": "index.html",
+   "bytes": 22240,
+   "sha256": "5201a453066604f85c92b6f878a3aa116ecdf4d7c85c53de7dfe549296bbb4ec"
+  },
+  {
+   "path": "models/cube_dispenser.gltf.json",
+   "bytes": 63197,
+   "sha256": "2c47ba159ac784d16db4b6c3d4e001303c8f13322a13dce69c29c9a73d9117f7"
+  },
+  {
+   "path": "models/door_shutter.gltf.json",
+   "bytes": 30461,
+   "sha256": "e9a5edc9283fe00c363d73eb1d858169a536a7f6beb8ee23d8490444cd6709c3"
+  },
+  {
+   "path": "models/exit_frame.gltf.json",
+   "bytes": 17753,
+   "sha256": "58afedf2ebbeba18320cf4370304435fa5bd8e5a870de0e8633bb607612d7765"
+  },
+  {
+   "path": "models/floor_button.gltf.json",
+   "bytes": 67110,
+   "sha256": "a7517375fa91a7801ab54c89a120b918599542633cbe9cc3b399cab158ee3d4e"
+  },
+  {
+   "path": "models/guard.gltf.json",
+   "bytes": 544816,
+   "sha256": "9a9ad3490e9448d659adbeb0172219e1432d1352d98575ca948288c3137918d8"
+  },
+  {
+   "path": "models/ladder.gltf.json",
+   "bytes": 59075,
+   "sha256": "d46ecaa184079318482ac8eab11d1edea89bba7ded377cf6548fe28fc6ce4223"
+  },
+  {
+   "path": "models/laser_emitter.gltf.json",
+   "bytes": 31814,
+   "sha256": "e84e9b46bb4a800c5d117e27ce6b27c8bfbe29e88e9ce122cc183075e402f72c"
+  },
+  {
+   "path": "models/laser_receiver.gltf.json",
+   "bytes": 55107,
+   "sha256": "37d3b380ffddea9995c210ee5f17b48cb6b10de878df141d47774f5d4f3c92a9"
+  },
+  {
+   "path": "models/launch_pad.gltf.json",
+   "bytes": 30355,
+   "sha256": "89076c81c67c473c7aeccb228c2369be6c1958b8de92d246d9a84e14830f3fea"
+  },
+  {
+   "path": "models/player.gltf.json",
+   "bytes": 562694,
+   "sha256": "5148c259e2d18d5dc8b991a47469fbf8bf5ebf8617dca2ff1e457d67f4728a50"
+  },
+  {
+   "path": "models/robot_friend.gltf.json",
+   "bytes": 223147,
+   "sha256": "0a432a16124e0e852f6c5ae613043688a72a492be199cd8fd3ef6a94f2ef19d3"
+  },
+  {
+   "path": "models/weighted_cube.gltf.json",
+   "bytes": 52690,
+   "sha256": "420671af58592c5510c6fd89d53ba938937a4c39ddb59c7bf3d2598f5b3ba1a2"
+  },
+  {
+   "path": "tex/back_wall_albedo.jpg",
+   "bytes": 6712,
+   "sha256": "a502423a087faf0f739a617aae2a2bf58ec948138b8e168e1ae4a7de85c27fcd"
+  },
+  {
+   "path": "tex/back_wall_normal.jpg",
+   "bytes": 24753,
+   "sha256": "ae2d96bd1638d76211749f8ebebe1254b90c177959f3c157d6e5f58eb54c8eaa"
+  },
+  {
+   "path": "tex/back_wall_rough.jpg",
+   "bytes": 11433,
+   "sha256": "39f40e4d288f157d95c97554329c28d659a700cfabde211c57001390c08077b7"
+  },
+  {
+   "path": "tex/floor_plate_albedo.jpg",
+   "bytes": 16209,
+   "sha256": "64bf64c9ac1fd9cf3487f3d309a223165bb453c7c9ed0bce4b3d0d5351d3178b"
+  },
+  {
+   "path": "tex/floor_plate_normal.jpg",
+   "bytes": 35469,
+   "sha256": "4360c6841eff2a2441d01d322c2b37eb124a74fe3f34b1fbe8eeaed66da32612"
+  },
+  {
+   "path": "tex/floor_plate_rough.jpg",
+   "bytes": 21202,
+   "sha256": "0b4777c08a8a7530d1005e15c6de8671ec5a79951b7ffb5c977aa5ea100828b5"
+  },
+  {
+   "path": "tex/goo_albedo.jpg",
+   "bytes": 8747,
+   "sha256": "fd28e2e5dc3c2defb75e98e9b7a6bdd7624f02e23d52d42114f1f068ecb60442"
+  },
+  {
+   "path": "tex/goo_normal.jpg",
+   "bytes": 35581,
+   "sha256": "041c2af3311d9d3b7dfb6ceb6a8145ea20bbfe3558da349388614e465ac64807"
+  },
+  {
+   "path": "tex/goo_rough.jpg",
+   "bytes": 14454,
+   "sha256": "1dc5e54092089ba195e40bdeef234324eac0d58043bc226eb9e0702bc91e298a"
+  },
+  {
+   "path": "tex/pit_wall_albedo.jpg",
+   "bytes": 22580,
+   "sha256": "06f5eac790738e9945728c2efbf1dd1fb9c050dae25b4db73c5823668a1319c0"
+  },
+  {
+   "path": "tex/pit_wall_normal.jpg",
+   "bytes": 34624,
+   "sha256": "26ed0770bfa3f111ffaf8589f9566c3a9a38f40c53ee1c31c023a9c38eedbdf5"
+  },
+  {
+   "path": "tex/pit_wall_rough.jpg",
+   "bytes": 27522,
+   "sha256": "0fa59fddc6d737c459cd1d1789bd1cb3154a76ec8fb2f987260ceefa0a06c8fc"
+  },
+  {
+   "path": "tex/wall_metal_albedo.jpg",
+   "bytes": 12813,
+   "sha256": "4471dd143c6efbbad629aa3c2c13a04da3b00070432b9df23026ea28becab24d"
+  },
+  {
+   "path": "tex/wall_metal_normal.jpg",
+   "bytes": 41794,
+   "sha256": "a2aad1642b0f409b03dc03f82d2e668462ea49c0a7095035d22ab210c6c30d43"
+  },
+  {
+   "path": "tex/wall_metal_rough.jpg",
+   "bytes": 17957,
+   "sha256": "73e76ce4fb32e1ab3215650616a651dcbb590e0ba2fb56887818a3d8a467e622"
+  },
+  {
+   "path": "tex/wall_white_albedo.jpg",
+   "bytes": 14564,
+   "sha256": "ae95c79fc1eca8d33a7ba34901077aace16202aa01bc05da61445e65af8783de"
+  },
+  {
+   "path": "tex/wall_white_normal.jpg",
+   "bytes": 43214,
+   "sha256": "b95e30bd0b6a2ba19d6f728dc084d8ea74922f0de055ee24b0030edee29c906a"
+  },
+  {
+   "path": "tex/wall_white_rough.jpg",
+   "bytes": 13553,
+   "sha256": "cac0fad2e709e79897267e8577cb8b7dd5d9af8d142f655ac62e8eb2686fb138"
+  }
+ ]
+}

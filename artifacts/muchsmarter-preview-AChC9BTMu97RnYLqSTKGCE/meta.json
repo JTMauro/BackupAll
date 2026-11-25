@@ -1,0 +1,103 @@
+{
+ "title": "MuchSmarter Preview",
+ "url": "https://claude.ai/artifact/AChC9BTMu97RnYLqSTKGCE",
+ "type": "web page",
+ "updated": "2026-11-04",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 19992,
+   "sha256": "bc07581bb987a0c9fd58af492cdcb1525516b65a85f71fbb556b2c052ccdb1e6"
+  },
+  {
+   "path": "shots/downloads.jpg",
+   "bytes": 37585,
+   "sha256": "eeb31e63c9746ca6796705332e79624641fda947d74371e2d77e0d9fc136ab58"
+  },
+  {
+   "path": "shots/favorites.jpg",
+   "bytes": 33318,
+   "sha256": "d55ee3ec1e8b222885bdb2ccdd8de87d6227745290fe02f68fbf82a44a4b1103"
+  },
+  {
+   "path": "shots/guide.jpg",
+   "bytes": 153535,
+   "sha256": "e7f73d4deaffb75c8f540585a94f154a2a8cc9f8304e5d631acb7840d448a10c"
+  },
+  {
+   "path": "shots/home-futuristic.jpg",
+   "bytes": 195907,
+   "sha256": "6ac1f50e5e8bf24d9df8adf373f476cfdcaee39bd83ae123fc309f5127a1210f"
+  },
+  {
+   "path": "shots/home-paleolithic.jpg",
+   "bytes": 99335,
+   "sha256": "5079afb1f983a89057c0f86c0d70892cd22c9b3e4c6f28eacb5a380c4a7d110b"
+  },
+  {
+   "path": "shots/home-standard.jpg",
+   "bytes": 79745,
+   "sha256": "0c2b7300fd0c2897739626cfe6a5752052ef2fb0c30a4f80473bec1943387397"
+  },
+  {
+   "path": "shots/home-sunset.jpg",
+   "bytes": 88406,
+   "sha256": "40526e171b127465442dad928a290a21f9a77bcc5a763e1f1146689a7520607c"
+  },
+  {
+   "path": "shots/home-techno.jpg",
+   "bytes": 135226,
+   "sha256": "b212c66aa490b98895c7d37d98c8b4b96a93f80a2822032f2ef0551307a0aa41"
+  },
+  {
+   "path": "shots/icon.png",
+   "bytes": 20255,
+   "sha256": "541a23d556ea1e8b8f86de381735cd667fc4ce094e526be7fb1e4070a34c1674"
+  },
+  {
+   "path": "shots/live.jpg",
+   "bytes": 117125,
+   "sha256": "105fa8d4265fe8d8a09f02b78dc1b2fed74a1a7582aab8a68042f345dec090f1"
+  },
+  {
+   "path": "shots/movies.jpg",
+   "bytes": 100548,
+   "sha256": "04308946f528fd098b383f9e1c4fe924fd1ff4dc1e7214b7c626611c4b172bac"
+  },
+  {
+   "path": "shots/phone-guide.jpg",
+   "bytes": 50123,
+   "sha256": "ca2b76ae9e3ad2f6ceb1863c9b0c3701e3d2a6360d70ffbf8d41e57498ae6562"
+  },
+  {
+   "path": "shots/phone-home.jpg",
+   "bytes": 31635,
+   "sha256": "9e58ab5c4314e8a47924613a7165427c3e71c90e91df141b9620c5c2ffc1e89e"
+  },
+  {
+   "path": "shots/phone-live.jpg",
+   "bytes": 42232,
+   "sha256": "da9de61137becdb534ffcaa563be0c71cdbc0a3b87188aeff0520a73d6c51321"
+  },
+  {
+   "path": "shots/phone-movies.jpg",
+   "bytes": 43448,
+   "sha256": "8e8718616ec8dc6d4eb1259f0e45736455e0b0fe6991e89b706fbe7a309d7350"
+  },
+  {
+   "path": "shots/series.jpg",
+   "bytes": 40613,
+   "sha256": "030bc2bc3098af2ff04f7ce5231bb0e927cf8fd49d7c5bb55c577e7fbf2adea3"
+  },
+  {
+   "path": "shots/settings.jpg",
+   "bytes": 35969,
+   "sha256": "9af02f8a05afcfd739f0883a8606a7d8ae64045941fda3c436c8f026ae40c252"
+  },
+  {
+   "path": "shots/themes.jpg",
+   "bytes": 67346,
+   "sha256": "fff61f9441f94469d17429ee6cb03e9ee5ebdbf256a219f9b18eb876656f05cf"
+  }
+ ]
+}

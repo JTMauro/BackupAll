@@ -1,0 +1,47 @@
+GATE MASTER ASSET PACK: integration notes (three.js r147, UMD)
+
+All files are original and generated procedurally (textures, models, sprites) or synthesized (audio).
+Nothing is copied from any other game. Embed them as base64 data: URLs for the offline single file.
+
+TEXTURES  tex/<set>_{albedo,normal,rough}.jpg  (512 px, seamless, 1 tile = 2 m in the board)
+  wall_white   portal-able plaster/concrete panel, seams at tile edges       metalness 0
+  wall_metal   dark brushed, bolted non-portal panel                         metalness ~0.85 with an envMap, ~0.45 without
+  floor_plate  2x2 plates, scuffs and bolts                                  metalness ~0.6
+  back_wall    large panels with vent slots                                  metalness 0
+  goo          toxic sludge. Scroll normalMap.offset slowly (e.g. t*0.012, t*0.007) and map.offset at half speed; roughness ~0.2
+  pit_wall     stained concrete with vertical drips for the pit walls and lip
+  albedo: texture.encoding = THREE.sRGBEncoding; normal/rough: linear. Normal maps use the OpenGL (+Y) convention three expects.
+
+MODELS  models/*.gltf.json  (glTF 2.0 JSON with the binary embedded as a base64 data URI; GLTFLoader loads it as-is.
+  The same models as .glb are available on request: the artifact host does not serve .glb files.)
+  player, guard (TestSubject, Guard): Mixamo skeleton with glTF node names "mixamorig:Hips" etc.
+    NOTE: GLTFLoader strips ':' from names (PropertyBinding.sanitizeNodeName), so after loading look up
+    "mixamorigHips", "mixamorigRightArm", ... This is the same as for any Mixamo GLB loaded in three.js.
+    Clips: Idle (3.0 s), Walk (1.1 s), Run (0.68 s), all in place (no root motion). Facing +Z, height ~1.75 m.
+    Rest pose is a T-pose (arms along ±X), like Mixamo. The bodies are rigid parts parented to bones (no skinning),
+    so Mixamo clips and your own bone rotations both drive them.
+  robot_friend: ~1.2 m. Bones Body, Head, LegL, LegR, ArmL, ArmR. Clips Idle and Walk. The eye mesh is named "Eye".
+  Items (named parts to animate):
+    weighted_cube (0.8 m; "Light" rings), floor_button ("Pad": lower ~0.06 m when pressed; "StatusLight"),
+    door_shutter ("DoorLeft"/"DoorRight": slide ±1.0 m on x; "Indicator"), laser_emitter / laser_receiver
+    (beam along +Z from "Lens"), launch_pad ("Plate", "Chevron"), ladder (4 m), cube_dispenser ("Hatch"),
+    exit_frame ("DoorLeft"/"DoorRight", "Trim").
+  glTF limits emissive to 1: after loading, set material.emissiveIntensity = 2-3 on meshes with an emissive colour
+  so lights and lenses glow (the board does this).
+
+EFFECTS  fx/*.png  (additive blending, depthWrite false)
+  moon_glow.png   soft see-through haze, alpha ≤ 0.35. Use 3-5 camera-facing quads at opacity ~0.25-0.3. This is
+                  what keeps it from washing the scene white; don't stack more than that.
+  moon_mote.png   floating particle (PointsMaterial map, size ~0.12)
+  lift_column.png vertical streaks: open cylinder, wrap RepeatWrapping, scroll texture.offset.y = -t*0.35
+  exit_glow.png   warm bloom quad behind the exit doorway
+  exit_shafts.png light shafts (god rays) fanning down: tall quad above and behind the doorway
+  goo_bubble.png  pop ring for the goo surface (scale up and fade)
+
+AUDIO  audio/*.mp3 (44.1 kHz mono, 96 kbps), loops as WAV (22.05 kHz) so they loop without gaps
+  Peaks ≤ -1 dBFS, loudness-balanced (RMS about -17 dB for one-shots, -22 dB for loops).
+  portal_fire_blue, portal_fire_orange, portal_open, teleport_whoosh, footstep_1..4, jump, land, ledge_grab,
+  ladder_climb_1..2, cube_pickup, cube_drop, button_press, button_release, door_open, door_close,
+  laser_hum_loop (4 s loop), laser_burn, guard_alert (non-verbal alarm), guard_shot, guard_knockover,
+  robot_beep_1..3, launch_pad, goo_death, fizzler_erase, exit_choir (synthesized vowel-pad swell, 8 s),
+  ambient_hum_loop (8 s loop), level_complete.

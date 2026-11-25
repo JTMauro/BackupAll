@@ -44,8 +44,8 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Intelligence or Ignorance: AI, Work, and the Future | Docs | 2026-11-18 | https://claude.ai/artifact/RC959XHTmAFJyLBTa9sEbC | `intelligence-or-ignorance--ai--work--and-the-future-RC959XHTmAFJyLBTa9sEbC/` |
 | Dirty Work (novel) | Docs | 2026-11-18 | https://claude.ai/artifact/49RHiLcwb7xnaAiDwaZHRe | `dirty-work--novel--49RHiLcwb7xnaAiDwaZHRe/` |
 | Burning Lead Assets | web page | 2026-11-18 | https://claude.ai/artifact/NqP6L8uJDwD4KamMwKXrip | `burning-lead-assets-NqP6L8uJDwD4KamMwKXrip/` |
-| Gate Master Asset Pack | web page | 2026-11-18 | https://claude.ai/artifact/FLBbTjmwEqbbfZfbx66tck | - |
-| Kessel Run FX Lab | web page | 2026-11-18 | https://claude.ai/artifact/Jkdqe85BjNnWnPPtPwYdVA | - |
+| Gate Master Asset Pack | web page | 2026-11-18 | https://claude.ai/artifact/FLBbTjmwEqbbfZfbx66tck | `gate-master-asset-pack-FLBbTjmwEqbbfZfbx66tck/` |
+| Kessel Run FX Lab | web page | 2026-11-18 | https://claude.ai/artifact/Jkdqe85BjNnWnPPtPwYdVA | `kessel-run-fx-lab-Jkdqe85BjNnWnPPtPwYdVA/` |
 | Kessel Run FX Board | web page | 2026-11-18 | https://claude.ai/artifact/W3LvwsdMZAGvqNSaaxb2nA | `kessel-run-fx-board-W3LvwsdMZAGvqNSaaxb2nA/` |
 | Kessel Run Assets | web page | 2026-11-18 | https://claude.ai/artifact/JW1X3ABBwaHKaJuX99oFYD | `kessel-run-assets-JW1X3ABBwaHKaJuX99oFYD/` |
 | Builder | web page | 2026-11-18 | https://claude.ai/artifact/9kXvZweupQE92LDPRjGSUk | `builder-9kXvZweupQE92LDPRjGSUk/` |
@@ -101,10 +101,10 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Voice Studio | web page | 2026-11-05 | https://claude.ai/artifact/P3r4cRrroL7qsGVF7JnYp8 | `voice-studio-P3r4cRrroL7qsGVF7JnYp8/` |
 | MuchSmarter App | web page | 2026-11-15 | https://claude.ai/artifact/QLitQawoE9VVVD3oVmBWZq | `muchsmarter-app-QLitQawoE9VVVD3oVmBWZq/` |
 | Laptop and Personal Belongings Security Reminder | Docs | 2026-10-30 | https://claude.ai/artifact/TmmWDjqC1nELsTMuHumJHq | `laptop-and-personal-belongings-security-reminder-TmmWDjqC1nELsTMuHumJHq/` |
-| TV shortlist: 6 options ranked | web page | 2026-11-04 | https://claude.ai/artifact/FipX1SyuVhBLTFRsNvMcKB | - |
+| TV shortlist: 6 options ranked | web page | 2026-11-04 | https://claude.ai/artifact/FipX1SyuVhBLTFRsNvMcKB | `tv-shortlist--6-options-ranked-FipX1SyuVhBLTFRsNvMcKB/` |
 | Secure File Server: Feature Specification | Docs | 2026-11-04 | https://claude.ai/artifact/4Y7nd8C3v53cTscUAH5Z9w | `secure-file-server--feature-specification-4Y7nd8C3v53cTscUAH5Z9w/` |
-| MuchSmarter Preview | web page | 2026-11-04 | https://claude.ai/artifact/AChC9BTMu97RnYLqSTKGCE | - |
-| CYDNI Designs | Design | 2026-11-03 | https://claude.ai/artifact/KzQ92AbwTHr4W5p9bmcxKP | - |
+| MuchSmarter Preview | web page | 2026-11-04 | https://claude.ai/artifact/AChC9BTMu97RnYLqSTKGCE | `muchsmarter-preview-AChC9BTMu97RnYLqSTKGCE/` |
+| CYDNI Designs | Design | 2026-11-03 | https://claude.ai/artifact/KzQ92AbwTHr4W5p9bmcxKP | `cydni-designs-KzQ92AbwTHr4W5p9bmcxKP/` |
 | FileVersionFix | web page | 2026-11-02 | https://claude.ai/artifact/5ZTo9wPyjyq3WRPeYbSgp5 | - |
 | Sign This Guide | web page | 2026-11-02 | https://claude.ai/artifact/UY1dVLvvhhGjA8Rzzhhxaq | - |
 | Proximia Connect — Executive Security Overview | Docs | 2026-10-29 | https://claude.ai/artifact/QzTZFwmwoK8UdL6RJCw7st | `proximia-connect---executive-security-overview-QzTZFwmwoK8UdL6RJCw7st/` |
