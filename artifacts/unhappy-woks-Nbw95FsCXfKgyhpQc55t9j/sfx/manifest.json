@@ -1,0 +1,288 @@
+{
+ "game": "Unhappy Woks",
+ "made_with": "Builder (synthesized, original)",
+ "files": [
+  {
+   "file": "bramble_launch_1.mp3",
+   "kind": "voice",
+   "seconds": 0.75,
+   "bytes": 8143
+  },
+  {
+   "file": "bramble_launch_2.mp3",
+   "kind": "voice",
+   "seconds": 0.71,
+   "bytes": 7882
+  },
+  {
+   "file": "bramble_launch_3.mp3",
+   "kind": "voice",
+   "seconds": 0.84,
+   "bytes": 9188
+  },
+  {
+   "file": "bramble_power.mp3",
+   "kind": "voice",
+   "seconds": 0.57,
+   "bytes": 6314
+  },
+  {
+   "file": "bramble_oof.mp3",
+   "kind": "voice",
+   "seconds": 0.38,
+   "bytes": 4486
+  },
+  {
+   "file": "soot_launch_1.mp3",
+   "kind": "voice",
+   "seconds": 0.48,
+   "bytes": 5531
+  },
+  {
+   "file": "soot_launch_2.mp3",
+   "kind": "voice",
+   "seconds": 0.84,
+   "bytes": 9188
+  },
+  {
+   "file": "soot_launch_3.mp3",
+   "kind": "voice",
+   "seconds": 1.0,
+   "bytes": 10755
+  },
+  {
+   "file": "soot_power.mp3",
+   "kind": "voice",
+   "seconds": 0.4,
+   "bytes": 4747
+  },
+  {
+   "file": "soot_oof.mp3",
+   "kind": "voice",
+   "seconds": 0.38,
+   "bytes": 4486
+  },
+  {
+   "file": "pip_launch_1.mp3",
+   "kind": "voice",
+   "seconds": 1.05,
+   "bytes": 11278
+  },
+  {
+   "file": "pip_launch_2.mp3",
+   "kind": "voice",
+   "seconds": 0.7,
+   "bytes": 7621
+  },
+  {
+   "file": "pip_launch_3.mp3",
+   "kind": "voice",
+   "seconds": 1.09,
+   "bytes": 11539
+  },
+  {
+   "file": "pip_power.mp3",
+   "kind": "voice",
+   "seconds": 0.4,
+   "bytes": 4747
+  },
+  {
+   "file": "pip_oof.mp3",
+   "kind": "voice",
+   "seconds": 0.38,
+   "bytes": 4486
+  },
+  {
+   "file": "ash_launch_1.mp3",
+   "kind": "voice",
+   "seconds": 1.45,
+   "bytes": 15196
+  },
+  {
+   "file": "ash_launch_2.mp3",
+   "kind": "voice",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "ash_launch_3.mp3",
+   "kind": "voice",
+   "seconds": 0.95,
+   "bytes": 10233
+  },
+  {
+   "file": "ash_power.mp3",
+   "kind": "voice",
+   "seconds": 0.78,
+   "bytes": 8404
+  },
+  {
+   "file": "ash_oof.mp3",
+   "kind": "voice",
+   "seconds": 0.7,
+   "bytes": 7621
+  },
+  {
+   "file": "thornback_launch_1.mp3",
+   "kind": "voice",
+   "seconds": 1.15,
+   "bytes": 12323
+  },
+  {
+   "file": "thornback_launch_2.mp3",
+   "kind": "voice",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "thornback_launch_3.mp3",
+   "kind": "voice",
+   "seconds": 1.31,
+   "bytes": 13890
+  },
+  {
+   "file": "thornback_power.mp3",
+   "kind": "voice",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "thornback_oof.mp3",
+   "kind": "voice",
+   "seconds": 0.7,
+   "bytes": 7621
+  },
+  {
+   "file": "grumble_1.mp3",
+   "kind": "voice",
+   "seconds": 1.32,
+   "bytes": 13890
+  },
+  {
+   "file": "grumble_2.mp3",
+   "kind": "voice",
+   "seconds": 0.73,
+   "bytes": 8143
+  },
+  {
+   "file": "grumble_3.mp3",
+   "kind": "voice",
+   "seconds": 1.11,
+   "bytes": 11800
+  },
+  {
+   "file": "grumble_4.mp3",
+   "kind": "voice",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "wood_hit.mp3",
+   "kind": "impact",
+   "seconds": 0.46,
+   "bytes": 5270
+  },
+  {
+   "file": "wood_break.mp3",
+   "kind": "impact",
+   "seconds": 0.59,
+   "bytes": 6576
+  },
+  {
+   "file": "stone_hit.mp3",
+   "kind": "impact",
+   "seconds": 0.3,
+   "bytes": 3702
+  },
+  {
+   "file": "stone_break.mp3",
+   "kind": "impact",
+   "seconds": 1.46,
+   "bytes": 15196
+  },
+  {
+   "file": "ice_hit.mp3",
+   "kind": "impact",
+   "seconds": 0.6,
+   "bytes": 6576
+  },
+  {
+   "file": "ice_break.mp3",
+   "kind": "impact",
+   "seconds": 1.15,
+   "bytes": 12061
+  },
+  {
+   "file": "metal_hit.mp3",
+   "kind": "impact",
+   "seconds": 1.3,
+   "bytes": 13629
+  },
+  {
+   "file": "metal_break.mp3",
+   "kind": "impact",
+   "seconds": 1.88,
+   "bytes": 19376
+  },
+  {
+   "file": "bot_hit.mp3",
+   "kind": "impact",
+   "seconds": 0.28,
+   "bytes": 3441
+  },
+  {
+   "file": "bot_break.mp3",
+   "kind": "impact",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "sentry_hit.mp3",
+   "kind": "impact",
+   "seconds": 0.23,
+   "bytes": 2919
+  },
+  {
+   "file": "sentry_break.mp3",
+   "kind": "impact",
+   "seconds": 1.8,
+   "bytes": 18592
+  },
+  {
+   "file": "boss_hit.mp3",
+   "kind": "impact",
+   "seconds": 1.1,
+   "bytes": 11800
+  },
+  {
+   "file": "boss_break.mp3",
+   "kind": "impact",
+   "seconds": 2.9,
+   "bytes": 29825
+  },
+  {
+   "file": "boss_intro.mp3",
+   "kind": "impact",
+   "seconds": 2.3,
+   "bytes": 23816
+  },
+  {
+   "file": "launch.mp3",
+   "kind": "impact",
+   "seconds": 0.53,
+   "bytes": 6053
+  },
+  {
+   "file": "victory.mp3",
+   "kind": "music",
+   "seconds": 8.12,
+   "bytes": 130865
+  },
+  {
+   "file": "menu_loop.mp3",
+   "kind": "music",
+   "seconds": 20.87,
+   "bytes": 334829
+  }
+ ]
+}

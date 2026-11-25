@@ -1,0 +1,100 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Crossed-Arms Teen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* layout: a photo-studio stage with soft key-light shadows, a slim control strip, and the model facts beneath */
+:root{--bg:#eceeef;--panel:#ffffff;--fg:#1f2326;--muted:#5f676d;--line:#d6dadd;--accent:#4f7aa8;
+--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16191b;--panel:#1f2326;--fg:#e8ecee;--muted:#9aa3a9;--line:#32383c;--accent:#7fa6cf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16191b;--panel:#1f2326;--fg:#e8ecee;--muted:#9aa3a9;--line:#32383c;--accent:#7fa6cf;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:14px}
+h1{font-family:var(--display);font-size:1.6rem;margin:0}
+p{margin:0;line-height:1.55;color:var(--muted);max-width:68ch}
+#stage{position:relative;width:100%;aspect-ratio:3/4;max-height:78vh;max-width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e9ebec}
+#stage canvas{display:block;width:100%;height:100%}
+#status{position:absolute;left:12px;bottom:10px;font:12px var(--mono);color:#5f676d}
+.bar{display:flex;flex-wrap:wrap;gap:8px}
+button{font:500 13px var(--body);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0;font-size:13px}
+dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding-top:2px}
+dd{margin:0;min-width:0;overflow-wrap:anywhere}
+code{font-family:var(--mono);font-size:12px}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap">
+<div class="wrap">
+  <h1>Crossed-Arms Teen</h1>
+  <p>A realistic 3D version of your photo, built free with Blender and MakeHuman: a smiling 16-year-old with a light brown side-swept fringe, blue eyes, a pale tee, light-wash jeans and olive sneakers, arms crossed. Lit like a studio shot with soft shadows. Drag to orbit, scroll or pinch to zoom.</p>
+  <div id="stage"><span id="status">Loading model…</span></div>
+  <div class="bar" id="bar">
+    <button type="button" data-v="front" aria-pressed="true">Front</button>
+    <button type="button" data-v="three" aria-pressed="false">Three-quarter</button>
+    <button type="button" data-v="side" aria-pressed="false">Side</button>
+    <button type="button" data-v="face" aria-pressed="false">Face</button>
+    <button type="button" id="turn" aria-pressed="false">Turntable</button>
+  </div>
+  <dl>
+    <dt>File</dt><dd><code>models/teen.json</code>, glTF 2.0, one embedded buffer, 5.1 MB, about 38,000 triangles</dd>
+    <dt>Parts</dt><dd>Body (skin), Hair, Eyes, Eyebrows, Eyelashes, Teeth, Clothes (tee and jeans), Shoes</dd>
+    <dt>Rig</dt><dd>MakeHuman’s Mixamo-named rig, saved in the crossed-arms pose with a smile</dd>
+    <dt>Size</dt><dd>1.68 m tall, metres, Y up, faces +Z</dd>
+    <dt>Licence</dt><dd>CC0 (MakeHuman assets). Matches the photo’s age, build, colouring, outfit and pose, not the real person’s identity.</dd>
+  </dl>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const stage = document.getElementById("stage"), status = document.getElementById("status");
+const r = new THREE.WebGLRenderer({ antialias: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.0; r.outputColorSpace = THREE.SRGBColorSpace;
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.prepend(r.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe9ebec);
+scene.add(new THREE.HemisphereLight(0xe6eeff, 0x6f665c, 1.0));
+const key = new THREE.DirectionalLight(0xfff1e0, 2.6); key.position.set(1.6, 3.0, 1.6); key.castShadow = true;
+Object.assign(key.shadow.camera, { left: -1.1, right: 1.1, top: 2.1, bottom: -0.3, near: 0.5, far: 9 });
+key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; key.shadow.radius = 3; scene.add(key);
+const fill = new THREE.DirectionalLight(0xdfe8ff, 0.45); fill.position.set(-2.5, 1.6, 1.5); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xcfdcff, 0.9); rim.position.set(-1, 2.2, -2.5); scene.add(rim);
+// a seamless studio floor that takes the shadow and fades into the backdrop
+const floorMat = new THREE.MeshStandardMaterial({ color: 0xd5d9dc, roughness: 1 });
+const floor = new THREE.Mesh(new THREE.CircleGeometry(6, 64), floorMat); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+// soft contact shadow right under the feet
+const cs = document.createElement("canvas"); cs.width = cs.height = 128; { const g = cs.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(0,0,0,0.45)"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+const contact = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cs), transparent: true, depthWrite: false }));
+contact.rotation.x = -Math.PI / 2; contact.position.y = 0.002; scene.add(contact);
+scene.fog = new THREE.Fog(0xe9ebec, 6, 12);
+const cam = new THREE.PerspectiveCamera(28, 3 / 4, 0.05, 50);
+const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true; ctl.minDistance = 0.5; ctl.maxDistance = 8; ctl.maxPolarAngle = Math.PI * 0.52;
+const VIEWS = { front: [[0, 1.0, 4.6], [0, 0.86, 0]], three: [[2.6, 1.15, 3.8], [0, 0.86, 0]], side: [[4.6, 1.0, 0.2], [0, 0.86, 0]], face: [[0.25, 1.52, 0.85], [0, 1.5, 0]] };
+function view(name) { const [p, t] = VIEWS[name]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); document.querySelectorAll("#bar [data-v]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === name))); }
+function size() { const w = stage.clientWidth, h = stage.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(stage); size(); view("front");
+const loader = new GLTFLoader();
+loader.register(parser => { parser.textureLoader = new THREE.TextureLoader(parser.options.manager); return { name: "img_textures" }; });
+async function loadEmbedded(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error(url + " returned " + res.status);
+  const json = await res.json(); const uri = json.buffers[0].uri; delete json.buffers[0].uri;
+  const bin = Uint8Array.from(atob(uri.slice(uri.indexOf(",") + 1)), c => c.charCodeAt(0)); json.buffers[0].byteLength = bin.length;
+  const js = new TextEncoder().encode(JSON.stringify(json)), jl = (js.length + 3) & ~3, bl = (bin.length + 3) & ~3;
+  const out = new Uint8Array(28 + jl + bl), dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, out.length, true);
+  dv.setUint32(12, jl, true); dv.setUint32(16, 0x4E4F534A, true); out.fill(0x20, 20, 20 + jl); out.set(js, 20);
+  dv.setUint32(20 + jl, bl, true); dv.setUint32(24 + jl, 0x004E4942, true); out.set(bin, 28 + jl);
+  return new Promise((ok, bad) => loader.parse(out.buffer, "", ok, bad));
+}
+try {
+  const g = await loadEmbedded("models/teen.json");
+  g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; if (/brow|lash|hair/i.test(o.material?.name || "")) { o.material.alphaTest = 0.2; o.material.transparent = false; if (/hair/i.test(o.material.name)) { o.material.side = THREE.FrontSide; o.receiveShadow = false; } } } });
+  scene.add(g.scene); status.textContent = ""; window.__loaded = true;
+} catch (e) { status.textContent = "Could not load the model: " + e.message; window.__loaded = "error"; }
+let turning = false;
+document.getElementById("bar").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.id === "turn") { turning = !turning; b.setAttribute("aria-pressed", String(turning)); ctl.autoRotate = turning; ctl.autoRotateSpeed = 1.6; } else view(b.dataset.v); });
+r.setAnimationLoop(() => { ctl.update(); r.render(scene, cam); });
+</script>
+
+</body></html>

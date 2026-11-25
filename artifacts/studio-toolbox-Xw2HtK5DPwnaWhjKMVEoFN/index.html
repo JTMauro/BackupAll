@@ -1,0 +1,154 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Studio Toolbox</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,700&display=swap">
+<style>
+/* layout: one reading column; a sticky search bar; "in use" as a dense shelf of link tiles, then the shortlist, the catalog table, and the avoid list */
+:root{
+  --bg:#f3f2ee; --panel:#fbfaf7; --ink:#1d2024; --muted:#5d636b; --line:#dcd9d1;
+  --accent:#b4531e; --accent-soft:#f3e2d6; --good:#2f7a4d; --good-soft:#dcefe2; --warn:#8a6400; --warn-soft:#f5ebcd; --bad:#a3362b; --bad-soft:#f6dcd8;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#15171a; --panel:#1c1f23; --ink:#e9e7e2; --muted:#9aa0a8; --line:#2f3338;
+  --accent:#e58a52; --accent-soft:#3a2619; --good:#6cc28d; --good-soft:#1b3326; --warn:#e2b94f; --warn-soft:#352b12; --bad:#ee8a7e; --bad-soft:#3a1f1b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15171a; --panel:#1c1f23; --ink:#e9e7e2; --muted:#9aa0a8; --line:#2f3338;
+  --accent:#e58a52; --accent-soft:#3a2619; --good:#6cc28d; --good-soft:#1b3326; --warn:#e2b94f; --warn-soft:#352b12; --bad:#ee8a7e; --bad-soft:#3a1f1b; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;display:grid;gap:30px}
+h1{font:700 clamp(30px,5vw,46px)/1.05 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font:700 22px/1.2 var(--display);margin:0 0 4px;text-wrap:balance}
+p{margin:0;color:var(--muted);max-width:68ch}
+a{color:var(--accent);text-underline-offset:2px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lede{display:grid;gap:10px}
+.counts{display:flex;flex-wrap:wrap;gap:8px 18px;font:500 13px var(--mono);color:var(--muted)}
+.counts b{color:var(--ink);font-weight:500}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar input{flex:1 1 240px;min-width:0;font:15px var(--body);padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.bar select{font:14px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);max-width:100%}
+.chk{display:flex;gap:6px;align-items:center;font-size:14px;color:var(--muted)}
+section{display:grid;gap:12px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.group{display:grid;gap:8px}
+.group h3{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0 0}
+.tile{display:grid;gap:4px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);text-decoration:none;color:var(--ink)}
+.tile:hover{border-color:var(--accent)}
+.tile .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.tile strong{font-weight:600}
+.tile span.what{font-size:13px;color:var(--muted)}
+.pill{font:500 11px var(--mono);padding:2px 7px;border-radius:999px;white-space:nowrap}
+.p-in{background:var(--good-soft);color:var(--good)} .p-pc{background:var(--accent-soft);color:var(--accent)}
+.p-key{background:var(--warn-soft);color:var(--warn)} .p-link{background:var(--line);color:var(--muted)}
+.top15{display:grid;gap:8px;counter-reset:n}
+.row{display:grid;grid-template-columns:2.2em 1fr;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.row .n{font:700 20px var(--display);color:var(--accent)}
+.row .body{display:grid;gap:4px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:12px var(--mono);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--muted)}
+.tag.gpu{border-color:var(--warn);color:var(--warn)} .tag.lic-ok{border-color:var(--good);color:var(--good)} .tag.lic-check{border-color:var(--bad);color:var(--bad)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);position:sticky;top:0;background:var(--panel)}
+td.name{font-weight:600;min-width:160px} td.small{font:13px var(--mono);color:var(--muted)}
+tr.areahead td{background:var(--bg);font:600 13px var(--display);color:var(--ink)}
+.avoid{display:grid;gap:8px}
+.avoid div{padding:10px 12px;border-left:3px solid var(--bad);background:var(--bad-soft);border-radius:0 8px 8px 0}
+.avoid strong{display:block}
+.empty{color:var(--muted);font-style:italic}
+footer{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.tile{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header class="lede">
+    <h1>Studio Toolbox</h1>
+    <p>Every free app, engine, AI model and public-domain library for Builder, with links. Green = Builder already uses it, orange = install on your PC, yellow = needs a free key. The catalog below was checked against current sources (Nov 2026); licences can change, so open the link before shipping something commercial.</p>
+    <div class="counts" id="counts"></div>
+  </header>
+
+  <div class="bar" role="search">
+    <label for="q" class="chk" style="position:absolute;left:-9999px">Search</label>
+    <input id="q" type="search" placeholder="Search: voice, 3D, music, upscale, lip-sync…" autocomplete="off">
+    <select id="area" aria-label="Area"><option value="">All areas</option></select>
+    <label class="chk"><input type="checkbox" id="cpu"> CPU only</label>
+    <label class="chk"><input type="checkbox" id="clean"> Clean licence only</label>
+  </div>
+
+  <section aria-labelledby="h-in">
+    <div><h2 id="h-in">In Builder now, and on your PC</h2><p>What the studio runs on today, plus the apps to install on your computer.</p></div>
+    <div id="inuse"></div>
+  </section>
+
+  <section aria-labelledby="h-top">
+    <div><h2 id="h-top">Top 15 to add next</h2><p>Most new capability per install. GPU items wait for your PC or a rented GPU.</p></div>
+    <div class="top15" id="top"></div>
+  </section>
+
+  <section aria-labelledby="h-cat">
+    <div><h2 id="h-cat">Full catalog</h2><p>Grouped by area. Priority H / M / L is for this studio. "(repo)" licences were not re-checked this month.</p></div>
+    <div class="tablebox"><table><thead><tr><th>Name</th><th>What it adds</th><th>Licence</th><th>Hardware</th><th>Size</th><th>Pri</th></tr></thead><tbody id="cat"></tbody></table></div>
+  </section>
+
+  <section aria-labelledby="h-avoid">
+    <div><h2 id="h-avoid">Avoid, or check first</h2><p>Non-commercial weights, revenue caps or region limits.</p></div>
+    <div class="avoid" id="avoid"></div>
+  </section>
+
+  <footer>Source: docs/free-apps.md in the Builder repo. Search links open a web search when a project page wasn't cited.</footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+const T = window.TOOLBOX, $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const linkFor = r => r.link || "https://duckduckgo.com/?q=" + encodeURIComponent(r.name + " github");
+const gpu = r => /GPU/i.test(r.hw || "") && !/^CPU/i.test(r.hw || "");
+const licBad = r => /non-?commercial|NC\b|revenue|territor|research only|PolyForm/i.test((r.licence || "") + " " + (r.what || ""));
+const licOk = r => !licBad(r) && /MIT|Apache|BSD|GPL|CC0|public domain|Zlib|MPL|ISC|LGPL/i.test(r.licence || "");
+const PILL = { in: ["p-in", "in use"], pc: ["p-pc", "your PC"], key: ["p-key", "free key"], link: ["p-link", "library"] };
+
+const areas = [...new Set(T.rows.filter(r => r.area !== "Top 15").map(r => r.area))];
+for (const a of areas) { const o = document.createElement("option"); o.value = o.textContent = a; $("#area").append(o); }
+$("#counts").innerHTML = `<span><b>${T.inuse.filter(x => x[4] === "in").length}</b> in use</span><span><b>${T.rows.length}</b> catalogued</span><span><b>${areas.length}</b> areas</span><span><b>${T.skip.length}</b> to avoid</span>`;
+
+function match(r, q) { return !q || [r.name, r.what, r.licence, r.area, r.why].join(" ").toLowerCase().includes(q); }
+function render() {
+  const q = $("#q").value.trim().toLowerCase(), area = $("#area").value, cpu = $("#cpu").checked, clean = $("#clean").checked;
+  // shelf
+  const groups = {};
+  for (const [g, name, what, url, kind] of T.inuse) if (!q || (name + " " + what + " " + g).toLowerCase().includes(q)) (groups[g] ||= []).push({ name, what, url, kind });
+  $("#inuse").innerHTML = Object.keys(groups).length ? Object.entries(groups).map(([g, xs]) => `<div class="group"><h3>${esc(g)}</h3><div class="shelf">${xs.map(x =>
+    `<a class="tile" href="${esc(x.url)}" target="_blank" rel="noopener"><span class="top"><strong>${esc(x.name)}</strong><span class="pill ${PILL[x.kind][0]}">${PILL[x.kind][1]}</span></span><span class="what">${esc(x.what)}</span></a>`).join("")}</div></div>`).join("")
+    : `<p class="empty">Nothing here matches.</p>`;
+  // top 15
+  const top = T.rows.filter(r => r.area === "Top 15" && match(r, q) && (!cpu || !gpu(r)) && (!clean || !licBad(r)));
+  $("#top").innerHTML = top.length ? top.map(r => `<div class="row"><span class="n">${esc(r.pri.replace("Top ", ""))}</span><div class="body">
+    <a href="${esc(linkFor(r))}" target="_blank" rel="noopener"><strong>${esc(r.name)}</strong></a><span>${esc(r.what)}</span>
+    ${r.why ? `<span style="color:var(--muted);font-size:14px">${esc(r.why)}</span>` : ""}
+    <span class="meta"><span class="tag ${licBad(r) ? "lic-check" : licOk(r) ? "lic-ok" : ""}">${esc(r.licence)}</span><span class="tag ${gpu(r) ? "gpu" : ""}">${esc(r.hw)}</span></span></div></div>`).join("")
+    : `<p class="empty">No shortlist items match.</p>`;
+  // catalog
+  let html = "", last = null, n = 0;
+  for (const r of T.rows) {
+    if (r.area === "Top 15" || (area && r.area !== area) || !match(r, q) || (cpu && gpu(r)) || (clean && licBad(r))) continue;
+    if (r.area !== last) { html += `<tr class="areahead"><td colspan="6">${esc(r.area)}</td></tr>`; last = r.area; }
+    html += `<tr><td class="name"><a href="${esc(linkFor(r))}" target="_blank" rel="noopener">${esc(r.name)}</a></td><td>${esc(r.what)}</td>
+      <td><span class="tag ${licBad(r) ? "lic-check" : licOk(r) ? "lic-ok" : ""}">${esc(r.licence)}</span></td><td class="small">${esc(r.hw)}</td><td class="small">${esc(r.size)}</td><td class="small">${esc(r.pri)}</td></tr>`;
+    n++;
+  }
+  $("#cat").innerHTML = n ? html : `<tr><td colspan="6" class="empty">Nothing in the catalog matches.</td></tr>`;
+  // avoid
+  const av = T.skip.filter(s => !q || (s.name + " " + s.problem).toLowerCase().includes(q));
+  $("#avoid").innerHTML = av.length ? av.map(s => `<div><strong>${s.link ? `<a href="${esc(s.link)}" target="_blank" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}</strong>${esc(s.problem)}</div>`).join("") : `<p class="empty">Nothing to avoid matches.</p>`;
+  try { localStorage.setItem("toolbox", JSON.stringify({ q: $("#q").value, area, cpu, clean })); } catch {}
+}
+try { const s = JSON.parse(localStorage.getItem("toolbox") || "{}"); $("#q").value = s.q || ""; $("#area").value = s.area || ""; $("#cpu").checked = !!s.cpu; $("#clean").checked = !!s.clean; } catch {}
+for (const id of ["#q", "#area", "#cpu", "#clean"]) $(id).addEventListener("input", render);
+render();
+</script>
+
+</body></html>

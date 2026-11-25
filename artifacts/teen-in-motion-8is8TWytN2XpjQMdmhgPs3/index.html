@@ -1,0 +1,169 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Teen in Motion</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* layout: a studio stage that fills the width, a row of move buttons under it, and a short how-to */
+:root{--bg:#eceeef;--panel:#ffffff;--fg:#1f2326;--muted:#5f676d;--line:#d6dadd;--accent:#3f6fa3;--accent-fg:#ffffff;
+--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16191b;--panel:#1f2326;--fg:#e8ecee;--muted:#9aa3a9;--line:#32383c;--accent:#7fa6cf;--accent-fg:#0d1722;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16191b;--panel:#1f2326;--fg:#e8ecee;--muted:#9aa3a9;--line:#32383c;--accent:#7fa6cf;--accent-fg:#0d1722;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:1000px;margin:0 auto;display:grid;gap:14px}
+h1{font-family:var(--display);font-size:1.6rem;margin:0}
+p{margin:0;line-height:1.55;color:var(--muted);max-width:70ch}
+#stage{position:relative;width:100%;aspect-ratio:16/10;max-height:74vh;max-width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#e9ebec;touch-action:none}
+#stage canvas{display:block;width:100%;height:100%}
+#status{position:absolute;left:12px;bottom:10px;font:12px var(--mono);color:#5f676d}
+#now{position:absolute;right:12px;top:10px;font:600 12px var(--body);color:#3b4247;background:rgba(255,255,255,.8);padding:4px 9px;border-radius:999px}
+.bar{display:flex;flex-wrap:wrap;gap:8px}
+.bar .sep{width:1px;background:var(--line);margin:2px 4px}
+button{font:500 13px var(--body);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+kbd{font:12px var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 4px;background:var(--panel)}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600&display=swap">
+<div class="wrap">
+  <h1>Teen in Motion</h1>
+  <p>Your photo teen, built with MakeHuman, now moves: motion-captured idle, walk and run, plus a nod, a head shake and hand gestures. Tap the floor to walk there, double-tap to run there, or use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrow keys (hold <kbd>Shift</kbd> to run). Drag to orbit.</p>
+  <div id="stage"><span id="status">Loading model and moves…</span><span id="now" hidden></span></div>
+  <div class="bar" id="bar">
+    <button type="button" data-a="idle" aria-pressed="true" disabled>Idle</button>
+    <button type="button" data-a="walk" aria-pressed="false" disabled>Walk</button>
+    <button type="button" data-a="run" aria-pressed="false" disabled>Run</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" data-a="wave" aria-pressed="false" disabled>Wave</button>
+    <button type="button" data-a="point" aria-pressed="false" disabled>Point</button>
+    <button type="button" data-a="thumbs up" aria-pressed="false" disabled>Thumbs up</button>
+    <button type="button" data-a="agree" aria-pressed="false" disabled>Nod</button>
+    <button type="button" data-a="headShake" aria-pressed="false" disabled>Shake head</button>
+    <button type="button" data-a="arms crossed" aria-pressed="false" disabled>Cross arms</button>
+  </div>
+  <p>Walk, run, idle, nod and head shake are three.js's free motion-capture clips (MIT), transferred onto his MakeHuman skeleton bone by bone. The hand gestures are posed by Builder. Model: CC0.</p>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { retarget, gestures } from "./anim.js";
+const stage = document.getElementById("stage"), status = document.getElementById("status"), nowEl = document.getElementById("now");
+const r = new THREE.WebGLRenderer({ antialias: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; stage.prepend(r.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe9ebec); scene.fog = new THREE.Fog(0xe9ebec, 9, 22);
+scene.add(new THREE.HemisphereLight(0xe6eeff, 0x6f665c, 1.0));
+const key = new THREE.DirectionalLight(0xfff1e0, 2.6); key.castShadow = true;
+Object.assign(key.shadow.camera, { left: -1.6, right: 1.6, top: 2.4, bottom: -1.2, near: 0.5, far: 12 }); key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
+scene.add(key, key.target);
+const rim = new THREE.DirectionalLight(0xcfdcff, 0.8); rim.position.set(-2, 2.5, -3); scene.add(rim);
+const floor = new THREE.Mesh(new THREE.CircleGeometry(14, 72), new THREE.MeshStandardMaterial({ color: 0xd5d9dc, roughness: 1 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const grid = new THREE.PolarGridHelper(10, 16, 10, 64, 0xc3c8cc, 0xc9ced2); grid.position.y = 0.002; scene.add(grid);
+const cam = new THREE.PerspectiveCamera(32, 16 / 10, 0.05, 60); cam.position.set(2.2, 1.6, 4.4);
+const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true; ctl.target.set(0, 0.95, 0); ctl.maxPolarAngle = Math.PI * 0.49; ctl.minDistance = 1; ctl.maxDistance = 12;
+function size() { const w = stage.clientWidth, h = stage.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(stage); size();
+
+// the viewer blocks fetch() of data: and blob: URLs, so turn each one-buffer .json into GLB bytes here
+const loader = new GLTFLoader();
+loader.register(p => { p.textureLoader = new THREE.TextureLoader(p.options.manager); return { name: "img_textures" }; });
+async function load(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error(url + " returned " + res.status);
+  const json = await res.json(); const uri = json.buffers[0].uri; delete json.buffers[0].uri;
+  const bin = Uint8Array.from(atob(uri.slice(uri.indexOf(",") + 1)), c => c.charCodeAt(0)); json.buffers[0].byteLength = bin.length;
+  const js = new TextEncoder().encode(JSON.stringify(json)), jl = (js.length + 3) & ~3, bl = (bin.length + 3) & ~3;
+  const out = new Uint8Array(28 + jl + bl), dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, out.length, true);
+  dv.setUint32(12, jl, true); dv.setUint32(16, 0x4E4F534A, true); out.fill(0x20, 20, 20 + jl); out.set(js, 20);
+  dv.setUint32(20 + jl, bl, true); dv.setUint32(24 + jl, 0x004E4942, true); out.set(bin, 28 + jl);
+  return new Promise((ok, bad) => loader.parse(out.buffer, "", ok, bad));
+}
+
+let boy, mixer, acts = {}, current = null, base = "idle";
+const LOOPS = new Set(["idle", "walk", "run"]);
+try {
+  const [g, bot] = await Promise.all([load("models/teen.json"), load("clips/mixamo-clips.json")]);
+  boy = new THREE.Group(); boy.add(g.scene); scene.add(boy);
+  g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; o.frustumCulled = false;
+    if (/brow|lash|hair/i.test(o.material?.name || "")) { o.material.alphaTest = 0.2; o.material.transparent = false; if (/hair/i.test(o.material.name)) { o.material.side = THREE.FrontSide; o.receiveShadow = false; } } } });
+  const moves = retarget(bot.scene, bot.animations.filter(c => ["idle", "walk", "run", "agree", "headShake"].includes(c.name)), g.scene);
+  mixer = new THREE.AnimationMixer(g.scene);
+  const idle = moves.find(c => c.name === "idle"); const a0 = mixer.clipAction(idle); a0.play(); mixer.setTime(0); g.scene.updateMatrixWorld(true);
+  const pose0 = new Map(); g.scene.traverse(o => { if (o.isBone) pose0.set(o, o.quaternion.clone()); }); mixer.stopAllAction();
+  for (const c of [...moves, ...gestures(g.scene, pose0, idle)]) {
+    const a = mixer.clipAction(c);
+    if (!LOOPS.has(c.name)) { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
+    acts[c.name] = a;
+  }
+  mixer.addEventListener("finished", e => { if (e.action === current && !LOOPS.has(current._name)) play(base); });
+  Object.entries(acts).forEach(([n, a]) => a._name = n);
+  play("idle", 0); status.textContent = "";
+  document.querySelectorAll("#bar button").forEach(b => b.disabled = false);
+  window.__ready = true;
+} catch (e) { status.textContent = "Could not load: " + e.message; window.__ready = "error"; }
+
+function play(name, fade = 0.3) {
+  const next = acts[name]; if (!next || next === current) { if (next && !LOOPS.has(name)) next.reset().play(); return; }
+  next.reset().setEffectiveWeight(1).fadeIn(fade).play();
+  if (current) current.fadeOut(fade);
+  current = next;
+  document.querySelectorAll("#bar button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.a === name)));
+  nowEl.hidden = false; nowEl.textContent = document.querySelector(`#bar [data-a="${name}"]`)?.textContent || name;
+}
+document.getElementById("bar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !mixer) return;
+  const n = b.dataset.a; target = null;
+  if (LOOPS.has(n)) base = n; else base = "idle";
+  play(n);
+});
+
+// moving around: tap the floor to walk there, double-tap to run there, or WASD / arrows
+let target = null, steer = null; const SPEED = { walk: 1.15, run: 3.4 };
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let downAt = null, lastTap = 0;
+r.domElement.addEventListener("pointerdown", e => { downAt = [e.clientX, e.clientY]; });
+r.domElement.addEventListener("pointerup", e => {
+  if (!downAt || !boy || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return;   // a drag orbits the camera
+  const rect = r.domElement.getBoundingClientRect(); ndc.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+  ray.setFromCamera(ndc, cam); const hit = ray.intersectObject(floor)[0]; if (!hit) return;
+  const now = performance.now(), run = now - lastTap < 320; lastTap = now;
+  target = hit.point.clone(); target.y = 0; base = run ? "run" : "walk"; play(base);
+});
+const keys = new Set();
+addEventListener("keydown", e => { if (/^(Arrow|Key[WASD]|Shift)/.test(e.code)) { keys.add(e.code); if (e.code.startsWith("Arrow")) e.preventDefault(); } });
+addEventListener("keyup", e => keys.delete(e.code));
+
+const clock = new THREE.Clock(), tmp = new THREE.Vector3();
+r.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mixer) mixer.update(dt);
+  if (boy) {
+    // keyboard steering (relative to the camera)
+    const fw = (keys.has("KeyW") || keys.has("ArrowUp") ? 1 : 0) - (keys.has("KeyS") || keys.has("ArrowDown") ? 1 : 0);
+    const sd = (keys.has("KeyD") || keys.has("ArrowRight") ? 1 : 0) - (keys.has("KeyA") || keys.has("ArrowLeft") ? 1 : 0);
+    let dir = null, mode = null;
+    if (fw || sd) {
+      const f = new THREE.Vector3(); cam.getWorldDirection(f); f.y = 0; f.normalize(); const s = new THREE.Vector3(-f.z, 0, f.x);
+      dir = f.multiplyScalar(fw).add(s.multiplyScalar(sd)).normalize(); mode = keys.has("ShiftLeft") || keys.has("ShiftRight") ? "run" : "walk"; target = null;
+      if (base !== mode) { base = mode; play(mode); }
+    } else if (target) {
+      tmp.copy(target).sub(boy.position); tmp.y = 0;
+      if (tmp.length() < 0.12) { target = null; base = "idle"; play("idle"); } else { dir = tmp.normalize(); mode = base; }
+    } else if (steer === "kb") { steer = null; base = "idle"; play("idle"); }
+    if (fw || sd) steer = "kb";
+    if (dir && (mode === "walk" || mode === "run")) {
+      const want = Math.atan2(dir.x, dir.z); let d = want - boy.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d));
+      boy.rotation.y += d * Math.min(1, dt * 10);
+      boy.position.addScaledVector(dir, SPEED[mode] * dt);
+      if (boy.position.length() > 9.5) boy.position.setLength(9.5);
+    }
+    // camera and light follow him
+    tmp.set(boy.position.x, 0.95, boy.position.z); const delta = tmp.clone().sub(ctl.target); ctl.target.add(delta); cam.position.add(delta);
+    key.position.set(boy.position.x + 1.6, 3.2, boy.position.z + 1.8); key.target.position.copy(boy.position);
+  }
+  ctl.update(); r.render(scene, cam);
+});
+</script>
+
+</body></html>

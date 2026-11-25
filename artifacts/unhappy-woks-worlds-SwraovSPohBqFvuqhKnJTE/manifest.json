@@ -1,0 +1,265 @@
+{
+ "game": "Unhappy Woks",
+ "fog": {
+  "forest": "#a77c62",
+  "ice": "#d2dfea",
+  "desert": "#e9c49a",
+  "station": "#0c1220",
+  "peaks": "#c6dbe6",
+  "lava": "#5a1a0c",
+  "swamp": "#56634a",
+  "clouds": "#f2cfd6",
+  "ocean": "#3a4858",
+  "temple": "#a8b894"
+ },
+ "files": [
+  {
+   "file": "ground_forest_color.jpg",
+   "world": "forest",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 289226
+  },
+  {
+   "file": "ground_forest_normal.jpg",
+   "world": "forest",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 102500
+  },
+  {
+   "file": "backdrop_forest.jpg",
+   "world": "forest",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 225319
+  },
+  {
+   "file": "ground_ice_color.jpg",
+   "world": "ice",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 59577
+  },
+  {
+   "file": "ground_ice_normal.jpg",
+   "world": "ice",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 62117
+  },
+  {
+   "file": "backdrop_ice.jpg",
+   "world": "ice",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 52186
+  },
+  {
+   "file": "ground_desert_color.jpg",
+   "world": "desert",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 125203
+  },
+  {
+   "file": "ground_desert_normal.jpg",
+   "world": "desert",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 57946
+  },
+  {
+   "file": "backdrop_desert.jpg",
+   "world": "desert",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 158010
+  },
+  {
+   "file": "ground_station_color.jpg",
+   "world": "station",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 134766
+  },
+  {
+   "file": "ground_station_normal.jpg",
+   "world": "station",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 50083
+  },
+  {
+   "file": "backdrop_station.jpg",
+   "world": "station",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 72706
+  },
+  {
+   "file": "ground_peaks_color.jpg",
+   "world": "peaks",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 315352
+  },
+  {
+   "file": "ground_peaks_normal.jpg",
+   "world": "peaks",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 104353
+  },
+  {
+   "file": "backdrop_peaks.jpg",
+   "world": "peaks",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 195316
+  },
+  {
+   "file": "ground_lava_color.jpg",
+   "world": "lava",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 231900
+  },
+  {
+   "file": "ground_lava_normal.jpg",
+   "world": "lava",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 124136
+  },
+  {
+   "file": "ground_lava_emissive.jpg",
+   "world": "lava",
+   "kind": "emissive",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 158193
+  },
+  {
+   "file": "backdrop_lava.jpg",
+   "world": "lava",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 93158
+  },
+  {
+   "file": "ground_swamp_color.jpg",
+   "world": "swamp",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 154899
+  },
+  {
+   "file": "ground_swamp_normal.jpg",
+   "world": "swamp",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 64496
+  },
+  {
+   "file": "backdrop_swamp.jpg",
+   "world": "swamp",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 39810
+  },
+  {
+   "file": "ground_clouds_color.jpg",
+   "world": "clouds",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 201358
+  },
+  {
+   "file": "ground_clouds_normal.jpg",
+   "world": "clouds",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 43501
+  },
+  {
+   "file": "backdrop_clouds.jpg",
+   "world": "clouds",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 102335
+  },
+  {
+   "file": "ground_ocean_color.jpg",
+   "world": "ocean",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 134750
+  },
+  {
+   "file": "ground_ocean_normal.jpg",
+   "world": "ocean",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 23706
+  },
+  {
+   "file": "backdrop_ocean.jpg",
+   "world": "ocean",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 124094
+  },
+  {
+   "file": "ground_temple_color.jpg",
+   "world": "temple",
+   "kind": "color",
+   "w": 1024,
+   "h": 1024,
+   "bytes": 265726
+  },
+  {
+   "file": "ground_temple_normal.jpg",
+   "world": "temple",
+   "kind": "normal",
+   "w": 512,
+   "h": 512,
+   "bytes": 97089
+  },
+  {
+   "file": "backdrop_temple.jpg",
+   "world": "temple",
+   "kind": "backdrop",
+   "w": 2048,
+   "h": 768,
+   "bytes": 79825
+  }
+ ]
+}

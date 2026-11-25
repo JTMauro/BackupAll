@@ -1,0 +1,208 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cydoodle Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: brand header + tabbed tour; each tab = step list beside one large framed screen. Single dark look (Cydoodle brand). */
+:root {
+  --ground: #120a2b;
+  --panel: #1c1342;
+  --line: #31266a;
+  --ink: #f1eeff;
+  --muted: #a99fd6;
+  --violet: #7c4dff;
+  --sun: #ffcc33;
+  --claude: #e08a6a;
+  --display: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: radial-gradient(900px 500px at 85% -10%, #3a1c8f 0%, transparent 60%), radial-gradient(700px 400px at -10% 30%, #241066 0%, transparent 60%), var(--ground);
+  color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; min-height: 100%;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand svg { width: 56px; height: 56px; flex: none; filter: drop-shadow(0 8px 16px rgb(0 0 0 / .4)); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1; margin: 0; letter-spacing: -.01em; }
+h1 b { color: var(--sun); font-weight: 700; }
+.tag { margin: 6px 0 0; color: var(--muted); max-width: 58ch; text-wrap: pretty; }
+.tabs { display: flex; gap: 6px; background: var(--panel); border: 1px solid var(--line); padding: 5px; border-radius: 14px; flex-wrap: wrap; }
+.tabs button { font: 600 .95rem var(--body); color: var(--muted); background: none; border: 0; padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--violet); color: #fff; box-shadow: 0 4px 0 #4f2bb8; }
+.tabs button:focus-visible, .step:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+
+.tour { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; }
+.intro h2 { font-family: var(--display); font-size: 1.5rem; margin: 0 0 4px; text-wrap: balance; }
+.intro p { margin: 0 0 14px; color: var(--muted); font-size: .92rem; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.step { width: 100%; text-align: left; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; background: transparent; border: 1px solid transparent; color: var(--ink); border-radius: 12px; padding: 10px 12px; cursor: pointer; font: inherit; }
+.step:hover { background: rgb(255 255 255 / .04); }
+.step[aria-current="true"] { background: var(--panel); border-color: var(--line); }
+.step .n { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font: 700 .85rem var(--display); background: var(--line); color: var(--muted); font-variant-numeric: tabular-nums; }
+.step[aria-current="true"] .n { background: var(--sun); color: #2a1a00; }
+.step strong { display: block; font-weight: 600; font-size: .95rem; }
+.step span.d { display: block; color: var(--muted); font-size: .84rem; line-height: 1.45; }
+.step .claude { color: var(--claude); font-weight: 600; }
+
+.stage { min-width: 0; display: grid; gap: 12px; justify-items: center; }
+.browser { width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #0b0620; box-shadow: 0 30px 60px rgb(0 0 0 / .5); }
+.browser .bar { display: flex; align-items: center; gap: 7px; padding: 9px 12px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.browser .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.browser .bar .url { margin-left: 10px; flex: 1; min-width: 0; font-size: .78rem; color: var(--muted); background: var(--ground); border-radius: 7px; padding: 4px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.browser img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.browser.wide img { aspect-ratio: 16 / 9; }
+.phone { width: min(330px, 100%); border-radius: 40px; padding: 10px; background: #050310; border: 2px solid #3b3170; box-shadow: 0 30px 60px rgb(0 0 0 / .55), inset 0 0 0 2px #19123a; }
+.phone img { display: block; width: 100%; height: auto; aspect-ratio: 1170 / 1992; border-radius: 30px; object-fit: cover; }
+.caption { color: var(--muted); font-size: .88rem; text-align: center; max-width: 70ch; margin: 0; text-wrap: pretty; }
+.caption b { color: var(--ink); font-weight: 600; }
+
+.howto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.howto div { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; min-width: 0; }
+.howto h3 { margin: 0 0 4px; font: 600 1.05rem var(--display); }
+.howto p { margin: 0; color: var(--muted); font-size: .88rem; }
+.howto code { font-size: .82rem; color: var(--sun); background: var(--ground); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+footer { color: var(--muted); font-size: .82rem; text-align: center; }
+
+@media (max-width: 860px) {
+  .tour { grid-template-columns: minmax(0, 1fr); }
+  .stage { order: -1; }
+  .howto { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stage img { transition: opacity .2s; }
+  .stage img.swap { opacity: .25; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#4c1d95"/></linearGradient></defs>
+        <rect width="64" height="64" rx="16" fill="url(#g)"/>
+        <path d="M42 20.5a15 15 0 1 0 0 23" fill="none" stroke="#2a0f6b" stroke-width="9" stroke-linecap="round" transform="translate(1.5 2.5)"/>
+        <path d="M42 20.5a15 15 0 1 0 0 23" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+        <path d="M47 27l1.9 4 4.3.5-3.2 3 .8 4.3-3.8-2.1-3.8 2.1.8-4.3-3.2-3 4.3-.5z" fill="#ffcc33"/>
+      </svg>
+      <div>
+        <h1>Cyd<b>oodle</b></h1>
+        <p class="tag">Our internal live quiz game. Creators build games in the Studio, the host puts them on the big screen, and everyone plays from their phone.</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Preview">
+      <button role="tab" id="tab-studio" data-view="studio">Admin · Studio</button>
+      <button role="tab" id="tab-player" data-view="player">Client · Phone</button>
+      <button role="tab" id="tab-screen" data-view="screen">Big screen</button>
+    </nav>
+  </header>
+
+  <section class="tour" aria-live="polite">
+    <div class="intro">
+      <h2 id="view-title"></h2>
+      <p id="view-sub"></p>
+      <ol class="steps" id="steps"></ol>
+    </div>
+    <div class="stage" id="stage"></div>
+  </section>
+
+  <section class="howto" aria-label="How a game runs">
+    <div><h3>1 · Build</h3><p>Creators sign in at <code>/admin</code>, write questions on the live design canvas, pick a theme, and can ask Claude for help using their own Claude account.</p></div>
+    <div><h3>2 · Host</h3><p>Publish, then press <b>Host live</b>. The big screen shows a 6-digit PIN and a QR code.</p></div>
+    <div><h3>3 · Play</h3><p>Players open the join link or scan the code, enter a nickname, and answer on their phone. Faster correct answers score more.</p></div>
+  </section>
+
+  <footer>Screens captured from a real test game, “Space Cadets”, played by two test players on an iPhone and a Pixel.</footer>
+</div>
+
+<script>
+const VIEWS = {
+  studio: {
+    title: 'Admin · Cydoodle Studio',
+    sub: 'Where approved creators build, theme, publish and host games.',
+    frame: 'browser', url: 'cydoodle.yourcompany.com/admin',
+    steps: [
+      ['admin-4-editor-with-claude', 'Game editor', 'Questions on the left, the design in the middle exactly as players will see it, and <span class="claude">Create with Claude</span> at the bottom.'],
+      ['admin-3-editor-sign-in-to-claude', 'Sign in to Claude', 'If you are not signed in, the chat is replaced by a sign-in prompt. Enter your Claude username and Claude asks for the password itself.'],
+      ['admin-5-theme-designer', 'Theme designer', 'Colors, background, font, shadow depth and motion, with a live preview. Claude can design a theme from a vibe.'],
+      ['admin-7-background-styles', '12 background styles', 'Bubbles, confetti, northern lights, hyperspace, ribbons, a dancing cube grid and more, plus the original orbs, crystals, galaxy, synthwave grid and ocean.'],
+      ['admin-8-photo-background', 'Photo or video background', 'Upload a photo, animated GIF or short video. Darken and blur to keep text readable, with any 3D effect on top.'],
+      ['admin-2-games', 'Your games', 'Every game with its status. Publish, host, duplicate or delete from the card.'],
+      ['admin-9-help-manual', 'Help: manuals', 'The complete User and Admin manuals, searchable, with a table of contents. The Admin Manual is shown to admins only.'],
+      ['admin-10-help-claude', 'Help: ask Claude', 'Ask anything with your own Claude account. The matching manual sections go along as Claude’s base knowledge. Claude can also create a new game or theme.'],
+      ['admin-11-settings-about', 'Settings › About', 'The version number and what changed in each release, plus your account and the server settings.'],
+      ['admin-6-team', 'Team', 'Admins decide who can create. Players never need an account.'],
+      ['admin-1-studio-signin', 'Studio sign-in', 'Creators sign in with the username and password an admin gave them.']
+    ]
+  },
+  player: {
+    title: 'Client · Player phone',
+    sub: 'Players join from any phone or computer. They can also add it to their home screen like an app.',
+    frame: 'phone',
+    steps: [
+      ['player-2-answer', 'Answer', 'Big color-and-shape buttons with a countdown bar. Answering faster scores more.'],
+      ['player-1-lobby', 'Lobby', 'After entering the PIN and a nickname, players wait here and can change their avatar.'],
+      ['player-3-correct', 'Correct', 'Points earned, answer streak, and who is just ahead.'],
+      ['player-4-not-quite', 'Not quite', 'Shows the right answer so everyone learns something.'],
+      ['player-5-podium', 'Final place', 'Medal and final score at the end of the game.'],
+      ['player-6-help', 'How to play', 'The ? button shows the player guide, with an Ask Claude box that uses the player’s own Claude account.']
+    ]
+  },
+  screen: {
+    title: 'Big screen · Host view',
+    sub: 'Put this on a projector or share it in a meeting. The host steps through with Next.',
+    frame: 'browser wide', url: 'cydoodle.yourcompany.com/host',
+    steps: [
+      ['game-3-question', 'Question', 'Timer, live answer count, and the four answer tiles on a 3D themed background.'],
+      ['game-1-lobby-pin-qr', 'Lobby', 'Game PIN and QR code. Names pop in as people join, and the host can lock the room.'],
+      ['game-2-get-ready', 'Get ready', 'Each question appears on its own for a few seconds before answers open.'],
+      ['game-4-answer-reveal', 'Answer reveal', 'Bars show how the room answered and the correct answer is highlighted.'],
+      ['game-5-leaderboard', 'Leaderboard', 'Top five, points gained and who moved up.'],
+      ['game-6-podium', 'Podium', 'Winners with confetti and a fanfare.']
+    ]
+  }
+};
+
+const $ = (s) => document.querySelector(s);
+let view = 'studio', idx = 0;
+
+function render() {
+  const v = VIEWS[view];
+  document.querySelectorAll('.tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.view === view)));
+  $('#view-title').textContent = v.title;
+  $('#view-sub').textContent = v.sub;
+  $('#steps').innerHTML = v.steps.map((s, i) => `<li><button class="step" data-i="${i}" aria-current="${i === idx}"><span class="n">${i + 1}</span><span><strong>${s[1]}</strong><span class="d">${s[2]}</span></span></button></li>`).join('');
+  const [img, name, desc] = v.steps[idx];
+  const src = `img/${img}.webp`;
+  const frame = v.frame === 'phone'
+    ? `<div class="phone"><img id="shot" src="${src}" alt="${name} screen on a phone" width="1170" height="1992"></div>`
+    : `<div class="browser ${v.frame.includes('wide') ? 'wide' : ''}"><div class="bar"><i></i><i></i><i></i><span class="url">${v.url}</span></div><img id="shot" src="${src}" alt="${name} screen" width="1440" height="900"></div>`;
+  $('#stage').innerHTML = frame + `<p class="caption"><b>${name}.</b> ${desc.replace(/<[^>]+>/g, '')}</p>`;
+}
+
+function go(next) { if (!VIEWS[next]) next = 'studio'; if (next !== view) { view = next; idx = 0; } render(); }
+document.querySelector('.tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  location.hash = b.dataset.view;
+});
+$('#steps').addEventListener('click', (e) => {
+  const b = e.target.closest('.step'); if (!b) return;
+  idx = Number(b.dataset.i); render();
+});
+addEventListener('keydown', (e) => {
+  if (e.target.closest('input, textarea')) return;
+  const n = VIEWS[view].steps.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { idx = (idx + 1) % n; render(); }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { idx = (idx - 1 + n) % n; render(); }
+});
+addEventListener('hashchange', () => go(location.hash.slice(1)));
+// Preload all screens so switching is instant.
+Object.values(VIEWS).forEach((v) => v.steps.forEach((s) => { const i = new Image(); i.src = `img/${s[0]}.webp`; }));
+go(location.hash.slice(1) || 'studio');
+</script>
+
+</body></html>

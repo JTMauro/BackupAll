@@ -1,0 +1,840 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tongues</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Noto+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-hand phone app. Shared language bar on top, one working surface per mode, thumb-reach tab bar fixed at the bottom. */
+:root{
+  --bg:#EEF2F7; --surface:#FFFFFF; --sunk:#E3E9F2; --ink:#0F1B2D; --muted:#56637A; --line:#D3DBE7;
+  --accent:#2448D8; --accent-soft:#DCE4FF; --accent-ink:#FFFFFF; --signal:#E8960C; --signal-soft:#FFF0D6; --bad:#C62E3A;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:14px; --nav-h:64px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A101B; --surface:#131C2C; --sunk:#0E1624; --ink:#E7ECF5; --muted:#94A1B8; --line:#25314A;
+  --accent:#86A0FF; --accent-soft:#1D2A52; --accent-ink:#0A101B; --signal:#F5B342; --signal-soft:#3A2C10; --bad:#FF6B76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A101B; --surface:#131C2C; --sunk:#0E1624; --ink:#E7ECF5; --muted:#94A1B8; --line:#25314A;
+  --accent:#86A0FF; --accent-soft:#1D2A52; --accent-ink:#0A101B; --signal:#F5B342; --signal-soft:#3A2C10; --bad:#FF6B76; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom,0px))}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:4px 12px}
+.brand{white-space:nowrap;font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.brand svg{width:26px;height:26px}
+.status{font-size:.75rem;color:var(--muted);text-align:right}
+.status b{color:var(--ink);font-weight:600}
+
+/* language bar */
+.langbar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.langbtn{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:8px 12px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);text-align:left}
+.langbtn small{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.langbtn span{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.swap{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.swap svg{width:20px;height:20px}
+.recent{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.recent::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 12px;font-size:.82rem;color:var(--muted)}
+.chip.all{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+textarea.src{width:100%;min-height:120px;border:none;background:transparent;resize:vertical;font-size:1.2rem;line-height:1.45;outline:none}
+textarea.src::placeholder{color:var(--muted)}
+.tool{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:.85rem}
+.tool svg{width:18px;height:18px}
+.tool.icon{padding:8px;width:40px;height:40px;justify-content:center}
+.primary{background:var(--accent);color:var(--accent-ink);border:none;border-radius:999px;padding:11px 22px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.primary:disabled{opacity:.5}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--sunk)}
+.seg button{border:none;background:transparent;padding:5px 12px;border-radius:999px;font-size:.82rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.label{font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.count{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.result .out{font-size:1.45rem;line-height:1.4;font-weight:500;overflow-wrap:anywhere}
+.result .roman{color:var(--muted);font-style:italic;margin-top:4px}
+.result .notes{font-size:.88rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.alts{display:flex;flex-wrap:wrap;gap:6px}
+.alts button{border:1px dashed var(--line);background:transparent;border-radius:10px;padding:5px 10px;font-size:.9rem;text-align:left}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:999px;background:var(--signal-soft);color:var(--ink);font-weight:600;letter-spacing:.03em}
+.back{font-size:.9rem;background:var(--sunk);border-radius:10px;padding:8px 10px}
+.thinking{color:var(--muted);display:flex;align-items:center;gap:8px}
+.dots{display:inline-flex;gap:3px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:b 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.err{color:var(--bad);font-size:.9rem}
+
+/* mic */
+.mic{width:76px;height:76px;border-radius:50%;border:none;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 6px 18px rgba(36,72,216,.3);position:relative}
+.mic svg{width:32px;height:32px}
+.mic.live{background:var(--signal);color:#1a1200}
+.mic.live::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--signal);animation:pulse 1.2s infinite}
+@keyframes pulse{from{opacity:.9;transform:scale(.92)}to{opacity:0;transform:scale(1.25)}}
+.mic.sm{width:52px;height:52px}.mic.sm svg{width:24px;height:24px}
+.partial{color:var(--muted);font-style:italic}
+
+/* camera */
+.dropzone{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bigbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:22px 10px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);font-weight:600;text-align:center}
+.bigbtn svg{width:30px;height:30px;color:var(--accent)}
+.bigbtn.main{background:var(--accent);color:var(--accent-ink);border:none}
+.bigbtn.main svg{color:var(--accent-ink)}
+.preview{position:relative;border-radius:var(--r);overflow:hidden;background:var(--sunk);max-height:46vh;display:flex;justify-content:center}
+.preview img{max-height:46vh;object-fit:contain;display:block}
+.block{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
+.block:last-child{border-bottom:none}
+.block .o{font-size:.85rem;color:var(--muted);overflow-wrap:anywhere}
+.block .t{font-size:1.1rem;font-weight:500;overflow-wrap:anywhere}
+.block .d{font-size:.85rem}
+.block .acts{display:flex;gap:4px;margin-top:4px}
+.mini{border:none;background:transparent;color:var(--muted);padding:4px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;font-size:.78rem}
+.mini svg{width:16px;height:16px}
+.mini.on{color:var(--signal)}
+
+/* live captions */
+.captions{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow-y:auto}
+.cap{border-left:3px solid var(--accent);padding:2px 0 2px 12px}
+.cap .o{font-size:.85rem;color:var(--muted)}
+.cap .t{font-size:1.25rem;font-weight:500}
+.empty{color:var(--muted);text-align:center;padding:18px 8px;font-size:.92rem}
+
+/* conversation */
+.convo{display:grid;grid-template-rows:1fr 1fr;gap:10px;height:calc(100dvh - 210px - env(safe-area-inset-bottom,0px) - env(safe-area-inset-top,0px));min-height:440px}
+.side{display:flex;flex-direction:column;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);min-height:0;overflow:hidden}
+.side.flip{transform:rotate(180deg)}
+.side.b{background:var(--sunk)}
+.side .msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.bub{max-width:88%;padding:8px 12px;border-radius:14px;font-size:1.05rem;overflow-wrap:anywhere}
+.bub.mine{align-self:flex-end;background:var(--accent-soft)}
+.bub.theirs{align-self:flex-start;background:var(--surface);border:1px solid var(--line);font-size:1.2rem;font-weight:500}
+.side.b .bub.theirs{background:var(--bg)}
+.side .ctl{display:flex;align-items:center;gap:8px;padding:8px 10px;border-top:1px solid var(--line)}
+.side .ctl .langbtn{flex:1;padding:6px 10px}
+.side .typed{display:flex;gap:6px;padding:0 10px 10px}
+.side .typed input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 12px}
+
+/* saved */
+.list{display:flex;flex-direction:column}
+.item{padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:flex-start}
+.item:last-child{border-bottom:none}
+.item .txt{flex:1;min-width:0}
+.item .o{font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+.item .t{font-weight:500;overflow-wrap:anywhere}
+.item .meta{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);height:var(--nav-h)}
+nav.tabs a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);text-decoration:none;font-size:.7rem;font-weight:500}
+nav.tabs a svg{width:23px;height:23px}
+nav.tabs a[aria-current="page"]{color:var(--accent)}
+nav.tabs a[aria-current="page"] svg{transform:translateY(-1px)}
+
+/* sheet + show mode */
+.scrim{position:fixed;inset:0;background:rgba(5,10,20,.5);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:640px;max-height:82dvh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;padding:14px max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
+.sheet input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 14px;font-size:1rem}
+.sheet .opts{overflow-y:auto;margin-top:10px;padding-bottom:14px}
+.opt{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:none;background:transparent;padding:11px 6px;border-bottom:1px solid var(--line)}
+.opt .n{font-weight:500}.opt .nat{color:var(--muted);font-size:.9rem;text-align:right}
+.opt.sel .n{color:var(--accent)}
+.opt.custom .n{color:var(--accent)}
+.show{position:fixed;inset:0;z-index:50;background:var(--surface);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) max(20px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) max(20px,env(safe-area-inset-left,0px))}
+.show .big{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;overflow:auto;transition:transform .3s}
+.show .big.flip{transform:rotate(180deg)}
+.show .big .t{font-family:var(--f-body);font-weight:600;font-size:clamp(2rem,9vw,4rem);line-height:1.2;overflow-wrap:anywhere}
+.show .big .o{color:var(--muted);font-size:1.05rem}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.88rem;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.hint{font-size:.82rem;color:var(--muted);background:var(--sunk);border-radius:10px;padding:8px 12px}
+h2{font-family:var(--f-display);font-size:1.15rem;margin:0;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+    <symbol id="i-live" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 7v10M21 12h0"/></symbol>
+    <symbol id="i-talk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v3l-4-3h-3"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+    <symbol id="i-starf" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+    <symbol id="i-speak" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-rot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 20 4l-6 16-3-7z"/></symbol>
+    <symbol id="i-kbd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M7 14h10"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="5" width="18" height="14" rx="4" fill="var(--accent)"/><path d="M7 19v5l5-5" fill="var(--accent)"/><rect x="12" y="12" width="18" height="14" rx="4" fill="var(--signal)"/><path d="M25 26v4l-4-4" fill="var(--signal)"/><text x="11" y="15.5" font-size="8" font-weight="700" text-anchor="middle" fill="var(--accent-ink)" font-family="sans-serif">A</text><text x="21" y="22.5" font-size="8" font-weight="700" text-anchor="middle" fill="#1a1200" font-family="sans-serif">文</text></svg>
+      Tongues
+    </div>
+    <div class="status" id="status">Connecting…</div>
+  </header>
+
+  <div id="sharedLang">
+    <div class="langbar">
+      <button class="langbtn" id="fromBtn"><small>From ▾</small><span id="fromName">Detect language</span></button>
+      <button class="swap" id="swapBtn" aria-label="Swap languages"><svg><use href="#i-swap"/></svg></button>
+      <button class="langbtn" id="toBtn"><small>To ▾</small><span id="toName">Spanish</span></button>
+    </div>
+    <div class="recent" id="recent" aria-label="Last 5 languages used" hidden></div>
+  </div>
+
+  <!-- TEXT -->
+  <section data-view="text" class="stack">
+    <div class="card stack">
+      <textarea id="srcText" class="src" placeholder="Type, paste, or tap the mic…" dir="auto" maxlength="5000"></textarea>
+      <div class="row">
+        <button class="tool icon" id="textMic" aria-label="Speak into the text box"><svg><use href="#i-mic"/></svg></button>
+        <button class="tool icon" id="clearBtn" aria-label="Clear text"><svg><use href="#i-x"/></svg></button>
+        <span class="count" id="count">0 / 5000</span>
+        <span class="spacer"></span>
+        <button class="primary" id="translateBtn">Translate</button>
+      </div>
+      <div class="row">
+        <span class="label">Tone</span>
+        <div class="seg" id="toneSeg">
+          <button data-v="auto" aria-pressed="true">Natural</button>
+          <button data-v="formal" aria-pressed="false">Formal</button>
+          <button data-v="casual" aria-pressed="false">Casual</button>
+        </div>
+      </div>
+      <div class="hint" id="kbdHint" hidden>Voice input isn't available in this view. Tap the text box and use the microphone key on your phone's keyboard, then press Translate.</div>
+    </div>
+    <div id="textResult"></div>
+  </section>
+
+  <!-- CAMERA -->
+  <section data-view="camera" class="stack" hidden>
+    <div class="row">
+      <span class="label">Read as</span>
+      <div class="seg" id="camMode">
+        <button data-v="text" aria-pressed="true">Any text</button>
+        <button data-v="menu" aria-pressed="false">Menu</button>
+        <button data-v="doc" aria-pressed="false">Sign / doc</button>
+      </div>
+    </div>
+    <div class="dropzone">
+      <label class="bigbtn main" for="camInput"><svg><use href="#i-cam"/></svg>Take photo</label>
+      <label class="bigbtn" for="libInput"><svg><use href="#i-img"/></svg>Choose photo</label>
+    </div>
+    <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+    <input type="file" id="libInput" accept="image/*" hidden>
+    <div class="hint" id="camHint">Point at a sign, menu, label, letter or screen. Snap again any time to keep scanning.</div>
+    <div id="camOut" class="stack"></div>
+  </section>
+
+  <!-- LIVE -->
+  <section data-view="live" class="stack" hidden>
+    <div class="card stack">
+      <div class="row"><h2>Live captions</h2><span class="spacer"></span>
+        <button class="tool" id="liveSpeak" aria-pressed="false"><svg><use href="#i-speak"/></svg><span>Read aloud: off</span></button></div>
+      <p style="margin:0;color:var(--muted);font-size:.9rem">Tap the mic and let someone talk, or listen to a tour guide, announcement or video. Each phrase is translated as it finishes.</p>
+      <div class="captions" id="captions" aria-live="polite"><div class="empty">Captions appear here.</div></div>
+      <div class="partial" id="livePartial"></div>
+      <div class="row" style="justify-content:center;gap:16px">
+        <button class="tool" id="liveClear">Clear</button>
+        <button class="mic" id="liveMic" aria-label="Start live captions"><svg><use href="#i-mic"/></svg></button>
+        <button class="tool" id="liveCopy">Copy all</button>
+      </div>
+      <div class="hint" id="liveHint" hidden>Live listening needs Chrome, Edge or the Claude desktop app. On iPhone or in the Claude mobile app, use Text mode with your keyboard's microphone key, or the Conversation tab's keyboard.</div>
+    </div>
+  </section>
+
+  <!-- CONVERSATION -->
+  <section data-view="talk" hidden>
+    <div class="convo">
+      <div class="side b flip" id="sideB">
+        <div class="msgs" id="msgsB"><div class="empty" id="emptyB"></div></div>
+        <div class="typed"><input id="typeB" dir="auto" placeholder="Type…"><button class="tool icon" id="sendB" aria-label="Send"><svg><use href="#i-send"/></svg></button></div>
+        <div class="ctl"><button class="langbtn" id="langB"><small>Their language</small><span id="langBName"></span></button><button class="mic sm" id="micB" aria-label="Speak (other person)"><svg><use href="#i-mic"/></svg></button></div>
+      </div>
+      <div class="side" id="sideA">
+        <div class="msgs" id="msgsA"><div class="empty" id="emptyA">Set the table between you. The top half faces the other person. Each of you taps your own mic.</div></div>
+        <div class="typed"><input id="typeA" dir="auto" placeholder="Type…"><button class="tool icon" id="sendA" aria-label="Send"><svg><use href="#i-send"/></svg></button></div>
+        <div class="ctl"><button class="langbtn" id="langA"><small>Your language</small><span id="langAName"></span></button><button class="mic sm" id="micA" aria-label="Speak (you)"><svg><use href="#i-mic"/></svg></button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAVED -->
+  <section data-view="saved" class="stack" hidden>
+    <div class="seg" id="savedSeg">
+      <button data-v="phrases" aria-pressed="true">Phrasebook</button>
+      <button data-v="starred" aria-pressed="false">Starred</button>
+      <button data-v="history" aria-pressed="false">History</button>
+    </div>
+    <div id="savedOut" class="stack"></div>
+  </section>
+</div>
+
+<nav class="tabs" aria-label="Modes"><div class="in">
+  <a href="#text" data-tab="text"><svg><use href="#i-text"/></svg>Text</a>
+  <a href="#camera" data-tab="camera"><svg><use href="#i-cam"/></svg>Camera</a>
+  <a href="#live" data-tab="live"><svg><use href="#i-live"/></svg>Live</a>
+  <a href="#talk" data-tab="talk"><svg><use href="#i-talk"/></svg>Converse</a>
+  <a href="#saved" data-tab="saved"><svg><use href="#i-star"/></svg>Saved</a>
+</div></nav>
+
+<div class="scrim" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="row" style="margin-bottom:10px"><h2 id="sheetTitle">Choose language</h2><span class="spacer"></span><button class="tool icon" id="sheetClose" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+    <input id="sheetSearch" placeholder="Search 155 languages, or type any language or dialect" autocomplete="off">
+    <div class="opts" id="sheetOpts"></div>
+  </div>
+</div>
+
+<div class="show" id="show" hidden>
+  <div class="row"><button class="tool" id="showRot"><svg><use href="#i-rot"/></svg>Flip</button><span class="spacer"></span><button class="tool" id="showSpeak"><svg><use href="#i-speak"/></svg>Speak</button><button class="tool icon" id="showClose" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="big" id="showBig"><div class="t" id="showT" dir="auto"></div><div class="o" id="showO" dir="auto"></div></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- languages ---------- */
+const RAW = "af|Afrikaans|Afrikaans;sq|Albanian|Shqip;am|Amharic|አማርኛ;ar|Arabic|العربية;ar-EG|Arabic (Egyptian)|مصري;hy|Armenian|Հայերեն;as|Assamese|অসমীয়া;ay|Aymara|Aymar aru;az|Azerbaijani|Azərbaycan;bm|Bambara|Bamanankan;eu|Basque|Euskara;be|Belarusian|Беларуская;bn|Bengali|বাংলা;bho|Bhojpuri|भोजपुरी;bs|Bosnian|Bosanski;br|Breton|Brezhoneg;bg|Bulgarian|Български;my|Burmese|မြန်မာ;yue|Cantonese|粵語;ca|Catalan|Català;ceb|Cebuano|Cebuano;chr|Cherokee|ᏣᎳᎩ;ny|Chichewa|Chichewa;zh-CN|Chinese (Simplified)|简体中文;zh-TW|Chinese (Traditional)|繁體中文;co|Corsican|Corsu;hr|Croatian|Hrvatski;cs|Czech|Čeština;da|Danish|Dansk;dv|Dhivehi|ދިވެހި;doi|Dogri|डोगरी;nl|Dutch|Nederlands;dz|Dzongkha|རྫོང་ཁ;en|English|English;en-GB|English (UK)|English (UK);eo|Esperanto|Esperanto;et|Estonian|Eesti;ee|Ewe|Eʋegbe;fo|Faroese|Føroyskt;fj|Fijian|Vosa Vakaviti;fil|Filipino (Tagalog)|Filipino;fi|Finnish|Suomi;fr|French|Français;fr-CA|French (Canada)|Français (Canada);fy|Frisian|Frysk;ff|Fula|Fulfulde;gl|Galician|Galego;ka|Georgian|ქართული;de|German|Deutsch;el|Greek|Ελληνικά;kl|Greenlandic|Kalaallisut;gn|Guarani|Avañe'ẽ;gu|Gujarati|ગુજરાતી;ht|Haitian Creole|Kreyòl ayisyen;ha|Hausa|Hausa;haw|Hawaiian|ʻŌlelo Hawaiʻi;he|Hebrew|עברית;hi|Hindi|हिन्दी;hmn|Hmong|Hmoob;hu|Hungarian|Magyar;is|Icelandic|Íslenska;ig|Igbo|Igbo;ilo|Ilocano|Ilokano;id|Indonesian|Bahasa Indonesia;iu|Inuktitut|ᐃᓄᒃᑎᑐᑦ;ga|Irish|Gaeilge;it|Italian|Italiano;ja|Japanese|日本語;jv|Javanese|Basa Jawa;kn|Kannada|ಕನ್ನಡ;kk|Kazakh|Қазақ;km|Khmer|ខ្មែរ;rw|Kinyarwanda|Kinyarwanda;gom|Konkani|कोंकणी;ko|Korean|한국어;kri|Krio|Krio;ku|Kurdish (Kurmanji)|Kurdî;ckb|Kurdish (Sorani)|کوردی;ky|Kyrgyz|Кыргызча;lo|Lao|ລາວ;la|Latin|Latina;lv|Latvian|Latviešu;ln|Lingala|Lingála;lt|Lithuanian|Lietuvių;lg|Luganda|Luganda;lb|Luxembourgish|Lëtzebuergesch;mk|Macedonian|Македонски;mai|Maithili|मैथिली;mg|Malagasy|Malagasy;ms|Malay|Bahasa Melayu;ml|Malayalam|മലയാളം;mt|Maltese|Malti;mi|Maori|Te Reo Māori;mr|Marathi|मराठी;mni|Meiteilon (Manipuri)|ꯃꯤꯇꯩꯂꯣꯟ;lus|Mizo|Mizo ṭawng;mn|Mongolian|Монгол;nv|Navajo|Diné bizaad;ne|Nepali|नेपाली;no|Norwegian|Norsk;oc|Occitan|Occitan;or|Odia|ଓଡ଼ିଆ;om|Oromo|Afaan Oromoo;pap|Papiamento|Papiamentu;ps|Pashto|پښتو;fa|Persian (Farsi)|فارسی;pl|Polish|Polski;pt-BR|Portuguese (Brazil)|Português (Brasil);pt-PT|Portuguese (Portugal)|Português (Portugal);pa|Punjabi|ਪੰਜਾਬੀ;qu|Quechua|Runasimi;ro|Romanian|Română;ru|Russian|Русский;sm|Samoan|Gagana Samoa;sa|Sanskrit|संस्कृतम्;gd|Scots Gaelic|Gàidhlig;nso|Sepedi|Sepedi;sr|Serbian|Српски;st|Sesotho|Sesotho;tn|Setswana|Setswana;sn|Shona|chiShona;sd|Sindhi|سنڌي;si|Sinhala|සිංහල;sk|Slovak|Slovenčina;sl|Slovenian|Slovenščina;so|Somali|Soomaali;es|Spanish|Español;es-MX|Spanish (Mexico)|Español (México);su|Sundanese|Basa Sunda;sw|Swahili|Kiswahili;sv|Swedish|Svenska;ty|Tahitian|Reo Tahiti;tg|Tajik|Тоҷикӣ;ta|Tamil|தமிழ்;tt|Tatar|Татар;te|Telugu|తెలుగు;th|Thai|ไทย;bo|Tibetan|བོད་སྐད;ti|Tigrinya|ትግርኛ;to|Tongan|Lea faka-Tonga;ts|Tsonga|Xitsonga;tr|Turkish|Türkçe;tk|Turkmen|Türkmen;tw|Twi (Akan)|Twi;uk|Ukrainian|Українська;ur|Urdu|اردو;ug|Uyghur|ئۇيغۇرچە;uz|Uzbek|Oʻzbek;vi|Vietnamese|Tiếng Việt;cy|Welsh|Cymraeg;wo|Wolof|Wolof;xh|Xhosa|isiXhosa;yi|Yiddish|ייִדיש;yo|Yoruba|Yorùbá;zu|Zulu|isiZulu";
+const LANGS = RAW.split(";").map(r => { const [code, name, native] = r.split("|"); return { code, name, native }; });
+const BY = Object.fromEntries(LANGS.map(l => [l.code, l]));
+const nameOf = c => c === "auto" ? "Detect language" : c?.startsWith("x:") ? c.slice(2) : (BY[c]?.name || c);
+const bcp = c => (c && c !== "auto" && !c.startsWith("x:")) ? c : undefined;
+
+/* ---------- state (per-device convenience) ---------- */
+const KEY = "tongues-v1";
+const S = Object.assign({
+  from: "auto", to: "es", tone: "auto", recent: ["es", "fr", "ja", "zh-CN", "ar", "de"],
+  convA: "en", convB: "es", liveSpeak: false, camMode: "text", savedTab: "phrases",
+  history: [], starred: [], phrases: {}
+}, (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })());
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch {} };
+
+/* ---------- capabilities ---------- */
+let sample = null, dict = null, tts = null, canImages = false, ready = false;
+function setStatus() {
+  const bits = [];
+  bits.push(sample ? "<b>Translation on</b>" : "<b>Translation off</b>");
+  bits.push(dict ? "voice ✓" : "voice: keyboard mic");
+  bits.push(canImages ? "camera ✓" : "camera off");
+  $("#status").innerHTML = ready ? bits.join(" · ") : "Connecting…";
+  $("#kbdHint").hidden = !ready || !!dict;
+  $("#liveHint").hidden = !ready || !!dict;
+}
+(async () => {
+  if (!window.claude?.use) { ready = true; setStatus(); $("#status").innerHTML = "<b>Open in Claude</b> to translate"; return; }
+  [sample, dict, tts] = await Promise.all(["sample", "dictation", "tts"].map(n => claude.use(n).catch(() => null)));
+  if (sample) { const l = await sample.limits().catch(() => null); canImages = !!l?.images; }
+  if (dict) wireDictation();
+  if (tts) tts.onState(({ state }) => { if (state === "idle") $$(".mini.on,.tool.on").forEach(b => b.classList.remove("on")); });
+  ready = true; setStatus();
+})();
+
+function errText(e) {
+  switch (e?.code) {
+    case "not_granted": return "Claude access was declined for this page. Reload the page to be asked again.";
+    case "rate_limited": return "Too many requests in a row. Wait a few seconds and try again.";
+    case "sampling_disabled": return "Claude isn't available on your account right now.";
+    case "images_unavailable": return "Photo reading isn't available in this view.";
+    case "image_rejected": return "That photo couldn't be read. Try a JPEG or PNG under 20 MB.";
+    case "invalid_json": return "The answer came back garbled. Tap Translate again.";
+    case "cancelled": return "Stopped.";
+    default: return e?.message || "Something went wrong. Try again.";
+  }
+}
+function need() { if (!sample) { toast(ready ? "Translation needs this page opened inside Claude." : "Still connecting… try again in a second."); return false; } return true; }
+
+/* ---------- speech out ---------- */
+function speak(text, code, btn) {
+  if (!text) return;
+  $$(".mini.on,.tool.on").forEach(b => b.classList.remove("on"));
+  btn?.classList.add("on");
+  const lang = bcp(code);
+  if (tts) {
+    tts.speak(text.slice(0, 2000), lang ? { language: lang } : undefined).catch(e => {
+      btn?.classList.remove("on");
+      if (e?.code !== "viewer_stopped") webSpeak(text, lang, btn);
+    });
+  } else webSpeak(text, lang, btn);
+}
+function webSpeak(text, lang, btn) {
+  try {
+    const ss = window.speechSynthesis; if (!ss) throw 0;
+    ss.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (lang) { u.lang = lang; const v = ss.getVoices().find(v => v.lang?.toLowerCase().startsWith(lang.toLowerCase().split("-")[0])); if (v) u.voice = v; }
+    u.rate = .95; u.onend = u.onerror = () => btn?.classList.remove("on");
+    ss.speak(u);
+  } catch { btn?.classList.remove("on"); toast("Audio playback isn't available here."); }
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Copied"); }
+  catch { toast("Copy blocked here. Press and hold the text to copy."); }
+}
+let toastT;
+function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+
+/* ---------- dictation (mic in) ---------- */
+let micTarget = null;
+function wireDictation() {
+  dict.onPartial(({ text }) => micTarget?.partial?.(text));
+  dict.onFinal(({ text }) => micTarget?.final?.(text));
+  dict.onState(({ state, reason }) => {
+    if (state === "listening") micTarget?.btn.classList.add("live");
+    if (state === "idle") {
+      const t = micTarget; micTarget = null;
+      $$(".mic.live,.tool.live").forEach(b => b.classList.remove("live"));
+      t?.idle?.(reason);
+    }
+  });
+}
+function toggleMic(target, code) {
+  if (!dict) { toast("Voice isn't available in this view. Use your keyboard's mic key."); target.fallback?.(); return; }
+  if (micTarget) { dict.stop().catch(() => {}); return; }
+  micTarget = target;
+  const lang = bcp(code);
+  dict.start(lang ? { language: lang } : undefined).catch(e => {
+    micTarget = null; target.btn.classList.remove("live");
+    if (e?.code === "not_granted") toast("Microphone was declined. You can still type.");
+    else if (e?.code === "unavailable") toast(lang ? `Voice isn't offered for ${nameOf(code)} here. Try typing.` : "Voice isn't available right now.");
+    else if (e?.code !== "dismissed") toast(errText(e));
+  });
+}
+
+/* ---------- language picker ---------- */
+let pickCb = null, pickSel = null, pickAuto = false;
+function openPicker(title, current, allowAuto, cb) {
+  pickCb = cb; pickSel = current; pickAuto = allowAuto;
+  $("#sheetTitle").textContent = title; $("#sheetSearch").value = "";
+  renderOpts(""); $("#sheet").hidden = false;
+  setTimeout(() => $("#sheetSearch").focus({ preventScroll: true }), 60);
+}
+function renderOpts(q) {
+  q = q.trim().toLowerCase();
+  let list = LANGS.filter(l => !q || l.name.toLowerCase().includes(q) || l.native.toLowerCase().includes(q) || l.code.toLowerCase() === q);
+  let html = "";
+  if (pickAuto && !q) html += `<button class="opt ${pickSel === "auto" ? "sel" : ""}" data-c="auto"><span class="n">Detect language</span><span class="nat">automatic</span></button>`;
+  if (!q) {
+    const rec = (S.used || []).slice(0, 5);
+    if (rec.length) html += `<div class="label" style="padding:10px 6px 2px">Recent</div>` + rec.map(c => opt(c)).join("") + `<div class="label" style="padding:14px 6px 2px">All ${LANGS.length} languages, A to Z</div>`;
+  }
+  html += list.map(l => opt(l.code)).join("");
+  if (q) html += `<button class="opt custom" data-c="x:${esc(q.replace(/^\w/, m => m.toUpperCase()))}"><span class="n">Use “${esc(q)}”</span><span class="nat">any language, dialect or style</span></button>`;
+  $("#sheetOpts").innerHTML = html;
+}
+const opt = c => `<button class="opt ${pickSel === c ? "sel" : ""}" data-c="${esc(c)}"><span class="n">${esc(nameOf(c))}</span><span class="nat" dir="auto">${esc(BY[c]?.native || "")}</span></button>`;
+$("#sheetSearch").addEventListener("input", e => renderOpts(e.target.value));
+$("#sheetOpts").addEventListener("click", e => { const b = e.target.closest(".opt"); if (!b) return; const c = b.dataset.c; closePicker(); pickCb?.(c); });
+$("#sheetClose").onclick = () => closePicker();
+$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") closePicker(); });
+function closePicker() { $("#sheet").hidden = true; }
+function bumpRecent(c) { if (c === "auto") return; S.used = [c, ...(S.used || []).filter(x => x !== c)].slice(0, 5); }
+
+/* ---------- shared language bar ---------- */
+function renderLang() {
+  $("#fromName").textContent = nameOf(S.from);
+  $("#toName").textContent = nameOf(S.to);
+  const used = (S.used || []).slice(0, 5);
+  $("#recent").hidden = !used.length;
+  $("#recent").innerHTML = used.map(c => `<button class="chip" data-c="${esc(c)}" aria-pressed="${c === S.to}">${esc(nameOf(c))}</button>`).join("");
+  $("#langAName").textContent = nameOf(S.convA);
+  $("#langBName").textContent = nameOf(S.convB);
+  $("#emptyB").textContent = `Hello! Tap the microphone and speak ${nameOf(S.convB)}. I will translate for you.`;
+  save();
+}
+$("#fromBtn").onclick = () => openPicker("Translate from", S.from, true, c => { S.from = c; bumpRecent(c); renderLang(); });
+if (!S.used) { S.used = []; }
+$("#toBtn").onclick = () => openPicker("Translate to", S.to, false, c => { S.to = c; bumpRecent(c); renderLang(); });
+$("#recent").onclick = e => { const b = e.target.closest(".chip"); if (b?.dataset.all) { $("#toBtn").click(); return; } if (b) { S.to = b.dataset.c; renderLang(); } };
+$("#swapBtn").onclick = () => {
+  const from = S.from === "auto" ? (lastDetected || "en") : S.from;
+  S.from = S.to; S.to = from; bumpRecent(S.from); bumpRecent(S.to);
+  if (lastResult) { $("#srcText").value = lastResult.translation; updateCount(); }
+  renderLang();
+};
+
+/* ---------- TEXT mode ---------- */
+let lastResult = null, lastDetected = null, textCtl = null;
+const src = $("#srcText");
+const updateCount = () => $("#count").textContent = `${src.value.length} / 5000`;
+src.addEventListener("input", updateCount);
+$("#clearBtn").onclick = () => { src.value = ""; updateCount(); src.focus(); };
+$("#toneSeg").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.tone = b.dataset.v; segSet("#toneSeg", S.tone); save(); };
+function segSet(sel, v) { $$(sel + " button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v)); }
+
+$("#textMic").onclick = () => {
+  const btn = $("#textMic"); let base = src.value ? src.value.replace(/\s*$/, " ") : "";
+  toggleMic({
+    btn,
+    partial: t => { src.value = base + t; updateCount(); },
+    final: t => { base = base + t + " "; src.value = base; updateCount(); },
+    idle: () => { if (src.value.trim()) runTranslate(); },
+    fallback: () => src.focus()
+  }, S.from);
+};
+
+const TONE = { auto: "natural, the way a fluent native speaker would say it", formal: "formal and polite (use formal pronouns/honorifics where the language has them)", casual: "casual and friendly, as between friends" };
+function exampleCard() {
+  return `<div class="card result stack">
+    <div class="row"><span class="badge">EXAMPLE</span><span class="label">English → Spanish</span></div>
+    <div class="out" dir="auto">¿Dónde está la farmacia más cercana?</div>
+    <div class="roman">DOHN-deh ehs-TAH lah far-MAH-syah mahs ser-KAH-nah</div>
+    <div class="alts"><button disabled>¿Hay una farmacia cerca de aquí?</button></div>
+    <div class="notes">“Farmacia” is the everyday word; look for a green cross sign. Type your own text above to replace this example.</div>
+  </div>`;
+}
+$("#textResult").innerHTML = exampleCard();
+$("#translateBtn").onclick = () => runTranslate();
+
+async function translateCore(text, from, to, tone, signal) {
+  const fromLine = from === "auto" ? "Detect the source language." : `Source language: ${nameOf(from)}.`;
+  return sample.json(
+`You are an expert human interpreter. ${fromLine} Target language: ${nameOf(to)}. Tone: ${TONE[tone] || TONE.auto}.
+Translate meaning, not word-for-word: keep names, numbers, units and formatting; render idioms with a natural equivalent.
+If the target is a dialect, style or invented language, honour it.
+Reply with only JSON:
+{"detected":"<source language name in English>","detectedCode":"<BCP-47 code or empty>","translation":"<translation>","romanization":"<pronunciation in Latin letters if the target does not use Latin script, else a simple English-speaker pronunciation guide for short phrases under 12 words, else empty>","alternatives":["<up to 2 other natural ways to say it, may be empty>"],"notes":"<one short sentence on nuance, idiom, politeness or culture, or empty>"}
+
+Text:
+<<<
+${text}
+>>>`, { modelTier: "quick", signal });
+}
+
+async function runTranslate() {
+  const text = src.value.trim();
+  if (!text) { src.focus(); return; }
+  if (!need()) return;
+  textCtl?.abort(); textCtl = new AbortController();
+  const out = $("#textResult");
+  out.innerHTML = `<div class="card thinking"><span class="dots"><i></i><i></i><i></i></span> Translating to ${esc(nameOf(S.to))}… <span class="spacer"></span><button class="tool" id="stopT">Stop</button></div>`;
+  $("#stopT").onclick = () => textCtl.abort();
+  const from = S.from, to = S.to, tone = S.tone;
+  try {
+    const r = await translateCore(text, from, to, tone, textCtl.signal);
+    if (!r || typeof r.translation !== "string") throw { code: "invalid_json" };
+    lastDetected = (r.detectedCode && BY[r.detectedCode]) ? r.detectedCode : (LANGS.find(l => l.name.toLowerCase() === String(r.detected || "").toLowerCase())?.code || null);
+    const rec = { id: Date.now(), from: from === "auto" ? (lastDetected || "x:" + (r.detected || "Unknown")) : from, to, orig: text, translation: r.translation, roman: r.romanization || "", alts: (r.alternatives || []).filter(Boolean).slice(0, 2), notes: r.notes || "", detected: from === "auto" ? r.detected : "" };
+    lastResult = rec;
+    S.history = [rec, ...S.history.filter(h => !(h.orig === rec.orig && h.to === rec.to))].slice(0, 60);
+    bumpRecent(to); renderLang();
+    renderResult(rec);
+    if (S.autoSpeakText) speak(rec.translation, to);
+  } catch (e) {
+    out.innerHTML = e?.code === "cancelled" ? "" : `<div class="card err">${esc(errText(e))}</div>`;
+  }
+}
+function isStarred(rec) { return S.starred.some(s => s.orig === rec.orig && s.translation === rec.translation); }
+function renderResult(rec) {
+  const out = $("#textResult");
+  out.innerHTML = `<div class="card result stack">
+    <div class="row"><span class="label">${rec.detected ? `Detected ${esc(rec.detected)}` : esc(nameOf(rec.from))} → ${esc(nameOf(rec.to))}</span></div>
+    <div class="out" dir="auto" id="rOut">${esc(rec.translation)}</div>
+    ${rec.roman ? `<div class="roman">${esc(rec.roman)}</div>` : ""}
+    ${rec.alts.length ? `<div><div class="label" style="margin-bottom:4px">Other ways to say it</div><div class="alts">${rec.alts.map((a, i) => `<button data-i="${i}" dir="auto">${esc(a)}</button>`).join("")}</div></div>` : ""}
+    ${rec.notes ? `<div class="notes">${esc(rec.notes)}</div>` : ""}
+    <div class="row" id="rActs">
+      <button class="tool" data-a="speak"><svg><use href="#i-speak"/></svg>Listen</button>
+      <button class="tool icon" data-a="copy" aria-label="Copy"><svg><use href="#i-copy"/></svg></button>
+      <button class="tool icon" data-a="star" aria-label="Star"><svg><use href="${isStarred(rec) ? "#i-starf" : "#i-star"}"/></svg></button>
+      <button class="tool icon" data-a="show" aria-label="Show full screen"><svg><use href="#i-full"/></svg></button>
+      <button class="tool" data-a="check"><svg><use href="#i-check"/></svg>Check meaning</button>
+    </div>
+    <div id="backOut"></div>
+  </div>`;
+  out.querySelector(".alts")?.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const i = +b.dataset.i; const cur = rec.translation; rec.translation = rec.alts[i]; rec.alts[i] = cur; renderResult(rec);
+  });
+  out.querySelector("#rActs").addEventListener("click", async e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const a = b.dataset.a;
+    if (a === "speak") speak(rec.translation, rec.to, b);
+    if (a === "copy") copy(rec.translation);
+    if (a === "star") { toggleStar(rec); renderResult(rec); }
+    if (a === "show") openShow(rec.translation, rec.orig, rec.to);
+    if (a === "check") backTranslate(rec);
+  });
+}
+async function backTranslate(rec) {
+  if (!need()) return;
+  const box = $("#backOut");
+  box.innerHTML = `<div class="thinking"><span class="dots"><i></i><i></i><i></i></span> Translating back…</div>`;
+  try {
+    const back = nameOf(rec.from.startsWith("x:") ? "en" : rec.from);
+    const { text } = await sample(`Translate this ${nameOf(rec.to)} text back into ${back} as literally as is readable, so someone can check what it really says. Reply with only the translation.\n\n${rec.translation}`, { modelTier: "quick" });
+    box.innerHTML = `<div class="back"><div class="label">What it says, translated back</div><div dir="auto">${esc(text)}</div></div>`;
+  } catch (e) { box.innerHTML = `<div class="err">${esc(errText(e))}</div>`; }
+}
+function toggleStar(rec) {
+  if (isStarred(rec)) { S.starred = S.starred.filter(s => !(s.orig === rec.orig && s.translation === rec.translation)); toast("Removed from Starred"); }
+  else { S.starred = [{ ...rec, id: Date.now() }, ...S.starred]; toast("Starred"); }
+  save();
+}
+
+/* ---------- show mode ---------- */
+let showCode = null;
+function openShow(t, o, code) { $("#showT").textContent = t; $("#showO").textContent = o || ""; showCode = code; $("#show").hidden = false; $("#showBig").classList.remove("flip"); try { navigator.wakeLock?.request("screen").catch(() => {}); } catch {} }
+$("#showClose").onclick = () => $("#show").hidden = true;
+$("#showRot").onclick = () => $("#showBig").classList.toggle("flip");
+$("#showSpeak").onclick = e => speak($("#showT").textContent, showCode, e.currentTarget);
+
+/* ---------- CAMERA mode ---------- */
+$("#camMode").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.camMode = b.dataset.v; segSet("#camMode", S.camMode); save(); };
+let camFile = null, camUrl = null, camCtl = null;
+["#camInput", "#libInput"].forEach(id => $(id).addEventListener("change", e => { const f = e.target.files?.[0]; e.target.value = ""; if (f) runCamera(f); }));
+const CAM_PROMPT = {
+  text: "Find every piece of readable text in the photo, in reading order. Group text that belongs together (a sentence, a label, a heading) into one block.",
+  menu: "This is a menu. List each dish or drink with its price if shown. In \"description\" explain in one short line what it is, main ingredients, and flag common allergens (nuts, shellfish, dairy, gluten, pork) and whether it is spicy.",
+  doc: "This is a sign, notice, label, form or document. Translate each block. In \"description\" add anything practical a traveller must know (deadlines, prohibitions, dosage, warnings, opening hours) when relevant, else empty."
+};
+async function runCamera(file) {
+  if (!need()) return;
+  if (!canImages) { toast("Photo reading isn't available in this view."); return; }
+  camFile = file; if (camUrl) URL.revokeObjectURL(camUrl); camUrl = URL.createObjectURL(file);
+  camCtl?.abort(); camCtl = new AbortController();
+  $("#camHint").hidden = true;
+  const out = $("#camOut");
+  out.innerHTML = `<div class="preview"><img src="${camUrl}" alt="Your photo"></div>
+    <div class="card thinking"><span class="dots"><i></i><i></i><i></i></span> Reading and translating to ${esc(nameOf(S.to))}… <span class="spacer"></span><button class="tool" id="stopC">Stop</button></div>`;
+  $("#stopC").onclick = () => camCtl.abort();
+  const to = S.to, mode = S.camMode;
+  try {
+    const r = await sample.json(
+`${CAM_PROMPT[mode]}
+Translate everything into ${nameOf(to)}. Keep prices, numbers and brand names as they are.
+Reply with only JSON:
+{"detected":"<language(s) of the text>","summary":"<one line in ${nameOf(to)}: what this photo shows>","blocks":[{"original":"<text as written>","translation":"<${nameOf(to)}>","romanization":"<pronunciation of the ORIGINAL in Latin letters if it is not Latin script, else empty>","description":"<extra explanation or empty>"}],"tip":"<one useful practical tip or empty>"}
+If there is no readable text, return an empty blocks array and describe the scene in summary.`,
+      { images: file, signal: camCtl.signal });
+    renderCamera(r, to);
+  } catch (e) {
+    out.querySelector(".thinking").outerHTML = e?.code === "cancelled" ? "" : `<div class="card err">${esc(errText(e))}</div>`;
+  }
+}
+function renderCamera(r, to) {
+  const blocks = Array.isArray(r?.blocks) ? r.blocks : [];
+  const out = $("#camOut");
+  out.innerHTML = `<div class="preview"><img src="${camUrl}" alt="Your photo"></div>
+  <div class="card stack">
+    <div class="row"><span class="label">${esc(r?.detected || "Text")} → ${esc(nameOf(to))}</span><span class="spacer"></span>
+      ${blocks.length ? `<button class="tool" id="camAll"><svg><use href="#i-speak"/></svg>Read all</button>` : ""}</div>
+    ${r?.summary ? `<div style="font-weight:600" dir="auto">${esc(r.summary)}</div>` : ""}
+    <div id="camBlocks">${blocks.map((b, i) => `<div class="block" data-i="${i}">
+      <div class="o" dir="auto">${esc(b.original)}${b.romanization ? ` <i>(${esc(b.romanization)})</i>` : ""}</div>
+      <div class="t" dir="auto">${esc(b.translation)}</div>
+      ${b.description ? `<div class="d" dir="auto">${esc(b.description)}</div>` : ""}
+      <div class="acts"><button class="mini" data-a="speak"><svg><use href="#i-speak"/></svg>Listen</button><button class="mini" data-a="orig"><svg><use href="#i-speak"/></svg>Original</button><button class="mini" data-a="copy"><svg><use href="#i-copy"/></svg>Copy</button><button class="mini" data-a="star"><svg><use href="#i-star"/></svg>Star</button><button class="mini" data-a="show"><svg><use href="#i-full"/></svg>Show</button></div>
+    </div>`).join("") || `<div class="empty">No readable text found. Try moving closer or holding steadier.</div>`}</div>
+    ${r?.tip ? `<div class="notes" style="font-size:.88rem;color:var(--muted)">${esc(r.tip)}</div>` : ""}
+  </div>
+  <div class="card stack">
+    <span class="label">Ask about this photo</span>
+    <div class="row"><input id="camQ" dir="auto" placeholder="Is this vegetarian? What time does it open?" style="flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 14px"><button class="primary" id="camAsk">Ask</button></div>
+    <div id="camAns"></div>
+  </div>
+  <div class="dropzone"><label class="bigbtn main" for="camInput"><svg><use href="#i-cam"/></svg>Snap next</label><label class="bigbtn" for="libInput"><svg><use href="#i-img"/></svg>Another photo</label></div>`;
+  $("#camAll")?.addEventListener("click", e => speak(blocks.map(b => b.translation).join(". "), to, e.currentTarget));
+  $("#camBlocks").addEventListener("click", e => {
+    const b = e.target.closest(".mini"); if (!b) return;
+    const blk = blocks[+b.closest(".block").dataset.i];
+    const rec = { from: "x:" + (r.detected || "Photo"), to, orig: blk.original, translation: blk.translation, roman: "", alts: [], notes: blk.description || "" };
+    if (b.dataset.a === "speak") speak(blk.translation, to, b);
+    if (b.dataset.a === "orig") speak(blk.original, null, b);
+    if (b.dataset.a === "copy") copy(blk.translation);
+    if (b.dataset.a === "star") toggleStar(rec);
+    if (b.dataset.a === "show") openShow(blk.translation, blk.original, to);
+  });
+  const ask = async () => {
+    const q = $("#camQ").value.trim(); if (!q || !need()) return;
+    const box = $("#camAns");
+    box.innerHTML = `<div class="thinking"><span class="dots"><i></i><i></i><i></i></span> Looking…</div>`;
+    try {
+      const { text } = await sample(`The user is looking at this photo (text in it: ${JSON.stringify(blocks.map(b => b.original).join(" | ")).slice(0, 4000)}). Answer their question briefly and practically, in the same language as the question. If you can't tell from the photo, say so.\n\nQuestion: ${q}`, { images: camFile, modelTier: "default" });
+      box.innerHTML = `<div class="back" dir="auto">${esc(text)}</div>`;
+    } catch (e) { box.innerHTML = `<div class="err">${esc(errText(e))}</div>`; }
+  };
+  $("#camAsk").onclick = ask;
+  $("#camQ").addEventListener("keydown", e => { if (e.key === "Enter") ask(); });
+}
+
+/* ---------- LIVE captions ---------- */
+const caps = []; let liveQueue = Promise.resolve();
+function renderLiveSpeak() { const b = $("#liveSpeak"); b.setAttribute("aria-pressed", S.liveSpeak); b.querySelector("span").textContent = "Read aloud: " + (S.liveSpeak ? "on" : "off"); }
+$("#liveSpeak").onclick = () => { S.liveSpeak = !S.liveSpeak; renderLiveSpeak(); save(); };
+$("#liveClear").onclick = () => { caps.length = 0; renderCaps(); };
+$("#liveCopy").onclick = () => caps.length ? copy(caps.map(c => `${c.o}\n→ ${c.t || ""}`).join("\n\n")) : toast("Nothing to copy yet.");
+function renderCaps() {
+  const box = $("#captions");
+  box.innerHTML = caps.length ? caps.map(c => `<div class="cap"><div class="o" dir="auto">${esc(c.o)}</div><div class="t" dir="auto">${c.t == null ? '<span class="dots"><i></i><i></i><i></i></span>' : esc(c.t)}</div></div>`).join("") : `<div class="empty">Captions appear here.</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+$("#liveMic").onclick = () => {
+  toggleMic({
+    btn: $("#liveMic"),
+    partial: t => $("#livePartial").textContent = t,
+    final: t => { $("#livePartial").textContent = ""; if (!t.trim()) return; const c = { o: t, t: null }; caps.push(c); renderCaps(); liveQueue = liveQueue.then(() => liveTranslate(c)); },
+    idle: reason => { $("#livePartial").textContent = ""; if (reason && !/stop/.test(reason)) toast("Listening paused. Tap the mic to continue."); }
+  }, S.from);
+};
+async function liveTranslate(c) {
+  if (!sample) { c.t = "(translation unavailable)"; renderCaps(); return; }
+  const ctx = caps.filter(x => x !== c && x.t).slice(-3).map(x => x.o).join(" / ");
+  try {
+    const { text } = await sample(`Live interpreting into ${nameOf(S.to)}. ${ctx ? `Earlier speech, for context only: "${ctx}". ` : ""}Translate only this new phrase naturally; reply with only the translation:\n\n${c.o}`, { modelTier: "quick", cache: false });
+    c.t = text.trim();
+    if (S.liveSpeak) speak(c.t, S.to);
+  } catch (e) { c.t = "⚠ " + errText(e); }
+  renderCaps();
+}
+
+/* ---------- CONVERSATION ---------- */
+const turns = [];
+$("#langA").onclick = () => openPicker("Your language", S.convA, false, c => { S.convA = c; bumpRecent(c); renderLang(); });
+$("#langB").onclick = () => openPicker("Their language", S.convB, false, c => { S.convB = c; bumpRecent(c); renderLang(); });
+function renderTurns() {
+  ["A", "B"].forEach(side => {
+    const box = $("#msgs" + side);
+    if (!turns.length) return;
+    box.innerHTML = turns.map((t, i) => {
+      const mine = t.by === side;
+      const txt = mine ? t.orig : (t.trans ?? "…");
+      return `<div class="bub ${mine ? "mine" : "theirs"}" data-i="${i}" dir="auto">${esc(txt)}</div>`;
+    }).join("");
+    box.scrollTop = box.scrollHeight;
+  });
+}
+async function addTurn(by, text) {
+  text = text.trim(); if (!text) return;
+  if (!need()) return;
+  const t = { by, orig: text, trans: null }; turns.push(t); renderTurns();
+  const from = by === "A" ? S.convA : S.convB, to = by === "A" ? S.convB : S.convA;
+  const ctx = turns.slice(-6, -1).map(x => `${x.by === "A" ? "Person A" : "Person B"}: ${x.orig}`).join("\n");
+  try {
+    const { text: out } = await sample(`You interpret a face-to-face conversation between Person A (${nameOf(S.convA)}) and Person B (${nameOf(S.convB)}).${ctx ? `\nRecent conversation:\n${ctx}` : ""}\nTranslate what ${by === "A" ? "Person A" : "Person B"} just said from ${nameOf(from)} into natural, polite ${nameOf(to)}. Reply with only the translation.\n\n${text}`, { modelTier: "quick", cache: false });
+    t.trans = out.trim();
+    speak(t.trans, to);
+  } catch (e) { t.trans = "⚠ " + errText(e); }
+  renderTurns();
+}
+["A", "B"].forEach(side => {
+  const inp = $("#type" + side);
+  const send = () => { const v = inp.value; inp.value = ""; addTurn(side, v); };
+  $("#send" + side).onclick = send;
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+  $("#mic" + side).onclick = () => {
+    let buf = "";
+    toggleMic({
+      btn: $("#mic" + side),
+      partial: () => {},
+      final: t => { buf += (buf ? " " : "") + t; },
+      idle: () => { if (buf) addTurn(side, buf); },
+      fallback: () => inp.focus()
+    }, side === "A" ? S.convA : S.convB);
+  };
+  $("#msgs" + side).addEventListener("click", e => {
+    const b = e.target.closest(".bub.theirs"); if (!b) return;
+    const t = turns[+b.dataset.i]; if (t?.trans) speak(t.trans, side === "A" ? S.convA : S.convB);
+  });
+});
+
+/* ---------- SAVED ---------- */
+const CATS = [["greet", "Greetings & basics"], ["food", "Food & restaurants"], ["dir", "Directions & transport"], ["hotel", "Hotel"], ["shop", "Shopping & money"], ["help", "Emergency & health"], ["work", "Business"], ["small", "Small talk"], ["num", "Numbers & time"]];
+$("#savedSeg").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.savedTab = b.dataset.v; segSet("#savedSeg", S.savedTab); renderSaved(); save(); };
+function itemHTML(r, i, kind) {
+  return `<div class="item" data-i="${i}" data-k="${kind}"><div class="txt">
+    <div class="meta">${esc(nameOf(r.from))} → ${esc(nameOf(r.to))}</div>
+    <div class="t" dir="auto">${esc(r.translation)}</div>
+    ${r.roman ? `<div class="o"><i>${esc(r.roman)}</i></div>` : ""}
+    <div class="o" dir="auto">${esc(r.orig)}</div></div>
+    <button class="mini" data-a="speak" aria-label="Listen"><svg><use href="#i-speak"/></svg></button>
+    <button class="mini" data-a="show" aria-label="Show"><svg><use href="#i-full"/></svg></button>
+    ${kind === "phr" ? `<button class="mini" data-a="star" aria-label="Star"><svg><use href="#i-star"/></svg></button>` : `<button class="mini" data-a="del" aria-label="Remove"><svg><use href="#i-x"/></svg></button>`}
+  </div>`;
+}
+let phrCat = null;
+function renderSaved() {
+  const out = $("#savedOut"); const tab = S.savedTab;
+  if (tab === "starred") {
+    out.innerHTML = `<div class="card">${S.starred.length ? `<div class="list">${S.starred.map((r, i) => itemHTML(r, i, "star")).join("")}</div>` : `<div class="empty">Tap the star on any translation to keep it here for quick access.</div>`}</div>`;
+  } else if (tab === "history") {
+    out.innerHTML = `<div class="card">${S.history.length ? `<div class="row" style="margin-bottom:4px"><span class="label">Last ${S.history.length}</span><span class="spacer"></span><button class="tool" id="clearHist">Clear history</button></div><div class="list">${S.history.map((r, i) => itemHTML(r, i, "hist")).join("")}</div>` : `<div class="empty">Your text translations will be listed here.</div>`}</div>`;
+    $("#clearHist")?.addEventListener("click", () => { S.history = []; save(); renderSaved(); });
+  } else {
+    const key = phrCat ? phrCat + "|" + S.to : null; const list = key ? S.phrases[key] : null;
+    out.innerHTML = `<div class="card stack"><div class="row"><h2>Travel phrasebook</h2><span class="spacer"></span><span class="label">${esc(nameOf(S.to))}</span></div>
+      <div class="cats">${CATS.map(([k, n]) => `<button class="chip" data-cat="${k}" aria-pressed="${k === phrCat}">${n}</button>`).join("")}</div>
+      <div id="phrList">${list ? `<div class="list">${list.map((r, i) => itemHTML(r, i, "phr")).join("")}</div>` : `<div class="empty">Pick a topic to get the 12 phrases you're most likely to need in ${esc(nameOf(S.to))}, with pronunciation.</div>`}</div></div>`;
+    out.querySelector(".cats").onclick = e => { const b = e.target.closest(".chip"); if (b) loadPhrases(b.dataset.cat); };
+  }
+}
+async function loadPhrases(cat) {
+  phrCat = cat; const key = cat + "|" + S.to;
+  if (S.phrases[key]) { renderSaved(); return; }
+  renderSaved();
+  if (!need()) return;
+  $("#phrList").innerHTML = `<div class="thinking"><span class="dots"><i></i><i></i><i></i></span> Building phrases…</div>`;
+  const catName = CATS.find(c => c[0] === cat)[1];
+  try {
+    const arr = await sample.json(`Write the 12 most useful phrases a traveller needs for "${catName}" in ${nameOf(S.to)}, natural and polite. Reply with only a JSON array of {"en":"<English>","t":"<${nameOf(S.to)}>","p":"<easy pronunciation for an English speaker>"}.`, { modelTier: "quick" });
+    if (!Array.isArray(arr)) throw { code: "invalid_json" };
+    S.phrases[key] = arr.slice(0, 15).map(x => ({ from: "en", to: S.to, orig: String(x.en || ""), translation: String(x.t || ""), roman: String(x.p || ""), alts: [], notes: "" }));
+    save(); if (phrCat === cat) renderSaved();
+  } catch (e) { $("#phrList").innerHTML = `<div class="err">${esc(errText(e))}</div>`; }
+}
+$("#savedOut").addEventListener("click", e => {
+  const b = e.target.closest(".mini"); if (!b) return;
+  const it = b.closest(".item"); const i = +it.dataset.i; const k = it.dataset.k;
+  const arr = k === "star" ? S.starred : k === "hist" ? S.history : S.phrases[phrCat + "|" + S.to];
+  const r = arr?.[i]; if (!r) return;
+  if (b.dataset.a === "speak") speak(r.translation, r.to, b);
+  if (b.dataset.a === "show") openShow(r.translation, r.orig, r.to);
+  if (b.dataset.a === "star") toggleStar(r);
+  if (b.dataset.a === "del") { arr.splice(i, 1); save(); renderSaved(); }
+});
+
+/* ---------- routing ---------- */
+const VIEWS = ["text", "camera", "live", "talk", "saved"];
+function route() {
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "text";
+  $$("section[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
+  $$("nav.tabs a").forEach(a => a.dataset.tab === v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+  $("#sharedLang").hidden = v === "talk";
+  if (v === "saved") renderSaved();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", route);
+
+/* ---------- init ---------- */
+segSet("#toneSeg", S.tone); segSet("#camMode", S.camMode); segSet("#savedSeg", S.savedTab);
+renderLang(); renderLiveSpeak(); updateCount(); route(); setStatus();
+})();
+</script>
+
+</body></html>

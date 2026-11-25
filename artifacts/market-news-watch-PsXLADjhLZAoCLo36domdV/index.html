@@ -1,0 +1,629 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Market News Watch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a surveillance desk — summary strip (winners/losers), valuation tape, flagged-article watch, then per-symbol case files. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --sunken: #e9edf3;
+  --ink: #141b26;
+  --muted: #5b6676;
+  --line: #d5dbe4;
+  --accent: #1f4fd1;
+  --accent-ink: #ffffff;
+  --good: #0f7a4a;  --good-bg: #dff3e8;
+  --ok: #2f7f6c;    --ok-bg: #e2f1ed;
+  --hold: #7a6a1c;  --hold-bg: #f4eecf;
+  --warn: #b4530a;  --warn-bg: #fbe7d6;
+  --bad: #b3202f;   --bad-bg: #f9dfe2;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e131b; --surface: #151c27; --sunken: #1b2431; --ink: #e6ebf2; --muted: #93a0b3; --line: #2a3546;
+    --accent: #7ea2ff; --accent-ink: #0b1220;
+    --good: #4fd394; --good-bg: #133526; --ok: #6cc7b1; --ok-bg: #15312c; --hold: #e0c766; --hold-bg: #332d12;
+    --warn: #f59c5a; --warn-bg: #3a2414; --bad: #ff7584; --bad-bg: #3d1a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e131b; --surface: #151c27; --sunken: #1b2431; --ink: #e6ebf2; --muted: #93a0b3; --line: #2a3546;
+  --accent: #7ea2ff; --accent-ink: #0b1220;
+  --good: #4fd394; --good-bg: #133526; --ok: #6cc7b1; --ok-bg: #15312c; --hold: #e0c766; --hold-bg: #332d12;
+  --warn: #f59c5a; --warn-bg: #3a2414; --bad: #ff7584; --bad-bg: #3d1a20;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1200px; margin: 0 auto; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); font-weight: 800; font-stretch: 80%; text-transform: uppercase; letter-spacing: 0.01em; }
+h2 { font-size: 1.25rem; font-weight: 700; font-stretch: 85%; text-transform: uppercase; letter-spacing: 0.04em; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+a { color: var(--accent); }
+.mono, .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+header.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between;
+  padding-block: 24px 16px; border-bottom: 3px solid var(--ink); }
+.brand { display: grid; gap: 4px; }
+.status { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.85rem; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 14px; border-radius: 6px; font-weight: 500; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: 0.55; cursor: progress; }
+.mode { font-family: var(--font-mono); font-size: 0.75rem; padding: 2px 8px; border-radius: 99px; background: var(--sunken); color: var(--ink); }
+.mode.claude { background: var(--accent); color: var(--accent-ink); }
+
+/* Pills */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+.r4 { background: var(--good-bg); color: var(--good); }
+.r3 { background: var(--ok-bg); color: var(--ok); }
+.r2 { background: var(--hold-bg); color: var(--hold); }
+.r1 { background: var(--warn-bg); color: var(--warn); }
+.r0 { background: var(--bad-bg); color: var(--bad); }
+.up { color: var(--good); } .down { color: var(--bad); }
+.flag { color: var(--bad); font-weight: 700; }
+
+/* Movers */
+.movers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.mover-col { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.mover-col h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.mover-col.win h2 { color: var(--good); } .mover-col.lose h2 { color: var(--bad); }
+.mover { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.mover .rank { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; }
+.mover .who { min-width: 0; }
+.mover .who b { font-family: var(--font-mono); }
+.mover .who .nm { display: block; color: var(--muted); font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mover .val { text-align: right; font-family: var(--font-mono); font-size: 0.85rem; }
+.mover .val strong { display: block; font-size: 1rem; }
+
+/* Table */
+.panel { display: grid; gap: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 4px 11px; border-radius: 99px; font-size: 0.82rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#search { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 6px 10px; border-radius: 6px; font: inherit; width: min(240px, 100%); }
+.table-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 820px; font-size: 0.9rem; }
+th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; background: var(--sunken); position: sticky; top: 0; }
+th[data-sort] { cursor: pointer; user-select: none; }
+th[data-sort]:hover { color: var(--ink); }
+th .arrow { font-size: 0.7rem; }
+td.r, th.r { text-align: right; }
+tbody tr:hover { background: var(--sunken); }
+.symlink { font-family: var(--font-mono); font-weight: 600; text-decoration: none; border-bottom: 1px dashed var(--accent); }
+.item-name { color: var(--muted); font-size: 0.8rem; display: block; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+
+/* Manipulation watch */
+.watch { display: grid; gap: 8px; }
+.watch-item { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.risk { display: grid; gap: 4px; text-align: center; }
+.risk b { font-family: var(--font-mono); font-size: 1.05rem; }
+.meter { height: 5px; border-radius: 3px; background: var(--sunken); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--bad); }
+.watch-item .t { min-width: 0; }
+.watch-item a { font-weight: 600; text-decoration: none; color: var(--ink); }
+.watch-item a:hover { color: var(--accent); }
+.flags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.flags span { font-size: 0.72rem; background: var(--bad-bg); color: var(--bad); padding: 1px 7px; border-radius: 4px; }
+
+/* Reports */
+.index { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-mono); font-size: 0.8rem; }
+.index a { text-decoration: none; }
+.reports { display: grid; gap: 16px; }
+.report { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 14px; scroll-margin-top: 16px; min-width: 0; }
+.report.hl { outline: 3px solid var(--accent); outline-offset: 2px; }
+.rep-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; }
+.rep-head .id { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; min-width: 0; }
+.rep-head .sym { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 600; }
+.rep-head .px { font-family: var(--font-mono); text-align: right; }
+.rep-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 260px); gap: 16px; }
+@media (max-width: 720px) { .rep-grid { grid-template-columns: 1fr; } }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.stat { background: var(--sunken); border-radius: 6px; padding: 6px 9px; }
+.stat .v { font-family: var(--font-mono); font-size: 0.92rem; font-weight: 500; }
+.spark svg { width: 100%; height: 90px; display: block; }
+.range { display: grid; gap: 3px; font-size: 0.75rem; color: var(--muted); }
+.range .bar { position: relative; height: 6px; background: var(--sunken); border-radius: 3px; }
+.range .bar i { position: absolute; top: -3px; width: 3px; height: 12px; background: var(--ink); border-radius: 2px; }
+.range .ends { display: flex; justify-content: space-between; font-family: var(--font-mono); }
+.why { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.alerts { display: grid; gap: 6px; }
+.alert { background: var(--bad-bg); color: var(--bad); border-radius: 6px; padding: 6px 10px; font-size: 0.88rem; font-weight: 500; }
+.arts { display: grid; gap: 0; }
+.art { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.art .rate { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600; }
+.art .body { min-width: 0; display: grid; gap: 3px; }
+.art a.title { font-weight: 600; color: var(--ink); text-decoration: none; }
+.art a.title:hover { color: var(--accent); text-decoration: underline; }
+.art .kp { font-size: 0.9rem; }
+.art .meta { font-size: 0.78rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.top-link { font-size: 0.8rem; justify-self: end; }
+.note { font-size: 0.82rem; color: var(--muted); max-width: 75ch; }
+
+/* Claude dialog */
+dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); max-width: min(520px, calc(100vw - 32px)); padding: 20px; }
+dialog::backdrop { background: rgb(0 0 0 / 0.45); }
+dialog .dlg-body, dialog .pane { display: grid; gap: 12px; }
+dialog .pane[hidden] { display: none; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tab { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.login-state { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; background: var(--sunken); font-weight: 500; }
+.login-state.on { background: var(--good-bg); color: var(--good); }
+dialog input { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+dialog .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+/* Info buttons, popover, glossary */
+.info { display: inline-grid; place-items: center; width: 16px; height: 16px; margin-left: 4px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--muted); background: transparent; color: var(--muted); font: 600 10px/1 var(--font-mono);
+  vertical-align: 1px; text-transform: none; letter-spacing: 0; }
+.info:hover, .info[aria-expanded="true"] { border-color: var(--accent); color: var(--accent-ink); background: var(--accent); }
+#tip { position: fixed; z-index: 50; width: max-content; max-width: min(340px, calc(100vw - 32px)); background: var(--ink); color: var(--bg);
+  border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; line-height: 1.45; box-shadow: 0 6px 24px rgb(0 0 0 / 0.25);
+  text-transform: none; letter-spacing: 0; font-weight: 400; }
+#tip b { display: block; margin-bottom: 2px; font-family: var(--font-display); font-size: 0.95rem; }
+.glossary { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
+.glossary summary { cursor: pointer; font-weight: 600; }
+.glossary dl { display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr); gap: 10px 18px; margin: 12px 0 4px; }
+.glossary dt { font-weight: 600; font-family: var(--font-display); }
+.glossary dd { margin: 0; color: var(--ink); max-width: 75ch; }
+@media (max-width: 560px) { .glossary dl { grid-template-columns: 1fr; gap: 2px; } .glossary dd { margin-bottom: 10px; } }
+/* MyEval */
+.myeval { background: var(--sunken); border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; }
+.myeval .ev-step { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; }
+.myeval .ev-step h4 { margin: 0; font-family: var(--font-display); font-size: 0.95rem; }
+.myeval .ev-step .amt { font-family: var(--font-mono); font-weight: 600; text-align: right; }
+.myeval .ev-step ul { grid-column: 1 / -1; margin: 0; padding-left: 18px; font-size: 0.88rem; display: grid; gap: 2px; }
+.myeval .ev-total { border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 4px; font-family: var(--font-mono); font-size: 0.9rem; }
+.myeval .ev-total strong { font-size: 1rem; }
+.myeval .ev-rec { font-size: 0.88rem; }
+.myeval .ev-note { font-size: 0.85rem; color: var(--warn); font-weight: 500; }
+.toast { min-height: 1.2em; font-size: 0.85rem; }
+.toast.err { color: var(--bad); }
+.empty { padding: 40px 0; text-align: center; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="top" id="top">
+    <div class="brand">
+      <span class="eyebrow">News surveillance &amp; valuation</span>
+      <h1>Market News Watch</h1>
+      <div class="status" id="status">Loading the latest scan…</div>
+    </div>
+    <div class="actions" id="live-actions" hidden>
+      <button class="btn" id="btn-claude" type="button">Connect Claude</button>
+      <button class="btn primary" id="btn-refresh" type="button">Run new scan</button>
+    </div>
+  </header>
+
+  <section class="movers" aria-label="Expected winners and losers">
+    <div class="mover-col win"><h2><span>Top 5 expected winners<button type="button" class="info" data-info="winners" aria-label="What is Top 5 expected winners?">i</button></span> <span class="eyebrow">upside</span></h2><div id="winners"></div></div>
+    <div class="mover-col lose"><h2><span>Top 5 expected losers<button type="button" class="info" data-info="losers" aria-label="What is Top 5 expected losers?">i</button></span> <span class="eyebrow">downside</span></h2><div id="losers"></div></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-val">
+    <div class="toolbar">
+      <h2 id="h-val">Valuations</h2>
+      <div class="chips" id="kinds" role="group" aria-label="Filter by asset type"></div>
+      <input id="search" type="search" placeholder="Search symbol or name" aria-label="Search symbol or name">
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th data-sort="symbol">Item<button type="button" class="info" data-info="item" aria-label="What is Item?">i</button> <span class="arrow"></span></th>
+          <th class="r" data-sort="price">Current value<button type="button" class="info" data-info="current" aria-label="What is Current value?">i</button> <span class="arrow"></span></th>
+          <th class="r" data-sort="expected_value">Expected value<button type="button" class="info" data-info="expected" aria-label="What is Expected value?">i</button> <span class="arrow"></span></th>
+          <th class="r" data-sort="upside">Change<button type="button" class="info" data-info="change" aria-label="What is Change?">i</button> <span class="arrow"></span></th>
+          <th class="r" data-sort="pe">P/E<button type="button" class="info" data-info="pe" aria-label="What is P/E?">i</button> <span class="arrow"></span></th>
+          <th data-sort="rec_level">To do<button type="button" class="info" data-info="todo" aria-label="What is To do?">i</button> <span class="arrow"></span></th>
+          <th class="r" data-sort="news_avg_rating">News 1–5<button type="button" class="info" data-info="news" aria-label="What is News 1–5?">i</button> <span class="arrow"></span></th>
+          <th data-sort="max_manipulation_risk">Manipulation<button type="button" class="info" data-info="manip" aria-label="What is Manipulation?">i</button> <span class="arrow"></span></th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="note">Expected value is a 3–6 month estimate that blends earnings value (P/E from SEC filings against a growth-adjusted fair multiple), price trend, and the news rating. Manipulation alerts cap the recommendation. Click a symbol for its full report.</p>
+    <details class="glossary" id="glossary"><summary>What the columns and numbers mean</summary><dl id="gloss-list"></dl></details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-watch">
+    <h2 id="h-watch">Manipulation watch<button type="button" class="info" data-info="risk" aria-label="What is the manipulation risk score?">i</button></h2>
+    <p class="note">Articles with the strongest signs of pump-and-dump promotion, coordinated hype, short-and-distort, rumour-driven moves, or reports of enforcement action.</p>
+    <div class="watch" id="watch"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-rep">
+    <h2 id="h-rep">Item reports</h2>
+    <div class="index" id="index"></div>
+    <div class="reports" id="reports"></div>
+  </section>
+
+  <p class="note">Ratings and valuations are generated automatically from public news feeds, Yahoo Finance prices and SEC EDGAR filings. They can be wrong and are not financial advice.</p>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
+  <div class="dlg-body">
+    <h3 id="dlg-title">Connect Claude</h3>
+    <p class="note">This is optional. Claude re-reads each article for a sharper 1–5 rating, manipulation score and key point. Without it, the built-in rules engine does the analysis.</p>
+    <div class="tabs" role="tablist" aria-label="How to connect">
+      <button type="button" role="tab" class="tab" id="tab-key" aria-controls="pane-key" aria-selected="true">API key</button>
+      <button type="button" role="tab" class="tab" id="tab-login" aria-controls="pane-login" aria-selected="false">Claude login</button>
+    </div>
+
+    <form id="claude-form" class="pane" role="tabpanel" aria-labelledby="tab-key">
+      <p class="note">Paste your own Anthropic API key from console.anthropic.com. It stays in this browser and is sent only to this app's server when you run a scan. Usage is billed to your key.</p>
+      <label for="api-key" class="eyebrow">Anthropic API key</label>
+      <input id="api-key" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <div class="toast" id="dlg-msg"></div>
+      <div class="row">
+        <button class="btn" type="button" id="btn-forget">Remove key</button>
+        <button class="btn primary" type="submit" id="btn-save">Save and run Claude scan</button>
+      </div>
+    </form>
+
+    <div id="pane-login" class="pane" role="tabpanel" aria-labelledby="tab-login" hidden>
+      <p class="note">Sign in with your Anthropic account instead of pasting a key. The sign-in page opens in the browser on the computer running this app, and Claude usage is billed to that account. Everyone using this app shares the login.</p>
+      <div class="login-state" id="login-state">Checking…</div>
+      <div class="toast" id="login-msg"></div>
+      <div class="row">
+        <button class="btn" type="button" id="btn-login-scan" hidden>Run Claude scan</button>
+        <button class="btn primary" type="button" id="btn-login">Sign in with Claude</button>
+      </div>
+    </div>
+
+    <div class="row"><button class="btn" type="button" id="btn-cancel">Close</button></div>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const REC_CLASS = { "Strong Buy": "r4", "Buy": "r3", "Hold": "r2", "Sell": "r1", "Dump it all": "r0" };
+  const RATE_LABEL = { 1: "Really bad", 2: "Bad", 3: "Neutral", 4: "Good", 5: "Incredible" };
+  const RATE_CLASS = { 1: "r0", 2: "r1", 3: "r2", 4: "r3", 5: "r4" };
+  const G = {
+    item: ["Item", "The symbol traders use for it, with its name underneath. Stocks use their ticker (AAPL = Apple). Commodity futures end in =F (GC=F = gold, CL=F = crude oil). Crypto ends in -USD (BTC-USD = Bitcoin). Indices start with ^ (^GSPC = S&P 500). \"Found in news\" means the app spotted the ticker in an article and added it automatically."],
+    current: ["Current value", "The latest market price from Yahoo Finance. Stocks are priced per share, gold and silver per troy ounce, oil per barrel, crypto per coin, indices in points, and currencies as an exchange rate."],
+    expected: ["Expected value", "The app's estimate of the price in about 3 to 6 months. It blends three things: what the company's profits say it is worth (for profitable companies), where the price trend is heading, and whether recent news is good or bad. It's an estimate from a formula, not a forecast you can rely on."],
+    change: ["Change", "How far the expected value is from the current value, in percent. +20% means the app expects the price to rise about 20%; -10% means it expects a 10% drop. Winners and losers are ranked by this number."],
+    pe: ["P/E (price-to-earnings)", "The price of one share divided by the profit per share over the last 12 months. A P/E of 20 means you pay $20 for every $1 the company earns in a year. A low P/E (under about 15) can mean the stock is cheap or that its profits are expected to fall. A high P/E (over about 30) means buyers expect fast growth, or the stock is expensive. \"loss\" means the company lost money, so it has no P/E. \"—\" means it isn't a company (gold, Bitcoin, an index) or no US SEC earnings data was found."],
+    todo: ["To do", "The suggested action, based on the expected change. Strong Buy: +15% or more. Buy: +5% to +15%. Hold: between -5% and +5%. Sell: -5% to -15%. Dump it all: worse than -15%. Manipulation signals lower it: a pump pattern forces Sell or Dump it all, heavy manipulation risk caps it at Hold, and stocks under $1 are capped at Sell."],
+    news: ["News 1–5", "The average rating of recent articles about this item. 1 = really bad news, 2 = bad, 3 = neutral or mixed, 4 = good, 5 = incredible news. The number in brackets is how many articles mention it. Articles that look like manipulation count for less in the average."],
+    manip: ["Manipulation", "\"low\" means the related news looks normal. A red flag lists alerts: a pump pattern (promotional articles plus a price or volume spike), unusual trading (volume 3× normal with a 10%+ move), articles that look like paid promotion, or news of regulators acting on manipulation. \"risk\" shows the highest article risk score when it's 30 or more."],
+    risk: ["Manipulation risk score (0–100)", "How strongly an article shows the signs of market manipulation. Points are added for hype language (\"could soar\", \"100x\", \"under-the-radar\"), paid-promotion disclaimers, penny or OTC stocks, unverified rumours, social-media pile-ons (short squeezes, meme stocks), short-seller attack language, huge % moves in the headline, and company-paid press releases. Categories: possible-pump (likely promotion), hype (crowd frenzy), rumour (unconfirmed claims), short-attack (an attempt to push the price down), enforcement (a regulator acting on manipulation). 30+ is worth a look; 50+ is a strong warning."],
+    winners: ["Top 5 expected winners", "The five items with the biggest expected price rise (Expected value vs Current value). Click a symbol to see why."],
+    losers: ["Top 5 expected losers", "The five items with the biggest expected price drop. Click a symbol to see why."],
+    why: ["Why", "The reasoning behind the expected value: how the P/E compares with a fair P/E for its growth, the price trend against its 50-day and 200-day averages, and how much the news mood moved the estimate."],
+    d1: ["1 day / 1 month / 6 months / 1 year", "How much the price has changed over each period. Green is up, red is down."],
+    eps: ["EPS (TTM)", "Earnings per share over the trailing twelve months: the company's profit divided by its number of shares, from official SEC filings. P/E is the price divided by this number."],
+    vol: ["Volatility", "How much the price swings, as a yearly percentage from the last 20 trading days. Around 15–25% is calm (a big stable company), 40% or more is jumpy, and 80%+ is very risky."],
+    vr: ["Volume vs avg", "Today's trading volume compared with the average of the last 20 days. 1× is normal. 3× or more together with a big price move is unusual and can be a sign of a pump."],
+    range: ["52-week range", "The lowest and highest closing prices of the past year. The marker shows where today's price sits between them."],
+    myeval: ["MyEval", "The exact arithmetic behind this item's expected value. It starts from today's price, adds the earnings part, the trend part and the news part, and multiplies the result out. The final percentage decides the To do rating."],
+    newslist: ["News & key points", "Every recent article that mentions this item. The box on the left is the article's rating from 1 (really bad news) to 5 (incredible news). Under the headline is the most important sentence. Click a headline to read the full article."],
+  };
+  const KINDS = [["all", "All"], ["equity", "Stocks"], ["etf", "ETFs"], ["commodity", "Commodities"], ["crypto", "Crypto"], ["index", "Indices"], ["fx", "Currencies"], ["bond", "Bonds"], ["news", "In the news"], ["alerts", "Alerts"]];
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} },
+  };
+  let R = null, live = false, kind = store.get("mnw.kind") || "all", sortKey = "upside", sortDir = -1, query = "";
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const anchor = (sym) => "r-" + sym.replace(/[^A-Za-z0-9]/g, "-");
+  const fmtPx = (v, cur) => {
+    if (v == null) return "—";
+    const d = Math.abs(v) >= 1000 ? 0 : Math.abs(v) >= 1 ? 2 : 4;
+    const s = v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+    return (cur === "USD" ? "$" : "") + s;
+  };
+  const pct = (v, d = 1) => v == null ? "—" : (v > 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
+  const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "down" : "";
+  const ago = (ts) => {
+    const m = Math.round((Date.now() / 1000 - ts) / 60);
+    if (m < 60) return m + " min ago";
+    const h = Math.round(m / 60);
+    return h < 48 ? h + " h ago" : Math.round(h / 24) + " days ago";
+  };
+  const isPx = (i) => !["index", "fx", "bond"].includes(i.kind) || i.symbol === "DX-Y.NYB" ? i.currency : "";
+
+  function spark(vals, up) {
+    if (!vals || vals.length < 2) return "";
+    const W = 260, H = 90, P = 6, lo = Math.min(...vals), hi = Math.max(...vals), span = hi - lo || 1;
+    const x = (i) => P + (i / (vals.length - 1)) * (W - 2 * P), y = (v) => P + (1 - (v - lo) / span) * (H - 2 * P);
+    const pts = vals.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ");
+    const col = up ? "var(--good)" : "var(--bad)";
+    const lx = x(vals.length - 1), ly = y(vals[vals.length - 1]);
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Last 60 trading days">
+      <line x1="${P}" x2="${W - P}" y1="${y(vals[0])}" y2="${y(vals[0])}" stroke="var(--line)" stroke-dasharray="3 3" fill="none"/>
+      <polygon points="${P},${H - P} ${pts} ${lx},${H - P}" fill="${col}" opacity="0.12"/>
+      <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="${lx}" cy="${ly}" r="3.2" fill="${col}"/></svg>`;
+  }
+
+  function moverRows(syms) {
+    const idx = Object.fromEntries(R.items.map((i) => [i.symbol, i]));
+    return syms.map((s, n) => {
+      const i = idx[s]; if (!i) return "";
+      return `<div class="mover"><span class="rank">${n + 1}</span>
+        <div class="who"><a class="symlink" href="#${anchor(s)}" data-go="${esc(s)}"><b>${esc(s)}</b></a> <span class="pill ${REC_CLASS[i.recommendation]}">${esc(i.recommendation)}</span><span class="nm">${esc(i.name)}</span></div>
+        <div class="val">${fmtPx(i.price, isPx(i))} → ${fmtPx(i.expected_value, isPx(i))}<strong class="${cls(i.upside)}">${pct(i.upside)}</strong></div></div>`;
+    }).join("");
+  }
+
+  function filtered() {
+    let items = R.items.filter((i) => {
+      if (kind === "news") return i.news_count > 0;
+      if (kind === "alerts") return i.alerts.length > 0 || i.max_manipulation_risk >= 30;
+      return kind === "all" || i.kind === kind;
+    });
+    if (query) {
+      const q = query.toLowerCase();
+      items = items.filter((i) => i.symbol.toLowerCase().includes(q) || (i.name || "").toLowerCase().includes(q));
+    }
+    return items.sort((a, b) => {
+      let x = a[sortKey], y = b[sortKey];
+      if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return (typeof x === "string" ? x.localeCompare(y) : x - y) * sortDir;
+    });
+  }
+
+  function renderTable() {
+    const items = filtered();
+    document.querySelectorAll("th[data-sort]").forEach((th) => {
+      th.querySelector(".arrow").textContent = th.dataset.sort === sortKey ? (sortDir > 0 ? "▲" : "▼") : "";
+      th.setAttribute("aria-sort", th.dataset.sort === sortKey ? (sortDir > 0 ? "ascending" : "descending") : "none");
+    });
+    $("#rows").innerHTML = items.length ? items.map((i) => {
+      const manip = i.alerts.length ? `<span class="flag" title="${esc(i.alerts.join(" · "))}">⚑ ${i.alerts.length} alert${i.alerts.length > 1 ? "s" : ""}</span>`
+        : i.max_manipulation_risk >= 30 ? `<span class="flag">⚑ risk ${i.max_manipulation_risk}</span>` : `<span class="muted">${i.news_count ? "low" : "—"}</span>`;
+      return `<tr>
+        <td><a class="symlink" href="#${anchor(i.symbol)}" data-go="${esc(i.symbol)}">${esc(i.symbol)}</a>${i.discovered ? '<span class="tag">found in news</span>' : ""}<span class="item-name">${esc(i.name)}</span></td>
+        <td class="r num">${fmtPx(i.price, isPx(i))}</td>
+        <td class="r num">${fmtPx(i.expected_value, isPx(i))}</td>
+        <td class="r num ${cls(i.upside)}">${pct(i.upside)}</td>
+        <td class="r num">${i.pe != null ? i.pe.toFixed(1) : i.kind === "equity" && i.eps != null && i.eps <= 0 ? "loss" : "—"}</td>
+        <td><span class="pill ${REC_CLASS[i.recommendation]}">${esc(i.recommendation)}</span></td>
+        <td class="r num">${i.news_avg_rating != null ? i.news_avg_rating.toFixed(1) + ` <span class="muted">(${i.news_count})</span>` : "—"}</td>
+        <td>${manip}</td></tr>`;
+    }).join("") : `<tr><td colspan="8" class="empty">No items match this filter.</td></tr>`;
+  }
+
+  function renderWatch() {
+    const ids = R.manipulation_watch || [];
+    $("#watch").innerHTML = ids.length ? ids.slice(0, 15).map((id) => {
+      const a = R.articles[id];
+      const syms = a.symbols.map((s) => `<a class="symlink" href="#${anchor(s)}" data-go="${esc(s)}">${esc(s)}</a>`).join(" ");
+      return `<div class="watch-item"><div class="risk"><b>${a.manipulation_risk}</b><div class="meter"><i style="width:${a.manipulation_risk}%"></i></div><span class="eyebrow">${esc(a.category)}</span></div>
+        <div class="t"><a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.title)}</a>
+        <div class="meta muted" style="font-size:.78rem">${esc(a.source)} · ${ago(a.published)} ${syms}</div>
+        <div class="flags">${a.manipulation_flags.map((f) => `<span>${esc(f)}</span>`).join("")}</div></div></div>`;
+    }).join("") : `<p class="muted">No articles crossed the manipulation threshold in this scan.</p>`;
+  }
+
+  function myeval(i) {
+    const e = i.myeval; if (!e) return "";
+    return `<div><div class="eyebrow">MyEval${info("myeval")}</div><div class="myeval">
+      <div class="ev-step"><h4>Start: today's price</h4><span class="amt">${esc(e.start)}</span></div>
+      ${e.steps.map((st) => `<div class="ev-step"><h4>${esc(st.title)}</h4><span class="amt ${cls(st.pct)}">${pct(st.pct)}</span>
+        <ul>${st.lines.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></div>`).join("")}
+      <div class="ev-total"><span>Add it up: ${esc(e.sum_line)}</span><strong>Expected value: ${esc(e.result_line)}</strong></div>
+      <div class="ev-rec">${esc(e.rec_line)}</div>
+      ${e.note ? `<div class="ev-note">${esc(e.note)}</div>` : ""}
+    </div></div>`;
+  }
+
+  function renderReports() {
+    const items = [...R.items].sort((a, b) => a.symbol.replace(/^\W/, "").localeCompare(b.symbol.replace(/^\W/, "")));
+    $("#index").innerHTML = items.map((i) => `<a href="#${anchor(i.symbol)}" data-go="${esc(i.symbol)}" class="${i.alerts.length ? "flag" : ""}">${esc(i.symbol)}</a>`).join("");
+    $("#reports").innerHTML = items.map((i) => {
+      const cur = isPx(i);
+      const pos = i.high_52w > i.low_52w ? ((i.price - i.low_52w) / (i.high_52w - i.low_52w)) * 100 : 50;
+      const arts = i.articles.map((id) => R.articles[id]).filter(Boolean);
+      const stats = [
+        ["1 day" + info("d1"), pct(i.chg_1d), cls(i.chg_1d)], ["1 month", pct(i.chg_1m), cls(i.chg_1m)], ["6 months", pct(i.chg_6m), cls(i.chg_6m)],
+        ["1 year", pct(i.chg_1y), cls(i.chg_1y)], ["P/E" + info("pe"), i.pe != null ? i.pe.toFixed(1) : "—", ""], ["EPS (TTM)" + info("eps"), i.eps != null ? "$" + i.eps.toFixed(2) : "—", ""],
+        ["Volatility" + info("vol"), i.volatility != null ? (i.volatility * 100).toFixed(0) + "%" : "—", ""], ["Volume vs avg" + info("vr"), i.volume_ratio != null ? i.volume_ratio.toFixed(1) + "×" : "—", i.volume_ratio >= 3 ? "flag" : ""],
+      ].map(([k, v, c]) => `<div class="stat"><div class="eyebrow">${k}</div><div class="v ${c}">${v}</div></div>`).join("");
+      return `<article class="report" id="${anchor(i.symbol)}">
+        <div class="rep-head">
+          <div class="id"><span class="sym">${esc(i.symbol)}</span><h3>${esc(i.name)}</h3><span class="tag">${esc(i.kind)}</span>${i.sector ? `<span class="tag">${esc(i.sector)}</span>` : ""}<span class="muted" style="font-size:.8rem">${esc(i.exchange)}</span></div>
+          <div class="px"><span class="pill ${REC_CLASS[i.recommendation]}">${esc(i.recommendation)}</span>
+            <div>${fmtPx(i.price, cur)} → <b>${fmtPx(i.expected_value, cur)}</b> <span class="${cls(i.upside)}">${pct(i.upside)}</span></div></div>
+        </div>
+        ${i.alerts.length ? `<div class="alerts">${i.alerts.map((a) => `<div class="alert">⚑ ${esc(a)}</div>`).join("")}</div>` : ""}
+        <div class="rep-grid">
+          <div style="display:grid;gap:12px;min-width:0">
+            <div><div class="eyebrow">Why${info("why")}</div><ul class="why">${i.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></div>
+            <div class="stats">${stats}</div>
+          </div>
+          <div style="display:grid;gap:8px;align-content:start">
+            <div class="spark">${spark(i.spark, (i.chg_3m ?? 0) >= 0)}</div>
+            <div class="range"><span>52-week range${info("range")}</span><div class="bar"><i style="left:calc(${pos.toFixed(1)}% - 1.5px)"></i></div>
+              <div class="ends"><span>${fmtPx(i.low_52w, cur)}</span><span>${fmtPx(i.high_52w, cur)}</span></div></div>
+          </div>
+        </div>
+        ${myeval(i)}
+        <div><div class="eyebrow">News &amp; key points (${arts.length})${info("newslist")}</div>
+          <div class="arts">${arts.length ? arts.map((a) => `<div class="art">
+            <div class="rate ${RATE_CLASS[a.rating]}" title="${RATE_LABEL[a.rating]} news">${a.rating}</div>
+            <div class="body"><a class="title" href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.title)}</a>
+              ${a.key_point && a.key_point !== a.title ? `<div class="kp">${esc(a.key_point)}</div>` : ""}
+              <div class="meta"><span>${esc(a.source)}</span><span>${ago(a.published)}</span><span>${RATE_LABEL[a.rating]} news</span>
+                ${a.manipulation_risk >= 30 ? `<span class="flag">⚑ manipulation risk ${a.manipulation_risk}: ${esc(a.manipulation_flags.join(", "))}</span>` : a.manipulation_risk ? `<span>risk ${a.manipulation_risk}</span>` : ""}
+                ${a.analyzed_by === "claude" ? "<span>reviewed by Claude</span>" : ""}</div></div></div>`).join("")
+            : `<p class="muted" style="margin:6px 0 0">No recent news mentions. Valuation is based on price data${i.pe != null ? " and earnings" : ""}.</p>`}</div></div>
+        <a class="top-link" href="#top">Back to table ↑</a>
+      </article>`;
+    }).join("");
+  }
+
+  function renderStatus(extra) {
+    const when = new Date(R.generated_at * 1000);
+    $("#status").innerHTML = `<span>Updated ${when.toLocaleString()}</span><span>·</span><span>${Object.keys(R.articles).length} articles from ${R.feeds_ok.length} sources</span><span>·</span><span>${R.items.length} instruments</span>
+      <span class="mode ${R.analysis_mode === "claude" ? "claude" : ""}">${R.analysis_mode === "claude" ? "Claude analysis" : "Rules engine"}</span>${extra ? `<span>${extra}</span>` : ""}`;
+  }
+
+  const info = (k) => `<button type="button" class="info" data-info="${k}" aria-label="What is ${G[k][0]}?">i</button>`;
+  $("#gloss-list").innerHTML = ["item", "current", "expected", "change", "pe", "eps", "todo", "news", "manip", "risk", "vol", "vr", "range"]
+    .map((k) => `<dt>${G[k][0]}</dt><dd>${G[k][1]}</dd>`).join("");
+
+  function render() {
+    renderStatus();
+    $("#winners").innerHTML = moverRows(R.top_winners);
+    $("#losers").innerHTML = moverRows(R.top_losers);
+    $("#kinds").innerHTML = KINDS.filter(([k]) => ["all", "news", "alerts"].includes(k) || R.items.some((i) => i.kind === k))
+      .map(([k, l]) => `<button type="button" class="chip" data-kind="${k}" aria-pressed="${k === kind}">${l}</button>`).join("");
+    renderTable(); renderWatch(); renderReports();
+    if (location.hash) go(location.hash.slice(1), false);
+  }
+
+  function go(id, push = true) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ block: "start", behavior: "instant" });
+    document.querySelectorAll(".report.hl").forEach((n) => n.classList.remove("hl"));
+    el.classList.add("hl");
+    if (push) history.replaceState(null, "", "#" + id);
+  }
+
+  const tip = document.createElement("div");
+  tip.id = "tip"; tip.setAttribute("role", "tooltip"); tip.hidden = true; document.body.appendChild(tip);
+  let tipFor = null;
+  function closeTip() { tip.hidden = true; if (tipFor) tipFor.setAttribute("aria-expanded", "false"); tipFor = null; }
+  function openTip(btn) {
+    const [t, d] = G[btn.dataset.info];
+    tip.style.left = "0px"; tip.style.top = "0px";
+    tip.innerHTML = `<b>${t}</b>${d}`; tip.hidden = false;
+    if (tipFor) tipFor.setAttribute("aria-expanded", "false");
+    tipFor = btn; btn.setAttribute("aria-expanded", "true");
+    const r = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    const left = Math.max(16, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 16));
+    const top = r.bottom + 8 + h > innerHeight - 8 ? r.top - h - 8 : r.bottom + 8;
+    tip.style.left = left + "px"; tip.style.top = Math.max(8, top) + "px";
+  }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeTip(); });
+  window.addEventListener("scroll", closeTip, { passive: true });
+
+  document.addEventListener("click", (e) => {
+    const ib = e.target.closest(".info");
+    if (ib) { e.preventDefault(); e.stopPropagation(); tipFor === ib ? closeTip() : openTip(ib); return; }
+    if (!e.target.closest("#tip")) closeTip();
+    const a = e.target.closest("[data-go]");
+    if (a) { e.preventDefault(); go(anchor(a.dataset.go)); return; }
+    const chip = e.target.closest("[data-kind]");
+    if (chip) { kind = chip.dataset.kind; store.set("mnw.kind", kind);
+      document.querySelectorAll("[data-kind]").forEach((c) => c.setAttribute("aria-pressed", c.dataset.kind === kind)); renderTable(); return; }
+    const th = e.target.closest("th[data-sort]");
+    if (th) { const k = th.dataset.sort; sortDir = k === sortKey ? -sortDir : (k === "symbol" ? 1 : -1); sortKey = k; renderTable(); }
+  });
+  $("#search").addEventListener("input", (e) => { query = e.target.value.trim(); renderTable(); });
+  window.addEventListener("hashchange", () => go(location.hash.slice(1), false));
+
+  // ---- live app controls (hidden in a static snapshot)
+  async function poll() {
+    const s = await fetch("api/status").then((r) => r.json());
+    if (s.scanning) { renderStatus("Scanning…"); setTimeout(poll, 3000); return; }
+    $("#btn-refresh").disabled = false;
+    if (s.error) { renderStatus(`<span class="flag">${esc(s.error)}</span>`); return; }
+    await load();
+  }
+  async function startScan(useKey) {
+    const headers = {}; const key = store.get("mnw.key");
+    if (useKey && key) headers["X-Anthropic-Key"] = key;
+    $("#btn-refresh").disabled = true;
+    const r = await fetch("api/refresh", { method: "POST", headers });
+    if (!r.ok) { $("#btn-refresh").disabled = false; renderStatus(`<span class="flag">Could not start a scan (${r.status}).</span>`); return; }
+    renderStatus("Scanning… this takes about a minute");
+    setTimeout(poll, 3000);
+  }
+  $("#btn-refresh").addEventListener("click", () => startScan(true));
+  const dlg = $("#dlg");
+  let serverClaude = false, loginPoll = null;
+  function showTab(which) {
+    const login = which === "login";
+    $("#tab-key").setAttribute("aria-selected", String(!login)); $("#tab-login").setAttribute("aria-selected", String(login));
+    $("#claude-form").hidden = login; $("#pane-login").hidden = !login;
+    store.set("mnw.tab", which);
+    if (login) refreshLogin();
+  }
+  async function refreshLogin() {
+    const s = await fetch("api/status").then((r) => r.json()).catch(() => null);
+    if (!s) return false;
+    serverClaude = s.server_claude;
+    const st = $("#login-state");
+    st.className = "login-state" + (serverClaude ? " on" : "");
+    st.textContent = serverClaude ? "✓ Signed in. Scans use this Claude login when no API key is saved."
+      : s.ant_installed ? "Not signed in." : "Not signed in. Claude login needs Anthropic's ant command-line tool on the computer running this app.";
+    $("#btn-login").textContent = serverClaude ? "Sign in again" : "Sign in with Claude";
+    $("#btn-login-scan").hidden = !serverClaude;
+    updateClaudeBtn();
+    return serverClaude;
+  }
+  $("#tab-key").addEventListener("click", () => showTab("key"));
+  $("#tab-login").addEventListener("click", () => showTab("login"));
+  $("#btn-claude").addEventListener("click", () => {
+    $("#api-key").value = store.get("mnw.key") || ""; $("#dlg-msg").textContent = ""; $("#login-msg").textContent = "";
+    showTab(store.get("mnw.tab") === "login" ? "login" : "key"); dlg.showModal();
+  });
+  $("#btn-cancel").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("close", () => { clearInterval(loginPoll); loginPoll = null; });
+  $("#btn-forget").addEventListener("click", () => { store.set("mnw.key", null); $("#api-key").value = ""; updateClaudeBtn(); $("#dlg-msg").className = "toast"; $("#dlg-msg").textContent = "Key removed from this browser."; });
+  $("#claude-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const k = $("#api-key").value.trim();
+    if (!k.startsWith("sk-ant-")) { $("#dlg-msg").className = "toast err"; $("#dlg-msg").textContent = "That doesn't look like an Anthropic API key. Keys start with sk-ant-."; return; }
+    store.set("mnw.key", k); updateClaudeBtn(); dlg.close(); startScan(true);
+  });
+  $("#btn-login").addEventListener("click", async () => {
+    const msg = $("#login-msg"); msg.className = "toast"; msg.textContent = "Starting sign-in…";
+    const r = await fetch("api/claude/login", { method: "POST" }).then((x) => x.json()).catch(() => ({ ok: false, error: "Could not reach the app's server." }));
+    if (!r.ok) { msg.className = "toast err"; msg.textContent = r.error || "The app's server couldn't start the sign-in. Restart the app and try again."; return; }
+    msg.textContent = "Finish signing in in the browser window that opened. This box updates when you're done.";
+    let tries = 0; clearInterval(loginPoll);
+    loginPoll = setInterval(async () => {
+      tries += 1;
+      if (await refreshLogin()) { clearInterval(loginPoll); msg.textContent = "Signed in. Run a Claude scan to re-rate the articles."; }
+      else if (tries > 60) { clearInterval(loginPoll); msg.className = "toast err"; msg.textContent = "Sign-in didn't finish. Click Sign in to try again."; }
+    }, 3000);
+  });
+  $("#btn-login-scan").addEventListener("click", () => { dlg.close(); startScan(false); });
+  function updateClaudeBtn() {
+    $("#btn-claude").textContent = store.get("mnw.key") ? "Claude connected (API key) ✓" : serverClaude ? "Claude connected (login) ✓" : "Connect Claude";
+  }
+
+  async function load() {
+    const r = await fetch("report.json", { cache: "no-store" });
+    if (!r.ok) { $("#status").textContent = "No scan yet. The first scan is running; this page refreshes when it finishes."; setTimeout(load, 5000); return; }
+    R = await r.json(); render();
+  }
+  fetch("api/status").then((r) => r.ok ? r.json() : null).then((s) => {
+    if (!s) return;
+    live = true; $("#live-actions").hidden = false; serverClaude = s.server_claude; updateClaudeBtn();
+    if (s.scanning) { $("#btn-refresh").disabled = true; setTimeout(poll, 3000); }
+  }).catch(() => {});
+  load().catch(() => { $("#status").textContent = "Could not load the report."; });
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Builder Screening Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* layout: one phone-first column; each piece is a block with its player on top and two lines under it */
+:root{
+  --bg:#f4f1ec; --panel:#ffffff; --ink:#1c1a17; --muted:#6b645b; --line:#e2dcd3; --accent:#9b4a1c;
+  --display:"Fraunces",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121110;--panel:#1b1a18;--ink:#efe9e1;--muted:#a59d93;--line:#2e2b28;--accent:#e0874f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121110;--panel:#1b1a18;--ink:#efe9e1;--muted:#a59d93;--line:#2e2b28;--accent:#e0874f;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px;display:grid;gap:28px}
+h1{font:700 clamp(30px,8vw,44px)/1.05 var(--display);margin:0;text-wrap:balance}
+h2{font:700 22px/1.2 var(--display);margin:0}
+p{margin:0;color:var(--muted)}
+section{display:grid;gap:14px}
+.piece{display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:0}
+.piece video,.piece img{width:100%;height:auto;display:block;border-radius:8px;background:#000}
+.piece.tall video{max-height:78vh;width:auto;max-width:100%;margin:0 auto}
+.piece audio{width:100%}
+.piece strong{font-weight:600}
+.piece .sub{font-size:14px;color:var(--muted)}
+.feature{border-color:var(--accent)}
+.label{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+footer{font-size:13px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>Builder Screening Room</h1>
+    <p>Everything the studio made today, ready to play on your phone. Tap a video to play it; use the full-screen button for the best view.</p>
+  </header>
+
+  <section aria-labelledby="h-films">
+    <h2 id="h-films">Films</h2>
+    <div class="piece feature">
+      <span class="label">Final</span>
+      <video controls playsinline preload="metadata" poster="media/arena_poster.jpg" src="media/arena.mp4"></video>
+      <strong>The Reluctant Champion</strong>
+      <span class="sub">Original arena comedy, 36 s. Three voices, sword and shield, crowd, fanfare and gong. (This copy is 720p for phones; the 1080p master is in your downloads.)</span>
+    </div>
+    <div class="grid">
+      <div class="piece">
+        <video controls playsinline preload="metadata" poster="media/park_poster.jpg" src="media/park.mp4"></video>
+        <strong>Jay and Maya in the park</strong>
+        <span class="sub">First two-character scene: camera cuts, two voices, music.</span>
+      </div>
+      <div class="piece">
+        <video controls playsinline preload="metadata" poster="media/first_test_poster.jpg" src="media/first_test.mp4"></video>
+        <strong>The first test video</strong>
+        <span class="sub">Where it started: one character, one voice, lip-sync.</span>
+      </div>
+    </div>
+    <div class="piece tall">
+      <video controls playsinline preload="metadata" poster="media/short_poster.jpg" src="media/short.mp4"></video>
+      <strong>Vertical short</strong>
+      <span class="sub">Made by one-click shorts: 9:16 with bold captions, for TikTok, Reels or Shorts.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-pics">
+    <h2 id="h-pics">Pictures</h2>
+    <div class="piece"><img src="media/comic.jpg" alt="Four-panel comic page titled Gladiator Lunch Break, set in the arena"><strong>Gladiator Lunch Break</strong><span class="sub">The comic maker: speech bubbles point at whoever is talking.</span></div>
+    <div class="grid">
+      <div class="piece"><img src="media/teapot.jpg" alt="A 3D teapot model seen from three angles"><strong>Photo to 3D</strong><span class="sub">One museum photo of a teapot became this 3D model.</span></div>
+      <div class="piece"><img src="media/still.jpg" alt="Finished 5 by 7 print of the coach sitting on a stool in the arena"><strong>Finished print still</strong><span class="sub">Golden grade, sharpening, vignette and grain, 300 dpi.</span></div>
+    </div>
+    <div class="piece"><img src="media/hair.jpg" alt="Before and after renders of strand hair and a less boxy t-shirt"><strong>Photoreal hair and clothes</strong><span class="sub">Before and after: real hair strands, a less boxy shirt.</span></div>
+  </section>
+
+  <section aria-labelledby="h-sound">
+    <h2 id="h-sound">Sounds</h2>
+    <div class="piece"><strong>Arena sound demo</strong><span class="sub">Gong, fanfare, cheers, sword clashes, laughs and boos, all generated by Builder.</span><audio controls preload="none" src="media/arena_sfx.mp3"></audio></div>
+    <div class="grid">
+      <div class="piece"><strong>Upbeat music</strong><span class="sub">Original, composed by Builder.</span><audio controls preload="none" src="media/music_upbeat_20s.mp3"></audio></div>
+      <div class="piece"><strong>Calm music</strong><span class="sub">Original, composed by Builder.</span><audio controls preload="none" src="media/music_calm_20s.mp3"></audio></div>
+    </div>
+  </section>
+
+  <footer>Characters: MakeHuman (CC0). Motion capture: CMU Graphics Lab, mocap.cs.cmu.edu (NSF EIA-0196217). Sets: Poly Haven (CC0). Props: Kenney and Quaternius (CC0). Voices: Kokoro (Apache-2.0).</footer>
+</div>
+
+</body></html>

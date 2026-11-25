@@ -1,0 +1,177 @@
+{
+ "game": "Unhappy Woks",
+ "made_with": "Builder (Blender procedural + CC0 textures)",
+ "files": [
+  {
+   "file": "tree_forest_giant.glb",
+   "world": "forest",
+   "kind": "tree",
+   "height_m": 25.0,
+   "tris": 4262,
+   "bytes": 423388,
+   "source": "bark: ambientCG Bark014 (CC0) https://ambientcg.com/view?id=Bark014; foliage: none",
+   "packed_as": "tree_forest_giant.glb.json"
+  },
+  {
+   "file": "tree_forest_conifer.glb",
+   "world": "forest",
+   "kind": "tree",
+   "height_m": 14.5,
+   "tris": 8650,
+   "bytes": 467740,
+   "source": "bark: ambientCG Bark004 (CC0) https://ambientcg.com/view?id=Bark004; foliage: procedural fir sprays painted in trees_woody.py (original)",
+   "packed_as": "tree_forest_conifer.glb.json"
+  },
+  {
+   "file": "tree_ice_pine.glb",
+   "world": "ice",
+   "kind": "tree",
+   "height_m": 9.2,
+   "tris": 11378,
+   "bytes": 483848,
+   "source": "bark: ambientCG Bark001 (CC0) https://ambientcg.com/view?id=Bark001; snow: plain white PBR material",
+   "packed_as": "tree_ice_pine.glb.json"
+  },
+  {
+   "file": "tree_ice_dead.glb",
+   "world": "ice",
+   "kind": "tree",
+   "height_m": 6.0,
+   "tris": 5788,
+   "bytes": 434204,
+   "source": "bark: ambientCG Bark004 (CC0) https://ambientcg.com/view?id=Bark004; foliage: none (bare; twigs are 3-sided tubes)",
+   "packed_as": "tree_ice_dead.glb.json"
+  },
+  {
+   "file": "tree_desert_dead.glb",
+   "world": "desert",
+   "kind": "tree",
+   "height_m": 4.0,
+   "tris": 1178,
+   "bytes": 298460,
+   "source": "bark: ambientCG Bark002 (CC0) https://ambientcg.com/view?id=Bark002; foliage: procedural bleached twig sprays (original)",
+   "packed_as": "tree_desert_dead.glb.json"
+  },
+  {
+   "file": "tree_peaks_pine.glb",
+   "world": "peaks",
+   "kind": "tree",
+   "height_m": 12.5,
+   "tris": 10886,
+   "bytes": 544288,
+   "source": "bark: ambientCG Bark001 (CC0) https://ambientcg.com/view?id=Bark001; foliage: procedural spruce sprays painted in trees_woody.py (original)",
+   "packed_as": "tree_peaks_pine.glb.json"
+  },
+  {
+   "file": "tree_swamp_cypress.glb",
+   "world": "swamp",
+   "kind": "tree",
+   "height_m": 10.5,
+   "tris": 3932,
+   "bytes": 378560,
+   "source": "bark: ambientCG Bark015 (CC0) https://ambientcg.com/view?id=Bark015; foliage: procedural feathery cypress sprays + Spanish-moss strands (original)",
+   "packed_as": "tree_swamp_cypress.glb.json"
+  },
+  {
+   "file": "tree_temple_jungle.glb",
+   "world": "temple",
+   "kind": "tree",
+   "height_m": 14.0,
+   "tris": 4940,
+   "bytes": 358316,
+   "source": "bark: ambientCG Bark013 (CC0) https://ambientcg.com/view?id=Bark013; foliage: procedural broadleaf clusters + vines (original)",
+   "packed_as": "tree_temple_jungle.glb.json"
+  },
+  {
+   "file": "tree_lava_charred.glb",
+   "world": "lava",
+   "kind": "tree",
+   "height_m": 5.0,
+   "tris": 1501,
+   "bytes": 262556,
+   "source": "bark: ambientCG Bark001 (CC0) https://ambientcg.com/view?id=Bark001; foliage: none; emissive: ember cracks derived from the Bark001 displacement map (procedural)",
+   "packed_as": "tree_lava_charred.glb.json"
+  },
+  {
+   "file": "tree_forest_broadleaf.glb",
+   "world": "forest",
+   "kind": "tree",
+   "height_m": 11.93,
+   "tris": 5272,
+   "bytes": 440424,
+   "source": "ambientCG Bark001 (CC0) bark; leaf sprigs painted procedurally (original)",
+   "packed_as": "tree_forest_broadleaf.glb.json"
+  },
+  {
+   "file": "plant_fern.glb",
+   "world": "forest",
+   "kind": "plant",
+   "height_m": 0.87,
+   "tris": 952,
+   "bytes": 60700,
+   "source": "Poly Haven fern_02 (CC0) frond textures on procedural arching fronds",
+   "packed_as": "plant_fern.glb.json"
+  },
+  {
+   "file": "plant_desert_cactus.glb",
+   "world": "desert",
+   "kind": "plant",
+   "height_m": 4.48,
+   "tris": 8464,
+   "bytes": 327760,
+   "source": "cactus skin (ribs, areoles, spines) painted procedurally; original design",
+   "packed_as": "plant_desert_cactus.glb.json"
+  },
+  {
+   "file": "plant_desert_shrub.glb",
+   "world": "desert",
+   "kind": "plant",
+   "height_m": 1.11,
+   "tris": 1650,
+   "bytes": 120292,
+   "source": "ambientCG Bark002 (CC0) stems; twig/leaf sprigs painted procedurally",
+   "packed_as": "plant_desert_shrub.glb.json"
+  },
+  {
+   "file": "tree_peaks_birch.glb",
+   "world": "peaks",
+   "kind": "tree",
+   "height_m": 9.88,
+   "tris": 3928,
+   "bytes": 367000,
+   "source": "birch bark painted procedurally (original); leaf sprigs painted procedurally",
+   "packed_as": "tree_peaks_birch.glb.json"
+  },
+  {
+   "file": "plant_swamp_reeds.glb",
+   "world": "swamp",
+   "kind": "plant",
+   "height_m": 1.48,
+   "tris": 4000,
+   "bytes": 202028,
+   "source": "reed blades and cattail stems/heads painted procedurally (original)",
+   "packed_as": "plant_swamp_reeds.glb.json"
+  },
+  {
+   "file": "tree_temple_palm.glb",
+   "world": "temple",
+   "kind": "tree",
+   "height_m": 11.59,
+   "tris": 2880,
+   "bytes": 317140,
+   "source": "ambientCG Bark012 (CC0) trunk with painted rings; fronds painted procedurally",
+   "packed_as": "tree_temple_palm.glb.json"
+  },
+  {
+   "file": "plant_temple_fern.glb",
+   "world": "temple",
+   "kind": "plant",
+   "height_m": 1.48,
+   "tris": 1392,
+   "bytes": 164152,
+   "source": "elephant-ear leaves and stems painted procedurally (original)",
+   "packed_as": "plant_temple_fern.glb.json"
+  }
+ ],
+ "how_to_unpack": "Each <name>.glb.json holds the exact GLB bytes as base64 in glb_base64 (sha256 given). Decode and write <name>.glb."
+}

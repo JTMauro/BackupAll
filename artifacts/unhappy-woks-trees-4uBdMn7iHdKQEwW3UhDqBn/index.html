@@ -1,0 +1,48 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Unhappy Woks Trees</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* layout: two preview sheets, then a table of every model grouped by world */
+:root{--bg:#f3efe6;--panel:#fffdf8;--ink:#2a2118;--muted:#76695a;--line:#e4dccd;--accent:#8a5a2b;
+  --display:"Baloo 2",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17130f;--panel:#211b15;--ink:#f1e8dc;--muted:#ab9d8b;--line:#3a3128;--accent:#e3a868;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17130f;--panel:#211b15;--ink:#f1e8dc;--muted:#ab9d8b;--line:#3a3128;--accent:#e3a868;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px;display:grid;gap:22px}
+h1{font:700 clamp(30px,8vw,42px)/1.05 var(--display);margin:0}
+h2{font:700 22px/1.2 var(--display);margin:0}
+p{margin:0;color:var(--muted)}
+figure{margin:0;display:grid;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}
+figure img{width:100%;height:auto;border-radius:8px;display:block}
+figcaption{font-size:13px;color:var(--muted)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+code{font:12px ui-monospace,Menlo,monospace}
+</style>
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>Unhappy Woks Trees</h1>
+    <p>17 game-ready trees and plants (glTF binary, Y-up, metres, origin at the base, textures embedded, leaves alpha-masked). Grown procedurally in Blender with CC0 bark textures and painted foliage. The red capsule in the previews is a 1.8 m person.</p>
+  </header>
+  <figure><img src="sheet_woody.jpg" alt="Nine woody trees: giant redwood trunk, fir, snowy pine, frosted dead tree, desert dead tree, alpine spruce, swamp cypress with moss, jungle tree with vines, charred tree"><figcaption>Woody set (9)</figcaption></figure>
+  <figure><img src="sheet_leafy.jpg" alt="Eight leafy plants: broadleaf tree, fern, cactus, desert shrub, birch, reeds, palm, tropical leaves"><figcaption>Leafy set (8)</figcaption></figure>
+  <section style="display:grid;gap:10px"><h2>Files</h2>
+    <div class="tablebox"><table><thead><tr><th>File</th><th>World</th><th>Height</th><th>Triangles</th><th>Size</th><th>Sources</th></tr></thead><tbody id="rows"></tbody></table></div>
+  </section>
+</div>
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+fetch("manifest.json").then(r => r.json()).then(m => {
+  const order = ["forest", "ice", "desert", "peaks", "swamp", "temple", "lava"];
+  m.files.sort((a, b) => order.indexOf(a.world) - order.indexOf(b.world) || a.file.localeCompare(b.file));
+  document.getElementById("rows").innerHTML = m.files.map(f => `<tr><td><code>${esc(f.file)}</code></td><td>${esc(f.world)}</td>
+    <td class="num">${Number(f.height_m).toFixed(1)} m</td><td class="num">${Number(f.tris).toLocaleString()}</td>
+    <td class="num">${Math.round(f.bytes / 1024)} KB</td><td>${esc(f.source)}</td></tr>`).join("");
+});
+</script>
+
+</body></html>

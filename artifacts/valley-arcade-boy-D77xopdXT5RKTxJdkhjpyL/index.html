@@ -1,0 +1,101 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Valley Arcade Boy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* layout: full-bleed 3D stage with a slim control strip and a spec sheet beneath */
+:root{--bg:#eef0ec;--panel:#ffffff;--fg:#1f2421;--muted:#5d665f;--line:#d5dad3;--accent:#b8282d;
+--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a18;--panel:#202421;--fg:#e8ece7;--muted:#9aa39c;--line:#333a35;--accent:#e2575b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171a18;--panel:#202421;--fg:#e8ece7;--muted:#9aa39c;--line:#333a35;--accent:#e2575b;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:16px}
+h1{font-family:var(--display);font-size:1.6rem;margin:0;text-wrap:balance}
+p{margin:0;line-height:1.55;color:var(--muted);max-width:65ch}
+#stage{position:relative;width:100%;aspect-ratio:4/3;max-height:70vh;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#stage canvas{display:block;width:100%;height:100%}
+#status{position:absolute;left:12px;bottom:10px;font:12px var(--mono);color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px}
+button{font:500 13px var(--body);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0;font-size:13px}
+dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px;padding-top:2px}
+dd{margin:0;min-width:0;overflow-wrap:anywhere}
+code{font-family:var(--mono);font-size:12px}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap">
+<div class="wrap">
+  <h1>Valley Arcade Boy</h1>
+  <p>Stylised rigged boy for three.js r160, about 1.45 m tall (1.48 m to the tips of his hair). The animations below are standard Mixamo clips played straight on his skeleton. Drag to orbit.</p>
+  <div id="stage"><span id="status">Loading model…</span></div>
+  <div class="bar" id="bar">
+    <button id="b-bind" data-clip="" aria-pressed="false">Bind pose</button>
+    <button id="b-idle" data-clip="idle" aria-pressed="true">Idle</button>
+    <button id="b-walk" data-clip="walk" aria-pressed="false">Walk</button>
+    <button id="b-run" data-clip="run" aria-pressed="false">Run</button>
+  </div>
+  <dl>
+    <dt>File</dt><dd><code>models/boy-real.json</code>, glTF 2.0 JSON, one base64 buffer, 10 JPEG textures in bufferViews, no Draco/meshopt/KTX2</dd>
+    <dt>Size</dt><dd>3.5 MB, 54,096 triangles</dd>
+    <dt>Meshes</dt><dd>Body_Skin, Hair, Eyes, Hoodie, Jeans, Sneakers (PBR: colour + normal maps)</dd>
+    <dt>Skeleton</dt><dd>67 Mixamo joints (<code>mixamorig:Hips</code> … ; three.js names them <code>mixamorigHips</code>), A-pose bind</dd>
+    <dt>Axes</dt><dd>Y-up, faces +Z, metres, feet at y = 0</dd>
+    <dt>Licence</dt><dd>CC0 1.0</dd>
+  </dl>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+const stage = document.getElementById("stage"), status = document.getElementById("status");
+const r = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+stage.prepend(r.domElement);
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xe4ecff, 0x5a4a3a, 1.3));
+const sun = new THREE.DirectionalLight(0xfff1e0, 2.4); sun.position.set(1.5, 2.5, 2.5); scene.add(sun);
+const rim = new THREE.DirectionalLight(0xcfe0ff, 0.8); rim.position.set(-2, 1.5, -2); scene.add(rim);
+const ground = new THREE.Mesh(new THREE.CircleGeometry(0.9, 48), new THREE.MeshStandardMaterial({ color: 0x8a948c, roughness: 1, transparent: true, opacity: 0.35 }));
+ground.rotation.x = -Math.PI / 2; scene.add(ground);
+const cam = new THREE.PerspectiveCamera(30, 4 / 3, 0.05, 50); cam.position.set(1.6, 1.1, 3.4);
+const ctl = new OrbitControls(cam, r.domElement); ctl.target.set(0, 0.78, 0); ctl.enableDamping = true; ctl.minDistance = 0.6; ctl.maxDistance = 6;
+function size() { const w = stage.clientWidth, h = stage.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+new ResizeObserver(size).observe(stage); size();
+const loader = new GLTFLoader();
+// Load textures through <img> (allowed) instead of fetch() of blob: URLs (blocked by the viewer).
+loader.register(parser => { parser.textureLoader = new THREE.TextureLoader(parser.options.manager); return { name: "img_textures" }; });
+// The viewer blocks fetching data: URIs, so turn each .json (one base64 buffer) into GLB bytes here.
+async function loadEmbedded(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error(url + " returned " + res.status);
+  const json = await res.json(); const uri = json.buffers[0].uri; delete json.buffers[0].uri;
+  const bin = Uint8Array.from(atob(uri.slice(uri.indexOf(",") + 1)), c => c.charCodeAt(0));
+  json.buffers[0].byteLength = bin.length;
+  let js = new TextEncoder().encode(JSON.stringify(json)); const jl = (js.length + 3) & ~3, bl = (bin.length + 3) & ~3;
+  const out = new Uint8Array(12 + 8 + jl + 8 + bl), dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, out.length, true);
+  dv.setUint32(12, jl, true); dv.setUint32(16, 0x4E4F534A, true); out.fill(0x20, 20, 20 + jl); out.set(js, 20);
+  dv.setUint32(20 + jl, bl, true); dv.setUint32(24 + jl, 0x004E4942, true); out.set(bin, 28 + jl);
+  return new Promise((ok, bad) => loader.parse(out.buffer, "", ok, bad));
+}
+let mixer, clips = {}, action;
+try {
+  const [boy, ref] = await Promise.all([loadEmbedded("models/boy-real.json"), loadEmbedded("clips/mixamo-clips.json")]);
+  scene.add(boy.scene);
+  mixer = new THREE.AnimationMixer(boy.scene);
+  for (const c of ref.animations) { const k = c.clone(); k.tracks = k.tracks.filter(t => !/Hips\.position/.test(t.name)); clips[c.name] = k; }
+  play("idle"); status.textContent = "";
+} catch (e) { status.textContent = "Could not load the model: " + e.message; }
+function play(name) {
+  if (action) action.fadeOut(0.25);
+  action = null;
+  if (name && clips[name]) { action = mixer.clipAction(clips[name]).reset().fadeIn(0.25).play(); }
+  else if (mixer) { mixer.stopAllAction(); }
+  document.querySelectorAll("#bar button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.clip === (name || ""))));
+}
+document.getElementById("bar").addEventListener("click", e => { const b = e.target.closest("button"); if (b && mixer) play(b.dataset.clip); });
+const clock = new THREE.Clock();
+r.setAnimationLoop(() => { const dt = clock.getDelta(); if (mixer) mixer.update(dt); ctl.update(); r.render(scene, cam); });
+</script>
+
+</body></html>

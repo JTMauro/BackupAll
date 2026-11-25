@@ -1,0 +1,412 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Valley Arcade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Monoton&family=Press+Start+2P&family=Chakra+Petch:wght@400;600&display=swap">
+<style>
+/* Layout: one full-bleed WebGL hall; UI floats in the corners like an arcade attendant's booth. Deliberately single dark theme (neon on black). */
+:root {
+  --ink: #05040a;          /* hall black */
+  --panel: rgba(14, 10, 28, .94);
+  --line: rgba(160, 120, 255, .28);
+  --text: #efeaff;
+  --dim: #a59cc6;
+  --magenta: #ff3be0;      /* neon tube 1 */
+  --cyan: #38f4ff;         /* neon tube 2 */
+  --token: #ffd24a;        /* brass token */
+  --f-display: "Monoton", "Bungee", Impact, sans-serif;
+  --f-head: "Bungee", "Arial Black", Impact, sans-serif;
+  --f-pixel: "Press Start 2P", ui-monospace, monospace;
+  --f-body: "Chakra Petch", system-ui, sans-serif;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--ink); color: var(--text); font-family: var(--f-body); font-size: 15px; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+/* ---------- title / loader ---------- */
+#title { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; text-align: center;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255, 59, 224, .25), transparent 60%), linear-gradient(rgba(5, 4, 10, .55), rgba(5, 4, 10, .9));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); transition: opacity .6s; }
+#title.gone { opacity: 0; pointer-events: none; }
+.title-inner { display: grid; gap: 22px; justify-items: center; max-width: 900px; }
+.logo { margin: 0; font-family: var(--f-display); font-weight: 400; line-height: 1.02; font-size: clamp(38px, 9vw, 104px); color: #fff; text-wrap: balance;
+  text-shadow: 0 0 6px #fff, 0 0 18px var(--magenta), 0 0 42px var(--magenta), 0 0 80px var(--magenta); animation: flicker 6s infinite; }
+.logo span { display: block; font-size: .62em; text-shadow: 0 0 6px #fff, 0 0 18px var(--cyan), 0 0 42px var(--cyan), 0 0 80px var(--cyan); }
+@keyframes flicker { 0%, 92%, 100% { opacity: 1 } 93% { opacity: .55 } 94% { opacity: 1 } 96% { opacity: .7 } }
+.sub { font-family: var(--f-pixel); font-size: clamp(9px, 1.6vw, 12px); color: var(--dim); letter-spacing: .08em; line-height: 2; max-width: 60ch; }
+.sub b { color: var(--token); font-weight: 400; }
+#loadwrap { width: min(420px, 80vw); display: grid; gap: 10px; }
+.bar { height: 10px; border: 2px solid var(--line); border-radius: 2px; overflow: hidden; background: rgba(255, 255, 255, .04); }
+#load-bar { height: 100%; width: 3%; background: linear-gradient(90deg, var(--magenta), var(--cyan)); transition: width .3s; }
+#load-label { font-family: var(--f-pixel); font-size: 10px; color: var(--dim); letter-spacing: .1em; }
+#enter { display: none; font-family: var(--f-pixel); font-size: 14px; letter-spacing: .1em; padding: 18px 28px; border: 3px solid var(--token); color: var(--token);
+  background: rgba(255, 210, 74, .08); border-radius: 4px; box-shadow: 0 0 24px rgba(255, 210, 74, .35), inset 0 0 18px rgba(255, 210, 74, .15); animation: blink 1.1s steps(2) infinite; }
+#loader.ready #enter { display: inline-block; }
+#loader.ready #loadwrap { display: none; }
+#enter:hover { background: rgba(255, 210, 74, .2); }
+@keyframes blink { 50% { color: #fff; border-color: #fff; } }
+.keys { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; font-size: 13px; color: var(--dim); }
+kbd { font-family: var(--f-pixel); font-size: 9px; padding: 4px 6px; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 4px; color: var(--text); background: rgba(255, 255, 255, .05); }
+
+/* ---------- HUD ---------- */
+#hud { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 10; pointer-events: none; }
+#hud > * { pointer-events: auto; }
+.brand { font-family: var(--f-head); font-size: 15px; letter-spacing: .04em; color: #fff; text-shadow: 0 0 10px var(--magenta); }
+.brand small { display: block; font-family: var(--f-pixel); font-size: 8px; color: var(--token); text-shadow: none; margin-top: 6px; letter-spacing: .08em; }
+.hud-btns { display: flex; gap: 8px; }
+.hbtn { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; font-family: var(--f-pixel); font-size: 9px; letter-spacing: .06em; display: inline-flex; gap: 8px; align-items: center; }
+.hbtn:hover { border-color: var(--cyan); color: var(--cyan); }
+.hbtn kbd { font-size: 8px; padding: 2px 4px; }
+
+#prompt { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 36px); transform: translateX(-50%); z-index: 10; text-align: center;
+  background: var(--panel); border: 1px solid var(--token); border-radius: 8px; padding: 12px 18px; box-shadow: 0 0 30px rgba(255, 210, 74, .25); max-width: calc(100vw - 32px); }
+#prompt .p1 { font-family: var(--f-pixel); font-size: 10px; color: var(--token); letter-spacing: .08em; }
+#prompt-title { display: block; font-family: var(--f-head); font-size: 20px; margin-top: 6px; }
+#prompt button { margin-top: 10px; background: var(--token); color: #1a1300; border: 0; border-radius: 4px; padding: 8px 14px; font-family: var(--f-pixel); font-size: 10px; }
+
+#toast { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 74px); transform: translateX(-50%); z-index: 40; background: var(--panel); border: 1px solid var(--line);
+  padding: 10px 16px; border-radius: 6px; font-size: 14px; max-width: calc(100vw - 32px); text-align: center; }
+
+/* ---------- side panels ---------- */
+.sheet { position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 64px); right: max(16px, env(safe-area-inset-right, 0px)); width: min(420px, calc(100vw - 32px));
+  max-height: calc(100% - 90px - env(safe-area-inset-top, 0px)); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px; display: grid; gap: 14px; align-content: start; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
+.sheet h2 { margin: 0; font-family: var(--f-head); font-size: 18px; font-weight: 400; letter-spacing: .03em; display: flex; justify-content: space-between; align-items: center; }
+.x { background: none; border: 1px solid var(--line); border-radius: 4px; width: 30px; height: 30px; font-size: 16px; line-height: 1; }
+#menu { width: min(620px, calc(100vw - 32px)); }
+#menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.game { text-align: left; background: rgba(255, 255, 255, .03); border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 6px; padding: 10px 12px; display: grid; gap: 4px; min-width: 0; }
+.game:hover { background: rgba(255, 255, 255, .08); border-color: var(--acc); }
+.g-year { font-family: var(--f-pixel); font-size: 8px; color: var(--dim); }
+.g-title { font-family: var(--f-head); font-size: 14px; line-height: 1.15; }
+.g-maker { font-size: 12px; color: var(--dim); }
+.g-ooo { font-family: var(--f-pixel); font-size: 7px; color: var(--token); }
+.hint { font-size: 13px; color: var(--dim); margin: 0; line-height: 1.5; }
+fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin: 0; display: grid; gap: 10px; }
+legend { font-family: var(--f-pixel); font-size: 9px; color: var(--dim); padding: 0 6px; letter-spacing: .08em; }
+.presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.presets.chars { grid-template-columns: repeat(2, 1fr); margin-bottom: 8px; }
+.presets label { display: block; }
+.presets input { position: absolute; opacity: 0; }
+.presets span { display: block; text-align: center; padding: 9px 4px; border: 1px solid var(--line); border-radius: 6px; font-family: var(--f-pixel); font-size: 8px; cursor: pointer; }
+.presets input:checked + span { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px rgba(56, 244, 255, .3) inset; }
+.presets input:focus-visible + span { outline: 2px solid var(--cyan); }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; }
+.row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--magenta); }
+.row input[type=range] { width: 150px; accent-color: var(--cyan); }
+.row output { font-family: var(--f-pixel); font-size: 9px; color: var(--cyan); min-width: 42px; text-align: right; }
+
+/* ---------- playing: CRT ---------- */
+#play { position: fixed; inset: 0; z-index: 25; background: radial-gradient(ellipse at center, #0b0816 0%, #000 75%); display: grid; place-items: center; align-content: center; gap: 14px;
+  opacity: 0; transition: opacity .35s; padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+#play.on { opacity: 1; }
+#crt { position: relative; border-radius: 18px / 14px; overflow: hidden; background: #000;
+  box-shadow: 0 0 0 10px #0c0c0e, 0 0 0 12px #1c1c22, 0 0 60px rgba(120, 160, 255, .18), 0 30px 80px rgba(0, 0, 0, .8); }
+#game { width: 100%; height: 100%; display: block; image-rendering: pixelated; image-rendering: crisp-edges; filter: saturate(1.15) contrast(1.08) brightness(1.06); }
+#play.vector #game { image-rendering: auto; filter: brightness(1.15) contrast(1.1) drop-shadow(0 0 3px rgba(200, 230, 255, .55)); }
+#crt::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .28) 0px, rgba(0, 0, 0, .28) 1px, transparent 1px, transparent 3px); mix-blend-mode: multiply; }
+#crt::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3;
+  background: radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, .06) 0%, transparent 45%), radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, .55) 100%);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .7); animation: crtroll 7s linear infinite; }
+@keyframes crtroll { 0%, 100% { opacity: 1 } 50% { opacity: .93 } }
+.crt-off #crt::before, .crt-off #crt::after { display: none; }
+.crt-off #crt { border-radius: 2px; }
+.crt-off #game { filter: none; }
+.pointer-game #game { cursor: crosshair; }
+#play-bar { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: center; max-width: min(900px, 100%); }
+#play-title { font-family: var(--f-head); font-size: 18px; }
+#play-meta { font-family: var(--f-pixel); font-size: 8px; color: var(--dim); }
+#play-controls { font-size: 13px; color: var(--dim); max-width: 60ch; text-align: center; }
+.pbtn { background: rgba(255, 255, 255, .06); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font-family: var(--f-pixel); font-size: 9px; }
+.pbtn:hover { border-color: var(--token); color: var(--token); }
+
+/* ---------- touch controls ---------- */
+#pad, #walkstick { display: none; }
+@media (pointer: coarse) {
+  #walkstick { display: block; position: fixed; z-index: 12; left: max(26px, env(safe-area-inset-left, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); width: 120px; height: 120px; border-radius: 50%;
+    border: 2px solid var(--line); background: rgba(14, 10, 28, .5); --kx: 0px; --ky: 0px; touch-action: none; }
+  #walkstick::after { content: ""; position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px; border-radius: 50%; background: rgba(56, 244, 255, .35); border: 2px solid var(--cyan); transform: translate(var(--kx), var(--ky)); }
+  #pad { display: flex; justify-content: space-between; align-items: center; width: min(560px, 100%); gap: 16px; }
+  .hud-btns kbd, .keys { display: none; }
+}
+.dpad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); }
+.vk { border: 1px solid var(--line); background: rgba(255, 255, 255, .07); border-radius: 8px; font-family: var(--f-pixel); font-size: 9px; touch-action: none; }
+.vk.down { background: rgba(56, 244, 255, .35); }
+.vk.up { grid-area: 1 / 2; } .vk.left { grid-area: 2 / 1; } .vk.right { grid-area: 2 / 3; } .vk.down-k { grid-area: 3 / 2; }
+.ab { display: flex; gap: 12px; align-items: center; }
+.ab .vk { width: 64px; height: 64px; border-radius: 50%; }
+.ab .vk.a { background: rgba(216, 20, 28, .5); } .ab .vk.b { background: rgba(255, 210, 0, .35); }
+.ab .vk.st { width: 54px; height: 30px; border-radius: 15px; font-size: 7px; }
+/* ---------- ATM ---------- */
+.atm-bal { display: grid; gap: 2px; padding: 12px; border-radius: 8px; background: #06140c; border: 1px solid rgba(91, 255, 122, .35); font-family: var(--f-pixel); }
+.atm-bal span { font-size: 8px; color: #8dffa2; letter-spacing: .08em; }
+.atm-bal b { font-size: 20px; color: #5bff7a; font-weight: 400; font-variant-numeric: tabular-nums; }
+.atm-bal small { font-family: var(--f-body); font-size: 12px; color: var(--dim); }
+.atm-h { margin: 4px 0 0; font-family: var(--f-pixel); font-size: 9px; font-weight: 400; color: var(--dim); letter-spacing: .06em; display: grid; gap: 4px; }
+.atm-h small { font-family: var(--f-body); font-size: 12px; letter-spacing: 0; }
+.atm-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.atm-row button { flex: 1 1 auto; min-width: 60px; padding: 10px 8px; border-radius: 6px; border: 1px solid rgba(91, 255, 122, .35); background: rgba(91, 255, 122, .07); font-family: var(--f-pixel); font-size: 9px; }
+.atm-row button:hover:not(:disabled) { background: rgba(91, 255, 122, .16); }
+.atm-row button:disabled { opacity: .35; cursor: not-allowed; }
+/* ---------- claw ---------- */
+#clawhud { position: fixed; z-index: 12; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); background: var(--panel); border: 1px solid #ff3d8b; border-radius: 10px; padding: 12px 16px; display: grid; gap: 8px; justify-items: center; width: max-content; max-width: calc(100vw - 32px); box-shadow: 0 0 30px rgba(255, 61, 139, .25); }
+.claw-title { font-family: var(--f-head); font-size: 16px; color: #ff8ac0; }
+#claw-status { font-size: 14px; text-align: center; }
+.claw-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+/* ---------- prizes ---------- */
+#prizes { width: min(460px, calc(100vw - 32px)); }
+#prize-list { display: grid; gap: 6px; }
+.prize { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 255, 255, .03); }
+.prize:hover { background: rgba(255, 255, 255, .07); }
+.pz-pic { width: 64px; height: 64px; border-radius: 6px; background: radial-gradient(circle at 50% 40%, #3a2a5c, #120c22); overflow: hidden; }
+.pz-pic canvas { width: 100%; height: 100%; display: block; }
+.pz-info { display: grid; gap: 2px; min-width: 0; }
+.pz-name { font-family: var(--f-head); font-size: 15px; }
+.pz-kind { font-size: 12px; color: var(--dim); }
+.pz-buy { font-family: var(--f-pixel); font-size: 11px; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--token); color: #1a1300; background: var(--token); min-width: 64px; }
+.pz-buy:hover:not(:disabled) { filter: brightness(1.1); }
+.pz-buy:disabled { background: transparent; color: var(--dim); border-color: var(--line); cursor: not-allowed; }
+/* ---------- music ---------- */
+.hud-vol { display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; color: var(--cyan); font-size: 15px; }
+.hud-vol input { width: 90px; accent-color: var(--cyan); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 760px) { .hud-vol { display: none; } }
+/* ---------- money ---------- */
+#wallet { margin-left: auto; display: grid; grid-template-columns: auto auto; gap: 2px 10px; align-items: baseline; background: var(--panel); border: 1px solid rgba(255, 210, 74, .45); border-radius: 6px; padding: 7px 12px; }
+.w-label { font-family: var(--f-pixel); font-size: 7px; color: var(--dim); letter-spacing: .08em; }
+#w-total { font-family: var(--f-pixel); font-size: 13px; color: var(--token); text-align: right; font-variant-numeric: tabular-nums; }
+.w-sub { grid-column: 1 / -1; font-size: 11px; color: var(--dim); text-align: right; font-variant-numeric: tabular-nums; }
+#wallet.spend #w-total { animation: spend .6s ease-out; }
+@keyframes spend { 0% { color: #ff5a5a; transform: scale(1.15); } 100% { color: var(--token); transform: none; } }
+.coinwrap { position: relative; display: inline-block; }
+#coin-fx { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); font-family: var(--f-pixel); font-size: 12px; color: #ff6b6b; opacity: 0; pointer-events: none; text-shadow: 0 0 8px #ff2b2b; }
+#coin-fx.go { animation: coinfx .9s ease-out; }
+@keyframes coinfx { 0% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -26px); } }
+.bills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.bills button { display: grid; gap: 4px; text-align: left; padding: 12px; border-radius: 6px; border: 1px solid rgba(91, 255, 122, .35); background: rgba(91, 255, 122, .07); }
+.bills button:hover:not(:disabled) { background: rgba(91, 255, 122, .16); }
+.bills button:disabled { opacity: .4; cursor: not-allowed; }
+.bills b { font-family: var(--f-head); font-size: 22px; font-weight: 400; color: #8dffa2; }
+.bills span { font-size: 13px; color: var(--dim); }
+.coinbox { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.pbtn.coin { border-color: var(--token); color: var(--token); background: rgba(255, 210, 74, .1); }
+.pbtn.coin:disabled { opacity: .4; }
+#play-credits { font-family: var(--f-pixel); font-size: 10px; color: #fff; }
+#play-quarters { font-family: var(--f-pixel); font-size: 8px; color: var(--dim); }
+#play-msg { width: 100%; text-align: center; font-size: 13px; color: var(--token); min-height: 1em; }
+#pops { position: fixed; inset: 0; pointer-events: none; z-index: 15; overflow: hidden; }
+.pop { position: absolute; left: 0; top: 0; font-family: var(--f-pixel); font-size: 16px; text-shadow: 0 0 10px currentColor, 0 2px 0 #000; white-space: nowrap; }
+
+/* ---------- raid ---------- */
+#raid { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 70px); left: 50%; transform: translateX(-50%); z-index: 11; text-align: center; pointer-events: none;
+  width: min(560px, calc(100vw - 32px)); display: grid; gap: 6px; }
+#raid-title { font-family: var(--f-head); font-size: clamp(18px, 3.4vw, 28px); color: #ff3b3b; text-shadow: 0 0 12px #ff1a1a, 0 2px 0 #000; animation: blink 1s steps(2) infinite; }
+#raid-sub { font-size: 14px; color: var(--text); text-shadow: 0 1px 2px #000; }
+#raid-count { font-family: var(--f-pixel); font-size: 11px; color: var(--token); }
+#crosshair, #weapons, #firebtn { display: none; }
+body.raid #weapons { display: flex; }
+body.armed #crosshair { display: block; }
+#crosshair { position: fixed; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px; z-index: 11; pointer-events: none;
+  background: linear-gradient(#fff, #fff) center / 2px 8px no-repeat, linear-gradient(#fff, #fff) center / 8px 2px no-repeat; border: 2px solid rgba(255, 255, 255, .8); border-radius: 50%; mix-blend-mode: difference; }
+#weapons { position: fixed; z-index: 11; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); gap: 6px; flex-wrap: wrap; justify-content: center; width: max-content; max-width: calc(100vw - 32px); }
+.wslot { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font-family: var(--f-pixel); font-size: 8px; color: var(--dim); opacity: .45; display: inline-flex; gap: 6px; align-items: center; }
+.wslot.owned { opacity: 1; color: var(--text); }
+.wslot.sel { border-color: #ff5a3b; color: #fff; box-shadow: 0 0 14px rgba(255, 90, 59, .5); }
+body.raid #prompt { bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); }
+@media (pointer: coarse) { body.armed #firebtn { display: block; position: fixed; z-index: 12; right: max(26px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 90px); width: 86px; height: 86px; border-radius: 50%; border: 2px solid #ff5a3b; background: rgba(255, 60, 40, .35); font-family: var(--f-pixel); font-size: 10px; touch-action: none; } }
+@media (max-width: 620px) { #wallet { grid-template-columns: auto; } .w-label, .w-sub { display: none; } }
+@media (prefers-reduced-motion: reduce) { .logo, #enter, #crt::after { animation: none; } }
+@media (max-width: 520px) { .brand { font-size: 12px; } .hbtn { padding: 8px; } .hbtn .lbl-long { display: none; } }
+</style>
+
+<canvas id="scene" tabindex="0"></canvas>
+
+<section id="title">
+  <div class="title-inner" id="loader">
+    <h1 class="logo">Valley<span>Arcade</span></h1>
+    <div id="loadwrap"><div class="bar"><div id="load-bar"></div></div><div id="load-label">Plugging in the cabinets</div></div>
+    <button id="enter" type="button">Walk in</button>
+    <div class="keys"><span><kbd>W A S D</kbd> walk</span><span><kbd>Shift</kbd> run</span><span><kbd>Drag</kbd> look</span><span><kbd>E</kbd> play</span><span><kbd>Tab</kbd> game list</span><span><kbd>5</kbd> insert coin</span><span><kbd>Esc</kbd> leave cabinet</span></div>
+  </div>
+</section>
+
+<header id="hud" hidden>
+  <div class="brand">Valley Arcade<small>25¢ PER PLAY</small></div>
+  <div id="wallet" title="Your money"><span class="w-label">MONEY</span><span id="w-total">$20.00</span><span class="w-sub"><span id="w-cash">$20.00</span> cash · <span id="w-q">0</span> × 25¢<span id="w-bank"></span></span></div>
+  <label class="hud-vol" for="hud-music" title="Music volume"><span aria-hidden="true">♪</span><span class="sr">Music volume</span><input type="range" id="hud-music" min="0" max="1" step="0.05"></label>
+  <div class="hud-btns">
+    <button class="hbtn" id="btn-games" type="button"><span>Games</span><kbd>Tab</kbd></button>
+    <button class="hbtn" id="btn-settings" type="button"><span>Graphics</span><kbd>G</kbd></button>
+  </div>
+</header>
+
+<div id="prompt" hidden><span class="p1" id="prompt-p1">PRESS E TO PLAY</span><span id="prompt-title"></span><button type="button" id="prompt-play">Play</button></div>
+<div id="toast" hidden></div>
+<div id="clawhud" hidden>
+  <div class="claw-title">Valley Grabber · 50¢ a try</div>
+  <div id="claw-status" aria-live="polite">Insert two quarters to play (key 5).</div>
+  <div class="claw-btns"><button type="button" class="pbtn coin" id="claw-pay">Insert 50¢ (5)</button><button type="button" class="pbtn" id="claw-drop">Drop (Space)</button><button type="button" class="pbtn" id="claw-leave">Leave (Esc)</button></div>
+</div>
+<div id="pops" aria-hidden="true"></div>
+<div id="raid" hidden><div id="raid-title"></div><div id="raid-sub"></div><div id="raid-count"></div></div>
+<div id="crosshair" aria-hidden="true"></div>
+<nav id="weapons" aria-label="Weapons">
+  <button type="button" class="wslot" data-w="pistol"><kbd>1</kbd>Pistol</button>
+  <button type="button" class="wslot" data-w="mg"><kbd>2</kbd>Machine gun</button>
+  <button type="button" class="wslot" data-w="crossbow"><kbd>3</kbd>Crossbow</button>
+  <button type="button" class="wslot" data-w="bfg"><kbd>4</kbd>BFG 9000</button>
+  <button type="button" class="wslot" data-w="heavy"><kbd>5</kbd>Heavy Barrel</button>
+</nav>
+<button type="button" id="firebtn">FIRE</button>
+<div id="walkstick" aria-hidden="true"></div>
+
+<aside id="menu" class="sheet" hidden>
+  <h2>Pick a game <button class="x" id="menu-close" type="button" aria-label="Close">×</button></h2>
+  <p class="hint">He walks over to the cabinet and starts playing. Esc brings you back to the floor.</p>
+  <div id="menu-list"></div>
+</aside>
+
+<aside id="change" class="sheet" hidden>
+  <h2>Change machine <button class="x" id="change-close" type="button" aria-label="Close">×</button></h2>
+  <p class="hint">Cash in, quarters out. Games and the claw machine only take quarters: 25¢ a game, 50¢ a claw try.</p>
+  <div class="bills">
+    <button type="button" data-bill="1"><b>$1</b><span>4 quarters</span></button>
+    <button type="button" data-bill="5"><b>$5</b><span>20 quarters</span></button>
+    <button type="button" data-bill="10"><b>$10</b><span>40 quarters</span></button>
+    <button type="button" data-bill="20"><b>$20</b><span>80 quarters</span></button>
+  </div>
+  <p class="hint" id="change-msg" aria-live="polite"></p>
+</aside>
+
+<aside id="atm" class="sheet" hidden>
+  <h2>ATM <button class="x" id="atm-close" type="button" aria-label="Close">×</button></h2>
+  <div class="atm-bal"><span>BANK BALANCE</span><b id="atm-bank">$0.00</b><small id="atm-onhand"></small></div>
+  <h3 class="atm-h">Deposit</h3>
+  <div class="atm-row">
+    <button type="button" data-dep="5">$5</button><button type="button" data-dep="10">$10</button><button type="button" data-dep="20">$20</button><button type="button" data-dep="all">All cash</button><button type="button" data-dep="q">All quarters</button>
+  </div>
+  <h3 class="atm-h">Withdraw cash</h3>
+  <div class="atm-row">
+    <button type="button" data-wd="5">$5</button><button type="button" data-wd="10">$10</button><button type="button" data-wd="20">$20</button><button type="button" data-wd="all">Everything</button>
+  </div>
+  <p class="hint" id="atm-msg" aria-live="polite">Money in the bank is safe. Withdraw it as cash, then get quarters at the change machine.</p>
+</aside>
+
+<aside id="prizes" class="sheet" hidden>
+  <h2>Prize counter <button class="x" id="prizes-close" type="button" aria-label="Close">×</button></h2>
+  <p class="hint" id="prize-wallet"></p>
+  <div id="prize-list"></div>
+  <p class="hint" id="prize-msg" aria-live="polite">Pick a prize. It goes on your shelf behind the counter.</p>
+</aside>
+
+<aside id="settings" class="sheet" hidden>
+  <h2>Graphics <button class="x" id="settings-close" type="button" aria-label="Close">×</button></h2>
+  <fieldset>
+    <legend>CHARACTER</legend>
+    <div class="presets chars">
+      <label><input type="radio" name="character" value="makehuman"><span>REALISTIC</span></label>
+      <label><input type="radio" name="character" value="builder"><span>BUILDER</span></label>
+    </div>
+    <p class="hint">Realistic: made with MakeHuman. Builder: the stylised boy in the red hoodie.</p>
+  </fieldset>
+  <fieldset>
+    <legend>QUALITY</legend>
+    <div class="presets">
+      <label><input type="radio" name="preset" id="pr-low" value="low"><span>LOW</span></label>
+      <label><input type="radio" name="preset" id="pr-medium" value="medium"><span>MED</span></label>
+      <label><input type="radio" name="preset" id="pr-high" value="high"><span>HIGH</span></label>
+      <label><input type="radio" name="preset" id="pr-ultra" value="ultra"><span>ULTRA</span></label>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>3D ARCADE</legend>
+    <label class="row" for="opt-scale">Render resolution <span><input type="range" id="opt-scale" min="0.4" max="2" step="0.1"> <output id="opt-scale-v"></output></span></label>
+    <label class="row" for="opt-shadows">Soft shadows <input type="checkbox" id="opt-shadows"></label>
+    <label class="row" for="opt-bloom">Neon bloom <input type="checkbox" id="opt-bloom"></label>
+    <label class="row" for="opt-aa">Anti-aliasing (SMAA) <input type="checkbox" id="opt-aa"></label>
+    <label class="row" for="opt-auto">Auto resolution (only if the frame rate drops) <input type="checkbox" id="opt-auto"></label>
+    <label class="row" for="opt-live">Live attract screens <span><input type="range" id="opt-live" min="0" max="23" step="1"> <output id="opt-live-v"></output></span></label>
+  </fieldset>
+  <fieldset>
+    <legend>GAME SCREEN &amp; SOUND</legend>
+    <label class="row" for="opt-crt">CRT scanlines and curvature <input type="checkbox" id="opt-crt"></label>
+    <label class="row" for="opt-music">Music volume <span><input type="range" id="opt-music" min="0" max="1" step="0.05"> <output id="opt-music-v"></output></span></label>
+    <label class="row" for="opt-sound">Sound <input type="checkbox" id="opt-sound"></label>
+    <label class="row" for="opt-ambience">Arcade ambience <input type="checkbox" id="opt-ambience"></label>
+  </fieldset>
+</aside>
+
+<section id="play" hidden>
+  <div id="crt"><canvas id="game"></canvas></div>
+  <div id="play-bar">
+    <div><div id="play-title"></div><div id="play-meta"></div></div>
+    <div id="play-controls"></div>
+    <div class="coinbox"><span class="coinwrap"><button class="pbtn coin" id="play-coin" type="button">Insert 25¢ (5)</button><span id="coin-fx" aria-hidden="true">-25¢</span></span><span id="play-credits"></span><span id="play-quarters"></span></div>
+    <div id="play-msg" aria-live="polite"></div>
+    <button class="pbtn" id="play-mute" type="button">Sound on</button>
+    <button class="pbtn" id="play-exit" type="button">Leave cabinet (Esc)</button>
+  </div>
+  <div id="pad">
+    <div class="dpad">
+      <button class="vk up" data-vk="ArrowUp" type="button" aria-label="Up">▲</button>
+      <button class="vk left" data-vk="ArrowLeft" type="button" aria-label="Left">◀</button>
+      <button class="vk right" data-vk="ArrowRight" type="button" aria-label="Right">▶</button>
+      <button class="vk down-k" data-vk="ArrowDown" type="button" aria-label="Down">▼</button>
+    </div>
+    <div class="ab">
+      <button class="vk st" data-vk="Enter" type="button">START</button>
+      <button class="vk b" data-vk="KeyX" type="button">B</button>
+      <button class="vk a" data-vk="Space" type="button">A</button>
+    </div>
+  </div>
+</section>
+
+<script src="games/_runtime.js"></script>
+<script src="games/pacman.js"></script>
+<script src="games/spaceinvaders.js"></script>
+<script src="games/donkeykong.js"></script>
+<script src="games/galaga.js"></script>
+<script src="games/mspacman.js"></script>
+<script src="games/asteroids.js"></script>
+<script src="games/frogger.js"></script>
+<script src="games/defender.js"></script>
+<script src="games/centipede.js"></script>
+<script src="games/pong.js"></script>
+<script src="games/digdug.js"></script>
+<script src="games/tempest.js"></script>
+<script src="games/breakout.js"></script>
+<script src="games/qbert.js"></script>
+<script src="games/joust.js"></script>
+<script src="games/poleposition.js"></script>
+<script src="games/donkeykongjr.js"></script>
+<script src="games/tron.js"></script>
+<script src="games/missilecommand.js"></script>
+<script src="games/triplehunt.js"></script>
+<script src="games/duckhunt.js"></script>
+<script src="games/raidonbungelingbay.js"></script>
+<script src="games/deerhunter.js"></script>
+<script src="games/heavybarrel.js"></script>
+<script src="games/nuclearwar.js"></script>
+<script src="games/taipan.js"></script>
+<script src="games/nuclearwaramiga.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="main.js"></script>
+<script>
+document.getElementById('prompt-play').addEventListener('click', () => {
+  const a = window.__arcade; if (a) a.interact();
+});
+</script>
+
+</body></html>

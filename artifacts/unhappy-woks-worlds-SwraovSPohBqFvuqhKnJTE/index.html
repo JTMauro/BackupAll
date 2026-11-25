@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Unhappy Woks Worlds</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* layout: one card per world: its backdrop across the top, then the tiled ground and its surface map side by side */
+:root{--bg:#f3efe6;--panel:#fffdf8;--ink:#2a2118;--muted:#76695a;--line:#e4dccd;--accent:#8a5a2b;
+  --display:"Baloo 2",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17130f;--panel:#211b15;--ink:#f1e8dc;--muted:#ab9d8b;--line:#3a3128;--accent:#e3a868;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17130f;--panel:#211b15;--ink:#f1e8dc;--muted:#ab9d8b;--line:#3a3128;--accent:#e3a868;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px;display:grid;gap:22px}
+h1{font:700 clamp(30px,8vw,42px)/1.05 var(--display);margin:0}
+h2{font:700 22px/1.2 var(--display);margin:0;display:flex;gap:10px;align-items:center}
+p{margin:0;color:var(--muted)}
+.world{display:grid;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.world img{width:100%;height:auto;display:block;border-radius:8px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.tile{aspect-ratio:1;border-radius:8px;background-size:50% 50%;background-repeat:repeat}
+.cap{font-size:12px;color:var(--muted)}
+.fog{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:inline-block}
+code{font:12px ui-monospace,Menlo,monospace;overflow-wrap:anywhere}
+</style>
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>Unhappy Woks Worlds</h1>
+    <p>Ground textures and backdrops for the 10 worlds. Grounds are real CC0 photo-scanned materials (ambientCG), blended and painted to tile seamlessly. Backdrops are real CC0 sky panoramas (Poly Haven) plus painted mountains, volcanoes, seas, spires, temples and space. Each ground is shown tiled 2×2 so you can check the repeat.</p>
+  </header>
+  <div id="worlds"></div>
+</div>
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+fetch("manifest.json").then(r => r.json()).then(m => {
+  const host = document.getElementById("worlds");
+  for (const [w, fog] of Object.entries(m.fog)) {
+    const f = k => m.files.find(x => x.world === w && x.kind === k);
+    const card = document.createElement("section");
+    card.className = "world";
+    const tiles = ["color", "normal", "emissive"].filter(k => f(k)).map(k =>
+      `<div><div class="tile" style="background-image:url('${esc(f(k).file)}')"></div><div class="cap"><code>${esc(f(k).file)}</code> · ${f(k).w}×${f(k).h} · ${Math.round(f(k).bytes / 1024)} KB</div></div>`).join("");
+    card.innerHTML = `<h2>${esc(w)} <span class="fog" style="background:${esc(fog)}" title="fog ${esc(fog)}"></span><span class="cap">fog ${esc(fog)}</span></h2>
+      <img src="${esc(f("backdrop").file)}" alt="${esc(w)} backdrop" loading="lazy"><div class="cap"><code>${esc(f("backdrop").file)}</code> · 2048×768 · ${Math.round(f("backdrop").bytes / 1024)} KB</div>
+      <div class="row">${tiles}</div>`;
+    host.append(card);
+  }
+}).catch(() => { document.getElementById("worlds").textContent = "Couldn't load the file list."; });
+</script>
+
+</body></html>

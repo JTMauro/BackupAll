@@ -1,0 +1,827 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Craft Studio</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: workbench — a narrow intake + job rail on the left, the selected build's stages, live preview and checks on the right */
+:root{
+  --bg:#f3f1ee; --panel:#ffffff; --sunk:#e9e6e1; --fg:#1d1b19; --muted:#6b655e; --line:#d9d4cc;
+  --accent:#d0571b; --accent-fg:#ffffff; --ok:#2f7d4f; --warn:#a86b00; --bad:#b3261e;
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#161514; --panel:#1f1d1b; --sunk:#2a2724; --fg:#ece8e3; --muted:#a39c93; --line:#37332f;
+  --accent:#f0773a; --accent-fg:#1a0f08; --ok:#5cc286; --warn:#e0a63a; --bad:#f07068; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161514; --panel:#1f1d1b; --sunk:#2a2724; --fg:#ece8e3; --muted:#a39c93; --line:#37332f;
+  --accent:#f0773a; --accent-fg:#1a0f08; --ok:#5cc286; --warn:#e0a63a; --bad:#f07068; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 32px}
+.app{max-width:1240px;margin:0 auto;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font:700 1.7rem/1.1 var(--display);margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0;max-width:70ch}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:10px;min-width:0}
+h2{font:600 .78rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+label{display:grid;gap:4px;font-weight:500;font-size:13px}
+textarea,input,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:86px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:500 13px var(--body);padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible,.job:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+.note.bad{color:var(--bad)}
+fieldset.human{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:8px;margin:0;min-width:0}
+fieldset.human legend{font:600 .78rem/1 var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:0 4px}
+.hgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+.hgrid label{font-size:12.5px}
+.hgrid output{float:right;font:12px var(--mono);color:var(--muted);font-weight:400}
+.hgrid input[type=range]{padding:0}
+.hgrid input[type=color]{height:34px;padding:2px}
+#h3d{position:absolute;inset:0}
+#h3d canvas{display:block;width:100%;height:100%}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;border-radius:8px;background:var(--sunk)}
+.seg label{display:block;font-weight:500}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;left:0;top:0;margin:0}
+.seg span{display:block;text-align:center;padding:7px 4px;border-radius:6px;cursor:pointer;font-size:13px}
+.seg input:checked+span{background:var(--panel);box-shadow:0 0 0 1px var(--line);color:var(--accent);font-weight:600}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
+.drop{display:grid;gap:6px;padding:10px;border:1.5px dashed var(--line);border-radius:8px}
+.drop.over{border-color:var(--accent);background:var(--sunk)}
+#refThumb{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.toggle{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px;border-radius:6px;background:var(--sunk)}
+.toggle b{font-weight:600}
+.jobs{display:grid;gap:6px;max-height:420px;overflow:auto}
+.job{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;text-align:left;padding:8px 10px;border-radius:6px;border:1px solid transparent;background:var(--bg);cursor:pointer;font:inherit;color:inherit;width:100%}
+.job[aria-current="true"]{border-color:var(--accent)}
+.job .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.job .m{grid-column:1/-1;font:12px var(--mono);color:var(--muted)}
+.pill{font:500 11px var(--mono);padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;align-self:start}
+.s-queued{color:var(--warn)} .s-running{color:var(--accent)} .s-done{color:var(--ok)} .s-failed,.s-stopped{color:var(--bad)}
+.stages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.stage{padding:8px;border-radius:6px;background:var(--sunk);font-size:12.5px;display:grid;gap:2px}
+.stage b{font:600 13px var(--display)}
+.stage.on{background:var(--accent);color:var(--accent-fg)}
+.stage.done b::after{content:" ✓"}
+.frame{position:relative;width:100%;aspect-ratio:16/10;max-width:100%;border-radius:6px;overflow:hidden;background:var(--sunk);border:1px solid var(--line)}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.frame .empty{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);text-align:center;padding:16px}
+.score{font:700 1.6rem/1 var(--display)}
+.checks{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.checks li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:6px;font-size:13px}
+.checks .y{color:var(--ok)} .checks .n{color:var(--bad)}
+.log{font:12px/1.5 var(--mono);background:var(--sunk);border-radius:6px;padding:10px;max-height:220px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:640px){.two{grid-template-columns:minmax(0,1fr)}.stages{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.live{font:12px var(--mono);color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.stage.on{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{opacity:.78}}}
+</style>
+
+<div class="app">
+  <header>
+    <h1>Craft Studio</h1>
+    <p class="sub">The Craft Anything loop in your chat for games, 3D objects and sounds: Study the request, Build it, Check it running (Claude looks at a picture of the result), Refine until it passes. Save objects as .glb and sounds as .wav. Your Claude Code chat can queue builds and read the results.</p>
+  </header>
+  <p class="note bad" id="notice" hidden></p>
+  <div class="grid">
+    <div style="display:grid;gap:16px;min-width:0">
+      <form class="card" id="form">
+        <h2>New build</h2>
+        <div class="seg" role="radiogroup" aria-label="What to make">
+          <label><input type="radio" name="kind" value="page" checked><span>Game or page</span></label>
+          <label><input type="radio" name="kind" value="object"><span>3D object</span></label>
+          <label><input type="radio" name="kind" value="sound"><span>Sound</span></label>
+          <label><input type="radio" name="kind" value="human"><span>Real human</span></label>
+        </div>
+        <fieldset class="human" id="humanFields" hidden>
+          <legend>MakeHuman settings</legend>
+          <p class="note">Built with Blender and MakeHuman by your Claude Code chat: realistic proportions, rigged with Mixamo bones, free to use (CC0). Takes 2–4 minutes once the chat picks it up.</p>
+          <div class="hgrid">
+            <label for="hAge">Age <output id="hAgeOut">16</output>
+              <input id="hAge" type="range" min="5" max="80" step="1" value="16"></label>
+            <label for="hGender">Body <output id="hGenderOut">Male</output>
+              <input id="hGender" type="range" min="0" max="1" step="0.05" value="1"></label>
+            <label for="hHeight">Height <output id="hHeightOut">Average</output>
+              <input id="hHeight" type="range" min="0" max="1" step="0.05" value="0.55"></label>
+            <label for="hWeight">Build <output id="hWeightOut">Slim</output>
+              <input id="hWeight" type="range" min="0" max="1" step="0.05" value="0.4"></label>
+            <label for="hMuscle">Muscle <output id="hMuscleOut">Average</output>
+              <input id="hMuscle" type="range" min="0" max="1" step="0.05" value="0.45"></label>
+            <label for="hSkin">Skin <input id="hSkin" type="color" value="#e3bda6"></label>
+            <label for="hHair">Hair style <select id="hHair"></select></label>
+            <label for="hHairColor">Hair colour <input id="hHairColor" type="color" value="#9e5224"></label>
+            <label for="hEyes">Eyes <select id="hEyes"></select></label>
+            <label for="hOutfit">Outfit <select id="hOutfit"></select></label>
+            <label for="hTop">Tee colour <span class="note" id="hTopNote">(plain tee)</span> <input id="hTop" type="color" value="#cdd8d3"></label>
+            <label for="hSmile">Smile <output id="hSmileOut">Smiling</output>
+              <input id="hSmile" type="range" min="0" max="1" step="0.05" value="0.7"></label>
+            <label for="hPose">Pose <select id="hPose"><option value="standing">Standing</option><option value="crossed">Arms crossed</option></select></label>
+            <label for="hJeans">Jeans wash <select id="hJeans"><option value="1">Dark</option><option value="1.15" selected>Medium</option><option value="1.32">Light</option></select></label>
+            <label for="hShoes">Shoes <select id="hShoes"></select></label>
+            <label for="hShoeColor"><span><input id="hShoeOn" type="checkbox" checked style="width:auto;margin:0 6px 0 0;vertical-align:middle">Shoe colour</span> <input id="hShoeColor" type="color" value="#5a6238"></label>
+          </div>
+          <div class="row"><button type="button" id="hFromPhoto" disabled>Fill in from the photo</button><span class="note" id="hPhotoNote">Add a photo below, then Claude reads off age, build and colours.</span></div>
+        </fieldset>
+        <label for="req" id="reqLabel">What should it be?
+          <textarea id="req" required></textarea></label>
+        <label for="target">Reference notes (optional)
+          <input id="target" placeholder="Look, materials, mood, what it should remind you of…"></label>
+        <div class="drop" id="drop">
+          <label for="refFile">Learn from a file (optional)
+            <input id="refFile" type="file" accept="image/*,audio/*"></label>
+          <div class="row" id="refShow" hidden><img id="refThumb" alt="Reference picture"><button type="button" id="refClear">Remove</button></div>
+          <span class="note">Or paste a picture (Ctrl+V / ⌘V) or drag one here.</span>
+        </div>
+        <p class="note" id="refNote">A photo or drawing to model from, or a sound file to match. Photos are shown to Claude; sounds are measured here (length, loudness, brightness) and the measurements are used.</p>
+        <div class="row">
+          <label for="rounds" style="grid-auto-flow:column;align-items:center;gap:8px">Refine rounds
+            <select id="rounds" style="width:auto"><option>1</option><option selected>2</option><option>3</option></select></label>
+          <button class="primary" id="go" type="submit">Build it</button>
+        </div>
+        <p class="note">Each step asks Claude using your own Claude usage. The first one asks you to allow that.</p>
+      </form>
+      <div class="card">
+        <div class="toggle"><span><b>Chat automation</b><br><span class="note" id="autoNote">Off. Builds your chat queues wait here.</span></span>
+          <button id="auto" type="button" aria-pressed="false">Turn on</button></div>
+        <h2>Builds</h2>
+        <div class="jobs" id="jobs"><p class="note">Loading builds…</p></div>
+      </div>
+    </div>
+
+    <section class="card" id="detail" aria-live="polite">
+      <div class="row" style="justify-content:space-between">
+        <div style="min-width:0"><h2 id="dKind">Example</h2><div style="font:600 1.2rem var(--display)" id="dTitle">No build selected</div></div>
+        <div class="row">
+          <button id="stop" type="button" hidden>Stop</button>
+          <button id="rerun" type="button" hidden>Run again</button>
+          <button id="saveFile" type="button" hidden>Save file</button>
+          <button id="save" type="button" hidden>Save HTML</button>
+          <button id="del" type="button" hidden>Delete</button>
+        </div>
+      </div>
+      <p class="note" id="dReq">Start a build on the left, or turn on chat automation and ask your Claude Code chat to queue one.</p>
+      <div class="stages" id="stages">
+        <div class="stage" data-s="study"><b>Study</b><span>Plan features and checks</span></div>
+        <div class="stage" data-s="build"><b>Build</b><span>Write the page</span></div>
+        <div class="stage" data-s="check"><b>Check</b><span>Run it, test it</span></div>
+        <div class="stage" data-s="refine"><b>Refine</b><span>Fix what failed</span></div>
+      </div>
+      <div class="live" id="live"></div>
+      <div class="frame"><div id="h3d" hidden></div><iframe id="view" title="Build preview" sandbox="allow-scripts allow-pointer-lock" hidden></iframe><div class="empty" id="viewEmpty">The working build appears here.</div></div>
+      <div class="two">
+        <div style="display:grid;gap:8px;min-width:0">
+          <h2>Checks</h2>
+          <div class="row"><span class="score" id="score">–</span><span class="note" id="scoreNote">Score from the last Check</span></div>
+          <ul class="checks" id="checks"></ul>
+        </div>
+        <div style="display:grid;gap:8px;min-width:0">
+          <h2>Activity</h2>
+          <pre class="log" id="log">Nothing yet.</pre>
+        </div>
+      </div>
+      <form class="row" id="follow" hidden>
+        <label for="change" style="flex:1 1 260px">Ask for a change<input id="change" placeholder="Make the boat faster and add a high score"></label>
+        <button class="primary" type="submit" id="changeGo" style="align-self:end">Change it</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const STEPS = ["study", "build", "check", "refine"];
+const PASS = 90;
+let db = null, sample = null, downloads = null, canImages = false;
+let builds = [], selId = null, auto = false;
+let run = null; // {id, ctl}
+const myQueue = new Set(); // builds queued from this tab while another was running
+const holder = "tab-" + Math.random().toString(36).slice(2);
+
+function notice(t) { const n = $("#notice"); n.textContent = t || ""; n.hidden = !t; }
+const ago = ms => { if (!ms) return ""; const s = Math.round((Date.now() - ms) / 1000); return s < 60 ? s + "s ago" : s < 3600 ? Math.round(s / 60) + "m ago" : s < 86400 ? Math.round(s / 3600) + "h ago" : Math.round(s / 86400) + "d ago"; };
+const errCopy = e => ({ not_granted: "Claude wasn't allowed for this page, so builds can't run here.", rate_limited: "Claude is busy for you right now. Try again in a minute.", cancelled: "Stopped.", invalid_json: "Claude's answer couldn't be read. Run it again.", empty_completion: "Claude came back empty even for a smaller version. Try a simpler request, or split it into parts.", images_unavailable: "Pictures can't be sent to Claude from this view." }[e?.code] || (e?.message || "Something went wrong."));
+
+// ---------- what each kind of build must be ----------
+const COMMON = `- ONE complete HTML document (<!doctype html> ... </html>), all CSS and JS inline. No fetch/XHR and no external images, fonts, audio or CSS.
+- Never use alert(), confirm() or prompt(). Wrap any localStorage use in try/catch.
+- It must run with no errors the moment it loads.
+- Original work only: no copied characters, logos, names, art, music or trademarked sounds.
+Reply with only the file inside one \`\`\`html code fence.`;
+const KINDS = {
+  page: {
+    label: "Game or page", file: null,
+    placeholder: "A one-screen arcade game where you steer a paper boat between rocks; arrow keys or swipe; score and restart.",
+    trialMs: 5000,
+    rules: `Rules for the file:
+- Libraries only as <script src> from https://cdn.jsdelivr.net/npm/ or https://cdnjs.cloudflare.com with an exact version. Draw art with canvas, SVG or CSS; make sounds with Web Audio.
+- Fill the window and resize with it. Work with keyboard, mouse and touch. Show something meaningful within a second.
+- If you use WebGL, create the renderer with preserveDrawingBuffer: true.
+${COMMON}`,
+    judge: "Judge play/usability and look from the picture, the run report and the code.",
+  },
+  object: {
+    label: "3D object", file: "glb",
+    placeholder: "A weathered wooden treasure chest with iron bands and a padlock, about 60 cm wide, for a three.js game.",
+    trialMs: 8000,
+    rules: `Rules for the file:
+- Load three.js r160 only through this import map and one <script type="module">:
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}<\/script>
+- Build the object procedurally: shaped geometry (LatheGeometry, ExtrudeGeometry with bevels, TubeGeometry, displaced or merged primitives) and textures painted on canvases (CanvasTexture, colorSpace = THREE.SRGBColorSpace; add roughness or normal detail where it helps). Use MeshStandardMaterial or MeshPhysicalMaterial with believable roughness and metalness. Aim for a convincing, detailed object, not a blocky placeholder.
+- Real-world size in metres, Y up, resting on y = 0, front facing +Z, centred on x and z. Under 60,000 triangles. Give meshes and materials clear names.
+- Show it: new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true}), ACESFilmic tone mapping, an environment from RoomEnvironment through PMREMGenerator, a key and a fill light, OrbitControls, a soft neutral background, a subtle ground shadow, camera framed from a three-quarter front angle so the object fills about 70% of the view. No automatic rotation.
+- window.craftObject = the object's root Group (no lights, ground or helpers inside it).
+- window.craftStats = () => ({triangles, meshes, materials, size: [width, height, depth]}) measured from craftObject.
+- window.craftExport = async (format) => format === "gltf"
+    ? {filename: "<short-name>.gltf", data: JSON.stringify(await new GLTFExporter().parseAsync(window.craftObject, {binary: false}))}
+    : {filename: "<short-name>.glb", data: await new GLTFExporter().parseAsync(window.craftObject, {binary: true})};
+  (import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js")
+${COMMON}`,
+    judge: "Judge the object from the picture first: silhouette, proportions, detail, materials and colour against the request (and the reference picture if one was described). Then the stats and the code. A plain or blocky result scores under 70.",
+  },
+  sound: {
+    label: "Sound", file: "wav",
+    placeholder: "A chunky arcade coin pickup: two bright rising notes with a short sparkle tail, under half a second.",
+    trialMs: 25000,
+    rules: `Rules for the file:
+- No libraries. Synthesize everything with the Web Audio API: oscillators, noise buffers, filters, envelopes, waveshapers, delays, and a convolver fed with a generated noise impulse for space.
+- window.craftSound = async (variant = 0) => AudioBuffer, rendered with an OfflineAudioContext at 44100 Hz, 1 or 2 channels, as long as the sound needs (at most 30 s). Peak between 0.5 and 0.9, short fades so there is no click at the start or end, no DC offset.
+- If the request wants several variations, set window.craftVariants = how many, and render each by index.
+- The page: a large Play button (create or resume the AudioContext inside the click; never autoplay), a button per variation, and a canvas that draws the waveform of what was rendered. Plain, tidy layout.
+${COMMON}`,
+    judge: "You can't hear it. Judge from the measurements (length, attack, loudness, brightness, envelope), the waveform picture and the synthesis code: does it plausibly sound like the request? Clipping, silence, clicks or wrong length are failures.",
+  },
+};
+const STALE_MS = 8 * 60000;
+const stale = b => b?.status === "running" && (!run || run.id !== b.id) && Date.now() - (b.updatedAt || 0) > STALE_MS;
+const shownStatus = b => stale(b) ? "interrupted" : (b.status || "queued");
+const kindOf = b => KINDS[b?.kind] ? b.kind : "page";
+
+function studyPrompt(b) {
+  const k = KINDS[kindOf(b)];
+  return `You are the Study step of a build engine. Plan one ${k.label.toLowerCase()} for this request.
+Request: ${b.request}
+${b.target ? "Reference notes: " + b.target : ""}
+${b.refSummary ? "Reference file: " + b.refSummary : ""}
+${b._refImage ? "A reference picture is attached: describe what to take from it (shape, parts, proportions, materials, colours) inside the plan." : ""}
+Reply with only JSON: {"title": short name, "summary": one sentence, "features": [5-10 concrete features${kindOf(b) === "object" ? " — parts, proportions in metres, materials and colours" : kindOf(b) === "sound" ? " — layers, pitch movement, envelope timings in ms, length, character" : ""}], "look": one sentence on style, "checks": [{"id": "c1", "what": a check a tester can verify}] (4-7 checks)}`;
+}
+const SIZE_NOTE = {
+  page: "Keep the file under about 900 lines.",
+  object: "Keep the file under about 700 lines: build the main forms from a few well-shaped parts and spend detail where it shows most. For a person or creature, use smooth shaped parts (lathe, tube and stretched spheres) joined cleanly, a simple face, and painted textures; no rigging.",
+  sound: "Keep the file under about 500 lines.",
+};
+const SMALLER_NOTE = "Your previous answer was too big to finish. Write a SHORTER file now: under about 450 lines, fewer parts, simpler textures, no extras. Start writing the file straight away.";
+async function askJson(id, ctl, label, prompt, extra) {
+  const t0 = Date.now(), inner = new AbortController(); let timedOut = false;
+  const stopInner = () => inner.abort(); ctl.signal.addEventListener("abort", stopInner);
+  const tick = setInterval(() => { const s = Math.round((Date.now() - t0) / 1000); $("#live").textContent = `${label}… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }, 1000);
+  const dog = setTimeout(() => { timedOut = true; inner.abort(); }, 240000);
+  try { return await sample.json(prompt, { signal: inner.signal, modelTier: "default", cache: false, ...extra }); }
+  catch (e) { if (timedOut && !ctl.signal.aborted) throw { code: "timeout", message: "Claude didn't answer within 4 minutes. Run it again." }; throw e; }
+  finally { clearInterval(tick); clearTimeout(dog); ctl.signal.removeEventListener("abort", stopInner); $("#live").textContent = ""; }
+}
+// One Claude call with a live clock and a watchdog: a call that goes quiet for 6 minutes is stopped.
+async function ask(id, ctl, label, prompt, tier, extra = {}) {
+  const t0 = Date.now(), inner = new AbortController(); let chars = 0, timedOut = false;
+  const stopInner = () => inner.abort(); ctl.signal.addEventListener("abort", stopInner);
+  const tick = setInterval(() => { const s = Math.round((Date.now() - t0) / 1000); $("#live").textContent = `${label}… ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}${chars ? " · " + chars.toLocaleString() + " characters" : " · Claude is thinking"}`; }, 1000);
+  const dog = setTimeout(() => { timedOut = true; inner.abort(); }, 360000);
+  try { return await sample(prompt, { signal: inner.signal, modelTier: tier, cache: false, ...extra, onText: ({ text }) => { chars = text.length; } }); }
+  catch (e) { if (timedOut && !ctl.signal.aborted) throw { code: "timeout", message: "Claude didn't finish within 6 minutes. Run it again, or ask for something smaller." }; throw e; }
+  finally { clearInterval(tick); clearTimeout(dog); ctl.signal.removeEventListener("abort", stopInner); $("#live").textContent = ""; }
+}
+function buildPrompt(b, prev, fixes, sizeNote = "") {
+  const k = KINDS[kindOf(b)], spec = JSON.stringify(b.spec || {}, null, 1);
+  if (!prev) return `You are the Build step. Make this ${k.label.toLowerCase()}.\nPlan: ${spec}\nOriginal request: ${b.request}\n${sizeNote}\n\n${k.rules}`;
+  return `You are the Refine step. Improve this ${k.label.toLowerCase()} so it meets the plan and fixes every problem listed. Keep what already works.
+Plan: ${spec}
+Problems to fix:
+${fixes.map(f => "- " + f).join("\n")}
+${sizeNote}
+Current file:
+\`\`\`html
+${prev}
+\`\`\`
+${k.rules}`;
+}
+function checkPrompt(b, html, report, hasPic) {
+  const k = KINDS[kindOf(b)];
+  return `You are the Check step. ${k.judge}
+Plan: ${JSON.stringify(b.spec || {})}
+Run report (loaded in a browser): ${JSON.stringify(report)}
+${hasPic ? "The attached picture is what the build showed (for a sound: its waveform)." : "No picture was available."}
+File:
+\`\`\`html
+${html}
+\`\`\`
+Reply with only JSON: {"score": 0-100 overall, "checks": [{"id": same ids as the plan, "passed": true|false, "detail": short reason}], "fixes": [specific changes still needed, empty if none]}. Any runtime error means score under ${PASS}.`;
+}
+function extractHtml(text) {
+  const f = text.match(/```html\s*([\s\S]*?)```/i); let h = f ? f[1] : text;
+  const i = h.search(/<!doctype html|<html/i); if (i > 0) h = h.slice(i);
+  return h.trim();
+}
+
+// ---------- running a build inside a sandboxed frame ----------
+// The probe reports errors, measures what the build made, takes a picture, and answers export requests.
+const PROBE = `<script>(function(){
+var P=function(m,t){try{parent.postMessage(Object.assign({craftProbe:1},m),"*",t||[])}catch(e){}};
+window.addEventListener("error",function(e){P({err:String(e.message||e.type)+(e.lineno?" (line "+e.lineno+")":"")})},true);
+window.addEventListener("unhandledrejection",function(e){P({err:"Unhandled promise: "+String(e.reason&&e.reason.message||e.reason)})});
+var ce=console.error;console.error=function(){P({err:[].map.call(arguments,String).join(" ").slice(0,300)});ce.apply(console,arguments)};
+var KIND="__KIND__",WAIT=__WAIT__,lastBuf=null;
+(function(){var raf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=function(cb){var done=false;var id=raf(function(t){if(!done){done=true;cb(t)}});setTimeout(function(){if(!done){done=true;cb(performance.now())}},60);return id}})();
+function wav(b){var n=b.length,c=b.numberOfChannels,sr=b.sampleRate,ab=new ArrayBuffer(44+n*c*2),v=new DataView(ab),o=0;
+ function s(t){for(var i=0;i<t.length;i++)v.setUint8(o++,t.charCodeAt(i))}function u32(x){v.setUint32(o,x,true);o+=4}function u16(x){v.setUint16(o,x,true);o+=2}
+ s("RIFF");u32(36+n*c*2);s("WAVE");s("fmt ");u32(16);u16(1);u16(c);u32(sr);u32(sr*c*2);u16(c*2);u16(16);s("data");u32(n*c*2);
+ var ch=[];for(var k=0;k<c;k++)ch.push(b.getChannelData(k));
+ for(var i=0;i<n;i++)for(k=0;k<c;k++){var x=Math.max(-1,Math.min(1,ch[k][i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2}return ab}
+function measure(b){var d=b.getChannelData(0),n=d.length,pk=0,ss=0,zc=0,first=-1,env=[],seg=Math.max(1,Math.floor(n/32));
+ for(var i=0;i<n;i++){var a=Math.abs(d[i]);if(a>pk)pk=a;ss+=d[i]*d[i];if(first<0&&a>0.01)first=i;if(i&&(d[i]>=0)!==(d[i-1]>=0))zc++}
+ for(var s0=0;s0<n;s0+=seg){var m=0;for(var j=s0;j<Math.min(n,s0+seg);j++)m=Math.max(m,Math.abs(d[j]));env.push(+m.toFixed(2))}
+ var pkAt=0;for(i=0;i<env.length;i++)if(env[i]>env[pkAt])pkAt=i;
+ return{seconds:+(n/b.sampleRate).toFixed(3),channels:b.numberOfChannels,peak:+pk.toFixed(3),rmsDb:+(10*Math.log10(ss/n+1e-12)).toFixed(1),
+  startsAfterMs:Math.round(Math.max(0,first)/b.sampleRate*1000),peakAtMs:Math.round(pkAt*seg/b.sampleRate*1000),
+  brightnessHz:Math.round(zc/2/(n/b.sampleRate)),clipped:pk>=0.999,startSample:+Math.abs(d[0]).toFixed(3),endSample:+Math.abs(d[n-1]).toFixed(3),envelope32:env}}
+function drawWave(b){var c=document.createElement("canvas");c.width=900;c.height=300;var g=c.getContext("2d"),d=b.getChannelData(0),n=d.length;
+ g.fillStyle="#fff";g.fillRect(0,0,900,300);g.strokeStyle="#ddd";g.beginPath();g.moveTo(0,150);g.lineTo(900,150);g.stroke();g.fillStyle="#1d5fa8";
+ for(var x=0;x<900;x++){var a=Math.floor(x/900*n),z=Math.floor((x+1)/900*n),lo=1,hi=-1;for(var i=a;i<z;i++){if(d[i]<lo)lo=d[i];if(d[i]>hi)hi=d[i]}g.fillRect(x,150-hi*140,1,Math.max(1,(hi-lo)*140))}
+ g.fillStyle="#333";g.font="14px sans-serif";g.fillText((n/b.sampleRate).toFixed(2)+" s",8,20);return c.toDataURL("image/jpeg",0.85)}
+function snap(){var best=null,area=0;document.querySelectorAll("canvas").forEach(function(c){var a=c.width*c.height;if(a>area){area=a;best=c}});
+ if(!best)return null;try{return best.toDataURL("image/jpeg",0.85)}catch(e){return null}}
+function basics(){var b=document.body||{};return{title:document.title,textChars:(b.innerText||"").length,canvases:document.querySelectorAll("canvas").length,buttons:document.querySelectorAll("button,[role=button]").length}}
+async function report(){var r=basics(),pic=null;
+ try{
+  if(KIND==="sound"){if(typeof window.craftSound!=="function"){r.problem="window.craftSound is missing"}else{
+   var t0=performance.now();lastBuf=await window.craftSound(0);r.renderMs=Math.round(performance.now()-t0);
+   if(!lastBuf||!lastBuf.getChannelData){r.problem="craftSound did not return an AudioBuffer"}else{r.sound=measure(lastBuf);pic=drawWave(lastBuf)}
+   if(window.craftVariants)r.variants=window.craftVariants}}
+  else if(KIND==="object"){if(!window.craftObject)r.problem="window.craftObject is missing";
+   try{if(typeof window.craftStats==="function")r.stats=window.craftStats()}catch(e){r.problem="craftStats failed: "+e.message}
+   if(typeof window.craftExport!=="function")r.problem=(r.problem?r.problem+"; ":"")+"window.craftExport is missing";pic=snap()}
+  else pic=snap();
+ }catch(e){P({err:String(e&&e.message||e)})}
+ P({done:1,info:r,pic:pic})}
+window.addEventListener("load",function(){setTimeout(report,WAIT)});
+window.addEventListener("message",async function(e){var q=e.data;if(!q||!q.craftExport)return;
+ try{if(KIND==="sound"){if(!lastBuf)lastBuf=await window.craftSound(q.variant||0);var ab=wav(lastBuf);P({file:{filename:(document.title||"sound").replace(/[^\\w\\- ]+/g,"").trim().replace(/\\s+/g,"-").toLowerCase()+".wav",data:ab}},[ab]);return}
+  if(typeof window.craftExport!=="function")throw new Error("This build has no export.");
+  var f=await window.craftExport(q.format);P({file:f},f.data instanceof ArrayBuffer?[f.data]:[])}
+ catch(err){P({fileError:String(err&&err.message||err)})}});
+})();<\/script>`;
+function instrument(html, kind) {
+  const probe = PROBE.replace("__KIND__", kind).replace("__WAIT__", kind === "object" ? "3500" : kind === "sound" ? "200" : "2600");
+  return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + probe) : probe + html;
+}
+function trial(html, kind) {
+  return new Promise(resolve => {
+    const f = document.createElement("iframe"); f.setAttribute("sandbox", "allow-scripts");
+    f.style.cssText = "position:fixed;left:0;top:0;width:960px;height:600px;border:0;opacity:0;pointer-events:none;z-index:-1"; f.setAttribute("aria-hidden", "true");
+    const errors = []; let done = false;
+    const onMsg = e => { if (e.source !== f.contentWindow || !e.data?.craftProbe) return; if (e.data.err && errors.length < 12) errors.push(e.data.err); if (e.data.done) finish(e.data); };
+    const finish = d => { if (done) return; done = true; removeEventListener("message", onMsg); f.remove(); resolve({ report: { errors, loaded: !!d, ...(d?.info || { problem: "It didn't finish loading in time." }) }, pic: d?.pic || null }); };
+    addEventListener("message", onMsg); f.srcdoc = instrument(html, kind); document.body.appendChild(f);
+    setTimeout(() => finish(null), KINDS[kind].trialMs + 4000);
+  });
+}
+function exportFrom(frame, format) {
+  return new Promise((ok, bad) => {
+    const onMsg = e => { if (e.source !== frame.contentWindow || !e.data?.craftProbe) return; if (e.data.file) { end(); ok(e.data.file); } else if (e.data.fileError) { end(); bad(new Error(e.data.fileError)); } };
+    const end = () => { clearTimeout(t); removeEventListener("message", onMsg); };
+    const t = setTimeout(() => { end(); bad(new Error("The build didn't answer the export in time.")); }, 30000);
+    addEventListener("message", onMsg); frame.contentWindow.postMessage({ craftExport: 1, format }, "*");
+  });
+}
+const dataUrlBlob = u => fetch(u).then(r => r.blob()).catch(() => { const [h, b] = u.split(","); const bin = atob(b); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], { type: h.slice(5, h.indexOf(";")) }); });
+
+// ---------- references: a picture goes to Claude, a sound is measured here ----------
+let refImage = null, refSummary = "";
+let thumbUrl = null;
+function showThumb(f) {
+  if (thumbUrl) { URL.revokeObjectURL(thumbUrl); thumbUrl = null; }
+  $("#hFromPhoto").disabled = !(f && f.type.startsWith("image/") && sample && canImages);
+  if (f && f.type.startsWith("image/")) { thumbUrl = URL.createObjectURL(f); $("#refThumb").src = thumbUrl; $("#refShow").hidden = false; }
+  else $("#refShow").hidden = true;
+}
+$("#refFile").addEventListener("change", () => useRef($("#refFile").files[0]));
+$("#refClear").onclick = () => { $("#refFile").value = ""; useRef(null); };
+document.addEventListener("paste", e => {
+  const item = [...(e.clipboardData?.items || [])].find(i => i.kind === "file" && /^(image|audio)\//.test(i.type));
+  if (!item) return; e.preventDefault();
+  const f = item.getAsFile(); const ext = (f.type.split("/")[1] || "png").replace("jpeg", "jpg");
+  useRef(new File([f], f.name && f.name !== "image." + ext ? f.name : "pasted-picture." + ext, { type: f.type })); $("#refFile").value = "";
+});
+const drop = $("#form");
+["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { if ([...(e.dataTransfer?.types || [])].includes("Files")) { e.preventDefault(); $("#drop").classList.add("over"); } }));
+["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { if (t === "dragleave" && drop.contains(e.relatedTarget)) return; $("#drop").classList.remove("over"); }));
+drop.addEventListener("drop", e => { const f = [...(e.dataTransfer?.files || [])].find(f => /^(image|audio)\//.test(f.type)); if (!f) return; e.preventDefault(); $("#refFile").value = ""; useRef(f); });
+async function useRef(f) {
+  refImage = null; refSummary = ""; showThumb(f);
+  if (!f) { $("#refNote").textContent = "A photo or drawing to model from, or a sound file to match."; return; }
+  if (f.type.startsWith("image/")) {
+    if (!canImages) { $("#refNote").textContent = "Pictures can't be sent to Claude from this view. Describe it in the notes instead."; return; }
+    refImage = f; refSummary = "a picture (" + f.name + ")"; $("#refNote").textContent = "Claude will study this picture: " + f.name;
+  } else if (f.type.startsWith("audio/")) {
+    $("#refNote").textContent = "Measuring " + f.name + "…";
+    try {
+      const buf = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await f.arrayBuffer());
+      const d = buf.getChannelData(0), n = d.length, seg = Math.max(1, Math.floor(n / 24)); let pk = 0, ss = 0, zc = 0; const env = [];
+      for (let i = 0; i < n; i++) { const a = Math.abs(d[i]); if (a > pk) pk = a; ss += d[i] * d[i]; if (i && (d[i] >= 0) !== (d[i - 1] >= 0)) zc++; }
+      for (let s = 0; s < n; s += seg) { let m = 0; for (let j = s; j < Math.min(n, s + seg); j++) m = Math.max(m, Math.abs(d[j])); env.push(+(m / (pk || 1)).toFixed(2)); }
+      refSummary = `a sound file "${f.name}": ${buf.duration.toFixed(2)} s, ${buf.numberOfChannels} channel(s), loudness ${(10 * Math.log10(ss / n + 1e-12)).toFixed(1)} dB RMS, brightness about ${Math.round(zc / 2 / buf.duration)} Hz (zero-crossing estimate), envelope over 24 equal steps (1 = loudest): ${env.join(" ")}. Match its length, shape and character.`;
+      $("#refNote").textContent = `Measured ${f.name}: ${buf.duration.toFixed(2)} s. These measurements guide the build.`;
+    } catch (e) { $("#refNote").textContent = "That sound file couldn't be read here. Try a WAV or MP3."; }
+  } else { $("#refNote").textContent = "Use a picture or a sound file."; showThumb(null); }
+}
+
+// ---------- the build loop: Study -> Build -> Check -> Refine ----------
+async function save(id, patch) { try { await db.doc("builds/" + id).update({ ...patch, updatedAt: Date.now() }); } catch (e) { notice("Couldn't save progress: " + (e.message || e.code)); } }
+async function logLine(id, text) {
+  const b = builds.find(x => x.id === id) || {}; const log = [...(b.log || []), { t: Date.now(), text }].slice(-60);
+  b.log = log; await save(id, { log });
+}
+async function runBuild(id, mode = "new", change = "", image = null) {
+  if (!sample) { notice("Claude isn't available in this view, so builds can't run here."); return; }
+  if (run) return;
+  const ctl = new AbortController(); run = { id, ctl }; renderDetail();
+  const b0 = builds.find(x => x.id === id); if (!b0) { run = null; return; }
+  const b = { ...b0 }, kind = kindOf(b);
+  const opts = (tier, extra = {}) => ({ signal: ctl.signal, modelTier: tier, cache: false, ...extra });
+  try {
+    await save(id, { status: "running", runner: holder, error: null });
+    let html = mode === "change" ? b.html : null, round = 0, fixes = mode === "change" ? [change] : [];
+    if (mode !== "change" || !b.spec) {
+      await save(id, { step: "study" }); await logLine(id, `Study: planning the ${KINDS[kind].label.toLowerCase()}${image ? " from your picture" : ""}`);
+      b._refImage = !!image;
+      const spec = await askJson(id, ctl, "Studying", studyPrompt(b), image ? { images: [image] } : {});
+      if (!spec || !Array.isArray(spec.checks)) throw { message: "The plan came back incomplete." };
+      b.spec = spec; await save(id, { spec, title: spec.title || b.request.slice(0, 60) });
+      await logLine(id, `Plan: ${spec.summary || ""} (${spec.checks.length} checks)`);
+    } else await logLine(id, "Change asked: " + change);
+    const maxRounds = (b.rounds || 2) + 1;
+    while (round < maxRounds) {
+      const refining = !!html; round++;
+      await save(id, { step: refining ? "refine" : "build", round });
+      await logLine(id, refining ? `Refine: fixing ${fixes.length} item(s)` : "Build: writing it");
+      let res;
+      try { res = await ask(id, ctl, "Writing", buildPrompt(b, html, fixes, SIZE_NOTE[kind]), "default"); }
+      catch (e) {
+        if (e?.code !== "empty_completion") throw e;
+        await logLine(id, "Claude came back empty on a file this big; asking for a smaller, simpler version");
+        res = await ask(id, ctl, "Writing (smaller)", buildPrompt(b, html, fixes, SMALLER_NOTE), "default");
+      }
+      const next = extractHtml(res.text);
+      if (!/<\/html>\s*$/i.test(next) || res.truncated) { fixes = ["The file was cut off before </html>. Write a shorter complete file: keep the core, drop extras."]; await logLine(id, "The file was cut short; asking for a tighter version"); continue; }
+      html = next; b.html = html; await save(id, { html, step: "check" });
+      await logLine(id, kind === "sound" ? "Check: rendering and measuring the sound" : "Check: running it and taking a picture");
+      const { report, pic } = await trial(html, kind);
+      const s = report.sound, st = report.stats;
+      await logLine(id, report.errors.length ? `Run: ${report.errors.length} error(s): ${report.errors[0]}` : report.problem ? "Run: " + report.problem
+        : s ? `Run: ${s.seconds} s, peak ${s.peak}, ${s.rmsDb} dB RMS, brightness ~${s.brightnessHz} Hz` : st ? `Run: ${st.triangles?.toLocaleString?.() ?? st.triangles} triangles, ${st.meshes} meshes, size ${(st.size || []).map(v => (+v).toFixed(2)).join(" × ")} m` : `Run: no errors, ${report.canvases} canvas`);
+      const usePic = pic && canImages;
+      const verdict = await askJson(id, ctl, "Checking", checkPrompt(b, html, report, usePic), usePic ? { images: [await dataUrlBlob(pic)] } : {});
+      const score = Math.max(0, Math.min(100, Math.round(+verdict.score || 0)));
+      const checks = Array.isArray(verdict.checks) ? verdict.checks.slice(0, 10) : [];
+      fixes = [...report.errors.map(e => "Runtime error: " + e), ...(report.problem ? [report.problem] : []), ...(Array.isArray(verdict.fixes) ? verdict.fixes : [])].slice(0, 12);
+      await save(id, { score, checks, fixes, runErrors: report.errors, measured: s || st || null });
+      await logLine(id, `Score ${score}. ${checks.filter(c => c.passed).length}/${checks.length} checks pass.`);
+      if (score >= PASS && !report.errors.length && !report.problem) break;
+    }
+    await save(id, { status: "done", step: "done", finishedAt: Date.now() });
+    await logLine(id, "Done.");
+  } catch (e) {
+    const stopped = e?.code === "cancelled" || ctl.signal.aborted;
+    await save(id, { status: stopped ? "stopped" : "failed", error: stopped ? null : errCopy(e) });
+    await logLine(id, stopped ? "Stopped." : "Failed: " + errCopy(e));
+    if (e?.code === "not_granted") { sample = null; setAuto(false); notice(errCopy(e)); }
+  } finally {
+    run = null; $("#live").textContent = ""; renderDetail(); renderJobs(); setTimeout(pickQueued, 400);
+  }
+}
+
+// ---------- chat automation: run builds the chat queued ----------
+function setAuto(on) {
+  auto = on && !!sample && !!db;
+  $("#auto").setAttribute("aria-pressed", String(auto)); $("#auto").textContent = auto ? "Turn off" : "Turn on";
+  $("#autoNote").textContent = auto ? "On. Builds your chat queues start here while this page is open." : "Off. Builds your chat queues wait here.";
+  try { localStorage.setItem("craft-auto", auto ? "1" : "0"); } catch (e) {}
+  if (auto) pickQueued();
+}
+async function pickQueued() {
+  if (run || !db) return;
+  const q = builds.filter(b => b.status === "queued" && !isHuman(b) && (auto || myQueue.has(b.id))).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))[0];
+  if (!q) return;
+  try { const lease = await db.doc("builds/" + q.id).acquire({ holder, ttlMs: 600000 }); if (!lease.acquired) return; } catch (e) { return; }
+  selId = q.id; renderJobs();
+  runBuild(q.id, q.change && q.html ? "change" : "new", q.change || "", q.refImage && canImages ? await dataUrlBlob(q.refImage) : null);
+}
+
+// ---------- rendering ----------
+function renderJobs() {
+  const el = $("#jobs"); el.innerHTML = "";
+  const empty = t => { const p = document.createElement("p"); p.className = "note"; p.textContent = t; el.append(p); };
+  if (!db) return empty("Sign in to claude.ai to keep builds.");
+  if (!builds.length) return empty("No builds yet. Start one above, or ask your chat to queue one.");
+  for (const b of builds) {
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "job"; btn.setAttribute("aria-current", String(b.id === selId));
+    const t = document.createElement("span"); t.className = "t"; t.textContent = b.title || b.request || "Untitled";
+    const p = document.createElement("span"); const st = shownStatus(b); p.className = "pill s-" + (st === "interrupted" ? "stopped" : st); p.textContent = st === "running" ? (b.step || "running") : st;
+    const m = document.createElement("span"); m.className = "m"; m.textContent = [KINDS[kindOf(b)].label, b.score != null ? "score " + b.score : "", b.source === "chat" ? "from chat" : "", ago(b.updatedAt || b.createdAt)].filter(Boolean).join(" · ");
+    btn.append(t, p, m); btn.onclick = () => { selId = b.id; renderJobs(); renderDetail(); };
+    el.append(btn);
+  }
+}
+let shownHtml = null;
+function renderDetail() {
+  const b = builds.find(x => x.id === selId), kind = kindOf(b);
+  const mine = run && run.id === selId;
+  $("#stop").hidden = !mine;
+  const hum = isHuman(b);
+  $("#rerun").hidden = !b || (!!run && !hum) || b.status === "queued" || (b.status === "running" && !stale(b));
+  $("#save").hidden = !b?.html || !downloads || hum;
+  $("#saveFile").hidden = hum ? !(b?.modelUrl && downloads) : (!b?.html || !downloads || !KINDS[kind].file || b.status === "running");
+  $("#saveFile").textContent = kind === "sound" ? "Save .wav" : "Save .glb";
+  $("#del").hidden = !b || mine;
+  $("#follow").hidden = hum ? !b?.modelUrl || b.status === "queued" || b.status === "running" : (!b?.html || !!run || (b.status === "running" && !stale(b)));
+  const humForm = selectedKind() === "human";
+  $("#go").disabled = humForm ? !db : (!sample || !db); $("#go").textContent = humForm ? "Send to my chat" : run ? "Add to queue" : "Build it";
+  $("#changeGo").disabled = hum ? !db : (!!run || !sample || !db);
+  document.querySelectorAll(".stage").forEach(st => { const [t, d] = (hum ? HSTEPS : PSTEPS)[st.dataset.s]; st.querySelector("b").textContent = t; st.querySelector("span").textContent = d; });
+  if (!b) return;
+  $("#dKind").textContent = KINDS[kind].label + (b.source === "chat" ? " · queued by chat" : "");
+  $("#dTitle").textContent = b.title || "Untitled";
+  $("#dReq").textContent = b.request + (b.refSummary ? "  ·  Reference: " + b.refSummary.split(":")[0] : "") + (b.error ? "  —  " + b.error : "") + (stale(b) ? "  —  This build stopped making progress (the page was closed or the connection dropped). Run it again." : "");
+  const cur = b.status === "done" ? "done" : hum ? hstep(b.step) : b.step, idx = STEPS.indexOf(cur);
+  document.querySelectorAll(".stage").forEach((s, i) => { s.classList.toggle("on", (b.status === "running" || (hum && b.status === "queued")) && s.dataset.s === cur); s.classList.toggle("done", b.status === "done" ? (i < 3 || (b.round || 0) > 1) : i < idx); });
+  $("#score").textContent = b.score != null ? b.score : "–";
+  $("#scoreNote").textContent = b.score != null ? (b.score >= PASS ? "Passes" : "Below " + PASS) + (b.round ? " · round " + b.round : "") : "Score from the last Check";
+  const ul = $("#checks"); ul.innerHTML = "";
+  const specChecks = b.spec?.checks || [];
+  for (const c of (b.checks?.length ? b.checks : specChecks.map(c => ({ id: c.id, passed: null, detail: c.what })))) {
+    const li = document.createElement("li"), mark = document.createElement("span"), txt = document.createElement("span");
+    mark.className = c.passed === true ? "y" : c.passed === false ? "n" : ""; mark.textContent = c.passed === true ? "✓" : c.passed === false ? "✗" : "·";
+    const what = specChecks.find(s => s.id === c.id)?.what;
+    txt.textContent = (what || c.id || "") + (c.detail && c.detail !== what ? " — " + c.detail : "");
+    li.append(mark, txt); ul.append(li);
+  }
+  $("#log").textContent = (b.log || []).map(l => new Date(l.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) + "  " + l.text).join("\n") || "Nothing yet.";
+  $("#log").scrollTop = 1e9;
+  const v = $("#view");
+  $("#h3d").hidden = !(hum && b.modelUrl);
+  if (hum) {
+    v.hidden = true; $("#viewEmpty").hidden = !!b.modelUrl;
+    $("#viewEmpty").textContent = b.status === "failed" ? "The chat couldn't build this one. See Activity." : "Your Claude Code chat builds this with Blender and MakeHuman. It appears here when it's ready.";
+    if (b.modelUrl) showHuman(b);
+    return;
+  }
+  if (b.html && b.html + kind !== shownHtml) { shownHtml = b.html + kind; v.srcdoc = instrument(b.html, kind); }
+  v.hidden = !b.html; $("#viewEmpty").hidden = !!b.html;
+  $("#viewEmpty").textContent = b.status === "queued" ? "Queued. It starts when chat automation is on." : "The working build appears here.";
+}
+
+// ---------- actions ----------
+// Shrink a picture to at most 640 px as a JPEG, so it fits in the saved build.
+async function shrink(file) {
+  try { const bmp = await createImageBitmap(file); const k = Math.min(1, 640 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(b => r(b || file), "image/jpeg", 0.82)); } catch (e) { return file; }
+}
+const blobToDataUrl = b => new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = bad; r.readAsDataURL(b); });
+function selectedKind() { return document.querySelector('input[name="kind"]:checked').value; }
+document.querySelectorAll('input[name="kind"]').forEach(r => r.addEventListener("change", () => { $("#req").placeholder = KINDS[selectedKind()].placeholder; }));
+$("#req").placeholder = KINDS.page.placeholder;
+$("#form").addEventListener("submit", async e => {
+  e.preventDefault(); if (selectedKind() === "human") return submitHuman();
+  if (!db || !sample) return;
+  const request = $("#req").value.trim(); if (!request) return;
+  const later = !!run;   // a build is already running here: queue this one to start right after it
+  const ref = db.collection("builds").doc();
+  const doc = { kind: selectedKind(), request, target: $("#target").value.trim(), refSummary, rounds: +$("#rounds").value, status: later ? "queued" : "running", step: later ? null : "study", source: "page", createdAt: Date.now(), updatedAt: Date.now(), log: [] };
+  try { await ref.set(doc); } catch (err) { notice("Couldn't save the build: " + (err.message || err.code)); return; }
+  builds = [{ id: ref.id, ...doc }, ...builds.filter(b => b.id !== ref.id)]; if (!later) selId = ref.id; renderJobs();
+  const img = refImage ? await shrink(refImage) : null;
+  if (img) { try { await ref.update({ refImage: await blobToDataUrl(img) }); } catch (err) { notice("The picture couldn't be saved with the build; it is still used for this run."); } }
+  $("#req").value = ""; $("#refFile").value = ""; refImage = null; refSummary = ""; showThumb(null); $("#refNote").textContent = "A photo or drawing to model from, or a sound file to match.";
+  if (later) { myQueue.add(ref.id); notice(""); $("#autoNote").textContent = "Queued. It starts when the current build finishes."; return; }
+  runBuild(ref.id, "new", "", img);
+});
+$("#follow").addEventListener("submit", e => { e.preventDefault(); const c = $("#change").value.trim(); if (!c || !selId) return; $("#change").value = ""; const b = builds.find(x => x.id === selId); if (isHuman(b)) return requeueHuman(b, c); runBuild(selId, "change", c); });
+$("#stop").onclick = () => run?.ctl.abort();
+$("#rerun").onclick = async () => { const b = builds.find(x => x.id === selId); if (!b) return; if (isHuman(b)) return requeueHuman(b, ""); runBuild(b.id, "new", "", b.refImage && canImages ? await dataUrlBlob(b.refImage) : null); };
+$("#auto").onclick = () => setAuto(!auto);
+const slug = b => (b.title || "build").replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-").toLowerCase() || "build";
+async function offer(filename, data) { await downloads.save({ filename, data }); }
+$("#save").onclick = async () => { const b = builds.find(x => x.id === selId); if (!b?.html || !downloads) return; try { await offer(slug(b) + ".html", b.html); } catch (e) { if (!["cancelled", "declined"].includes(e?.code)) notice("Couldn't save the file: " + (e.message || e.code)); } };
+$("#saveFile").onclick = async () => {
+  const b = builds.find(x => x.id === selId); if (!(b?.html || b?.modelUrl) || !downloads) return;
+  const btn = $("#saveFile"), label = btn.textContent; btn.disabled = true; btn.textContent = "Preparing…";
+  try {
+    if (isHuman(b)) { await offer(slug(b) + ".glb", await modelBytes(b.modelUrl)); }
+    else if (kindOf(b) === "sound") { const f = await exportFrom($("#view"), "wav"); await offer(slug(b) + ".wav", f.data); }
+    else {
+      try { const f = await exportFrom($("#view"), "glb"); await offer(slug(b) + ".glb", f.data); }
+      catch (e) {
+        if (e?.code !== "rejected_extension") throw e;
+        const f = await exportFrom($("#view"), "gltf");
+        try { await offer(slug(b) + ".gltf", f.data); } catch (e2) { if (e2?.code !== "rejected_extension") throw e2; await offer(slug(b) + ".gltf.json", f.data); }
+      }
+    }
+  } catch (e) { if (!["cancelled", "declined"].includes(e?.code)) notice("Couldn't save the file: " + (e.message || e.code)); }
+  finally { btn.disabled = false; btn.textContent = label; }
+};
+let armDel = null;
+$("#del").onclick = async () => {
+  if (armDel !== selId) { armDel = selId; $("#del").textContent = "Delete for good?"; setTimeout(() => { armDel = null; $("#del").textContent = "Delete"; }, 3000); return; }
+  const id = selId; armDel = null; $("#del").textContent = "Delete";
+  try { await db.doc("builds/" + id).delete(); selId = null; shownHtml = null; $("#view").hidden = true; $("#viewEmpty").hidden = false; } catch (e) { notice("Couldn't delete: " + (e.message || e.code)); }
+};
+
+// ---------- real humans: built by your Claude Code chat with Blender + MakeHuman ----------
+const CHAT_SESSION = "session_01V21hohKTKK43ZJQqjDtSrw";
+const HUMAN_ASSETS = {"hair": [["short01", "Short, tousled"], ["short02", "Short, neat"], ["short03", "Side-swept fringe"], ["short04", "Short, messy"], ["bob01", "Bob"], ["bob02", "Straight bob"], ["long01", "Long"], ["ponytail01", "Ponytail"], ["braid01", "Braid"], ["afro01", "Afro"]], "eyes": [["brown_eye", "Brown"], ["brownlight_eye", "Light brown"], ["blue_eye", "Blue"], ["lightblue_eye", "Light blue"], ["deepblue_eye", "Deep blue"], ["bluegreen_eye", "Blue-green"], ["green_eye", "Green"], ["grey_eye", "Grey"], ["ice_eye", "Ice"]], "outfits": [["male_casualsuit06", "Plain tee and jeans"], ["male_casualsuit02", "Long-sleeve tee and jeans"], ["male_casualsuit04", "Printed tee and jeans"], ["male_casualsuit01", "Denim shirt and jeans"], ["male_casualsuit03", "Checked shirt and jeans"], ["male_casualsuit05", "Jacket and jeans"], ["male_elegantsuit01", "Suit and tie"], ["male_worksuit01", "Work overalls"], ["female_casualsuit01", "Fitted tee and jeans"], ["female_casualsuit02", "Tee and denim shorts"], ["female_elegantsuit01", "Blouse and skirt"], ["female_sportsuit01", "Sports top and leggings"]], "shoes": [["shoes02", "Trail sneakers"], ["shoes05", "White sneakers"], ["shoes06", "Navy sneakers"], ["shoes01", "Brown leather shoes"], ["shoes04", "Black dress shoes"], ["shoes03", "Black boots"]], "defaults": {"hair": "short03", "eyes": "blue_eye", "outfit": "male_casualsuit06", "shoes": "shoes02"}};
+let mcp = null;
+KINDS.human = { label: "Real human", file: "glb", placeholder: "Notes for the chat (optional), for example: a 16-year-old in a loose pale T-shirt, slim jeans and olive canvas sneakers.", trialMs: 0, rules: "", judge: "" };
+const isHuman = b => kindOf(b) === "human";
+const HSTEPS = { study: ["Queued", "Waiting for the chat"], build: ["Blender", "MakeHuman builds the body"], check: ["Check", "Renders and checks it"], refine: ["Done", "Ready to view and save"] };
+const PSTEPS = { study: ["Study", "Plan features and checks"], build: ["Build", "Write the page"], check: ["Check", "Run it, test it"], refine: ["Refine", "Fix what failed"] };
+const hstep = s => ({ queued: "study", building: "build", checking: "check", done: "refine" }[s] || s);
+
+function fillSelect(id, items, def) {
+  const el = $(id); el.innerHTML = "";
+  for (const [v, label] of items) { const o = document.createElement("option"); o.value = v; o.textContent = label; if (v === def) o.selected = true; el.append(o); }
+}
+fillSelect("#hHair", HUMAN_ASSETS.hair, HUMAN_ASSETS.defaults.hair);
+fillSelect("#hEyes", HUMAN_ASSETS.eyes, HUMAN_ASSETS.defaults.eyes);
+fillSelect("#hOutfit", HUMAN_ASSETS.outfits, HUMAN_ASSETS.defaults.outfit);
+fillSelect("#hShoes", HUMAN_ASSETS.shoes, HUMAN_ASSETS.defaults.shoes);
+const word = (v, lo, mid, hi) => v < 0.35 ? lo : v > 0.65 ? hi : mid;
+function syncOutputs() {
+  $("#hAgeOut").textContent = $("#hAge").value;
+  const g = +$("#hGender").value; $("#hGenderOut").textContent = g > 0.8 ? "Male" : g < 0.2 ? "Female" : "Mixed";
+  $("#hHeightOut").textContent = word(+$("#hHeight").value, "Short", "Average", "Tall");
+  $("#hWeightOut").textContent = word(+$("#hWeight").value, "Slim", "Average", "Heavy");
+  $("#hMuscleOut").textContent = word(+$("#hMuscle").value, "Soft", "Average", "Muscular");
+  const sm = +$("#hSmile").value; $("#hSmileOut").textContent = sm < 0.15 ? "Neutral" : sm < 0.5 ? "Slight" : "Smiling";
+}
+["#hAge", "#hGender", "#hHeight", "#hWeight", "#hMuscle", "#hSmile"].forEach(id => $(id).addEventListener("input", syncOutputs)); syncOutputs();
+const syncTee = () => { const plain = $("#hOutfit").value === "male_casualsuit06"; $("#hTop").disabled = !plain; $("#hTopNote").textContent = plain ? "(plain tee)" : "(plain tee only)"; };
+$("#hOutfit").addEventListener("change", syncTee); syncTee();
+$("#hShoeOn").addEventListener("change", () => { $("#hShoeColor").disabled = !$("#hShoeOn").checked; });
+const hex01 = h => [1, 3, 5].map(i => +(parseInt(h.slice(i, i + 2), 16) / 255).toFixed(3));
+function humanParams() {
+  return { age: +$("#hAge").value, gender: +$("#hGender").value, height: +$("#hHeight").value, weight: +$("#hWeight").value, muscle: +$("#hMuscle").value,
+    skin: $("#hSkin").value, skinRGB: hex01($("#hSkin").value), hair: $("#hHair").value, hairColor: $("#hHairColor").value, hairRGB: hex01($("#hHairColor").value),
+    eyes: $("#hEyes").value, outfit: $("#hOutfit").value, top: $("#hTop").value, topRGB: $("#hOutfit").value === "male_casualsuit06" ? hex01($("#hTop").value) : null,
+    shoes: $("#hShoes").value, shoesRGB: $("#hShoeOn").checked ? hex01($("#hShoeColor").value) : null,
+    smile: +$("#hSmile").value, pose: $("#hPose").value, jeansLight: +$("#hJeans").value };
+}
+function describeHuman(p) {
+  const label = (sel, v) => (HUMAN_ASSETS[sel].find(x => x[0] === v) || [v, v])[1];
+  return `${p.age}-year-old ${p.gender > 0.8 ? "male" : p.gender < 0.2 ? "female" : "person"}, ${label("hair", p.hair).toLowerCase()} hair, ${label("outfits", p.outfit).toLowerCase()}`;
+}
+function setHumanForm(on) {
+  $("#humanFields").hidden = !on;
+  $("#req").required = !on;
+  $("#reqLabel").firstChild.textContent = on ? "Notes for the chat (optional)" : "What should it be?";
+  $("#rounds").closest("label").hidden = on;
+  renderDetail();
+}
+document.querySelectorAll('input[name="kind"]').forEach(r => r.addEventListener("change", () => setHumanForm(selectedKind() === "human")));
+
+async function notifyChat(id, what) {
+  const manual = "Tell your Claude Code chat: “check Craft Studio”.";
+  if (!mcp) { await logLine(id, "Waiting for your chat. " + manual); return; }
+  try {
+    await mcp.callTool("Claude Code Remote", "send_message", { session_id: CHAT_SESSION, message: `Craft Studio: please build real human ${id} (${what}). The settings are in the Craft Studio artifact's builds collection, document ${id}.` });
+    await logLine(id, "Your Claude Code chat was told. It builds the person with Blender and MakeHuman.");
+  } catch (e) {
+    const why = { approval_required: "Craft Studio needs your OK to message your chat.", server_not_connected: "The Claude Code Remote connector isn't connected for you.", not_in_manifest: "Messaging your chat was turned off for this page.", blocked_by_policy: "Your organisation blocks messaging your chat from a page.", needs_reauth: "Reconnect Claude Code Remote in claude.ai Settings, Connectors." }[e?.code] || ("Couldn't message your chat (" + (e?.code || "error") + ").");
+    await logLine(id, why + " " + manual);
+  }
+}
+async function submitHuman() {
+  if (!db) { notice("Sign in to claude.ai to keep builds."); return; }
+  const params = humanParams(), ref = db.collection("builds").doc(), now = Date.now();
+  const doc = { kind: "human", request: $("#req").value.trim() || describeHuman(params), target: $("#target").value.trim(), params, status: "queued", step: "queued", source: "page", createdAt: now, updatedAt: now, log: [{ t: now, text: "Queued for Blender + MakeHuman" }] };
+  try { await ref.set(doc); } catch (err) { notice("Couldn't save the build: " + (err.message || err.code)); return; }
+  const img = refImage ? await shrink(refImage) : null;
+  if (img) { try { await ref.update({ refImage: await blobToDataUrl(img) }); } catch (err) {} }
+  builds = [{ id: ref.id, ...doc }, ...builds.filter(b => b.id !== ref.id)]; selId = ref.id; renderJobs(); renderDetail();
+  $("#req").value = ""; $("#refFile").value = ""; refImage = null; refSummary = ""; showThumb(null);
+  notifyChat(ref.id, doc.request);
+}
+async function requeueHuman(b, change) {
+  try { await db.doc("builds/" + b.id).update({ status: "queued", step: "queued", change: change || null, error: null, updatedAt: Date.now() }); } catch (e) { notice("Couldn't queue it: " + (e.message || e.code)); return; }
+  await logLine(b.id, change ? "Change asked: " + change : "Asked to build it again");
+  notifyChat(b.id, change ? "change: " + change : "rebuild");
+}
+
+// read age, build and colours off the photo
+$("#hFromPhoto").onclick = async () => {
+  if (!refImage || !sample || !canImages) return;
+  const btn = $("#hFromPhoto"); btn.disabled = true; $("#hPhotoNote").textContent = "Claude is looking at the photo…";
+  try {
+    const lists = k => HUMAN_ASSETS[k].map(x => x[0]).join(", ");
+    const r = await sample.json(`Look at the person in this photo and choose settings for a MakeHuman 3D character that matches their age, build, colouring and clothes (not their identity).
+Reply with only JSON: {"age": years 5-80, "gender": 0 female to 1 male, "height": 0-1 (0.5 average for their age), "weight": 0-1 (0.5 average), "muscle": 0-1,
+"skin": "#rrggbb", "hairColor": "#rrggbb", "hair": one of [${lists("hair")}], "eyes": one of [${lists("eyes")}], "outfit": one of [${lists("outfits")}], "top": "#rrggbb" main top colour, "shoes": one of [${lists("shoes")}], "smile": 0 neutral to 1 broad smile, "pose": "standing" or "crossed" (arms folded), "jeans": "dark", "medium" or "light" wash, "notes": one short sentence on anything the settings can't capture}`,
+      { images: [await shrink(refImage)], modelTier: "default", cache: false });
+    const set = (id, v) => { if (v != null && v !== "") $(id).value = v; };
+    set("#hAge", r.age); set("#hGender", r.gender); set("#hHeight", r.height); set("#hWeight", r.weight); set("#hMuscle", r.muscle);
+    if (/^#[0-9a-f]{6}$/i.test(r.skin || "")) set("#hSkin", r.skin);
+    if (/^#[0-9a-f]{6}$/i.test(r.hairColor || "")) set("#hHairColor", r.hairColor);
+    if (/^#[0-9a-f]{6}$/i.test(r.top || "")) set("#hTop", r.top);
+    for (const [id, k, list] of [["#hHair", r.hair, "hair"], ["#hEyes", r.eyes, "eyes"], ["#hOutfit", r.outfit, "outfits"], ["#hShoes", r.shoes, "shoes"]]) if (HUMAN_ASSETS[list].some(x => x[0] === k)) set(id, k);
+    set("#hSmile", r.smile);
+    if (r.pose === "crossed" || r.pose === "standing") set("#hPose", r.pose);
+    set("#hJeans", { dark: "1", medium: "1.15", light: "1.32" }[r.jeans]);
+    syncOutputs();
+    if (r.notes && !$("#req").value) $("#req").value = r.notes;
+    $("#hPhotoNote").textContent = "Filled in from the photo. Adjust anything, then send it.";
+  } catch (e) { $("#hPhotoNote").textContent = errCopy(e); }
+  finally { btn.disabled = !refImage; }
+};
+
+// 3D viewer for finished people (three.js in the page, studio light and shadows)
+let H3 = null, shownModel = null;
+async function three() {
+  if (H3) return H3;
+  const THREE = await import("three");
+  const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+  const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+  const host = $("#h3d"), r = new THREE.WebGLRenderer({ antialias: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+  r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; host.append(r.domElement);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe9ebec);
+  scene.add(new THREE.HemisphereLight(0xe6eeff, 0x6f665c, 1.0));
+  const key = new THREE.DirectionalLight(0xfff1e0, 2.6); key.position.set(1.6, 3.0, 1.8); key.castShadow = true;
+  Object.assign(key.shadow.camera, { left: -1.1, right: 1.1, top: 2.2, bottom: -0.3, near: 0.5, far: 9 }); key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; scene.add(key);
+  const rim = new THREE.DirectionalLight(0xcfdcff, 0.9); rim.position.set(-1, 2.2, -2.5); scene.add(rim);
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(6, 64), new THREE.MeshStandardMaterial({ color: 0xd5d9dc, roughness: 1 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+  const cam = new THREE.PerspectiveCamera(28, 1, 0.05, 50), ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true; ctl.maxPolarAngle = Math.PI * 0.52;
+  const size = () => { const w = host.clientWidth || 1, h = host.clientHeight || 1; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+  new ResizeObserver(size).observe(host); size();
+  const loader = new GLTFLoader(); loader.register(p => { p.textureLoader = new THREE.TextureLoader(p.options.manager); return { name: "img_textures" }; });
+  r.setAnimationLoop(() => { ctl.update(); r.render(scene, cam); });
+  H3 = { THREE, scene, cam, ctl, loader, model: null };
+  return H3;
+}
+// GLB bytes from a one-buffer glTF JSON (the viewer blocks fetch() of data: URIs)
+function jsonToGlb(json) {
+  const uri = json.buffers[0].uri; delete json.buffers[0].uri;
+  const bin = Uint8Array.from(atob(uri.slice(uri.indexOf(",") + 1)), c => c.charCodeAt(0)); json.buffers[0].byteLength = bin.length;
+  const js = new TextEncoder().encode(JSON.stringify(json)), jl = (js.length + 3) & ~3, bl = (bin.length + 3) & ~3;
+  const out = new Uint8Array(28 + jl + bl), dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, out.length, true);
+  dv.setUint32(12, jl, true); dv.setUint32(16, 0x4E4F534A, true); out.fill(0x20, 20, 20 + jl); out.set(js, 20);
+  dv.setUint32(20 + jl, bl, true); dv.setUint32(24 + jl, 0x004E4942, true); out.set(bin, 28 + jl);
+  return out.buffer;
+}
+async function modelBytes(url) {
+  const res = await fetch(url); if (!res.ok) throw new Error("the model file returned " + res.status);
+  return /\.glb($|\?)/i.test(url) ? await res.arrayBuffer() : jsonToGlb(await res.json());
+}
+async function showHuman(b) {
+  if (!b.modelUrl || shownModel === b.modelUrl) return;
+  shownModel = b.modelUrl;
+  try {
+    const h = await three(), bytes = await modelBytes(b.modelUrl);
+    const g = await new Promise((ok, bad) => h.loader.parse(bytes, "", ok, bad));
+    if (h.model) h.scene.remove(h.model);
+    g.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; if (o.material?.transparent || /brow|lash|hair/i.test(o.material?.name || "")) { o.material.alphaTest = 0.2; o.material.transparent = false; o.material.needsUpdate = true; if (/hair/i.test(o.material.name)) { o.material.side = h.THREE.FrontSide; o.receiveShadow = false; } } } });
+    g.scene.updateMatrixWorld(true);
+    const box = new h.THREE.Box3(); g.scene.traverse(o => { if (o.isSkinnedMesh) { o.computeBoundingBox(); box.union(o.boundingBox.clone().applyMatrix4(o.matrixWorld)); } else if (o.isMesh) box.expandByObject(o); });
+    const size = box.getSize(new h.THREE.Vector3());
+    g.scene.position.y -= box.min.y; g.scene.position.x -= (box.min.x + box.max.x) / 2; g.scene.position.z -= (box.min.z + box.max.z) / 2; h.scene.add(g.scene); h.model = g.scene;
+    const H = size.y; h.cam.position.set(H * 1.4, H * 0.62, H * 2.6); h.ctl.target.set(0, H * 0.52, 0); h.ctl.update();
+  } catch (e) { shownModel = null; notice("Couldn't show the model: " + e.message); }
+}
+
+// ---------- start ----------
+(async () => {
+  [db, sample, downloads, mcp] = await Promise.all([claude.use("db"), claude.use("sample"), claude.use("downloads"), claude.use("mcp")].map(p => p.catch(() => null)));
+  if (sample) { const lim = await sample.limits().catch(() => null); canImages = !!lim?.images; }
+  if (!sample) notice("Claude isn't available in this view, so builds can't run here. You can still look through saved builds.");
+  renderDetail();
+  if (!db) { renderJobs(); return; }
+  const timer = setTimeout(() => { if (!builds.length) $("#jobs").innerHTML = '<p class="note">Builds are taking a while to load.</p>'; }, 10000);
+  db.collection("builds").orderBy("createdAt", "desc").limit(60).onSnapshot(snap => {
+    clearTimeout(timer);
+    builds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!selId && builds.length) selId = builds[0].id;
+    renderJobs(); renderDetail(); pickQueued();
+  }, err => { clearTimeout(timer); notice("Couldn't load builds: " + (err.message || err.code)); });
+  setInterval(() => { if (!run) { renderJobs(); renderDetail(); } }, 60000);
+  let wasOn = false; try { wasOn = localStorage.getItem("craft-auto") === "1"; } catch (e) {}
+  if (wasOn && sample) setAuto(true);
+})();
+</script>
+
+</body></html>
