@@ -17,13 +17,14 @@ param([switch]$RunBackup, [switch]$Review)
 
 $ErrorActionPreference = 'Stop'
 $AppName    = 'Claude Vault'
-$AppVersion = '1.1.0'
+$AppVersion = '1.2.0'
 $AppDir     = Join-Path $env:APPDATA 'ClaudeVault'
 $ConfigPath = Join-Path $AppDir 'config.json'
 $LogPath    = Join-Path $AppDir 'ClaudeVault.log'
 $StatePath  = Join-Path $AppDir 'state.json'
 $TaskName   = 'Claude Vault Backup'
 $ExportPage = 'https://claude.ai/settings/data-privacy-controls'
+$OrgExportPage = 'https://claude.ai/admin-settings/data-privacy-controls'
 New-Item -ItemType Directory -Force -Path $AppDir | Out-Null
 
 # Files that hold sign-in tokens or API keys. Never copied into a Git repo.
@@ -214,7 +215,7 @@ function Backup-Exports($cfg, $stage, $state) {
     if (-not (Test-Path $dl)) { Write-Log "Exports: Downloads folder not found ($dl)."; return }
     $done = @($state.ProcessedExports)
     $zips = Get-ChildItem $dl -File -Filter '*.zip' -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -match '^data-' -or $_.Name -match 'claude' } |
+            Where-Object { $_.Length -gt 0 } |
             Sort-Object LastWriteTime
     Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
     foreach ($z in $zips) {
@@ -242,6 +243,28 @@ function Backup-Exports($cfg, $stage, $state) {
         Write-Log "Exports: filed $($z.Name) as $stamp."
     }
     $state.ProcessedExports = $done
+}
+
+function Import-ExportZip([string]$zipPath) {
+    # Files one claude.ai export zip right away (used by the Export tab). Returns a short result line.
+    $cfg = Get-Config; $state = Get-State
+    $dl = $cfg.DownloadsFolder
+    if ((Split-Path $zipPath -Parent) -ne $dl) { Copy-Item $zipPath (Join-Path $dl (Split-Path $zipPath -Leaf)) -Force }
+    $stage = Join-Path $cfg.BackupFolder 'latest'
+    New-Item -ItemType Directory -Force -Path $stage | Out-Null
+    $before = (Get-ChildItem (Join-Path $stage 'claude-ai-exports') -Recurse -Filter *.md -ErrorAction SilentlyContinue | Measure-Object).Count
+    Backup-Exports $cfg $stage $state
+    Save-State $state
+    $after = (Get-ChildItem (Join-Path $stage 'claude-ai-exports') -Recurse -Filter *.md -ErrorAction SilentlyContinue | Measure-Object).Count
+    return "Saved $($after - $before) new chat and project files to $(Join-Path $stage 'claude-ai-exports')."
+}
+
+function Test-IsExportZip([string]$path) {
+    try {
+        Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+        $a = [IO.Compression.ZipFile]::OpenRead($path)
+        $ok = [bool]($a.Entries | Where-Object { $_.Name -eq 'conversations.json' }); $a.Dispose(); return $ok
+    } catch { return $false }
 }
 
 function Sync-CloudRepo($cfg) {
@@ -607,6 +630,54 @@ $r4.Add_Click({
     if (Test-Path $p) { Start-Process explorer.exe $p } else { [System.Windows.Forms.MessageBox]::Show('No claude.ai export filed yet. Export from claude.ai, then run a backup.', $AppName) | Out-Null }
 })
 $r5.Add_Click({ Start-Process 'https://claude.ai/artifact/QBahUjAzjftw6EFWWAo5jv' })
+
+# --- Export tab: guided claude.ai export
+$tE = New-Tab 'Export chats'
+$eY = 12
+$eTitle = Add-Label $tE 'Back up your claude.ai chats and Projects in 4 steps. Takes about 5 minutes plus waiting for the email.' 12 $eY 710
+$s1 = Add-Label $tE 'Step 1.  Ask Claude for the export' 12 50 710; $s1.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
+$s1t = Add-Label $tE 'Click the button. On the page that opens, find "Data management" and click "Export Data". (Primary Owner: this exports the whole organization.)' 12 74 710; $s1t.Height = 36
+$e1 = Add-Button $tE 'Open the export page' 12 112 220
+$e1b = Add-Button $tE 'Personal export page instead' 242 112 220
+$s2 = Add-Label $tE 'Step 2.  Wait for the email' 12 160 710; $s2.Font = $s1.Font
+$s2t = Add-Label $tE 'Anthropic emails you a download link, usually within minutes to a few hours. The link works once and expires after 24 hours.' 12 184 710; $s2t.Height = 36
+$s3 = Add-Label $tE 'Step 3.  Paste the link here' 12 228 710; $s3.Font = $s1.Font
+$eLink = Add-Text $tE '' 12 254 560
+$e3 = Add-Button $tE 'Download' 582 250 140
+$s4 = Add-Label $tE 'Step 4.  Claude Vault files it' 12 300 710; $s4.Font = $s1.Font
+$eStatus = Add-Label $tE 'Waiting for step 3. Already have the zip? Use the button below.' 12 326 710; $eStatus.Height = 40
+$e4 = Add-Button $tE 'Pick the zip myself...' 12 372 220
+$eTimer = New-Object System.Windows.Forms.Timer; $eTimer.Interval = 3000
+$script:eStarted = $null
+
+$e1.Add_Click({ Start-Process $OrgExportPage })
+$e1b.Add_Click({ Start-Process $ExportPage })
+$e3.Add_Click({
+    $u = $eLink.Text.Trim()
+    if ($u -notmatch '^https://') { [System.Windows.Forms.MessageBox]::Show('Paste the full link from the email (it starts with https://).', $AppName) | Out-Null; return }
+    $script:eStarted = Get-Date
+    Start-Process $u
+    $eStatus.Text = 'Your browser is downloading the export. If it asks where to save, choose Downloads. Watching for the zip...'
+    $eTimer.Start()
+})
+$eTimer.Add_Tick({
+    $dl = (Get-Config).DownloadsFolder
+    $z = Get-ChildItem $dl -File -Filter *.zip -ErrorAction SilentlyContinue |
+         Where-Object { $_.LastWriteTime -ge $script:eStarted.AddMinutes(-1) } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($z -and (Test-IsExportZip $z.FullName)) {
+        $eTimer.Stop(); $eStatus.Text = "Found $($z.Name). Filing it..."; [System.Windows.Forms.Application]::DoEvents()
+        try { $eStatus.Text = 'Done. ' + (Import-ExportZip $z.FullName) } catch { $eStatus.Text = "Could not file it: $_" }
+    } elseif (((Get-Date) - $script:eStarted).TotalMinutes -gt 20) {
+        $eTimer.Stop(); $eStatus.Text = 'No export zip appeared in Downloads after 20 minutes. If it saved somewhere else, use "Pick the zip myself".'
+    }
+})
+$e4.Add_Click({
+    $d = New-Object System.Windows.Forms.OpenFileDialog; $d.Filter = 'Zip files (*.zip)|*.zip'; $d.InitialDirectory = (Get-Config).DownloadsFolder
+    if ($d.ShowDialog() -ne 'OK') { return }
+    if (-not (Test-IsExportZip $d.FileName)) { $eStatus.Text = 'That zip is not a claude.ai export (no conversations.json inside).'; return }
+    $eStatus.Text = 'Filing it...'; [System.Windows.Forms.Application]::DoEvents()
+    try { $eStatus.Text = 'Done. ' + (Import-ExportZip $d.FileName) } catch { $eStatus.Text = "Could not file it: $_" }
+})
 
 # --- Review tab: everything in the backup, tick what to delete
 $tV = New-Tab 'Review and delete'

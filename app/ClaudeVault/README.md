@@ -1,4 +1,4 @@
-# Claude Vault 1.1.0
+# Claude Vault 1.2.0
 
 Claude Vault backs up everything Claude-related on your PC on a schedule. It sends the backup to a folder you choose (such as OneDrive), to Git, or to both.
 
@@ -30,6 +30,16 @@ Every run also saves a dated zip in `snapshots\`. Snapshots are **kept forever**
 **Monthly review:** once a month the app opens a **Review and delete** list. It shows every snapshot, backed-up Claude Code session and exported chat, with date and size. Tick the items you don't want, then click **Delete ticked items**, or click **Reviewed** to be reminded again next month. You can open the list any time from the **Review and delete** tab.
 
 **Auto-delete turned off:** Claude Code normally deletes sessions older than 30 days from your PC. Claude Vault raises that limit (`cleanupPeriodDays`) to about 10 years. Your old settings file is saved as `settings.json.bak`. You can turn this off in the config.
+
+## Export your chats (guided)
+
+The **Export chats** tab walks you through it in four steps:
+1. Click **Open the export page**, then **Export Data** on claude.ai.
+2. Wait for the email from Anthropic.
+3. Paste the link and click **Download**. Your signed-in browser downloads the zip.
+4. Claude Vault spots the zip in Downloads and files it. It shows how many chat and Project files it saved.
+
+Already have the zip? Click **Pick the zip myself**.
 
 ## The one manual step
 
