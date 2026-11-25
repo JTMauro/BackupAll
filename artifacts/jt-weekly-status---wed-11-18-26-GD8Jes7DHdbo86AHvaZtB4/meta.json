@@ -1,0 +1,18 @@
+{
+ "title": "JT Weekly Status – Wed 11/18/26",
+ "url": "https://claude.ai/artifact/GD8Jes7DHdbo86AHvaZtB4",
+ "type": "Docs",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "9f7744da00ba7f581b76398827a7b431cab2fd822b94a9d0680b8ba9b6e998e4"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 2833,
+   "sha256": "9e31afc46cc65032b402f5df5423004daf55bedfe99d0affa03a87af2af2158c"
+  }
+ ]
+}

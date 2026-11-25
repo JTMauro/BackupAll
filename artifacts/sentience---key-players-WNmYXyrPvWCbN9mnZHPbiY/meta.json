@@ -1,0 +1,18 @@
+{
+ "title": "Sentience — Key Players",
+ "url": "https://claude.ai/artifact/WNmYXyrPvWCbN9mnZHPbiY",
+ "type": "Docs",
+ "updated": "2026-10-25",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "382199ad1981b54d817c79b3a40b2c5920883ea339c6103d18ccfa0a3de01731"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 56551,
+   "sha256": "d689607c625d514ee584622edc3ae8fb69d42de23903246c2bb97eec4ccf7a5d"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "title": "Sentience — Character Sheet",
+ "url": "https://claude.ai/artifact/HwFEM1yfc4xK8H5JYWrDvE",
+ "type": "Docs",
+ "updated": "2026-10-25",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "a38d73c81ac26add69b21f26b17ce97c34275739c46dda4e28b16c29e7c7d99d"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 6326,
+   "sha256": "cd628d7b8a87474c18964449a241d4b55e6ecab2c4f189c82147e0b5f4075e57"
+  }
+ ]
+}

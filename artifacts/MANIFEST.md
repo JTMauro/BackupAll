@@ -40,8 +40,8 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Burning Lead | web page | 2026-11-18 | https://claude.ai/artifact/C8y463mfdJANZkvTY1577M | `burning-lead-C8y463mfdJANZkvTY1577M/` |
 | Gate Master | web page | 2026-11-18 | https://claude.ai/artifact/RgkXzqopmHi66xRZY3rd82 | `gate-master-RgkXzqopmHi66xRZY3rd82/` |
 | Kessel Run | web page | 2026-11-18 | https://claude.ai/artifact/RoebwBaQzZKu5WZBqSrDPM | `kessel-run-RoebwBaQzZKu5WZBqSrDPM/` |
-| JT Weekly Status – Wed 11/18/26 | Docs | 2026-11-18 | https://claude.ai/artifact/GD8Jes7DHdbo86AHvaZtB4 | - |
-| Intelligence or Ignorance: AI, Work, and the Future | Docs | 2026-11-18 | https://claude.ai/artifact/RC959XHTmAFJyLBTa9sEbC | - |
+| JT Weekly Status – Wed 11/18/26 | Docs | 2026-11-18 | https://claude.ai/artifact/GD8Jes7DHdbo86AHvaZtB4 | `jt-weekly-status---wed-11-18-26-GD8Jes7DHdbo86AHvaZtB4/` |
+| Intelligence or Ignorance: AI, Work, and the Future | Docs | 2026-11-18 | https://claude.ai/artifact/RC959XHTmAFJyLBTa9sEbC | `intelligence-or-ignorance--ai--work--and-the-future-RC959XHTmAFJyLBTa9sEbC/` |
 | Dirty Work (novel) | Docs | 2026-11-18 | https://claude.ai/artifact/49RHiLcwb7xnaAiDwaZHRe | - |
 | Burning Lead Assets | web page | 2026-11-18 | https://claude.ai/artifact/NqP6L8uJDwD4KamMwKXrip | `burning-lead-assets-NqP6L8uJDwD4KamMwKXrip/` |
 | Gate Master Asset Pack | web page | 2026-11-18 | https://claude.ai/artifact/FLBbTjmwEqbbfZfbx66tck | - |
@@ -62,9 +62,9 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Architect User Manual | Docs | 2026-11-17 | https://claude.ai/artifact/Ara74TVUhXWULtzHFhrwfg | `architect-user-manual-Ara74TVUhXWULtzHFhrwfg/` |
 | CydFTP Download | web page | 2026-11-14 | https://claude.ai/artifact/F24EvnsHq6hkCBR3Zf8yyu | `cydftp-download-F24EvnsHq6hkCBR3Zf8yyu/` |
 | Planetguard | web page | 2026-11-03 | https://claude.ai/artifact/5ZvSAoKvuu4bjGyXoZa4Pr | `planetguard-5ZvSAoKvuu4bjGyXoZa4Pr/` |
-| CydniTime Arcade | web page | 2026-11-04 | https://claude.ai/artifact/DsvkNsZwwMYcfWjbxAp98f | - |
-| CYDNI 3D | web page | 2026-11-04 | https://claude.ai/artifact/NGZZbmSJPmgeBL72yWZixn | - |
-| CydVerse Trailer | web page | 2026-11-16 | https://claude.ai/artifact/86b9aFy2gZYvssGgM71AeL | - |
+| CydniTime Arcade | web page | 2026-11-04 | https://claude.ai/artifact/DsvkNsZwwMYcfWjbxAp98f | `cydnitime-arcade-DsvkNsZwwMYcfWjbxAp98f/` |
+| CYDNI 3D | web page | 2026-11-04 | https://claude.ai/artifact/NGZZbmSJPmgeBL72yWZixn | `cydni-3d-NGZZbmSJPmgeBL72yWZixn/` |
+| CydVerse Trailer | web page | 2026-11-16 | https://claude.ai/artifact/86b9aFy2gZYvssGgM71AeL | `cydverse-trailer-86b9aFy2gZYvssGgM71AeL/` |
 | CydVerse Release Kit | web page | 2026-11-16 | https://claude.ai/artifact/LiBB8Q3w9vQtdrhwaWftyw | `cydverse-release-kit-LiBB8Q3w9vQtdrhwaWftyw/` |
 | Morph This | web page | 2026-11-15 | https://claude.ai/artifact/4cRoYzdgqhznicxc1BoVMt | `morph-this-4cRoYzdgqhznicxc1BoVMt/` |
 | CydVerse | web page | 2026-11-14 | https://claude.ai/artifact/Vgi8DP34X451mhSAKr536j | `cydverse-Vgi8DP34X451mhSAKr536j/` |
@@ -91,8 +91,8 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Cydcor 3D Wallpaper | web page | 2026-10-24 | https://claude.ai/artifact/7i9USLWVH8xS3vVe1ofYAQ | `cydcor-3d-wallpaper-7i9USLWVH8xS3vVe1ofYAQ/` |
 | Defend This Too | web page | 2026-11-08 | https://claude.ai/artifact/KS6kMdhss1AnRXYxUfQswU | `defend-this-too-KS6kMdhss1AnRXYxUfQswU/` |
 | Sign This | web page | 2026-11-02 | https://claude.ai/artifact/PbKzpZ2fJTo6trq9GLme6E | `sign-this-PbKzpZ2fJTo6trq9GLme6E/` |
-| MiVida | web page | 2026-11-08 | https://claude.ai/artifact/BUh5GJKSrxe3RVqp6VPWuq | - |
-| Cronyard | web page | 2026-11-07 | https://claude.ai/artifact/Va3hv1B95FroXP7Sz9BtWo | - |
+| MiVida | web page | 2026-11-08 | https://claude.ai/artifact/BUh5GJKSrxe3RVqp6VPWuq | `mivida-BUh5GJKSrxe3RVqp6VPWuq/` |
+| Cronyard | web page | 2026-11-07 | https://claude.ai/artifact/Va3hv1B95FroXP7Sz9BtWo | `cronyard-Va3hv1B95FroXP7Sz9BtWo/` |
 | Free Address Database Concept | Docs | 2026-11-06 | https://claude.ai/artifact/EKzbZrzVkpA39QxgGHpwvV | `free-address-database-concept-EKzbZrzVkpA39QxgGHpwvV/` |
 | IT Holiday Invite Files | web page | 2026-11-06 | https://claude.ai/artifact/JYQbUdJie4xQR3SRX1ctaZ | `it-holiday-invite-files-JYQbUdJie4xQR3SRX1ctaZ/` |
 | Kracken | web page | 2026-11-05 | https://claude.ai/artifact/8t1qiNsWxCgvBivneakKNo | `kracken-8t1qiNsWxCgvBivneakKNo/` |
@@ -109,8 +109,8 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Sign This Guide | web page | 2026-11-02 | https://claude.ai/artifact/UY1dVLvvhhGjA8Rzzhhxaq | - |
 | Proximia Connect — Executive Security Overview | Docs | 2026-10-29 | https://claude.ai/artifact/QzTZFwmwoK8UdL6RJCw7st | `proximia-connect---executive-security-overview-QzTZFwmwoK8UdL6RJCw7st/` |
 | Valley Casino | web page | 2026-10-28 | https://claude.ai/artifact/SyUwoJ4WSwcofd8MMYqGz3 | - |
-| Sentience — Character Sheet | Docs | 2026-10-25 | https://claude.ai/artifact/HwFEM1yfc4xK8H5JYWrDvE | - |
-| Sentience — Key Players | Docs | 2026-10-25 | https://claude.ai/artifact/WNmYXyrPvWCbN9mnZHPbiY | - |
+| Sentience — Character Sheet | Docs | 2026-10-25 | https://claude.ai/artifact/HwFEM1yfc4xK8H5JYWrDvE | `sentience---character-sheet-HwFEM1yfc4xK8H5JYWrDvE/` |
+| Sentience — Key Players | Docs | 2026-10-25 | https://claude.ai/artifact/WNmYXyrPvWCbN9mnZHPbiY | `sentience---key-players-WNmYXyrPvWCbN9mnZHPbiY/` |
 | Live Wallpaper Pack | web page | 2026-10-23 | https://claude.ai/artifact/CjFvjYJr6PkLnsgKQZgGM7 | `live-wallpaper-pack-CjFvjYJr6PkLnsgKQZgGM7/` |
 | Carnival Fun Park | web page | 2026-10-22 | https://claude.ai/artifact/VR5DeFu1jUAo6FK69rUa4n | `carnival-fun-park-VR5DeFu1jUAo6FK69rUa4n/` |
 | Carnival Fun | web page | 2026-10-22 | https://claude.ai/artifact/WFqYHNLLLp43ZQE4vs2zZr | `carnival-fun-WFqYHNLLLp43ZQE4vs2zZr/` |

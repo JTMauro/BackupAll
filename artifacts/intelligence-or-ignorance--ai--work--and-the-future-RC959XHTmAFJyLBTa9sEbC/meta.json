@@ -1,0 +1,18 @@
+{
+ "title": "Intelligence or Ignorance: AI, Work, and the Future",
+ "url": "https://claude.ai/artifact/RC959XHTmAFJyLBTa9sEbC",
+ "type": "Docs",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "2d24e3e3cb7c30025b6eb240425be95e58d678b0f6f4f978703356a12f39d4f9"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 103874,
+   "sha256": "2b9e41c83b6b2975b3a723c971071eeefa800040ba6ab1d3bf200f26c946a305"
+  }
+ ]
+}

@@ -1,0 +1,82 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CydVerse Trailer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a cinema page; the trailer first, a single download control under it. Single dark look on purpose, matching CydVerse. */
+:root{--bg:#070b12;--panel:#111a26;--rule:#243244;--text:#eef4fb;--dim:#9fb0c3;--sky:#38bdf8;--ok:#3fb950;--warn:#e3b341;
+  --display:"Chakra Petch","Segoe UI",system-ui,sans-serif;--body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:radial-gradient(ellipse 80% 55% at 50% 0%,#132235 0%,var(--bg) 70%);background-color:var(--bg);color:var(--text);font:400 16px/1.6 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px;display:grid;gap:22px}
+h1{font:700 clamp(1.8rem,4.5vw,2.8rem)/1.05 var(--display);margin:0;letter-spacing:.02em}
+h1 b{color:var(--sky)}
+.eyebrow{font:600 .78rem/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--sky)}
+video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:14px;background:#000;box-shadow:0 30px 80px rgba(0,0,0,.65),0 0 0 1px #1d2b3d;display:block}
+.bar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.meta{color:var(--dim);font-size:.92rem}
+.btn{appearance:none;cursor:pointer;font:600 1rem var(--body);color:#fff;padding:11px 20px;border-radius:10px;background:linear-gradient(180deg,#5ccbf7,#1d93cf 50%,#12709f);border:1px solid #063149;border-top-color:#9be3ff;box-shadow:0 6px 16px rgba(14,165,233,.3)}
+.btn:hover{filter:brightness(1.08)}.btn:focus-visible{outline:2px solid #e0f6ff;outline-offset:3px}.btn[disabled]{filter:grayscale(.6) brightness(.7);cursor:default}
+.status{font-size:.88rem;color:var(--dim);min-height:1.3em}.status.ok{color:var(--ok)}.status.warn{color:var(--warn)}
+.beats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.beat{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;min-width:0}
+.beat b{display:block;font:700 1rem var(--display);letter-spacing:.03em}
+.beat span{color:var(--dim);font-size:.85rem}
+.note{color:var(--dim);font-size:.85rem}
+@media (max-width:980px){.beats{grid-template-columns:repeat(4,minmax(0,1fr))}}@media (max-width:560px){.beats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+
+<main class="wrap">
+  <div class="eyebrow">Concept preview · 1 minute 54 seconds</div>
+  <h1><b>C</b>yd<b>V</b>erse: Your Own File Universe</h1>
+  <video id="v" src="CydVerse-Trailer.mp4" poster="poster-v5.jpg" controls playsinline preload="metadata"></video>
+  <div class="bar">
+    <div class="meta">1280×720 · H.264 MP4 with original music · 14.1 MB</div>
+    <div style="display:grid;gap:4px;justify-items:end">
+      <button class="btn" id="dl" type="button">Download MP4</button>
+      <div class="status" id="st" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="beats" aria-label="What the trailer shows">
+    <div class="beat"><b>0:00 Opening</b><span>C V becomes CydVerse; the black hole</span></div>
+    <div class="beat"><b>0:14 Orbit</b><span>Your internal file server</span></div>
+    <div class="beat"><b>0:19 Vault</b><span>Your personal drive</span></div>
+    <div class="beat"><b>0:24 Starport</b><span>Your client portal</span></div>
+    <div class="beat"><b>0:29 Launchpad</b><span>The FTP and SFTP server</span></div>
+    <div class="beat"><b>0:34 One universe</b><span>All four together</span></div>
+    <div class="beat"><b>0:37 One console</b><span>Starbase and its agents</span></div>
+    <div class="beat"><b>0:44 Many FTP servers</b><span>One install</span></div>
+    <div class="beat"><b>0:51 Never down</b><span>Sync mode takes over</span></div>
+    <div class="beat"><b>0:58 Send it, burn it</b><span>Auto-destruction</span></div>
+    <div class="beat"><b>1:05 Locked down</b><span>MFA, TPM keys, TLS 1.3, FIPS 140-3</span></div>
+    <div class="beat"><b>1:12 One agent</b><span>Every device; lost laptops killed in one click</span></div>
+    <div class="beat"><b>1:22 Bad actors</b><span>Blocked; lockdown and travel requests</span></div>
+    <div class="beat"><b>1:30 The right people</b><span>Roles, stricter group policies, alerts</span></div>
+    <div class="beat"><b>1:37 Relay</b><span>Email down? Alerts still reach every screen and phone</span></div>
+    <div class="beat"><b>1:45 End card</b><span>CydVerse, Your Own File Universe</span></div>
+  </div>
+  <p class="note">Vault, Orbit, Starport and Relay are built; Launchpad and Starbase are designed. The trailer shows the whole planned system.</p>
+</main>
+
+<script>
+(function(){
+  var btn=document.getElementById('dl'), st=document.getElementById('st');
+  function say(m,c){st.textContent=m;st.className='status'+(c?' '+c:'');}
+  var dP=(window.claude&&window.claude.use)?window.claude.use('downloads'):Promise.resolve(null);
+  btn.addEventListener('click',async function(){
+    btn.disabled=true;say('Preparing the file…');
+    try{
+      var d=await dP; if(!d){say('Downloads aren’t available in this view. Open this page on claude.ai.','warn');btn.disabled=false;return;}
+      var r=await fetch('CydVerse-Trailer.mp4'); if(!r.ok) throw {code:'fetch'};
+      var blob=await r.blob(); say('Confirm the download in the prompt.');
+      await d.save({filename:'CydVerse-Trailer.mp4',data:blob}); say('Saved CydVerse-Trailer.mp4.','ok');
+    }catch(e){var c=e&&e.code;
+      if(c==='declined')say('Download cancelled.');else if(c==='rate_limited')say('Another download prompt is open.','warn');
+      else if(c==='fetch')say('The video couldn’t be loaded. Reload and try again.','warn');else say('Downloads aren’t available in this view. Open this page on claude.ai.','warn');}
+    btn.disabled=false;
+  });
+})();
+</script>
+
+</body></html>

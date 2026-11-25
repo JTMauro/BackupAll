@@ -1,0 +1,33 @@
+{
+ "title": "CydVerse Trailer",
+ "url": "https://claude.ai/artifact/86b9aFy2gZYvssGgM71AeL",
+ "type": "web page",
+ "updated": "2026-11-16",
+ "files": [
+  {
+   "path": "CydVerse-Trailer.mp4",
+   "bytes": 14143491,
+   "sha256": "e553fecbb97072d98b6b6f091ee95df0221b52173e3e6bbf687c8802994ee522"
+  },
+  {
+   "path": "index.html",
+   "bytes": 6635,
+   "sha256": "4118daa051759d5c25dc0ef265bf29f0649ae98522a6d928c7b5521377974dd0"
+  },
+  {
+   "path": "poster-v4.jpg",
+   "bytes": 88528,
+   "sha256": "18392d88297fa901f261d07fffbe8d18895b77d8f5c326b24ebeb15a5bde7cf4"
+  },
+  {
+   "path": "poster-v5.jpg",
+   "bytes": 44749,
+   "sha256": "842d27c5e361183a6acb362508273fbb157ded8442f31478a840a7b0969aa39f"
+  },
+  {
+   "path": "poster.jpg",
+   "bytes": 49331,
+   "sha256": "e8134b43b5bbafcaf035f8fc109c88918add6a4b1c57780b7deadc57c70f20a9"
+  }
+ ]
+}
