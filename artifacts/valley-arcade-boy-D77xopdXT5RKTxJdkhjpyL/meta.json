@@ -1,0 +1,23 @@
+{
+ "title": "Valley Arcade Boy",
+ "url": "https://claude.ai/artifact/D77xopdXT5RKTxJdkhjpyL",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "clips/mixamo-clips.json",
+   "bytes": 3797328,
+   "sha256": "45b8800416408df77fdb7665059ecab962e3e83697bab67bb7d9fccde1a1b468"
+  },
+  {
+   "path": "index.html",
+   "bytes": 8105,
+   "sha256": "e86e05c4d9498699f8903d2c958e328375763efcbd9c322810e9968314832a81"
+  },
+  {
+   "path": "models/boy-real.json",
+   "bytes": 3493052,
+   "sha256": "04b73812859b697b0fcf065842ae7c19cece82537c211be136dc36c55f392d37"
+  }
+ ]
+}

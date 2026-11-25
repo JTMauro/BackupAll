@@ -1,0 +1,38 @@
+{
+ "title": "TriviaHound",
+ "url": "https://claude.ai/artifact/ELZDpsWo5ZJuS2xsGf5fE1",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "audio.js",
+   "bytes": 23767,
+   "sha256": "ac05f63168cd3066036b43814daa253d8ffd4cd6a835d93c6c32d72acbf28038"
+  },
+  {
+   "path": "board-art.js",
+   "bytes": 35455,
+   "sha256": "ccce068142675d89d01ea7f7bda33f7894f0d0e9a454ee820d1e3cb01e50349d"
+  },
+  {
+   "path": "index.html",
+   "bytes": 111790,
+   "sha256": "d533c59d5764d20604614dc6d2e9981ed0a42e0b9ddc3733177dd68a1281b5da"
+  },
+  {
+   "path": "matcher.js",
+   "bytes": 11412,
+   "sha256": "8ea24735e4cea1b268c27a19371f9e816356bc25c0b0b71809e1adf8b73b0678"
+  },
+  {
+   "path": "questions-offline.js",
+   "bytes": 2344284,
+   "sha256": "952bb0849991395411825c16ed7b970f18c7643b43368010369c2cd7e806c578"
+  },
+  {
+   "path": "questions-online.js",
+   "bytes": 13035,
+   "sha256": "65fcfd5d9a56d52409ebea865778c8213c316c97bd8e5787e0641d9b7370ae8f"
+  }
+ ]
+}

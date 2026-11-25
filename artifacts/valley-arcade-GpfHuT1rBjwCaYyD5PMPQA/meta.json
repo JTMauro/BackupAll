@@ -1,0 +1,193 @@
+{
+ "title": "Valley Arcade",
+ "url": "https://claude.ai/artifact/GpfHuT1rBjwCaYyD5PMPQA",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "claw.js",
+   "bytes": 13482,
+   "sha256": "99b7a49bcd31423972d627fa5dfd7d536501b4b946cfa27e7d2b5c6f6b97f8ae"
+  },
+  {
+   "path": "games/_runtime.js",
+   "bytes": 10826,
+   "sha256": "54b4f734efc6db7a4d1d19b84e377b6011b4612221abd5b9e2dbb04901053935"
+  },
+  {
+   "path": "games/asteroids.js",
+   "bytes": 20467,
+   "sha256": "0d9d2891d22d197b05dd3c06ec4afbafd3235897088d17f1a689ec92cd3d9962"
+  },
+  {
+   "path": "games/breakout.js",
+   "bytes": 14084,
+   "sha256": "356219ee52e2cd6bb94680259f7e05fd1d53d6c9471c1b72b670dcf4c93d2240"
+  },
+  {
+   "path": "games/centipede.js",
+   "bytes": 30941,
+   "sha256": "7a0ce04fb90437cf7302886f818683484bc1273c9aeb13dbd2f82d47784ea091"
+  },
+  {
+   "path": "games/deerhunter.js",
+   "bytes": 109523,
+   "sha256": "66b5d0b32d726e95a02c1a67249b6bcbc57f0f1527f2c8acc38c5f63844d9151"
+  },
+  {
+   "path": "games/defender.js",
+   "bytes": 33933,
+   "sha256": "0c253cfe6659772001bed4516ef6be5317dc29d9255bc931a3b945c6912ad5d1"
+  },
+  {
+   "path": "games/digdug.js",
+   "bytes": 48795,
+   "sha256": "f9e7029a838eb2a2ff1bca0ff023ab895c28f9413c166a8e769d9f30a815736f"
+  },
+  {
+   "path": "games/donkeykong.js",
+   "bytes": 76483,
+   "sha256": "3e5bbd5ff9fab60f1b9cdf97e1367de10bea453b7d31cad052a5924a8a8d947e"
+  },
+  {
+   "path": "games/donkeykongjr.js",
+   "bytes": 54941,
+   "sha256": "b18ca74b4e642a763d7c47d879281ae127773b50e9555a320c69454c5b9ef13d"
+  },
+  {
+   "path": "games/duckhunt.js",
+   "bytes": 53553,
+   "sha256": "568101251757cb8757856b82903a15a349f1fb00955037146dc33b7e33b9144d"
+  },
+  {
+   "path": "games/frogger.js",
+   "bytes": 37704,
+   "sha256": "6dcf37e302d6f898a12d566f60c1d56e5b7f6f82260cc9783c89339b56566f2d"
+  },
+  {
+   "path": "games/galaga.js",
+   "bytes": 46271,
+   "sha256": "6320ad4b946f659955e26076c756e1c63475f7ae34e75b265b75cb309c04755c"
+  },
+  {
+   "path": "games/heavybarrel.js",
+   "bytes": 119242,
+   "sha256": "32f2bea47ffa71ee7521a108e969e1da6b53a5162bdaa31bfc5af9bf001e9da0"
+  },
+  {
+   "path": "games/joust.js",
+   "bytes": 44630,
+   "sha256": "a7ce62603b3b7c6c440caf045309026647431b876f4828ede88ec6549802c36c"
+  },
+  {
+   "path": "games/missilecommand.js",
+   "bytes": 30435,
+   "sha256": "2b773af0d65bcff4301f33198f3b774e5f7afa90ea3d07b034055b2092603b93"
+  },
+  {
+   "path": "games/mspacman.js",
+   "bytes": 40610,
+   "sha256": "8c426f357506a556bc98c3ba3f8d9c925008141b947bd40388ebdafcaaebeb65"
+  },
+  {
+   "path": "games/nuclearwar.js",
+   "bytes": 114789,
+   "sha256": "677baa589ade9423717f537f0010619ebd301a19d858ed174a632d29cb9cb4cb"
+  },
+  {
+   "path": "games/nuclearwaramiga.js",
+   "bytes": 166327,
+   "sha256": "db16a72e5ceec5cd70d2ca3c07c1ef1b39dc74d13f8123b7bc6874aa2455e5e0"
+  },
+  {
+   "path": "games/pacman.js",
+   "bytes": 41155,
+   "sha256": "5d7acdd2e8e0a4874891eda5e21df2168b42988e497a6caf2ac04cf503a011bd"
+  },
+  {
+   "path": "games/poleposition.js",
+   "bytes": 49936,
+   "sha256": "4d39e5607c848c2ca8c59d29e4cee9a0c7b4a90ecafdda62569675efc6ef559e"
+  },
+  {
+   "path": "games/pong.js",
+   "bytes": 14131,
+   "sha256": "4b5207714738a6532c022b44a4f0b5a47ae3726134efd40af0783e2a4db8a85f"
+  },
+  {
+   "path": "games/qbert.js",
+   "bytes": 36455,
+   "sha256": "74904c26aefb4270ce26605c568d5f50dda43c9f21cb72eef3039b3c85841396"
+  },
+  {
+   "path": "games/raidonbungelingbay.js",
+   "bytes": 60252,
+   "sha256": "b25f423e2951e692af19debc42d35ad4b424da7c4befdaade8fa6a119b80d8a3"
+  },
+  {
+   "path": "games/spaceinvaders.js",
+   "bytes": 30349,
+   "sha256": "ae2c063417510185bd4888cdebdb659284bd322adc3cc139a08acbdffe55da8c"
+  },
+  {
+   "path": "games/taipan.js",
+   "bytes": 89335,
+   "sha256": "b8ca92d101092ca5972bd9b9f132d3dd7aafea6abf2623a6af28b9a863adb692"
+  },
+  {
+   "path": "games/tempest.js",
+   "bytes": 38151,
+   "sha256": "d6719e83febe245c7e9f8ae5c698c1311f68dd92d4dba33b25f110ba243898d7"
+  },
+  {
+   "path": "games/triplehunt.js",
+   "bytes": 52664,
+   "sha256": "4cf72d76feb31f502380a0747c1b76bfcb8c1e1b6444e1dd72216261d905d7da"
+  },
+  {
+   "path": "games/tron.js",
+   "bytes": 45444,
+   "sha256": "1795106a0bbd0464060a24eb0c1d21283c0f437bbf33516bf467008295a0a65b"
+  },
+  {
+   "path": "index.html",
+   "bytes": 32466,
+   "sha256": "66ea77eab2bdd24dfc290d6240175b1b485c80173529afb22a4896f75084858a"
+  },
+  {
+   "path": "main.js",
+   "bytes": 135338,
+   "sha256": "7a5404fbd6a0b31524cb48cddae2727b0033ac46e5e799f7a7c14911055de525"
+  },
+  {
+   "path": "models/anims.json",
+   "bytes": 2763285,
+   "sha256": "a74e3f1b72aabc62375f1f789be1f86e248282e8560962ead0d3a8675a51fd43"
+  },
+  {
+   "path": "models/boy-builder.json",
+   "bytes": 3493052,
+   "sha256": "04b73812859b697b0fcf065842ae7c19cece82537c211be136dc36c55f392d37"
+  },
+  {
+   "path": "models/boy.json",
+   "bytes": 3875426,
+   "sha256": "ebd64ebb6570d2832674dda770b307eab0a24bbe73411883221b0621f1c1c053"
+  },
+  {
+   "path": "music.js",
+   "bytes": 8271,
+   "sha256": "ccff1f29bd3497ce5aefbfe84b9ed14456724810fa547eefbd6c1090c6413319"
+  },
+  {
+   "path": "prizes.js",
+   "bytes": 16832,
+   "sha256": "bb6200bf4081089cacd9c4bc2e78b1bae601c38a8659c8be1b9fcd70df2ff74f"
+  },
+  {
+   "path": "raid.js",
+   "bytes": 39170,
+   "sha256": "797c2f31d5cfe519d0cc6412d156059f6183e71fc1ab49dfe80762343b362ae1"
+  }
+ ]
+}

@@ -1,0 +1,498 @@
+{
+ "title": "Unhappy Woks",
+ "url": "https://claude.ai/artifact/Nbw95FsCXfKgyhpQc55t9j",
+ "type": "web page",
+ "updated": "2026-11-24",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 170132,
+   "sha256": "290c0603fb0bf63ced512065812fe292030d5eab4fd48277addc93e0e9f403ab"
+  },
+  {
+   "path": "sfx/ash_launch_1.mp3",
+   "bytes": 15196,
+   "sha256": "d4e6d0f835dcf08243d9420eab6ef0f319eda1fdd6a03ce0cfe814b924472f8b"
+  },
+  {
+   "path": "sfx/ash_launch_2.mp3",
+   "bytes": 11800,
+   "sha256": "09da81b41d115be06283081f813a19afb76584147b8fea4416f663b646e62d92"
+  },
+  {
+   "path": "sfx/ash_launch_3.mp3",
+   "bytes": 10233,
+   "sha256": "f5f45203f35a99a58356c7b2453156ba8649a87cd2eb9d140545793af8e1ed81"
+  },
+  {
+   "path": "sfx/ash_oof.mp3",
+   "bytes": 7621,
+   "sha256": "97b07f1ee2c071b23c84877ba5793f5104b14b4d4b752e96e792ec74f239112a"
+  },
+  {
+   "path": "sfx/ash_power.mp3",
+   "bytes": 8404,
+   "sha256": "6b182ab51a196584eb22aee3ebfa523c995d73de14940be80b42d15e42effe32"
+  },
+  {
+   "path": "sfx/boss_break.mp3",
+   "bytes": 29825,
+   "sha256": "7fc64bb7535de2de4592419318f88dd972b3a5258b5215df7b003d4d7476df9e"
+  },
+  {
+   "path": "sfx/boss_hit.mp3",
+   "bytes": 11800,
+   "sha256": "badc61c297b0b3853249a50a94127380eb82b6c08c33da5052eb29c2b3f4ab90"
+  },
+  {
+   "path": "sfx/boss_intro.mp3",
+   "bytes": 23816,
+   "sha256": "5b45c8481afbf23ca2e9389c167715db3fda5094376384500a19192a61a854fd"
+  },
+  {
+   "path": "sfx/bot_break.mp3",
+   "bytes": 11800,
+   "sha256": "a21d243ec9ee9961e3f5f1e211d4d858f5b7179d2a09087d33eefad123aeb111"
+  },
+  {
+   "path": "sfx/bot_hit.mp3",
+   "bytes": 3441,
+   "sha256": "67bf32d8d2d22f59f0d1ab7491c2beb187c8214e7451462654477d4841b4b9f9"
+  },
+  {
+   "path": "sfx/bramble_launch_1.mp3",
+   "bytes": 8143,
+   "sha256": "beb17705d4c815b30a09c048ea04bf9fa47c5dbf81681bbc4ac51c0c226355dd"
+  },
+  {
+   "path": "sfx/bramble_launch_2.mp3",
+   "bytes": 7882,
+   "sha256": "577caab1d19e9699a95be3dda21a1b2c132b405c48c2708af7e0416470b3bf21"
+  },
+  {
+   "path": "sfx/bramble_launch_3.mp3",
+   "bytes": 9188,
+   "sha256": "0abc9a48f49a7eb75e5b890a6f444f74efe301fde6dd2dc061e3dc2fec9c4eb4"
+  },
+  {
+   "path": "sfx/bramble_oof.mp3",
+   "bytes": 4486,
+   "sha256": "53c41a56d12c619691d79d721268f10a2cfb73811f18b481d1b4f1f829749890"
+  },
+  {
+   "path": "sfx/bramble_power.mp3",
+   "bytes": 6314,
+   "sha256": "5324b80697b7bf31f9363b64c03f10a2a1afc314c554769f5587afa8327f74bf"
+  },
+  {
+   "path": "sfx/grumble_1.mp3",
+   "bytes": 13890,
+   "sha256": "f30eb8f68e2e1930a8067158d6bc794435b1bdca855291750fbd8c8534dfa1a1"
+  },
+  {
+   "path": "sfx/grumble_2.mp3",
+   "bytes": 8143,
+   "sha256": "87a1204ff145a28fd2a1ce34e831552805767c023de07067214240b8fe6b3053"
+  },
+  {
+   "path": "sfx/grumble_3.mp3",
+   "bytes": 11800,
+   "sha256": "87dbdf24f8bbcbdbcbbed724cd1d9c484642f44766e441344591e7101ccc249e"
+  },
+  {
+   "path": "sfx/grumble_4.mp3",
+   "bytes": 11800,
+   "sha256": "15561e0053cf1324d9b81c79435874323fd1189bfaa1ad995913d9e0a078a1b1"
+  },
+  {
+   "path": "sfx/ice_break.mp3",
+   "bytes": 12061,
+   "sha256": "87ef9d153357c4d8ebd2476e5a9ff16c207181b74761aefa150efdb31ecde927"
+  },
+  {
+   "path": "sfx/ice_hit.mp3",
+   "bytes": 6576,
+   "sha256": "b78cb764009d7e751b4ac873a13e49bd55dbf3df76cf59b71f7cc7993bb34f68"
+  },
+  {
+   "path": "sfx/launch.mp3",
+   "bytes": 6053,
+   "sha256": "659e89cdeefb98e4d65125ccfe2b32a1ce57b165b72adb2c32ccc3fe80bbcfef"
+  },
+  {
+   "path": "sfx/manifest.json",
+   "bytes": 4624,
+   "sha256": "ffe958df5368c2c8ee430b5dfec1d8975fc1f5c2f4c443454493c870aa9c2dff"
+  },
+  {
+   "path": "sfx/menu_loop.mp3",
+   "bytes": 334829,
+   "sha256": "5c76810fb94ea43709332fa33350f9a8ff7a89895165a195385f71a2ab23da61"
+  },
+  {
+   "path": "sfx/metal_break.mp3",
+   "bytes": 19376,
+   "sha256": "72d0b05db2661761cca62c1512b218c8896f6b8e02b59d0468ce8d8ef46a4087"
+  },
+  {
+   "path": "sfx/metal_hit.mp3",
+   "bytes": 13629,
+   "sha256": "075714e7f49e3dfdaf4e4e4dd832cd3f746c5c03de022ed61ccc996cc411e4c3"
+  },
+  {
+   "path": "sfx/pip_launch_1.mp3",
+   "bytes": 11278,
+   "sha256": "095a448b1cb929226aa7c5a3732252d205002ff65896cab47a9ecbfd57850398"
+  },
+  {
+   "path": "sfx/pip_launch_2.mp3",
+   "bytes": 7621,
+   "sha256": "556c68b19f9b9a67371d1349e6cd36a1861ffc0758b332fa12b9543bb851a154"
+  },
+  {
+   "path": "sfx/pip_launch_3.mp3",
+   "bytes": 11539,
+   "sha256": "1dca1953484beecdc6ee6e52f29708915d8bd713b8eda2b1cc952a508cfd9bf5"
+  },
+  {
+   "path": "sfx/pip_oof.mp3",
+   "bytes": 4486,
+   "sha256": "eab225758dce7dd862ce4cddae8da6f89cc6d0fff2b5aad4d13f2834484d014c"
+  },
+  {
+   "path": "sfx/pip_power.mp3",
+   "bytes": 4747,
+   "sha256": "c0d3b806b025a4c6f944c535f2d73be8065e0c02ff2600db73dec4737bc03119"
+  },
+  {
+   "path": "sfx/sentry_break.mp3",
+   "bytes": 18592,
+   "sha256": "ef7f62f64b9e527f3202d353f2de3e2eb3ecd0fb20ac37fbe7a740d4cfadffca"
+  },
+  {
+   "path": "sfx/sentry_hit.mp3",
+   "bytes": 2919,
+   "sha256": "703b665b7eb465f4678f011ec6cf6cf01d0839386112ef03b6216e7ec41a0a02"
+  },
+  {
+   "path": "sfx/soot_launch_1.mp3",
+   "bytes": 5531,
+   "sha256": "94a5888ec38aefb6512bcb3793026bf4172e402ebd276a5b3d5aa2752718c621"
+  },
+  {
+   "path": "sfx/soot_launch_2.mp3",
+   "bytes": 9188,
+   "sha256": "3abfbc73131aa07693eff65e05de025c20160196332f3af56092c4731e9aa757"
+  },
+  {
+   "path": "sfx/soot_launch_3.mp3",
+   "bytes": 10755,
+   "sha256": "a30373e6cbe8173029fc36d59e92605a57cda85cb5436d93ef05f9f21ded8bcb"
+  },
+  {
+   "path": "sfx/soot_oof.mp3",
+   "bytes": 4486,
+   "sha256": "532678e2e9be6231439d95a9f53b36dbdcc74c6dc8202585f57ff5e69c7f05e4"
+  },
+  {
+   "path": "sfx/soot_power.mp3",
+   "bytes": 4747,
+   "sha256": "51e139b0b659b4c0764ffaa6186ef315a62ace559e83d74a1e006999b4c29c5c"
+  },
+  {
+   "path": "sfx/stone_break.mp3",
+   "bytes": 15196,
+   "sha256": "332d084fa6cf9e2d8dbe79226431dbce7028c9a223a18668530477ea9ced0bed"
+  },
+  {
+   "path": "sfx/stone_hit.mp3",
+   "bytes": 3702,
+   "sha256": "37f8e8bf1845b0860ddefa3098da9de247946903320b2c3d5f78e5b3eb15cde8"
+  },
+  {
+   "path": "sfx/thornback_launch_1.mp3",
+   "bytes": 12323,
+   "sha256": "3cb787239ccaaffbe58a647a0f01592062e0494b3f5131b6da42ac4207b555fb"
+  },
+  {
+   "path": "sfx/thornback_launch_2.mp3",
+   "bytes": 11800,
+   "sha256": "12529c33ad117af2a6ad13e2cebbf287b97177e6d6b593ccd48d421b03129f3c"
+  },
+  {
+   "path": "sfx/thornback_launch_3.mp3",
+   "bytes": 13890,
+   "sha256": "fcef8a0d9aca12bc273c3c2977d9423ab1d110589a527fe1ca90d7069e900f2b"
+  },
+  {
+   "path": "sfx/thornback_oof.mp3",
+   "bytes": 7621,
+   "sha256": "841d779dc04f94fa175aef2098f8a22bdaa1b4804ddb81cf1392c274882dc611"
+  },
+  {
+   "path": "sfx/thornback_power.mp3",
+   "bytes": 11800,
+   "sha256": "f3bafba04e541e47750d66338d056eabc54d769d48924bbffd6f14d5bd471161"
+  },
+  {
+   "path": "sfx/victory.mp3",
+   "bytes": 130865,
+   "sha256": "04997ffa487f8ac7c4e341934e451c603f975c8ada28a89d0163ebb96fdb31e7"
+  },
+  {
+   "path": "sfx/wood_break.mp3",
+   "bytes": 6576,
+   "sha256": "bbf714dab6ae6714af39cbc906ee6693d7e2336cf3c4b6e4b2e8b76fef3bb8fb"
+  },
+  {
+   "path": "sfx/wood_hit.mp3",
+   "bytes": 5270,
+   "sha256": "963d9db5a6014341a50feaa2d16487311b1eaacab2f28c004af7209f092c2d70"
+  },
+  {
+   "path": "terrain/backdrop_clouds.jpg",
+   "bytes": 102335,
+   "sha256": "c97789cc39ca3440bd22c8412303710741f40b510ee571f224046ee99a4f2083"
+  },
+  {
+   "path": "terrain/backdrop_desert.jpg",
+   "bytes": 158010,
+   "sha256": "e209d465c6beff32be7d0198d5ba964b92931b9ff0bf712ffb40c62a0adf26d1"
+  },
+  {
+   "path": "terrain/backdrop_forest.jpg",
+   "bytes": 225319,
+   "sha256": "94bed106e8a52864485b6e2f4e03ed652991c2edc032037d2cfe6df7e788ae15"
+  },
+  {
+   "path": "terrain/backdrop_ice.jpg",
+   "bytes": 52186,
+   "sha256": "6f7cc2c88eb77592ed54c5fa8cc7869aba5b176f0419d7c162997e2d27fddfd9"
+  },
+  {
+   "path": "terrain/backdrop_lava.jpg",
+   "bytes": 93158,
+   "sha256": "ef83b193169b769c86a2fecefb87b01029f8be5aac2fad3473d674496a136113"
+  },
+  {
+   "path": "terrain/backdrop_ocean.jpg",
+   "bytes": 124094,
+   "sha256": "2330186992d24ab18e89791def1c4b4a09aec43ef25afea6bd0ea49c6ddb44bd"
+  },
+  {
+   "path": "terrain/backdrop_peaks.jpg",
+   "bytes": 195316,
+   "sha256": "672ed1afbadc46cbb26e7842527d05aee50b542b4a18c301903ddd6691cca411"
+  },
+  {
+   "path": "terrain/backdrop_station.jpg",
+   "bytes": 72706,
+   "sha256": "b12e243e1aa7d2a942d6735ba7ff2b311d57f37a8362f05ed4b49df2654c4f47"
+  },
+  {
+   "path": "terrain/backdrop_swamp.jpg",
+   "bytes": 39810,
+   "sha256": "e1480a4b59769f2d89ccb6c432c5d207663561baa3bf433b39be0d1d2ad04c44"
+  },
+  {
+   "path": "terrain/backdrop_temple.jpg",
+   "bytes": 79825,
+   "sha256": "6c880309fe10feacb6fa56e29160f5d5a08be4d5fb9b7d5d86f2d1fb13252f11"
+  },
+  {
+   "path": "terrain/ground_clouds_color.jpg",
+   "bytes": 201358,
+   "sha256": "7838e029e22a54e254994b1de450b2a43086ff8ea7b28586559b2f70b3397426"
+  },
+  {
+   "path": "terrain/ground_clouds_normal.jpg",
+   "bytes": 43501,
+   "sha256": "0a14073bfdb2f97a5af60be85a9310f4a0f17d4be50f8abfc341e09176f812db"
+  },
+  {
+   "path": "terrain/ground_desert_color.jpg",
+   "bytes": 125203,
+   "sha256": "97d1ce408b5522fb686572fca182b9a752eca5b5eaf8dd25ec8c6e22434db412"
+  },
+  {
+   "path": "terrain/ground_desert_normal.jpg",
+   "bytes": 57946,
+   "sha256": "19af4afc930a5c86bf87a2c49726997ea34df1f0f044df7524aeee0f38b2373a"
+  },
+  {
+   "path": "terrain/ground_forest_color.jpg",
+   "bytes": 289226,
+   "sha256": "af36a35238a96c00aea16f8e4d5ffb1afc1679d98211c3a8991655592bec4055"
+  },
+  {
+   "path": "terrain/ground_forest_normal.jpg",
+   "bytes": 102500,
+   "sha256": "36ccd1945cf5cf0902753c2489a7cd0a9e010a67deb944eb51aa2584e6fb2f85"
+  },
+  {
+   "path": "terrain/ground_ice_color.jpg",
+   "bytes": 59577,
+   "sha256": "5e163f2a57229f18b88c932bc855f7e4178665cbaac880acbc9e1ab4c244969a"
+  },
+  {
+   "path": "terrain/ground_ice_normal.jpg",
+   "bytes": 62117,
+   "sha256": "3fb59f67b2d18bff94a473e4045c562beca28a29690563c55e04c49a1d22dac1"
+  },
+  {
+   "path": "terrain/ground_lava_color.jpg",
+   "bytes": 231900,
+   "sha256": "ae7225dfb6acfb3e876aa0305858d51281042e29bb4a224fac1849fb1b960450"
+  },
+  {
+   "path": "terrain/ground_lava_emissive.jpg",
+   "bytes": 158193,
+   "sha256": "cb3ee01e30c7298f417438600e9d91fa02c9975cedc37b0a1af28b6f9be97a35"
+  },
+  {
+   "path": "terrain/ground_lava_normal.jpg",
+   "bytes": 124136,
+   "sha256": "9395772562a700103614139b393f004d3ca87f93725f7ad7c7f5d0077be43b2d"
+  },
+  {
+   "path": "terrain/ground_ocean_color.jpg",
+   "bytes": 134750,
+   "sha256": "055993d7784d7b246d514414a766db085cef45bf84bd30ed68f45807849799cc"
+  },
+  {
+   "path": "terrain/ground_ocean_normal.jpg",
+   "bytes": 23706,
+   "sha256": "f710af1e7276f1834abf5e2d058dd90d15bed502de485aa32543778a7927fc14"
+  },
+  {
+   "path": "terrain/ground_peaks_color.jpg",
+   "bytes": 315352,
+   "sha256": "338ea93bf073b1c7ef2a3bf97ec5109242746d558fb9301227d3568f57c9e044"
+  },
+  {
+   "path": "terrain/ground_peaks_normal.jpg",
+   "bytes": 104353,
+   "sha256": "e1b735352059bc6e923a5d5a1daca9f7af39a3d88eb5bbe859f102eef34afe48"
+  },
+  {
+   "path": "terrain/ground_station_color.jpg",
+   "bytes": 134766,
+   "sha256": "98db9dbf6d1751d3dffcf3beebe368d2843d722583fa96d6480450f00320e107"
+  },
+  {
+   "path": "terrain/ground_station_normal.jpg",
+   "bytes": 50083,
+   "sha256": "218f24d3ea3bf26e8a0507de8e6d9d742e9c07b4e3e821a20c49e116c8ab9eca"
+  },
+  {
+   "path": "terrain/ground_swamp_color.jpg",
+   "bytes": 154899,
+   "sha256": "4b6cb82174e421789ae611b0ec144114fda110a13894547b6246b02277e77c11"
+  },
+  {
+   "path": "terrain/ground_swamp_normal.jpg",
+   "bytes": 64496,
+   "sha256": "1467f3025dff7891e9ae7c26ee4f1359b79389cd16c8713c4a942b7732620603"
+  },
+  {
+   "path": "terrain/ground_temple_color.jpg",
+   "bytes": 265726,
+   "sha256": "208f6a6df391bdda3eb79fa258562d8414634baf6b76f4e8ac170c50f8a2459c"
+  },
+  {
+   "path": "terrain/ground_temple_normal.jpg",
+   "bytes": 97089,
+   "sha256": "737be867d72e39f3a89b1edd89fbebfd28e43d585e52922adb2e27ad5b5ecf4c"
+  },
+  {
+   "path": "terrain/manifest.json",
+   "bytes": 4421,
+   "sha256": "a12afb67ad7e524e26161cbad93decd6eb5349e68072c185cf99d71538928b33"
+  },
+  {
+   "path": "trees/plant_desert_cactus.glb.json",
+   "bytes": 437069,
+   "sha256": "a20c686c531007c73c4d4b8db6d985c398f7aa787c614bf74fe0ad6f1461677e"
+  },
+  {
+   "path": "trees/plant_desert_shrub.glb.json",
+   "bytes": 160444,
+   "sha256": "39d3670c9e1e9d10942e803ebaaa66a22013f8e9d62e622a629498984ccad47f"
+  },
+  {
+   "path": "trees/plant_fern.glb.json",
+   "bytes": 80980,
+   "sha256": "4943eae76d34af72850d2d3f67708e384c78082f86c65ab1c52febb148cad286"
+  },
+  {
+   "path": "trees/plant_swamp_reeds.glb.json",
+   "bytes": 269423,
+   "sha256": "8426bf57d3e639e595ff00b14cb1d627a7fa1ab708f9f69ddd88ba04167e191c"
+  },
+  {
+   "path": "trees/plant_temple_fern.glb.json",
+   "bytes": 218923,
+   "sha256": "4d72531bac7f5962845c6112bc4ffc331bdd2833b320dc5534b46d84735fa4db"
+  },
+  {
+   "path": "trees/tree_desert_dead.glb.json",
+   "bytes": 397998,
+   "sha256": "9915bb1efa9a7c0ca94820412014a98cf0473858c16af08ba8637fa72dac4b3f"
+  },
+  {
+   "path": "trees/tree_forest_broadleaf.glb.json",
+   "bytes": 587287,
+   "sha256": "b85648562da1478b0c8c1affe89a3273d75527dd0bf1acc2c9012a8cfbf02013"
+  },
+  {
+   "path": "trees/tree_forest_conifer.glb.json",
+   "bytes": 623709,
+   "sha256": "092d1c7fb8bc1f38ac80da13eb7fbf08da8abc5717c8b13b6bc8e1a897786174"
+  },
+  {
+   "path": "trees/tree_forest_giant.glb.json",
+   "bytes": 564571,
+   "sha256": "ca47313a2e1f57919ac9edfb92829e2932562d9da77e21c947f37cd6896f7deb"
+  },
+  {
+   "path": "trees/tree_ice_dead.glb.json",
+   "bytes": 578987,
+   "sha256": "556e626b5409ad426c74349c5c9ec47a3491458ab577d1e3ac553240f1d32d78"
+  },
+  {
+   "path": "trees/tree_ice_pine.glb.json",
+   "bytes": 645179,
+   "sha256": "7816b29d86d20aa3a29d39966bd5cacf3d1837c5f0cdb72f83100f2e511609d6"
+  },
+  {
+   "path": "trees/tree_lava_charred.glb.json",
+   "bytes": 350127,
+   "sha256": "dd0d976e6aa692815c36bec863200071cbae0f9428133b3d118332f2b5b61fe8"
+  },
+  {
+   "path": "trees/tree_peaks_birch.glb.json",
+   "bytes": 489386,
+   "sha256": "c3021ae3ad0813d9e8113f3f3129aef4b6da8f76ca2b8e8cf94699ec67c5e490"
+  },
+  {
+   "path": "trees/tree_peaks_pine.glb.json",
+   "bytes": 725769,
+   "sha256": "256a497fd72998c3a3bd405c56cac47c8caf1ed606cc0a789925212e90ac6b0e"
+  },
+  {
+   "path": "trees/tree_swamp_cypress.glb.json",
+   "bytes": 504800,
+   "sha256": "e28e1b506a9f41911f538b3aa1a12e7d9d4956286451afaaa6b7c2a9f023e2df"
+  },
+  {
+   "path": "trees/tree_temple_jungle.glb.json",
+   "bytes": 477808,
+   "sha256": "4dd51f3e1d0e2f29d421c756d3b0567085620b76e8a5232af8d7d1fcb91b0818"
+  },
+  {
+   "path": "trees/tree_temple_palm.glb.json",
+   "bytes": 422906,
+   "sha256": "0a7a747f055ce6e1d67932c9de6d6c51cfc461d5fa04d83eb573627bdb0af382"
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "title": "Teen in Motion",
+ "url": "https://claude.ai/artifact/8is8TWytN2XpjQMdmhgPs3",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "anim.js",
+   "bytes": 13766,
+   "sha256": "b80f2b9cca6f08d065dc07efd0c4d494a1f1c65622f24b1c40dc102a0309b04b"
+  },
+  {
+   "path": "clips/mixamo-clips.json",
+   "bytes": 3797328,
+   "sha256": "45b8800416408df77fdb7665059ecab962e3e83697bab67bb7d9fccde1a1b468"
+  },
+  {
+   "path": "index.html",
+   "bytes": 13395,
+   "sha256": "7797eea8cbb8689540b10f059bdb108ed83b786dc4f2b2c1749e9d041d83e76b"
+  },
+  {
+   "path": "models/teen.json",
+   "bytes": 4296357,
+   "sha256": "c472d1c2fd7e351de7fd9ef514fe5744cb2e70a5c744dc433b2fe98b0f879e91"
+  }
+ ]
+}

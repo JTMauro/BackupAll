@@ -1,0 +1,43 @@
+{
+ "title": "Talking Teen",
+ "url": "https://claude.ai/artifact/VZoBkwaPDJ3ffodiep7aXo",
+ "type": "web page",
+ "updated": "2026-11-23",
+ "files": [
+  {
+   "path": "anim.js",
+   "bytes": 15531,
+   "sha256": "a339414027d3d691c9d9ed0728fc2d2cb8d1b289aec5842b996d4a1e44659ce4"
+  },
+  {
+   "path": "clips/cmu-clips.json",
+   "bytes": 2745414,
+   "sha256": "9003afdb79acd740c30ddd9f8b2cf19246dfbdf5ede9a34d1a896ad8fa2a4857"
+  },
+  {
+   "path": "clips/mixamo-clips.json",
+   "bytes": 3797328,
+   "sha256": "45b8800416408df77fdb7665059ecab962e3e83697bab67bb7d9fccde1a1b468"
+  },
+  {
+   "path": "index.html",
+   "bytes": 30802,
+   "sha256": "e9bd9842bb27d88676e8612783038a6152f76bde94030d3d3a4893f818bf1fab"
+  },
+  {
+   "path": "models/light.json",
+   "bytes": 2153728,
+   "sha256": "4e0cfb6b198bc406314a03a21cf64599806b0fd29c7945f7e9a4e06fcd1bfdab"
+  },
+  {
+   "path": "models/teen.json",
+   "bytes": 6329468,
+   "sha256": "4ac2d9953f5bb528873d130a2531559268550180195285fe05b1d599c27a40bf"
+  },
+  {
+   "path": "sound/lines.json",
+   "bytes": 239875,
+   "sha256": "289623ea83cc0bb114636c11e1ebd8bad7570b576a4404c9590754a8b392e04c"
+  }
+ ]
+}

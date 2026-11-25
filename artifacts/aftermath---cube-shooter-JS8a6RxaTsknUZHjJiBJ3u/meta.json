@@ -1,0 +1,28 @@
+{
+ "title": "Aftermath – Cube Shooter",
+ "url": "https://claude.ai/artifact/JS8a6RxaTsknUZHjJiBJ3u",
+ "type": "web page",
+ "updated": "2026-11-21",
+ "files": [
+  {
+   "path": "builder-fx.js",
+   "bytes": 117790,
+   "sha256": "134fe692f5a62849d78d6d2065dffba59f0cff29d72293d68b5f2a1e728faa31"
+  },
+  {
+   "path": "builder-music.js",
+   "bytes": 24962,
+   "sha256": "fda6221eb0b50221f08c966787d88e4abfd840f097d2de1a736d60de352b2514"
+  },
+  {
+   "path": "builder-sfx.js",
+   "bytes": 22918,
+   "sha256": "a6564ff48cdbd7e6d74cd4be053f6c1e97ca12a7b5c782b119cc3f225440faf8"
+  },
+  {
+   "path": "index.html",
+   "bytes": 183393,
+   "sha256": "67cfe110d8e78ad4e6c9b77663164b88eca38f35750a0662b17ab4f7537c10bf"
+  }
+ ]
+}

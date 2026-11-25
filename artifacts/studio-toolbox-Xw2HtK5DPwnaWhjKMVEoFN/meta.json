@@ -1,0 +1,18 @@
+{
+ "title": "Studio Toolbox",
+ "url": "https://claude.ai/artifact/Xw2HtK5DPwnaWhjKMVEoFN",
+ "type": "web page",
+ "updated": "2026-11-23",
+ "files": [
+  {
+   "path": "data.js",
+   "bytes": 58559,
+   "sha256": "96f6c455454589824c61a20e327f81dd469fcc994b8ba5196c56ce0512669046"
+  },
+  {
+   "path": "index.html",
+   "bytes": 12682,
+   "sha256": "fbfe0d1a9d41b64b242a26e6bd82b88a441c66ca5fa306c3038dc3e3176bbd40"
+  }
+ ]
+}

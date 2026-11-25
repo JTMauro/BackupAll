@@ -1,0 +1,128 @@
+{
+ "title": "Cydoodle Preview",
+ "url": "https://claude.ai/artifact/4Xy491MV5ALnxNFr7QB6qc",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "img/admin-1-studio-signin.webp",
+   "bytes": 28708,
+   "sha256": "a53468741dbe71848742dd3b3b9d3820e911420ff6a1efd70c8fbe7c7c5344c8"
+  },
+  {
+   "path": "img/admin-10-help-claude.webp",
+   "bytes": 89690,
+   "sha256": "19af7b68379977073f5d4fe62295b1193f6ae1b9f89102a332cd0b7ea7c7720d"
+  },
+  {
+   "path": "img/admin-11-settings-about.webp",
+   "bytes": 87868,
+   "sha256": "6ff5c25e654d15ef0cd4d085505da3dcb3e1c73a6299cffa032d8746965c02d7"
+  },
+  {
+   "path": "img/admin-2-games.webp",
+   "bytes": 21258,
+   "sha256": "02cf44a70d67e576d3d78ba3a6b1ee177a29de0bfa3b73cd3b28af23184b8399"
+  },
+  {
+   "path": "img/admin-3-editor-sign-in-to-claude.webp",
+   "bytes": 59272,
+   "sha256": "c1ab83f71c2197a2a077d1b5c38b461ae76e142e5f51df72323fcf90b741e7e4"
+  },
+  {
+   "path": "img/admin-4-editor-with-claude.webp",
+   "bytes": 93298,
+   "sha256": "9195e595fa2640807e348843d3ce220b351de97ce6b6970113a85f46b2f04900"
+  },
+  {
+   "path": "img/admin-5-theme-designer.webp",
+   "bytes": 78556,
+   "sha256": "ccdb1551ab90b98ddd3f244442ae01467ed65a414452995ed7449fd2fedb5592"
+  },
+  {
+   "path": "img/admin-6-team.webp",
+   "bytes": 28028,
+   "sha256": "c510d99458006b0b3087c1ea94b4ce3c291de807cc4eae6b7fecc6107636d621"
+  },
+  {
+   "path": "img/admin-7-background-styles.webp",
+   "bytes": 76380,
+   "sha256": "2f8e9a06d05434072cb872675673d5b7f4b708dd85cf20d83462687d23669026"
+  },
+  {
+   "path": "img/admin-8-photo-background.webp",
+   "bytes": 67188,
+   "sha256": "52cd4035a899a1a254f23ad2b03f3f9eece39f98e6cce9fcbe556783ecd6ed89"
+  },
+  {
+   "path": "img/admin-9-help-manual.webp",
+   "bytes": 82244,
+   "sha256": "816f459212707a2a1c6d832a84e8498ac4be2a55162067eede8f68413bb467aa"
+  },
+  {
+   "path": "img/game-1-lobby-pin-qr.webp",
+   "bytes": 112248,
+   "sha256": "87b5ad8a7b6675c90703d90d1a3dd75c4fe623b2c2741b1e93886c8cbebb7576"
+  },
+  {
+   "path": "img/game-2-get-ready.webp",
+   "bytes": 70520,
+   "sha256": "48aedcd0e5fa7bca637f843034c6c50a884267f5705c89c481dc0ade0d742615"
+  },
+  {
+   "path": "img/game-3-question.webp",
+   "bytes": 69352,
+   "sha256": "3eaccf6d9505103c48db3f32816b4b4bef4017edd6f87ed1dc1d6a85493d09ed"
+  },
+  {
+   "path": "img/game-4-answer-reveal.webp",
+   "bytes": 71166,
+   "sha256": "58062332b3b0b1588a7fb5e5ff14c4f14eefc0649122a79e37863d586861d697"
+  },
+  {
+   "path": "img/game-5-leaderboard.webp",
+   "bytes": 78442,
+   "sha256": "7a6b36169f7577c145451ff22a16dfa2df10a7804e9b1276bc7337768ab96b11"
+  },
+  {
+   "path": "img/game-6-podium.webp",
+   "bytes": 57814,
+   "sha256": "3dc986d8d2d806a4962e01ebec836468f15aa518905b8c86a1a45ec37c47dff3"
+  },
+  {
+   "path": "img/player-1-lobby.webp",
+   "bytes": 59048,
+   "sha256": "00f9fdcbf92615243e54f2d2b23299031c3e510ffaf43ff04639ad472fe85ea1"
+  },
+  {
+   "path": "img/player-2-answer.webp",
+   "bytes": 50908,
+   "sha256": "53b3a2d1f1b92fb09dd47a11ae666986563a9d4da9d6ac84436377809d62797e"
+  },
+  {
+   "path": "img/player-3-correct.webp",
+   "bytes": 51362,
+   "sha256": "651f1ca32d94a5530be0daf8eeff2e5d323e41d213e1a887f5a475862f7240fd"
+  },
+  {
+   "path": "img/player-4-not-quite.webp",
+   "bytes": 56592,
+   "sha256": "acb5eb0718d08901e4c4908be82494cdb4b7d3aca9cd0ed4b9a248fe6a8bfbcb"
+  },
+  {
+   "path": "img/player-5-podium.webp",
+   "bytes": 55340,
+   "sha256": "47315d7095d0da70ee841c97c4e0d13ca5a0160a46fa7a62dd6cf9fec6884348"
+  },
+  {
+   "path": "img/player-6-help.webp",
+   "bytes": 125762,
+   "sha256": "2b6cfd0dce1a1789690eba4c1ff3a0b170e9a3bb5eac13dc09e4e25d329a42a9"
+  },
+  {
+   "path": "index.html",
+   "bytes": 14631,
+   "sha256": "43e06c32cf6b93488eec6ec520b34c2e9302edf6c6a23250060de2760c9f0cf8"
+  }
+ ]
+}

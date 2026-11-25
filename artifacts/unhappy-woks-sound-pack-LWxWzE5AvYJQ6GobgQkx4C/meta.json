@@ -1,0 +1,253 @@
+{
+ "title": "Unhappy Woks Sound Pack",
+ "url": "https://claude.ai/artifact/LWxWzE5AvYJQ6GobgQkx4C",
+ "type": "web page",
+ "updated": "2026-11-24",
+ "files": [
+  {
+   "path": "ash_launch_1.mp3",
+   "bytes": 15196,
+   "sha256": "d4e6d0f835dcf08243d9420eab6ef0f319eda1fdd6a03ce0cfe814b924472f8b"
+  },
+  {
+   "path": "ash_launch_2.mp3",
+   "bytes": 11800,
+   "sha256": "09da81b41d115be06283081f813a19afb76584147b8fea4416f663b646e62d92"
+  },
+  {
+   "path": "ash_launch_3.mp3",
+   "bytes": 10233,
+   "sha256": "f5f45203f35a99a58356c7b2453156ba8649a87cd2eb9d140545793af8e1ed81"
+  },
+  {
+   "path": "ash_oof.mp3",
+   "bytes": 7621,
+   "sha256": "97b07f1ee2c071b23c84877ba5793f5104b14b4d4b752e96e792ec74f239112a"
+  },
+  {
+   "path": "ash_power.mp3",
+   "bytes": 8404,
+   "sha256": "6b182ab51a196584eb22aee3ebfa523c995d73de14940be80b42d15e42effe32"
+  },
+  {
+   "path": "boss_break.mp3",
+   "bytes": 29825,
+   "sha256": "7fc64bb7535de2de4592419318f88dd972b3a5258b5215df7b003d4d7476df9e"
+  },
+  {
+   "path": "boss_hit.mp3",
+   "bytes": 11800,
+   "sha256": "badc61c297b0b3853249a50a94127380eb82b6c08c33da5052eb29c2b3f4ab90"
+  },
+  {
+   "path": "boss_intro.mp3",
+   "bytes": 23816,
+   "sha256": "5b45c8481afbf23ca2e9389c167715db3fda5094376384500a19192a61a854fd"
+  },
+  {
+   "path": "bot_break.mp3",
+   "bytes": 11800,
+   "sha256": "a21d243ec9ee9961e3f5f1e211d4d858f5b7179d2a09087d33eefad123aeb111"
+  },
+  {
+   "path": "bot_hit.mp3",
+   "bytes": 3441,
+   "sha256": "67bf32d8d2d22f59f0d1ab7491c2beb187c8214e7451462654477d4841b4b9f9"
+  },
+  {
+   "path": "bramble_launch_1.mp3",
+   "bytes": 8143,
+   "sha256": "beb17705d4c815b30a09c048ea04bf9fa47c5dbf81681bbc4ac51c0c226355dd"
+  },
+  {
+   "path": "bramble_launch_2.mp3",
+   "bytes": 7882,
+   "sha256": "577caab1d19e9699a95be3dda21a1b2c132b405c48c2708af7e0416470b3bf21"
+  },
+  {
+   "path": "bramble_launch_3.mp3",
+   "bytes": 9188,
+   "sha256": "0abc9a48f49a7eb75e5b890a6f444f74efe301fde6dd2dc061e3dc2fec9c4eb4"
+  },
+  {
+   "path": "bramble_oof.mp3",
+   "bytes": 4486,
+   "sha256": "53c41a56d12c619691d79d721268f10a2cfb73811f18b481d1b4f1f829749890"
+  },
+  {
+   "path": "bramble_power.mp3",
+   "bytes": 6314,
+   "sha256": "5324b80697b7bf31f9363b64c03f10a2a1afc314c554769f5587afa8327f74bf"
+  },
+  {
+   "path": "grumble_1.mp3",
+   "bytes": 13890,
+   "sha256": "f30eb8f68e2e1930a8067158d6bc794435b1bdca855291750fbd8c8534dfa1a1"
+  },
+  {
+   "path": "grumble_2.mp3",
+   "bytes": 8143,
+   "sha256": "87a1204ff145a28fd2a1ce34e831552805767c023de07067214240b8fe6b3053"
+  },
+  {
+   "path": "grumble_3.mp3",
+   "bytes": 11800,
+   "sha256": "87dbdf24f8bbcbdbcbbed724cd1d9c484642f44766e441344591e7101ccc249e"
+  },
+  {
+   "path": "grumble_4.mp3",
+   "bytes": 11800,
+   "sha256": "15561e0053cf1324d9b81c79435874323fd1189bfaa1ad995913d9e0a078a1b1"
+  },
+  {
+   "path": "ice_break.mp3",
+   "bytes": 12061,
+   "sha256": "87ef9d153357c4d8ebd2476e5a9ff16c207181b74761aefa150efdb31ecde927"
+  },
+  {
+   "path": "ice_hit.mp3",
+   "bytes": 6576,
+   "sha256": "b78cb764009d7e751b4ac873a13e49bd55dbf3df76cf59b71f7cc7993bb34f68"
+  },
+  {
+   "path": "index.html",
+   "bytes": 4093,
+   "sha256": "4934e70dc0ad78c197df22f0e78b4d1b005e4f4e51bfcd34382f942c899a1596"
+  },
+  {
+   "path": "launch.mp3",
+   "bytes": 6053,
+   "sha256": "659e89cdeefb98e4d65125ccfe2b32a1ce57b165b72adb2c32ccc3fe80bbcfef"
+  },
+  {
+   "path": "manifest.json",
+   "bytes": 4624,
+   "sha256": "ffe958df5368c2c8ee430b5dfec1d8975fc1f5c2f4c443454493c870aa9c2dff"
+  },
+  {
+   "path": "menu_loop.mp3",
+   "bytes": 334829,
+   "sha256": "5c76810fb94ea43709332fa33350f9a8ff7a89895165a195385f71a2ab23da61"
+  },
+  {
+   "path": "metal_break.mp3",
+   "bytes": 19376,
+   "sha256": "72d0b05db2661761cca62c1512b218c8896f6b8e02b59d0468ce8d8ef46a4087"
+  },
+  {
+   "path": "metal_hit.mp3",
+   "bytes": 13629,
+   "sha256": "075714e7f49e3dfdaf4e4e4dd832cd3f746c5c03de022ed61ccc996cc411e4c3"
+  },
+  {
+   "path": "pip_launch_1.mp3",
+   "bytes": 11278,
+   "sha256": "095a448b1cb929226aa7c5a3732252d205002ff65896cab47a9ecbfd57850398"
+  },
+  {
+   "path": "pip_launch_2.mp3",
+   "bytes": 7621,
+   "sha256": "556c68b19f9b9a67371d1349e6cd36a1861ffc0758b332fa12b9543bb851a154"
+  },
+  {
+   "path": "pip_launch_3.mp3",
+   "bytes": 11539,
+   "sha256": "1dca1953484beecdc6ee6e52f29708915d8bd713b8eda2b1cc952a508cfd9bf5"
+  },
+  {
+   "path": "pip_oof.mp3",
+   "bytes": 4486,
+   "sha256": "eab225758dce7dd862ce4cddae8da6f89cc6d0fff2b5aad4d13f2834484d014c"
+  },
+  {
+   "path": "pip_power.mp3",
+   "bytes": 4747,
+   "sha256": "c0d3b806b025a4c6f944c535f2d73be8065e0c02ff2600db73dec4737bc03119"
+  },
+  {
+   "path": "sentry_break.mp3",
+   "bytes": 18592,
+   "sha256": "ef7f62f64b9e527f3202d353f2de3e2eb3ecd0fb20ac37fbe7a740d4cfadffca"
+  },
+  {
+   "path": "sentry_hit.mp3",
+   "bytes": 2919,
+   "sha256": "703b665b7eb465f4678f011ec6cf6cf01d0839386112ef03b6216e7ec41a0a02"
+  },
+  {
+   "path": "soot_launch_1.mp3",
+   "bytes": 5531,
+   "sha256": "94a5888ec38aefb6512bcb3793026bf4172e402ebd276a5b3d5aa2752718c621"
+  },
+  {
+   "path": "soot_launch_2.mp3",
+   "bytes": 9188,
+   "sha256": "3abfbc73131aa07693eff65e05de025c20160196332f3af56092c4731e9aa757"
+  },
+  {
+   "path": "soot_launch_3.mp3",
+   "bytes": 10755,
+   "sha256": "a30373e6cbe8173029fc36d59e92605a57cda85cb5436d93ef05f9f21ded8bcb"
+  },
+  {
+   "path": "soot_oof.mp3",
+   "bytes": 4486,
+   "sha256": "532678e2e9be6231439d95a9f53b36dbdcc74c6dc8202585f57ff5e69c7f05e4"
+  },
+  {
+   "path": "soot_power.mp3",
+   "bytes": 4747,
+   "sha256": "51e139b0b659b4c0764ffaa6186ef315a62ace559e83d74a1e006999b4c29c5c"
+  },
+  {
+   "path": "stone_break.mp3",
+   "bytes": 15196,
+   "sha256": "332d084fa6cf9e2d8dbe79226431dbce7028c9a223a18668530477ea9ced0bed"
+  },
+  {
+   "path": "stone_hit.mp3",
+   "bytes": 3702,
+   "sha256": "37f8e8bf1845b0860ddefa3098da9de247946903320b2c3d5f78e5b3eb15cde8"
+  },
+  {
+   "path": "thornback_launch_1.mp3",
+   "bytes": 12323,
+   "sha256": "3cb787239ccaaffbe58a647a0f01592062e0494b3f5131b6da42ac4207b555fb"
+  },
+  {
+   "path": "thornback_launch_2.mp3",
+   "bytes": 11800,
+   "sha256": "12529c33ad117af2a6ad13e2cebbf287b97177e6d6b593ccd48d421b03129f3c"
+  },
+  {
+   "path": "thornback_launch_3.mp3",
+   "bytes": 13890,
+   "sha256": "fcef8a0d9aca12bc273c3c2977d9423ab1d110589a527fe1ca90d7069e900f2b"
+  },
+  {
+   "path": "thornback_oof.mp3",
+   "bytes": 7621,
+   "sha256": "841d779dc04f94fa175aef2098f8a22bdaa1b4804ddb81cf1392c274882dc611"
+  },
+  {
+   "path": "thornback_power.mp3",
+   "bytes": 11800,
+   "sha256": "f3bafba04e541e47750d66338d056eabc54d769d48924bbffd6f14d5bd471161"
+  },
+  {
+   "path": "victory.mp3",
+   "bytes": 130865,
+   "sha256": "04997ffa487f8ac7c4e341934e451c603f975c8ada28a89d0163ebb96fdb31e7"
+  },
+  {
+   "path": "wood_break.mp3",
+   "bytes": 6576,
+   "sha256": "bbf714dab6ae6714af39cbc906ee6693d7e2336cf3c4b6e4b2e8b76fef3bb8fb"
+  },
+  {
+   "path": "wood_hit.mp3",
+   "bytes": 5270,
+   "sha256": "963d9db5a6014341a50feaa2d16487311b1eaacab2f28c004af7209f092c2d70"
+  }
+ ]
+}

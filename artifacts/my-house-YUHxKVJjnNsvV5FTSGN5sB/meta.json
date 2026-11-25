@@ -1,0 +1,1403 @@
+{
+ "title": "My House",
+ "url": "https://claude.ai/artifact/YUHxKVJjnNsvV5FTSGN5sB",
+ "type": "web page",
+ "updated": "2026-11-23",
+ "files": [
+  {
+   "path": "arcade.js",
+   "bytes": 5835,
+   "sha256": "d25f64598b9a6eccec0623f4fc2c68db1f549de805c8fa536214dbadbb8d3d93"
+  },
+  {
+   "path": "emu/LICENSE-EmulatorJS.txt",
+   "bytes": 35111,
+   "sha256": "a617fab6d251b3302b1cb2c1c94f52d1c584f6fcb2fc218ec1a475bc08053a61"
+  },
+  {
+   "path": "emu/cores/LICENSE-mame2003.txt",
+   "bytes": 7937,
+   "sha256": "ba6c4d2d81531ba22fe9d2cf6ce6b4787b7c7e5fc4bcdfe4aa4c2012508f9549"
+  },
+  {
+   "path": "emu/cores/core.json",
+   "bytes": 349,
+   "sha256": "cd01e55bb6ab14de0541af829c08f3cb2de2a7556ed3fbf1526cbfa9280a84fe"
+  },
+  {
+   "path": "emu/cores/mame2003_libretro.gz.wasm",
+   "bytes": 6822942,
+   "sha256": "5b8d0467e3c9d318f003336e7ab5661ce6d618a04f981e557967c5b2c56d2e39"
+  },
+  {
+   "path": "emu/cores/mame2003_libretro.js",
+   "bytes": 277713,
+   "sha256": "7addea3760c1dc06794ab3af884a0f42593cba9cf3d0c8a2beac01baa720b517"
+  },
+  {
+   "path": "emu/emulator.css",
+   "bytes": 33532,
+   "sha256": "0ba5b1ce183b6ecb95c17e54e89fbae77697ebb94ec23caca5fd19f9b569defe"
+  },
+  {
+   "path": "emu/src/GameManager.js",
+   "bytes": 19048,
+   "sha256": "f026130eda3648557498c54c70cbb5b36fd71b088e7e42e5a13e413aab11d888"
+  },
+  {
+   "path": "emu/src/compression.js",
+   "bytes": 6409,
+   "sha256": "bd6723ec29fee8de81118cfbddfcb53301b8f41f7c6fb22c2de44dedbf111c2c"
+  },
+  {
+   "path": "emu/src/emulator.js",
+   "bytes": 341944,
+   "sha256": "24c2c46e88b1a41062ea54e825cc70a312e384bff4dbb6d6dd38c1f8574c18d5"
+  },
+  {
+   "path": "emu/src/gamepad.js",
+   "bytes": 6054,
+   "sha256": "27707ee9256cf3e1a6f32d1c3c42f2aed991d637773699fff566008229cc09c8"
+  },
+  {
+   "path": "emu/src/nipplejs.js",
+   "bytes": 20259,
+   "sha256": "cf745190f5dc5db942ad54f5683d56c6d6da445646f4b4fc23c049c9985a04df"
+  },
+  {
+   "path": "emu/src/shaders.js",
+   "bytes": 139565,
+   "sha256": "79bcd4c35740b2858fc28f2f1894ddb8f483f1aba6f564869a713515726fe902"
+  },
+  {
+   "path": "emu/src/storage.js",
+   "bytes": 4600,
+   "sha256": "06759f310bb2d782d2728e1d3417a0d8f613eff935d2959c1a705670041a6f2e"
+  },
+  {
+   "path": "games/_runtime.js",
+   "bytes": 10826,
+   "sha256": "54b4f734efc6db7a4d1d19b84e377b6011b4612221abd5b9e2dbb04901053935"
+  },
+  {
+   "path": "games/acesofpacific.js",
+   "bytes": 72379,
+   "sha256": "94a8a21ecbfac80cfb20801bd5ac64154549f3e92567e901499a38aaa873b06c"
+  },
+  {
+   "path": "games/acesofthedeep.js",
+   "bytes": 67396,
+   "sha256": "6177c9ea7883ced2c216e4802379c3339fbc9f6fd676278919b5b6c4c7a96d45"
+  },
+  {
+   "path": "games/afterburner2.js",
+   "bytes": 51164,
+   "sha256": "3de5ed3045090e8be23ad997682827b60e61394dddf8d706070023677aa9b9b3"
+  },
+  {
+   "path": "games/alphamission.js",
+   "bytes": 50591,
+   "sha256": "14f134396980d118b711953aab45f76927d8e478c5c3a1ad8d2679c8fc21fc9a"
+  },
+  {
+   "path": "games/amidar.js",
+   "bytes": 25652,
+   "sha256": "6815565dc6a388a17137d88c73b4fb47a4da04140cbe6ebc5a61effd854e5e64"
+  },
+  {
+   "path": "games/apb.js",
+   "bytes": 38034,
+   "sha256": "f28310a783f8e16db217af710132f366e721a596b592b595836522e99f2ae339"
+  },
+  {
+   "path": "games/arkanoid.js",
+   "bytes": 49448,
+   "sha256": "62b48bd4ccf3dede748d1ef1bf0f0a2bfcfae59f61149c68c0a52d38493734a5"
+  },
+  {
+   "path": "games/armorattack.js",
+   "bytes": 25142,
+   "sha256": "010f07666310b726f54f0591be50dce73a41be4f9b0be097e83c766c6d55b5c1"
+  },
+  {
+   "path": "games/asteroids.js",
+   "bytes": 20486,
+   "sha256": "238decf67c895dc638a5e2d0d99c1b997e608eb04cd945f1abbc9cd3c391c3f9"
+  },
+  {
+   "path": "games/asteroidsdeluxe.js",
+   "bytes": 27002,
+   "sha256": "20d00417fa1887b259ff2973bdac857d906fcd704a93d29f8079e587fedc7378"
+  },
+  {
+   "path": "games/astroblaster.js",
+   "bytes": 33271,
+   "sha256": "23287d584b07f97d1b6e87eca2154acbf225bc59675e0b7459806ffacaad5ccf"
+  },
+  {
+   "path": "games/atetris.js",
+   "bytes": 31527,
+   "sha256": "60710aa4f2303a09bc6b8a8f1c3e82f69d14b3df2f356c57d10a17022e6254fc"
+  },
+  {
+   "path": "games/athena.js",
+   "bytes": 55032,
+   "sha256": "3d65828be4be4f15b1f819bba768d8d6611c80d6ee3c4385b6f04ad8ac883f3f"
+  },
+  {
+   "path": "games/baddudes.js",
+   "bytes": 59973,
+   "sha256": "10bb7115d0b4c74006ea06f7696bf8d4e6406b28d96314508cba3e6143f465e4"
+  },
+  {
+   "path": "games/bagman.js",
+   "bytes": 33406,
+   "sha256": "dfe860f3b1bbb4cd4ba0f87d111ae8678a7f3450cde398b5ee08149bafa53388"
+  },
+  {
+   "path": "games/battleshark.js",
+   "bytes": 51850,
+   "sha256": "a70b6436944481915eeecb283e5b21be53d3e78de856c72171a0eb1d26facc03"
+  },
+  {
+   "path": "games/battlezone.js",
+   "bytes": 35581,
+   "sha256": "ceedb64791f706c91a2b9b83e8f81c37be411c7b92705b272d582913b678fc33"
+  },
+  {
+   "path": "games/berzerk.js",
+   "bytes": 31204,
+   "sha256": "4fcb1d198e76349699c8065848223e167f8511dac1b77611ca0c967db27caf21"
+  },
+  {
+   "path": "games/bioniccommando.js",
+   "bytes": 46040,
+   "sha256": "4c9d752b89d1f0f9b387eecc8a134f65cd69900079f542e2465ac4881b0cfc65"
+  },
+  {
+   "path": "games/blackwidow.js",
+   "bytes": 28725,
+   "sha256": "2eb76aa1f136beb72917b91d0f6f4be9ad6afc34d91cee52c076d0379c840a93"
+  },
+  {
+   "path": "games/blakestone.js",
+   "bytes": 108862,
+   "sha256": "e72300257952f64d017e3a73de7bfd2c72acbf36dcd6a6362e6270f9b4e9aa07"
+  },
+  {
+   "path": "games/blockade.js",
+   "bytes": 21745,
+   "sha256": "8636c20369ebbfbfdd2491fbde16907086e48b7d27d5f920a10fb8a709ec0548"
+  },
+  {
+   "path": "games/blood.js",
+   "bytes": 112508,
+   "sha256": "8c0b5c89027583cc9a4d19bb865a7ee86de3ec2c412d149be9ccdb8369638316"
+  },
+  {
+   "path": "games/bombjack.js",
+   "bytes": 35864,
+   "sha256": "a65d615d71fe26a5439ac93531d6988a53d60725ff5098848253d72fb0b42fdf"
+  },
+  {
+   "path": "games/borderline.js",
+   "bytes": 36524,
+   "sha256": "3c6ba3dcc0dd0aaad8cd6e4fce15aa3ab08234c514cb11ca9f1e4d921d6330fc"
+  },
+  {
+   "path": "games/bosconian.js",
+   "bytes": 36139,
+   "sha256": "12c60882488058e50b1c4f7a9b3e4f43f03265c01a0fb110c93355cf70d1ecd2"
+  },
+  {
+   "path": "games/breakout.js",
+   "bytes": 14099,
+   "sha256": "a72239ca6d02ea8fed105042f3322e2f6652d12ac8f51d0569b9f711da504631"
+  },
+  {
+   "path": "games/bubbles.js",
+   "bytes": 31953,
+   "sha256": "c65d6dcac91338c0009d29fe8dd0fc7bf7940ceab49be46253ee6bf3755781b8"
+  },
+  {
+   "path": "games/bublbobl.js",
+   "bytes": 70418,
+   "sha256": "ceb367ef2731216e466abefa69a7ad0f39d66f879673fa2853afb48074d7fe6b"
+  },
+  {
+   "path": "games/bumpnjump.js",
+   "bytes": 34723,
+   "sha256": "c49858d678e1c49b44c082dc7b4cc17ff9047029e309ab189a973e25445b5457"
+  },
+  {
+   "path": "games/burgertime.js",
+   "bytes": 39241,
+   "sha256": "c8dcbb52d3f798e03528e3aee386ce0ed1822c4ea9a2199d4523c520c984e0f8"
+  },
+  {
+   "path": "games/canyonbomber.js",
+   "bytes": 20302,
+   "sha256": "7b019de39ca45c22e0eb1be894bffb3ec9905b0bccdef7e4bff51c855f88b1e9"
+  },
+  {
+   "path": "games/captaincommando.js",
+   "bytes": 108942,
+   "sha256": "315d5f318b67358dffe060ddcb26fed59c2cd5060583dac1c2c106a465f069bd"
+  },
+  {
+   "path": "games/carnival.js",
+   "bytes": 30464,
+   "sha256": "ee8f66799c95340007dd12526b29a2493503981eaafb38f95279add1d099ff66"
+  },
+  {
+   "path": "games/carrierairwing.js",
+   "bytes": 61197,
+   "sha256": "48e08a5354975c622169cfa28d5d804de07c8c433f50b471978e3806992e20ac"
+  },
+  {
+   "path": "games/cavemanninja.js",
+   "bytes": 59696,
+   "sha256": "fc70e67a311396610fa879132aa03c77260907cdbb3951231998744345006257"
+  },
+  {
+   "path": "games/centipede.js",
+   "bytes": 30960,
+   "sha256": "d0a56c7daef9de1d60441d4ce4e9a781bfc93544c7828b55542d5a19cff8a32b"
+  },
+  {
+   "path": "games/chasehq.js",
+   "bytes": 48081,
+   "sha256": "772a4ead2fd25dde194942ad5a7d870f0a7e5d0df5f6418fcfef7d677f4da1d5"
+  },
+  {
+   "path": "games/checkman.js",
+   "bytes": 31460,
+   "sha256": "fc3d0e2e3b315157da94cd6f06b997c9a93da4a7e1fbbfdfb32915ccfcb46009"
+  },
+  {
+   "path": "games/choplifter.js",
+   "bytes": 38534,
+   "sha256": "7f1b4b438c183b97b4054d6c2e6228fc0ab11c3e95d56354df3db11821baf103"
+  },
+  {
+   "path": "games/circus.js",
+   "bytes": 18910,
+   "sha256": "4fa83572e8c656a3981b33675852dd4fed7c699c3f632b1b9bbaa6c725c72fec"
+  },
+  {
+   "path": "games/circuscharlie.js",
+   "bytes": 38672,
+   "sha256": "d13dc32a9ed44332e7596b73fa9dedf97cee2550b6b2e639e25f7765315c03ad"
+  },
+  {
+   "path": "games/columns.js",
+   "bytes": 25377,
+   "sha256": "57c600a23bcfe1d4f7b22613b7314515adee9f6e3b86e0cad58a57c98120d196"
+  },
+  {
+   "path": "games/comanche.js",
+   "bytes": 72483,
+   "sha256": "7ae20ec3e81a675e04bdda7b818f984240ec34c16d3cb31bdb89cbdf9c472d08"
+  },
+  {
+   "path": "games/commando.js",
+   "bytes": 45023,
+   "sha256": "5acbb6cc252bad6dcb25612370f922de5adf2664004cc59743dd82bd902bdf43"
+  },
+  {
+   "path": "games/congobongo.js",
+   "bytes": 42014,
+   "sha256": "b7596843ce27e9708e7f75369f36377b9d8f7c101e3122264146d4fdf04cfbea"
+  },
+  {
+   "path": "games/contra.js",
+   "bytes": 59317,
+   "sha256": "e918503ed0693e093873eda8913a6995b66c4ee5ff8033f9d3523256e9279b9d"
+  },
+  {
+   "path": "games/cosmicavenger.js",
+   "bytes": 28819,
+   "sha256": "8f670d129708f8c5fbb4b7db82a0415e6ab4aeb051e51b7c0cbd5c85a88f79ca"
+  },
+  {
+   "path": "games/crazyclimber.js",
+   "bytes": 33915,
+   "sha256": "e53c1273bf12bfd3d451e1fa6e5db4a86c165c20a2aad59acf3154f55e46d715"
+  },
+  {
+   "path": "games/crushroller.js",
+   "bytes": 23981,
+   "sha256": "12078288600165d10ecf8b980bcf7e6bce2729f18c9fcbbb75ae4ba171ace1d7"
+  },
+  {
+   "path": "games/crystalcastles.js",
+   "bytes": 34261,
+   "sha256": "4f4fdf0f3057b0cba336fdd280ce60415457797459b52a427990644d420387ba"
+  },
+  {
+   "path": "games/cyberball.js",
+   "bytes": 41567,
+   "sha256": "2310f6ae87b5f9753063f7e5de8d8a5389dd7fa9bd107893727adcbeeff54eac"
+  },
+  {
+   "path": "games/darius.js",
+   "bytes": 51214,
+   "sha256": "f80fdf234cfb669be2e8c6a6ed0209001739bd932e751d8470de50289388fa3e"
+  },
+  {
+   "path": "games/deathrace.js",
+   "bytes": 22779,
+   "sha256": "feff7d6392023f38d1540b6214e86b99191d681e441e2bdc40bb43a576c10145"
+  },
+  {
+   "path": "games/deerhunter.js",
+   "bytes": 109546,
+   "sha256": "b34b159ef18e04e10e33519df79693d45bf2198443e6cd2c69cd3d1e07a72df8"
+  },
+  {
+   "path": "games/defender.js",
+   "bytes": 33952,
+   "sha256": "977657040075939633a61c36a313208078a5b211bc683d4bfeccf6b88999c25b"
+  },
+  {
+   "path": "games/digdug.js",
+   "bytes": 48821,
+   "sha256": "6b0d014cdf75881163ebfd4dd6ecb85e1ad6cef00b6d7a2184e2351b9d704bb2"
+  },
+  {
+   "path": "games/digdug2.js",
+   "bytes": 40936,
+   "sha256": "5786d12726df67e02284008f78c6c0ec75bbf2538d4f9360f5bf50ee9036524b"
+  },
+  {
+   "path": "games/discsoftron.js",
+   "bytes": 30901,
+   "sha256": "0841985f480e65f73e0faa2c5369f20c59a4e58b762101b5bc1e71bbe0f12b8c"
+  },
+  {
+   "path": "games/dominoman.js",
+   "bytes": 26983,
+   "sha256": "5e44b6fa357b8ecc0fc21772d53f4893ec527c9cb0126d585d00aa8920bb67be"
+  },
+  {
+   "path": "games/donkeykong.js",
+   "bytes": 76494,
+   "sha256": "abd31f99e01b97bcb196c4f1f8d1a77b81d979acd159061afe2695db1631be2d"
+  },
+  {
+   "path": "games/donkeykong3.js",
+   "bytes": 32693,
+   "sha256": "1766997c864285e8cc2592cf3a3afabf4aaf0c677726b96eb82d892353b84641"
+  },
+  {
+   "path": "games/donkeykongjr.js",
+   "bytes": 54952,
+   "sha256": "3fe291cdc45a09d822cae64f3e63e6a0f42b5e7608c824a7984cc6f7301183de"
+  },
+  {
+   "path": "games/doom.js",
+   "bytes": 157662,
+   "sha256": "447f770031f18002e4881dd320c900ba8fa390d407725d860bc0895c4e2b6052"
+  },
+  {
+   "path": "games/doom2.js",
+   "bytes": 163762,
+   "sha256": "b3524c9d8944b9a7ab34c93865cf3014e02a8139e7bd96fd3f4f5321913c23fb"
+  },
+  {
+   "path": "games/doubledragon.js",
+   "bytes": 57388,
+   "sha256": "76bd82a6f1c85b72cdc2ca9b42c85f4f1bbe9f1867684be30a00837bc76b7eb3"
+  },
+  {
+   "path": "games/dragonspirit.js",
+   "bytes": 39497,
+   "sha256": "adc3660b97ef79ed22dafb217c2c950bdde51ac978b4298116abc93a23b6090f"
+  },
+  {
+   "path": "games/duckhunt.js",
+   "bytes": 53572,
+   "sha256": "fc94640bd490a6cac73776e08ce6552efc0c6751a83970d0803b6d99b1f277b3"
+  },
+  {
+   "path": "games/duke3d.js",
+   "bytes": 151524,
+   "sha256": "a9b78c684dc3887a4c7e25d0e2e30ff40f9bbbdaa2eb453e476520b45c788dc1"
+  },
+  {
+   "path": "games/elevatoraction.js",
+   "bytes": 40785,
+   "sha256": "2a9a4fab44946df06b41b1fab97483b0e2a8a2eb7104326a7141361fc1b1060b"
+  },
+  {
+   "path": "games/empirestrikesback.js",
+   "bytes": 85595,
+   "sha256": "48d9abcc89b419ffb233417f3ac0ab01e9ce17da6ed77a42eb0f201064d03e5f"
+  },
+  {
+   "path": "games/eyes.js",
+   "bytes": 30056,
+   "sha256": "bf86561b40b78ee4a4a11901b88513aadc03b021a7818139c0a62fdf41904927"
+  },
+  {
+   "path": "games/f117a.js",
+   "bytes": 83686,
+   "sha256": "c2b05818d182f656bf3685be8541cd750b507cb0ef99e14ef2f54c248ecb1a2e"
+  },
+  {
+   "path": "games/f15se3.js",
+   "bytes": 127744,
+   "sha256": "149c7a5526aea9b0b65f39cc83676221f21992467223bc6696d2a553630ea054"
+  },
+  {
+   "path": "games/falcon3.js",
+   "bytes": 114417,
+   "sha256": "5f4d27f71ebf50a15c4da9d28d35dfee3abdb6a232503acb538ad013a48f766d"
+  },
+  {
+   "path": "games/finalfight.js",
+   "bytes": 72453,
+   "sha256": "2eb19c3e3bb770670e83638395595542bb311a85b7a17edb7b4bec4d6bb90c05"
+  },
+  {
+   "path": "games/flicky.js",
+   "bytes": 38975,
+   "sha256": "b51be2e4fff57669cd36a11608a98b2e01a14efd9dbc2096f5db8b722b29c891"
+  },
+  {
+   "path": "games/flightsim.js",
+   "bytes": 64946,
+   "sha256": "b3a435a765c6ea2b763a04cfa9c806256f93a96294fbd341b088b05e7153e25a"
+  },
+  {
+   "path": "games/foodfight.js",
+   "bytes": 30207,
+   "sha256": "f5c4dbaa1f2b682752dac1c4e22468f2510e3bcfecb144369f49ef9b9c63c54c"
+  },
+  {
+   "path": "games/forgottenworlds.js",
+   "bytes": 47204,
+   "sha256": "b342726783711ac19777407321aa0f56aa79538ff87bff2ad1c6a513c567c3fe"
+  },
+  {
+   "path": "games/frenzy.js",
+   "bytes": 43011,
+   "sha256": "019e4fb597f63f56e5b66c305f8c28ecf33863a36e1c32cb21edb7cf34ff08ff"
+  },
+  {
+   "path": "games/frogger.js",
+   "bytes": 37714,
+   "sha256": "d4da069fdafb32aa1ba08517d6ee4474af178d6656cfe29a2bef8ec1f8f456d6"
+  },
+  {
+   "path": "games/frontline.js",
+   "bytes": 39569,
+   "sha256": "94a21e988c57df92de9a03dc74710cb6d9a4821b13c2676c9fa171d4c077920d"
+  },
+  {
+   "path": "games/galaga.js",
+   "bytes": 46290,
+   "sha256": "21c342a3fd13487e273ff85a561df6605118dfdfd98ea76ef44441aa55374a84"
+  },
+  {
+   "path": "games/galaxian.js",
+   "bytes": 26750,
+   "sha256": "cb72579a1ece7c28c4796218d35a3a914c6f0dbdf0e4a6a3f9364174020e06fb"
+  },
+  {
+   "path": "games/game1942.js",
+   "bytes": 37605,
+   "sha256": "40fb8e95054b0150c517ddf7a8614bc5cbf01c46ae101778ea94d79a6d15db71"
+  },
+  {
+   "path": "games/game1943.js",
+   "bytes": 39758,
+   "sha256": "b310da8913ce389d7d94d1a0ec801bed3e89bec2b7df16e25508e0c87e176f60"
+  },
+  {
+   "path": "games/gaplus.js",
+   "bytes": 38173,
+   "sha256": "32775266e59560d2ee60406480ba7e1b0a3723225a299366fdc0e01a04c715bb"
+  },
+  {
+   "path": "games/gauntlet.js",
+   "bytes": 52801,
+   "sha256": "cb79882371876b812106e515a62a6fe96588255b3209b4554468be4f0fb773f3"
+  },
+  {
+   "path": "games/ghostsngoblins.js",
+   "bytes": 65465,
+   "sha256": "1961c0b6d03b93fe7ef7536b92640c995316e0fd4d99cea510c62f139118ccf3"
+  },
+  {
+   "path": "games/goldenaxe.js",
+   "bytes": 105281,
+   "sha256": "77a7b0ee1e0a67acb528e4bf2eb525fdf3cbc8d944b71baccf5b4d70cba25207"
+  },
+  {
+   "path": "games/gorf.js",
+   "bytes": 40585,
+   "sha256": "b57d6ed5def4143c81b1e96064d5014603c3a99af9bf4052016fdcc6a63f5cd2"
+  },
+  {
+   "path": "games/gradius.js",
+   "bytes": 45356,
+   "sha256": "4ed3484cab4e52523a799b311b16b2017e3e9a4c005ffe089cdf1f609134ac2c"
+  },
+  {
+   "path": "games/gravitar.js",
+   "bytes": 30989,
+   "sha256": "92f533dd4398996b2d72a6f8166263fb8ccf54e419bc78eaafd196974fe658c0"
+  },
+  {
+   "path": "games/guerrillawar.js",
+   "bytes": 73783,
+   "sha256": "01a2ce0ef26f30ffdb7592083770eb5c7d63c102e659651ce44c657049832a42"
+  },
+  {
+   "path": "games/gunfight.js",
+   "bytes": 30143,
+   "sha256": "27bee418667014c52e0eac6080d091f5ed8e3dbc240e77078a4e45c5644ad973"
+  },
+  {
+   "path": "games/gunsmoke.js",
+   "bytes": 48200,
+   "sha256": "7ba8354d7f1afc888d30a9130010d1474af10189b198dcf0e075fcde660ce044"
+  },
+  {
+   "path": "games/gyruss.js",
+   "bytes": 34508,
+   "sha256": "108c0ffdd36117359987b10c341dd655656c9645484570ccff9ed537051a47f6"
+  },
+  {
+   "path": "games/halleyscomet.js",
+   "bytes": 32234,
+   "sha256": "cb83506e705d7a811f3d1499f2047a990e436c11c64c6e98d5c8f1297099f47e"
+  },
+  {
+   "path": "games/hangon.js",
+   "bytes": 32349,
+   "sha256": "d41066de9f6a88223368c117bb9a9ee9dbc0d347da4462030f24530655c1a81d"
+  },
+  {
+   "path": "games/headon.js",
+   "bytes": 24455,
+   "sha256": "15499285543f088e20f6b40076e98a2b84a751a51c977d076ded8f65ba3e1408"
+  },
+  {
+   "path": "games/heavybarrel.js",
+   "bytes": 119257,
+   "sha256": "57a0739b981e3ad5d93eb0ef1029e42a2779db01d26024049746e88103b5824c"
+  },
+  {
+   "path": "games/heiankyo.js",
+   "bytes": 27671,
+   "sha256": "23f73e1f4de4160ee970a271612a44740cec927903298f75ea521d38020c5ae1"
+  },
+  {
+   "path": "games/heretic.js",
+   "bytes": 146811,
+   "sha256": "9c54b028aab56f3449b882d0151440ae5a3e84b32c06a65bc5932df5adb908d7"
+  },
+  {
+   "path": "games/hexen.js",
+   "bytes": 151915,
+   "sha256": "d3b5e52b2a4eeaa01e477ce67f0221fcd577a9700e01b5ce2a59e40217a32cbd"
+  },
+  {
+   "path": "games/highwaychase.js",
+   "bytes": 29613,
+   "sha256": "8fd12e3c6920ba7bc8c3076bfaf7ae253ffbd9ff5760b081758982403f454971"
+  },
+  {
+   "path": "games/hunterkiller688.js",
+   "bytes": 64621,
+   "sha256": "d2ee938027407cfd26a4b6815c5ad5abe96ff3800b9ebd97b32be04f49e629f5"
+  },
+  {
+   "path": "games/hypersports.js",
+   "bytes": 39093,
+   "sha256": "782f11df64ddd77c51139cb94ee3a5b256252d34422525c95aef1e3bd619ccad"
+  },
+  {
+   "path": "games/ikariwarriors.js",
+   "bytes": 73189,
+   "sha256": "1816abeb1d2dcc2a275b5452438ebc2ce844eccb775a9f4cfa9f8410f4d8eb41"
+  },
+  {
+   "path": "games/journey.js",
+   "bytes": 51438,
+   "sha256": "f7c56602c4630cfee189991dc3c5ab26f4bf589c3fa00d40ad0e96eddce496b4"
+  },
+  {
+   "path": "games/joust.js",
+   "bytes": 44644,
+   "sha256": "1b4423656b5ef0d23797153e23d59dc975d13b36dd294ce3de5d89481377eac3"
+  },
+  {
+   "path": "games/jrpacman.js",
+   "bytes": 37520,
+   "sha256": "66a1928bc203fb5bdbe4538cb7f05a0e6b7a61cf1a18a4f9adb67ec6f563bbde"
+  },
+  {
+   "path": "games/jumpbug.js",
+   "bytes": 30859,
+   "sha256": "dcb8c384dbe54f71d3780ef7a1296309134cbfe42381344bd1a442e9586209b1"
+  },
+  {
+   "path": "games/junglehunt.js",
+   "bytes": 37364,
+   "sha256": "c704307f9ee993f427e57cbd355e5d6ac346ec7866489d872f53db90ab39f022"
+  },
+  {
+   "path": "games/junofirst.js",
+   "bytes": 29150,
+   "sha256": "d7a391c532795362949289c8f7ca7f348f1121add0a8caa1b599c612fa75dda9"
+  },
+  {
+   "path": "games/kangaroo.js",
+   "bytes": 34899,
+   "sha256": "d36eb4803f27869fc7f6b9b8d86ba70b88499050fcdd22589f4c1f1c1df90e79"
+  },
+  {
+   "path": "games/karatechamp.js",
+   "bytes": 51155,
+   "sha256": "2641a575cb8a4f9257603eb62301cb4e519cd31620f461669921d20660bc21fa"
+  },
+  {
+   "path": "games/kikikaikai.js",
+   "bytes": 52551,
+   "sha256": "219742b15c2ba626f567926627f966f8d47e44af53c3a861d33fc33a7284f993"
+  },
+  {
+   "path": "games/kingballoon.js",
+   "bytes": 24797,
+   "sha256": "c6a87d57097d2ac9a8c441ce419a2b283afe8018e3680ec93127a7454cfc981e"
+  },
+  {
+   "path": "games/kingoffighters.js",
+   "bytes": 73364,
+   "sha256": "dfffa8656687dd57e84bfd129ce5755aec1074262a6b54810aedb2945ca96dec"
+  },
+  {
+   "path": "games/klax.js",
+   "bytes": 24949,
+   "sha256": "0cd86b33c4a2ea6399145a15e22082708465d8ed3564d1674c3a94046b430372"
+  },
+  {
+   "path": "games/kungfumaster.js",
+   "bytes": 46838,
+   "sha256": "5b2a154aa042dc629966107af8e709ac9fe71933b7bbbb7c7517b53e622f6b01"
+  },
+  {
+   "path": "games/ladybug.js",
+   "bytes": 32478,
+   "sha256": "858ed9a74383cd48b917fdfdf5fb64b950c4003753574368db8e3b3f91a244f7"
+  },
+  {
+   "path": "games/loderunner.js",
+   "bytes": 46110,
+   "sha256": "576e3911ef6743989040ffd531cb674d6a57b3e513f8226bf26053599775655a"
+  },
+  {
+   "path": "games/lunarlander.js",
+   "bytes": 25791,
+   "sha256": "fe2ec3184fa77ba45e6b154311b95a116150aeca80badd9469bbe901115f62d5"
+  },
+  {
+   "path": "games/manifest.js",
+   "bytes": 84913,
+   "sha256": "3ed00e6a2ea17e5f10cb48f5d89a242611ae3ddfe499fc749e1e9f8d89313481"
+  },
+  {
+   "path": "games/mappy.js",
+   "bytes": 39650,
+   "sha256": "fc1bb63ca6aec357bde92b9c9cffdcb42c836e95cf28b6574cb0854a7356b5b4"
+  },
+  {
+   "path": "games/marblemadness.js",
+   "bytes": 35142,
+   "sha256": "47c6873c6afecff76b87fff65fc7bb2ddb6901e84d7fac378d33da02e574900f"
+  },
+  {
+   "path": "games/mariobros.js",
+   "bytes": 38396,
+   "sha256": "66d959a6e95364ec37688edfb1adb40959eb7156558d038ca260632b1c9605a6"
+  },
+  {
+   "path": "games/metalslug.js",
+   "bytes": 81185,
+   "sha256": "edaa73eb0334a4cce8a64880b65177cfdbaa0697f22e2d1d3e76f46f8fc951eb"
+  },
+  {
+   "path": "games/millipede.js",
+   "bytes": 35018,
+   "sha256": "e982e8695663f64a154f49de7265bd59ba2fd552e9ef46a80431c3fb59e7ee5f"
+  },
+  {
+   "path": "games/missilecommand.js",
+   "bytes": 30457,
+   "sha256": "3b95e7c896c2473ae90af8f34bd064d04f529d486ffaf765d63cd0ed6cde8056"
+  },
+  {
+   "path": "games/monacogp.js",
+   "bytes": 28599,
+   "sha256": "22e97580b0846e643e8e4bf8aeb7a3f370ee9b0a07409a8f483d66c46fc64434"
+  },
+  {
+   "path": "games/mooncresta.js",
+   "bytes": 30299,
+   "sha256": "46260067a4081a1249693a418fde11ddb59cd4ec6d77d36420869ff5f5cbe0bb"
+  },
+  {
+   "path": "games/moonpatrol.js",
+   "bytes": 28557,
+   "sha256": "1eae6a0b78aa1794491617628dae268bf02055615d57a1b6d68a9a23bb701a72"
+  },
+  {
+   "path": "games/mousetrap.js",
+   "bytes": 30091,
+   "sha256": "203715453fe3e94f23e4215794f4cfd4cedcd09947072742f1fe0134be00424b"
+  },
+  {
+   "path": "games/mrdo.js",
+   "bytes": 39546,
+   "sha256": "a6c6b50e56995fa3602789bcaf1a3120e93a4ddc3187a04f2041718d2e76f5eb"
+  },
+  {
+   "path": "games/mrdoscastle.js",
+   "bytes": 31218,
+   "sha256": "02339df8eb50527807be9b1318793574da648b539ae9e0d34dc6b2e755f351d0"
+  },
+  {
+   "path": "games/mspacman.js",
+   "bytes": 40632,
+   "sha256": "43a81c9ffc5c593f017e14905cbc4412a7ec628bd6e181bf2f423ae970ccafb1"
+  },
+  {
+   "path": "games/nam1975.js",
+   "bytes": 53876,
+   "sha256": "45b3f91cddd44158f83ffa89fe44a45632b5ccf7df53c6a0d66b2fab929a0e5b"
+  },
+  {
+   "path": "games/naughtyboy.js",
+   "bytes": 33613,
+   "sha256": "331938fc80759e02e76967e80ad19df3e1e5abd1b8885a2ef1188c115d0b4d8b"
+  },
+  {
+   "path": "games/nbajam.js",
+   "bytes": 49000,
+   "sha256": "b3c8411f6eccf7f407928378845cbf30612e1fb2fe80e55cf519dc1437a327cc"
+  },
+  {
+   "path": "games/newzealandstory.js",
+   "bytes": 47329,
+   "sha256": "73b6773e302f8867ebda5e1580523e5fd09151ba135072d146c0b1a2bd07a00c"
+  },
+  {
+   "path": "games/nightdriver.js",
+   "bytes": 15057,
+   "sha256": "afdae54aeec4c568a5463cc798addf41be70f52e878def23a7da91113782c05b"
+  },
+  {
+   "path": "games/nuclearwar.js",
+   "bytes": 114808,
+   "sha256": "7c70783d13bc29ec5e1bee07fe23b3093ce2a25d72d474744ca41eab0f42edb2"
+  },
+  {
+   "path": "games/nuclearwaramiga.js",
+   "bytes": 166350,
+   "sha256": "d5e1438e4357337325cdc82a59d9c3a4368ce985df706f4d4c739f1e0d20f5c3"
+  },
+  {
+   "path": "games/omegarace.js",
+   "bytes": 23569,
+   "sha256": "9b377ddcbc7850261d2e8df6ee1c2597d95068328560846e16cb6053bb87dae5"
+  },
+  {
+   "path": "games/operationwolf.js",
+   "bytes": 42817,
+   "sha256": "ff45d48e249b123ac9d0698a3ca7e03fdc29fe76bb23ceea32bfb0ada804d598"
+  },
+  {
+   "path": "games/outrun.js",
+   "bytes": 44544,
+   "sha256": "a7db2da4d9d3608fbab208733794f950583fded5d917b19287280103d954b357"
+  },
+  {
+   "path": "games/pacland.js",
+   "bytes": 42923,
+   "sha256": "e24c201bc64946968bd63a6d51e04074cf325e2b36b64bd68ef7a110ef01f360"
+  },
+  {
+   "path": "games/pacman.js",
+   "bytes": 41174,
+   "sha256": "c80ea1b064d254ba05f7e85c8aa9cf831d3be87acb47d2821da127a445e77a46"
+  },
+  {
+   "path": "games/pacmania.js",
+   "bytes": 41210,
+   "sha256": "038d7390cd3b83e513fb9948220881d03bc48fe1ac83357ad48f863732de2f54"
+  },
+  {
+   "path": "games/paperboy.js",
+   "bytes": 47939,
+   "sha256": "ffda6e6e9a15a71bcf3bea56088515f4d217d6093a8d839a6d1b9ce0827bab14"
+  },
+  {
+   "path": "games/pengo.js",
+   "bytes": 39002,
+   "sha256": "7dec4ead188353085423398590fc38471e83d024b315b75fdfc44f9a353ffdf8"
+  },
+  {
+   "path": "games/pepper2.js",
+   "bytes": 30879,
+   "sha256": "5357f6686152bb55c2c0736839efbb68e46e66df70939ccd8961515718610726"
+  },
+  {
+   "path": "games/phoenix.js",
+   "bytes": 35325,
+   "sha256": "5b4034b286ee6241cfd422330f8bfa1963519ddd95f146fd69cb0b1c8a7bd0c9"
+  },
+  {
+   "path": "games/poleposition.js",
+   "bytes": 49963,
+   "sha256": "068aee1033e688f2863f4cda10ad192431dc4843ed0a49fc93b3dc8cf1557d9a"
+  },
+  {
+   "path": "games/pong.js",
+   "bytes": 14150,
+   "sha256": "340d3506b45c04939003c03b1f52c487a88b4e88ac0bc797a8fe3d36e0dc4875"
+  },
+  {
+   "path": "games/pooyan.js",
+   "bytes": 31611,
+   "sha256": "9e54ea05c511b95d6b076e805bb1a97393b5421c08e0262f7e72bd34f35651f7"
+  },
+  {
+   "path": "games/popeye.js",
+   "bytes": 38576,
+   "sha256": "fd27f5ac6fe0fa8ccc16436d51317c2a907443cd10992d43c07b7d334b59c285"
+  },
+  {
+   "path": "games/pow.js",
+   "bytes": 56805,
+   "sha256": "8199fc8500f8aa4b4556b54232337db8b38b620301ab937e6d1e0832d9d9d19d"
+  },
+  {
+   "path": "games/punchout.js",
+   "bytes": 42418,
+   "sha256": "acb2c64d8c80ccb57c5e587d968244972bd5d1345e714db256ba7256414633a9"
+  },
+  {
+   "path": "games/puzzlebobble.js",
+   "bytes": 38288,
+   "sha256": "fb9103363c5ba926be7ef904d54174edfd6ea9f1d1960f006ca12994484393b8"
+  },
+  {
+   "path": "games/qbert.js",
+   "bytes": 36494,
+   "sha256": "f352f42a5491712f8263d583ebcd09759e769fcebbe8f5beeb66cd62c4311cf7"
+  },
+  {
+   "path": "games/qix.js",
+   "bytes": 29119,
+   "sha256": "9e928c4cd7bf5d440a2ee662e6675d84ff172061774eead9987ca1a305b5ad50"
+  },
+  {
+   "path": "games/quake.js",
+   "bytes": 119235,
+   "sha256": "6a612fbad9134dde3c8bc60360dce5b720308356b775272afe884a3dedb4e16a"
+  },
+  {
+   "path": "games/raiden.js",
+   "bytes": 63547,
+   "sha256": "066553b1ad14021add21c5ddadd0798e035c40d455421c6ec49feef7a88d2114"
+  },
+  {
+   "path": "games/raidonbungelingbay.js",
+   "bytes": 60283,
+   "sha256": "db2e535cbde4895d844d2a9da6a965a152942b940dc5b759a6e381c08d336c40"
+  },
+  {
+   "path": "games/rainbowislands.js",
+   "bytes": 44917,
+   "sha256": "c1df7abee8becab3a2d8dc54876e13e39ca5341f9e5f03dc4f4429f6f0685cc6"
+  },
+  {
+   "path": "games/rallyx.js",
+   "bytes": 33322,
+   "sha256": "5fb69dca3b93e71cc71404eba3fed7ba6d76de39bc5732aebded3a044f8a779c"
+  },
+  {
+   "path": "games/rampage.js",
+   "bytes": 42303,
+   "sha256": "915f394be58876ed792ebf79a83370e99d78f796a926c2086c6f6fb85f6965a9"
+  },
+  {
+   "path": "games/rampart.js",
+   "bytes": 38114,
+   "sha256": "b7780df70a84feb05af2586b14261c0afb2b88803191e1980acc6bfc516cd888"
+  },
+  {
+   "path": "games/rastan.js",
+   "bytes": 56266,
+   "sha256": "389b3045772a7769d6cbc49dff2cafa9fa5db12def6d704c3d6bf32032fd5c02"
+  },
+  {
+   "path": "games/redbaron.js",
+   "bytes": 30316,
+   "sha256": "3371d197fb4ba1813cb74fd7944f23524469540ff96f60dc6bb7c535876c52e3"
+  },
+  {
+   "path": "games/renegade.js",
+   "bytes": 44147,
+   "sha256": "244f29beb361abcbcb672b534eacadc2be8d0580a19ad48f5511620cdbe2f325"
+  },
+  {
+   "path": "games/returnofthejedi.js",
+   "bytes": 97793,
+   "sha256": "b42c9d1146ab9d4826861af1ad3a3beb8c1fd32d1c4e75aa412902758a8fc95b"
+  },
+  {
+   "path": "games/ripoff.js",
+   "bytes": 22488,
+   "sha256": "879a11bd51654558ef6021e6a4151feb08559a543546b9350503094d1ee92a80"
+  },
+  {
+   "path": "games/riseofthetriad.js",
+   "bytes": 123581,
+   "sha256": "ed73d754f27844d88946404a14a9a9317971f79a5166e0faf27f51946363ecfc"
+  },
+  {
+   "path": "games/roadrunner.js",
+   "bytes": 32260,
+   "sha256": "ea503ea3ec30bd7f6900470266c1a9d62f481ad723c50dcb8defacfc637da294"
+  },
+  {
+   "path": "games/robotron.js",
+   "bytes": 35948,
+   "sha256": "9614299f6e8a44bbc757a6365c103eebd85a6a9a4165dddbf20b71485ab68d8b"
+  },
+  {
+   "path": "games/rollingthunder.js",
+   "bytes": 36905,
+   "sha256": "4659891f8784618a65b45733db7525c602a03710bfdb6d0d6fb2acbb6f19031f"
+  },
+  {
+   "path": "games/route16.js",
+   "bytes": 36924,
+   "sha256": "7c1b6aae4bafc4f3e71181a3d068dd89fdd7c03585b619d66964aeeaa06d5882"
+  },
+  {
+   "path": "games/rtype.js",
+   "bytes": 50227,
+   "sha256": "a7cab60612c4735f4b2ba7ab7fbdf86e94e5750fc584af3bc35e079d61668a70"
+  },
+  {
+   "path": "games/samuraishodown.js",
+   "bytes": 80775,
+   "sha256": "dba74671b07387bcfcb7734ffad344f1214fff86407c720482a942c551cf45d1"
+  },
+  {
+   "path": "games/satanshollow.js",
+   "bytes": 28932,
+   "sha256": "80440f03aaa162a6dc51545d8bd74561bec3c32859a26bd130961dc30d6ddcac"
+  },
+  {
+   "path": "games/scramble.js",
+   "bytes": 29517,
+   "sha256": "2555cc2246f8040630d4e33b6a38e73c842a429b0e9ca6b1de2b56ea4186d1c4"
+  },
+  {
+   "path": "games/seawolf.js",
+   "bytes": 18919,
+   "sha256": "c4db49c1b0a47f3b7e33d3ec966bfab9f7fba9f4940f7bf02ee425a1bdf08fc9"
+  },
+  {
+   "path": "games/shadowwarrior.js",
+   "bytes": 156112,
+   "sha256": "aaf427338bcd2f17ab1825af59296399841a5d559b2e0dd8b0568904acf1eff8"
+  },
+  {
+   "path": "games/shinobi.js",
+   "bytes": 49372,
+   "sha256": "24caff9ddb7ccccb9e9d36e93f0bd7f902ba35a6bb1cbbcbaac4fd77a08713e9"
+  },
+  {
+   "path": "games/silentservice2.js",
+   "bytes": 67250,
+   "sha256": "16a1457f077365991db1baad7a55b56147eabacef4550672e0d8d08ea3b5952c"
+  },
+  {
+   "path": "games/simpsons.js",
+   "bytes": 112367,
+   "sha256": "97dd63204547fb66aab09ed2fa34dbd94228ab7a279057021931dbe6333f4f0b"
+  },
+  {
+   "path": "games/sinistar.js",
+   "bytes": 43009,
+   "sha256": "8eef9616ce927c63d229b2b41c98981f9caaf505f3027102e9937df78c676682"
+  },
+  {
+   "path": "games/skyshark.js",
+   "bytes": 58882,
+   "sha256": "a771aa60bd9266f80e121711fba361f04e6bee3e8e679cd32ffa728b903c7317"
+  },
+  {
+   "path": "games/smashtv.js",
+   "bytes": 47641,
+   "sha256": "07f9eb05682e947edf3449bbd918f55376e90fafbd6574075d9baeff588fd95d"
+  },
+  {
+   "path": "games/snowbros.js",
+   "bytes": 43149,
+   "sha256": "58cfc85138c4c8e820213982f1dc8bfba2f3b14819d4cbd31bb174c562eb02cd"
+  },
+  {
+   "path": "games/sonson.js",
+   "bytes": 35693,
+   "sha256": "de459bf43db54d7c87d6e88f00a48bef699491a730ab333339e039f13151ceb7"
+  },
+  {
+   "path": "games/spacechaser.js",
+   "bytes": 23997,
+   "sha256": "92d97d6d8376fc12166df1cf49335d178fc566250b6e39bcf56d4e731e67f56a"
+  },
+  {
+   "path": "games/spaceduel.js",
+   "bytes": 26138,
+   "sha256": "5f402d86d8c89c88ba5a7b748202e714076666343ee740fb4b1fdfd9148529ec"
+  },
+  {
+   "path": "games/spacefury.js",
+   "bytes": 30274,
+   "sha256": "a304da805de7c1bd3ec90d90bc34fe4b0764cdd65eb20185c4fcadfdc5c901e4"
+  },
+  {
+   "path": "games/spaceinvaders.js",
+   "bytes": 30363,
+   "sha256": "54201929f629ef011b9a927c80ce063bb02458534f9e7a1c84eb33fff9cb4624"
+  },
+  {
+   "path": "games/spacepanic.js",
+   "bytes": 28675,
+   "sha256": "e9cbbca0b70722c57744e8902a7736256e8988f9e3defadeabf936224d8cf767"
+  },
+  {
+   "path": "games/spacetactics.js",
+   "bytes": 28616,
+   "sha256": "46ca5e83c9023ce515cc42b6e97702344cc41d0f70eb3d75a036abd5c51a2c15"
+  },
+  {
+   "path": "games/spacewars.js",
+   "bytes": 22966,
+   "sha256": "1264d2accfbf549c5b69ba51e4a12b253b6e15623ba6fe7a8b96d3959938e566"
+  },
+  {
+   "path": "games/spearofdestiny.js",
+   "bytes": 107941,
+   "sha256": "8702950e20e0221c96d78909b6a056d130e11bc26bb1527d1f57547f5eca5e3f"
+  },
+  {
+   "path": "games/splat.js",
+   "bytes": 30335,
+   "sha256": "641a530b9080e3e6ebdf2b42529d16475fe35c2e1a53a930ce2c37ce4e0f927c"
+  },
+  {
+   "path": "games/sprint2.js",
+   "bytes": 27491,
+   "sha256": "e28c82c61dcdf8816624a3b0d2a00e8a02828e18227ac125e3b7bde1bf996160"
+  },
+  {
+   "path": "games/spyhunter.js",
+   "bytes": 50979,
+   "sha256": "c2bc8ae0224e708d3dd37fc0dc0b156d2090b6c5ef207bb73eb07a135d71aa8a"
+  },
+  {
+   "path": "games/starcastle.js",
+   "bytes": 22184,
+   "sha256": "28164e7d8eb6a24d4fe9020ea0ece066e6056d2f42340932d1070cb68aef197c"
+  },
+  {
+   "path": "games/stargate.js",
+   "bytes": 41176,
+   "sha256": "5d5e159b811fda105f4d9cda746c2ee779b0c92379b5b20b05313125b7f92546"
+  },
+  {
+   "path": "games/startrek.js",
+   "bytes": 37325,
+   "sha256": "bd6728c612bd869ac7eda64ad6a57f2f9676de64216311b423dbe5b593b972b8"
+  },
+  {
+   "path": "games/starwars.js",
+   "bytes": 69206,
+   "sha256": "0af321064b5c96e98a3866620a7020087131a1ca53e0510237f2a91ce10266b9"
+  },
+  {
+   "path": "games/streetfighter2.js",
+   "bytes": 82478,
+   "sha256": "47df453724264b2a1cbbf826bff3c7493d12a2fc2cecaec03c7a64111ab7b998"
+  },
+  {
+   "path": "games/strider.js",
+   "bytes": 57957,
+   "sha256": "81eaf8b07f9961eb6d53ce78f948fe84c5ede2724b28c3316012b872a681a274"
+  },
+  {
+   "path": "games/sub688.js",
+   "bytes": 59808,
+   "sha256": "780466cdcd5275a13ea96897746a61b148591f5f20fa7fbfd0ad2bd8af5c2246"
+  },
+  {
+   "path": "games/subroc3d.js",
+   "bytes": 51979,
+   "sha256": "01d0c80309a371a5e9e193debbf6236dad8711ef09b119b9b7a6bd2db6e33112"
+  },
+  {
+   "path": "games/superbreakout.js",
+   "bytes": 19281,
+   "sha256": "e10a9492221722d7f75a5c6125353abfd8bb3003561bd4c00aafc8265b5c4901"
+  },
+  {
+   "path": "games/supercobra.js",
+   "bytes": 30829,
+   "sha256": "43ed4725c235734161809affb0479faf3cbe2db29e9272cdcc302bfba03ed86a"
+  },
+  {
+   "path": "games/superpacman.js",
+   "bytes": 35430,
+   "sha256": "116aa65d2d9be94587539884f6d14d1eba49fee62c807300a040510a96fd0e0a"
+  },
+  {
+   "path": "games/supersprint.js",
+   "bytes": 35122,
+   "sha256": "da9ad8ac61d543140dd735f63b954222f16cc83dc427e7fcd538bd9dad8a2884"
+  },
+  {
+   "path": "games/tailgunner.js",
+   "bytes": 17999,
+   "sha256": "a0bdaffd3092d8e5502c6290f188704b49619f78c6549e2fce5f958daba89777"
+  },
+  {
+   "path": "games/taipan.js",
+   "bytes": 89365,
+   "sha256": "a022f06142d8ca62b1eb80ce07f212f828da7436a00cc133b3b2b50021a60f93"
+  },
+  {
+   "path": "games/tankbattalion.js",
+   "bytes": 27546,
+   "sha256": "77c38158e077b10e539db9c9ff1691d46c94c1dd8431387f0a6f934ad2edd163"
+  },
+  {
+   "path": "games/tapper.js",
+   "bytes": 32973,
+   "sha256": "1428c4cf07f5ee747598a0b99dce15ef0edab7e85de62ba8ede2c28fc742cc00"
+  },
+  {
+   "path": "games/targ.js",
+   "bytes": 20966,
+   "sha256": "e8d929eb1d629696580aacf438a142daff3eb1c54e05a4a0b09f4b209f569ac2"
+  },
+  {
+   "path": "games/tecmobowl.js",
+   "bytes": 47978,
+   "sha256": "895ff48c6ad0e9ad0b5ec609f055ac954112e9af0a1ed8e50c50ea15b784ce9e"
+  },
+  {
+   "path": "games/tempest.js",
+   "bytes": 38166,
+   "sha256": "90386c67de5f3fa125ba13364d990df85757ca9169607c9fa4afb7b298ca9d88"
+  },
+  {
+   "path": "games/timepilot.js",
+   "bytes": 35278,
+   "sha256": "6d742b9544363b2f4fc2c4f32456f2721456deccccee9448ea2fbabab20b5587"
+  },
+  {
+   "path": "games/tmnt.js",
+   "bytes": 108345,
+   "sha256": "9a6a5636187633fb6758c3d225aa5cde8a169aafceae87403cd82d79eb9ecbe3"
+  },
+  {
+   "path": "games/toki.js",
+   "bytes": 56314,
+   "sha256": "4fc2446ae6a7ee82a1cfc9696cd08f4cf5c324f449aab7552efab5156bc28de0"
+  },
+  {
+   "path": "games/tokio.js",
+   "bytes": 41855,
+   "sha256": "313548f043b513edeb30c3441c2a479d4d766a43a223128c88631272930c9f89"
+  },
+  {
+   "path": "games/toobin.js",
+   "bytes": 32974,
+   "sha256": "c2d1d98a283e33b4b524335d8b0372637e69583e2f480b235f769e125330dc91"
+  },
+  {
+   "path": "games/totalcarnage.js",
+   "bytes": 57680,
+   "sha256": "d0be06c01cbb35fc007fa90c6e1990ca615fcaa8f3594f5bec9933fecb27ba90"
+  },
+  {
+   "path": "games/trackfield.js",
+   "bytes": 40267,
+   "sha256": "f52cc6a204b46077b6e46876aed988dbdb43ac695117ea97d6de415908b3ed60"
+  },
+  {
+   "path": "games/triplehunt.js",
+   "bytes": 52689,
+   "sha256": "b47b83da212c01e96437f66120a4eddfac006e83e77dc83f541f54fb380a7590"
+  },
+  {
+   "path": "games/tron.js",
+   "bytes": 45459,
+   "sha256": "7851f3cfb466c7484c105ac9ecd879b7f867fd64ed654ebdcf73b4b0a9bf137f"
+  },
+  {
+   "path": "games/truxton.js",
+   "bytes": 46527,
+   "sha256": "c7f2fa90d857e907157f2586ebde532c0112f528ba47c61294eb2e0751efe5a0"
+  },
+  {
+   "path": "games/tumblepop.js",
+   "bytes": 44922,
+   "sha256": "c164b811850873a73368850ecd864d80fe16cf9ecf6dd1888c5a15d960cdf21c"
+  },
+  {
+   "path": "games/turbo.js",
+   "bytes": 36169,
+   "sha256": "3acc935ef14f1879c8f0ee671dcdbecf5a31df65df61ba3e8cae01954c35f9e5"
+  },
+  {
+   "path": "games/tutankham.js",
+   "bytes": 35222,
+   "sha256": "d04a622b6d0fc81e527396b8077636c52581b072df3a2f3beb6b169010c2add0"
+  },
+  {
+   "path": "games/twincobra.js",
+   "bytes": 39379,
+   "sha256": "4e19514221dd4dafcf2966cfb635d597b02b36145c8d3932c5c57da096898325"
+  },
+  {
+   "path": "games/usnavyfighters.js",
+   "bytes": 80780,
+   "sha256": "659662ede13660ed44b7ef32af5f36e6dcf730217153b07787d1da9969bcd573"
+  },
+  {
+   "path": "games/vanguard.js",
+   "bytes": 36930,
+   "sha256": "dcb8cd97f2e2290ff59701291b5a57ff6b65e0bbd0da51f666eed598e4b7a485"
+  },
+  {
+   "path": "games/venture.js",
+   "bytes": 33117,
+   "sha256": "9cb9da0c9e3d198af6cb16c513d7e684e2b02f0b7ee45808c11b1eb6dfd10c47"
+  },
+  {
+   "path": "games/wackowacko.js",
+   "bytes": 25823,
+   "sha256": "74b6210676f050366b785e701a64dc5794c97d6cf81e364324631cfc444b1aa8"
+  },
+  {
+   "path": "games/warlords.js",
+   "bytes": 27663,
+   "sha256": "31e603503e8a64caa89c52d9daa71d03ac1287eb928336e659f2da6faee549c9"
+  },
+  {
+   "path": "games/warpwarp.js",
+   "bytes": 31029,
+   "sha256": "5af0ed9311e914811a2cf4d31f8cbd6fc1595aa7c61f37b5c8522edfebab181b"
+  },
+  {
+   "path": "games/wizardofwor.js",
+   "bytes": 33264,
+   "sha256": "100684ed0e29ffaf96a9226d844371e097d834ceb92be292e04d85c4383d1abd"
+  },
+  {
+   "path": "games/wolf3d.js",
+   "bytes": 107771,
+   "sha256": "d9840966104b89057d0ee82bc50956a43b0977f8024e74319c0eaa6f12c2b29d"
+  },
+  {
+   "path": "games/wonderboy.js",
+   "bytes": 47100,
+   "sha256": "93bc49b824ebf2783cef712e4e721c4e7d043ec7dc422a44c0aa048a07339c1b"
+  },
+  {
+   "path": "games/xevious.js",
+   "bytes": 49095,
+   "sha256": "17f24bc3d2faed445f6cbadb057c2043d50d1b6b9b451d72254ade31f2430755"
+  },
+  {
+   "path": "games/xmen.js",
+   "bytes": 106727,
+   "sha256": "edaf3d69a551bd92a5d98c33c9b405e81c4c10e5e3254f2905558d057ad0967e"
+  },
+  {
+   "path": "games/xybots.js",
+   "bytes": 47707,
+   "sha256": "58b6173d89353fe8c338c0b00f6a5333162130d2c94a9684d0d2d2a11874919d"
+  },
+  {
+   "path": "games/zaxxon.js",
+   "bytes": 40281,
+   "sha256": "9ee4643a75b3f0bf89e61c52eab02704f832052c281d44ead1ec33f0f3dd77a8"
+  },
+  {
+   "path": "index.html",
+   "bytes": 31800,
+   "sha256": "50fef124b0e7e40274ba19f9bddfc82f68211628c03c5c2537c4c83ca6c6a459"
+  },
+  {
+   "path": "main.js",
+   "bytes": 177137,
+   "sha256": "4c27deda096cb63bf441069099a037e1f5195bd7b6b792358ba92c1d591968f7"
+  },
+  {
+   "path": "mame-list.js",
+   "bytes": 329848,
+   "sha256": "a66a1fb23d85d1ed99e1b7c34eb5295a5912b804336632162de212daba1e70a1"
+  },
+  {
+   "path": "models/anims.json",
+   "bytes": 2763285,
+   "sha256": "a74e3f1b72aabc62375f1f789be1f86e248282e8560962ead0d3a8675a51fd43"
+  },
+  {
+   "path": "models/boy.json",
+   "bytes": 2441157,
+   "sha256": "476dd6fc105c16939ad33417071650968feb2adb6474c1eb3c9edc49d17ce6e5"
+  },
+  {
+   "path": "models/teen.json",
+   "bytes": 4296357,
+   "sha256": "c472d1c2fd7e351de7fd9ef514fe5744cb2e70a5c744dc433b2fe98b0f879e91"
+  },
+  {
+   "path": "models/xbot-clips.json",
+   "bytes": 3797328,
+   "sha256": "45b8800416408df77fdb7665059ecab962e3e83697bab67bb7d9fccde1a1b468"
+  },
+  {
+   "path": "music.js",
+   "bytes": 11721,
+   "sha256": "5f11bcbb74c84641ef661315f010150bb6afca851f8f88cb05d9bcae1900eecb"
+  },
+  {
+   "path": "pc.js",
+   "bytes": 67724,
+   "sha256": "d337d530f1dc1a4f89aa888c637d102c0c366c1fb4c4940e4d41334d69b56277"
+  },
+  {
+   "path": "teen-anim.js",
+   "bytes": 13901,
+   "sha256": "d316d915bfa6c1bec805f30dcebb8939722d3d1241d79d86d5d4dd6a08755b21"
+  },
+  {
+   "path": "tvshow.js",
+   "bytes": 30199,
+   "sha256": "84f5784c7df4ea9a1986063452da6cca1d18e8aff586d77c9ce18178beb14f0e"
+  }
+ ]
+}

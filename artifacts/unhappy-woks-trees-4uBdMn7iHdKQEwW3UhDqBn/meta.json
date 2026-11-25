@@ -1,0 +1,113 @@
+{
+ "title": "Unhappy Woks Trees",
+ "url": "https://claude.ai/artifact/4uBdMn7iHdKQEwW3UhDqBn",
+ "type": "web page",
+ "updated": "2026-11-24",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 4266,
+   "sha256": "bd138be9caf7704cd66b4e7f4fe01b35ed4729a9159d19e36bf959889190b11b"
+  },
+  {
+   "path": "manifest.json",
+   "bytes": 5401,
+   "sha256": "22dea52bcfc47054e500390d9a059eb63a1751dfc9b051ff402395be171e823a"
+  },
+  {
+   "path": "plant_desert_cactus.glb.json",
+   "bytes": 437186,
+   "sha256": "7a0df8ab9af7d1aa39dfbe76a586b460d5744bfc4042876ccf78d0fb8337ffaa"
+  },
+  {
+   "path": "plant_desert_shrub.glb.json",
+   "bytes": 160561,
+   "sha256": "165457a29cb1d91ca187b8716cc121804f01c18f115ca0b3fa10e73acdc860fb"
+  },
+  {
+   "path": "plant_fern.glb.json",
+   "bytes": 81096,
+   "sha256": "4d19b6fa93c3f1ea6dc3940e25a1adcad4716941df960a0f03cebf32ebe9b30d"
+  },
+  {
+   "path": "plant_swamp_reeds.glb.json",
+   "bytes": 269540,
+   "sha256": "56d03ec592917a9004d23fb50b58580bccad4a26cd9e4e03d49b8410c29ed4a3"
+  },
+  {
+   "path": "plant_temple_fern.glb.json",
+   "bytes": 219040,
+   "sha256": "e707086e303169f8884c591ad9cd399d58e44316cc9ebfa90d95893ae6e2e057"
+  },
+  {
+   "path": "sheet_leafy.jpg",
+   "bytes": 154213,
+   "sha256": "33367adca51eedbaa1848f847345af79b6695d5a0ce62d2c2926d454e0dbcc7f"
+  },
+  {
+   "path": "sheet_woody.jpg",
+   "bytes": 248495,
+   "sha256": "a93e274799ab44a1bd75e6d2e7f98a2a0c7b462d35f7bb852e0a35cdf5ec10c9"
+  },
+  {
+   "path": "tree_desert_dead.glb.json",
+   "bytes": 398115,
+   "sha256": "ce0c44189b6b7c5d52b641ed5f59b0a2f18999c6425c91700124d18e41d7c440"
+  },
+  {
+   "path": "tree_forest_broadleaf.glb.json",
+   "bytes": 587404,
+   "sha256": "b3b89e0c357e62c53efbd15061e73ec77c933e0eb46bba5b17d9ea255de7ac17"
+  },
+  {
+   "path": "tree_forest_conifer.glb.json",
+   "bytes": 623826,
+   "sha256": "bce75f9730ca3cfee75a7fbe889eb8baa4bd282e34dd5bd316e1a077ac8bfbf5"
+  },
+  {
+   "path": "tree_forest_giant.glb.json",
+   "bytes": 564688,
+   "sha256": "613e9cf84393909c1bce2609dc5a6444e3452978efcf0e36d0aabde8ed3f521e"
+  },
+  {
+   "path": "tree_ice_dead.glb.json",
+   "bytes": 579104,
+   "sha256": "077b0334492889340ed8a84ea464209855a9c4244971449c95823fa309a2f2ff"
+  },
+  {
+   "path": "tree_ice_pine.glb.json",
+   "bytes": 645296,
+   "sha256": "f9181d0d15508557ef1dfef78c31b0b2bc6d968f12c0c8f18c4d40180ff751f8"
+  },
+  {
+   "path": "tree_lava_charred.glb.json",
+   "bytes": 350244,
+   "sha256": "a00757372d5bb529ad3322530eb9f2983e383a2a4e66c16523e933e1564f754a"
+  },
+  {
+   "path": "tree_peaks_birch.glb.json",
+   "bytes": 489503,
+   "sha256": "d448603a09a99bb7a3f866058a1003d897760f55162f614326aaabaa0fa7db64"
+  },
+  {
+   "path": "tree_peaks_pine.glb.json",
+   "bytes": 725886,
+   "sha256": "9328749dffa9a9e5ec82825e962059915c226b4e479ec58ce49640a67c88a8a9"
+  },
+  {
+   "path": "tree_swamp_cypress.glb.json",
+   "bytes": 504917,
+   "sha256": "5435f1c490e251468dfc5f00e1770cda696b40b09a7086f5051e3bc6a12da12a"
+  },
+  {
+   "path": "tree_temple_jungle.glb.json",
+   "bytes": 477925,
+   "sha256": "7065b65565a922eb238bede3b7022471c009458a2a273d766a84f4b06b3e95d7"
+  },
+  {
+   "path": "tree_temple_palm.glb.json",
+   "bytes": 423023,
+   "sha256": "920fd957986ad0dcc21c1573d9f7070a5bd31e01f537b9e75d2897cb15fbeac3"
+  }
+ ]
+}

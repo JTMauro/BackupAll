@@ -1,0 +1,13 @@
+{
+ "title": "Craft Studio",
+ "url": "https://claude.ai/artifact/M9fWEdBoJXToL7TMRF6B2i",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 70234,
+   "sha256": "29248df244bce846eb8508a1f451dc6fb58b284de2e681769388b2b4b8a81dbe"
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "title": "Builder Screening Room",
+ "url": "https://claude.ai/artifact/5vMyt8ytsU4KfurHZzAnjB",
+ "type": "web page",
+ "updated": "2026-11-23",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 6243,
+   "sha256": "a4c8365ba74ac206ca682909cc323e380eb8884523856d3cf1108743c56e49b2"
+  },
+  {
+   "path": "media/arena.mp4",
+   "bytes": 14625107,
+   "sha256": "4e7c7348391dcae0edac9e81781574521752cc4757cab9914ef5478705cb63e2"
+  },
+  {
+   "path": "media/arena_poster.jpg",
+   "bytes": 22409,
+   "sha256": "23feeede20f648b373e53475fa3d0d6fac4fa12a13803fcab308b5a1e29bd87a"
+  },
+  {
+   "path": "media/arena_sfx.mp3",
+   "bytes": 393449,
+   "sha256": "4207e9dee4cca989a074fae971be80542bece4a96a4445bfe74851d6bb2abd6a"
+  },
+  {
+   "path": "media/comic.jpg",
+   "bytes": 184908,
+   "sha256": "11e718d17aabea0d429f58ddc04b06e91d9530bbfca096758e49842fc0f95054"
+  },
+  {
+   "path": "media/first_test.mp4",
+   "bytes": 5681372,
+   "sha256": "1d45b1b773fe53b77be9b5456c85d73a5b70ebe6c07e6ef59f1ef0ce05a2ca9f"
+  },
+  {
+   "path": "media/first_test_poster.jpg",
+   "bytes": 13718,
+   "sha256": "5ff54e1eb7dc2d830dd4e1e046c5853a3bbce13978a8791276144b2a8846de45"
+  },
+  {
+   "path": "media/hair.jpg",
+   "bytes": 33188,
+   "sha256": "980d1cd700f6e38bb3e846912e89ee001669e146f3e376439539071f11de4584"
+  },
+  {
+   "path": "media/music_calm_20s.mp3",
+   "bytes": 401285,
+   "sha256": "bf50c1e3479c102855a5d32adf6cedb458a912c97c3fbde5a7effbbe7562b4b4"
+  },
+  {
+   "path": "media/music_upbeat_20s.mp3",
+   "bytes": 401285,
+   "sha256": "dfb631016a70dd8b731eec5839988b0aad14383dc611903b574913865cb88010"
+  },
+  {
+   "path": "media/park.mp4",
+   "bytes": 6606274,
+   "sha256": "8608adb34f4038521397678c343c54771842a050fc1b72223d3ff4de5fa9e2a9"
+  },
+  {
+   "path": "media/park_poster.jpg",
+   "bytes": 21668,
+   "sha256": "a6228649a2401b44cf312a49e7d04bd3da148fa59f5bb6caeb07e43c1fd7850e"
+  },
+  {
+   "path": "media/short.mp4",
+   "bytes": 3236586,
+   "sha256": "19d8e984aac6393f28d56f3c90a5eefa78e57458d0235aeea23c290bd3c52990"
+  },
+  {
+   "path": "media/short_poster.jpg",
+   "bytes": 35898,
+   "sha256": "7088696674b1e27723c87df87df007bf1cb909e51fa1be717765bc647ad96af5"
+  },
+  {
+   "path": "media/still.jpg",
+   "bytes": 209680,
+   "sha256": "d1fd9ab89fe9402e79994c04ed02ec40e1ea1e15a448c956015f1545aa9708dd"
+  },
+  {
+   "path": "media/teapot.jpg",
+   "bytes": 55230,
+   "sha256": "dd69f15b976c13be78482161b47337b9dcbb5194347eb446e8d17ba7ee317fd7"
+  }
+ ]
+}

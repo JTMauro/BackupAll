@@ -1,0 +1,18 @@
+{
+ "title": "Market News Watch",
+ "url": "https://claude.ai/artifact/PsXLADjhLZAoCLo36domdV",
+ "type": "web page",
+ "updated": "2026-11-24",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 47620,
+   "sha256": "66a7a6494e94a13182c1d2fbc11fc01a6ae4b3d2b1e0d8fe572aa24963524ab4"
+  },
+  {
+   "path": "report.json",
+   "bytes": 768279,
+   "sha256": "245cda5393f5e5d12104ec20c0b1d8a48e09e7d2ee1a745ef85f7654fd32af89"
+  }
+ ]
+}

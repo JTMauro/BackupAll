@@ -1,0 +1,18 @@
+{
+ "title": "Crossed-Arms Teen",
+ "url": "https://claude.ai/artifact/8j2D2hnRCTosgUnohcub2E",
+ "type": "web page",
+ "updated": "2026-11-22",
+ "files": [
+  {
+   "path": "index.html",
+   "bytes": 9478,
+   "sha256": "5774cbc4fdbc84224afce3a5d3b4cb8b5d2a63336e0d19ff386793f35595a66d"
+  },
+  {
+   "path": "models/teen.json",
+   "bytes": 4987432,
+   "sha256": "e0c3ef1e2e3cbd6a2ac07778ffe97e6a0ce7897bc7e2705291fc292d13e45ec8"
+  }
+ ]
+}
