@@ -1,0 +1,18 @@
+{
+ "title": "Zoom Phone QRG – Connect and Basics",
+ "url": "https://claude.ai/artifact/H4avn3RgNyz4p7adVH7qXL",
+ "type": "Docs",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "44c2134681fce6b3477ada8733ce1c88be27825ceffd84c59abb8f36bdb78978"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 1299,
+   "sha256": "df8237a652703fb1ab4f71c8035a333867309075c4bb5873104f9bf7690e9237"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "title": "Zoom Phone QRG – Admin",
+ "url": "https://claude.ai/artifact/WrcEYszpxE3HzwG3yEbdUL",
+ "type": "Docs",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "292939dfdd385fd5a7dbb0e348e4db6d474f07c24e2a18f357e94b4a9abc03fc"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 5171,
+   "sha256": "f21e25154023c43389943ea4d007e214eb3be69cfc11cac26f8c33fc33820723"
+  }
+ ]
+}

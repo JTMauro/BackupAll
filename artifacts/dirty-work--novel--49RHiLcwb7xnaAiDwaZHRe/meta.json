@@ -1,0 +1,18 @@
+{
+ "title": "Dirty Work (novel)",
+ "url": "https://claude.ai/artifact/49RHiLcwb7xnaAiDwaZHRe",
+ "type": "Docs",
+ "updated": "2026-11-18",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "8e0d0ab3775adaefb6179113c7903a41924dd20bf964216ac6f74298d100c516"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 16555,
+   "sha256": "16c8fc7f6a5ce6b6cef8cabaf4687d37909b4efae28335231796081d1ca5a2bc"
+  }
+ ]
+}

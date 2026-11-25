@@ -1,0 +1,18 @@
+{
+ "title": "Zoom Phone QRG – Ultra Basic Edition (Joke)",
+ "url": "https://claude.ai/artifact/7A2JR1p4JwFgqV4oi43jAC",
+ "type": "Docs",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "fe0f7d1f26872eaad922766f1e50f25625b42cead6e23179deaad26b45bc0b96"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 1364,
+   "sha256": "afe022b1d0202d88c851c7f5ad36033015e925eba32c70fd1ca7e8e7c6aadbf8"
+  }
+ ]
+}

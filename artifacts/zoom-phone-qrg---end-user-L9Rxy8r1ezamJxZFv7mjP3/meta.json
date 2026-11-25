@@ -1,0 +1,18 @@
+{
+ "title": "Zoom Phone QRG – End User",
+ "url": "https://claude.ai/artifact/L9Rxy8r1ezamJxZFv7mjP3",
+ "type": "Docs",
+ "updated": "2026-11-17",
+ "files": [
+  {
+   "path": "doc-url.txt",
+   "bytes": 50,
+   "sha256": "cf997ae728115a9b58254c12725d207ccab6f493d51aa0e071869334bba94ea6"
+  },
+  {
+   "path": "doc.md",
+   "bytes": 2032,
+   "sha256": "07b318c001a37bc9dc9e140e51505e20a06e0762a758f5ca2a8aab68634f3955"
+  }
+ ]
+}

@@ -42,23 +42,23 @@ Generated 2026-11-25. Each folder holds the downloaded files plus meta.json (tit
 | Kessel Run | web page | 2026-11-18 | https://claude.ai/artifact/RoebwBaQzZKu5WZBqSrDPM | `kessel-run-RoebwBaQzZKu5WZBqSrDPM/` |
 | JT Weekly Status – Wed 11/18/26 | Docs | 2026-11-18 | https://claude.ai/artifact/GD8Jes7DHdbo86AHvaZtB4 | `jt-weekly-status---wed-11-18-26-GD8Jes7DHdbo86AHvaZtB4/` |
 | Intelligence or Ignorance: AI, Work, and the Future | Docs | 2026-11-18 | https://claude.ai/artifact/RC959XHTmAFJyLBTa9sEbC | `intelligence-or-ignorance--ai--work--and-the-future-RC959XHTmAFJyLBTa9sEbC/` |
-| Dirty Work (novel) | Docs | 2026-11-18 | https://claude.ai/artifact/49RHiLcwb7xnaAiDwaZHRe | - |
+| Dirty Work (novel) | Docs | 2026-11-18 | https://claude.ai/artifact/49RHiLcwb7xnaAiDwaZHRe | `dirty-work--novel--49RHiLcwb7xnaAiDwaZHRe/` |
 | Burning Lead Assets | web page | 2026-11-18 | https://claude.ai/artifact/NqP6L8uJDwD4KamMwKXrip | `burning-lead-assets-NqP6L8uJDwD4KamMwKXrip/` |
 | Gate Master Asset Pack | web page | 2026-11-18 | https://claude.ai/artifact/FLBbTjmwEqbbfZfbx66tck | - |
 | Kessel Run FX Lab | web page | 2026-11-18 | https://claude.ai/artifact/Jkdqe85BjNnWnPPtPwYdVA | - |
 | Kessel Run FX Board | web page | 2026-11-18 | https://claude.ai/artifact/W3LvwsdMZAGvqNSaaxb2nA | `kessel-run-fx-board-W3LvwsdMZAGvqNSaaxb2nA/` |
 | Kessel Run Assets | web page | 2026-11-18 | https://claude.ai/artifact/JW1X3ABBwaHKaJuX99oFYD | `kessel-run-assets-JW1X3ABBwaHKaJuX99oFYD/` |
 | Builder | web page | 2026-11-18 | https://claude.ai/artifact/9kXvZweupQE92LDPRjGSUk | `builder-9kXvZweupQE92LDPRjGSUk/` |
-| Zoom Phone QRG – End User | Docs | 2026-11-17 | https://claude.ai/artifact/L9Rxy8r1ezamJxZFv7mjP3 | - |
-| Zoom Phone QRG – Admin | Docs | 2026-11-17 | https://claude.ai/artifact/WrcEYszpxE3HzwG3yEbdUL | - |
+| Zoom Phone QRG – End User | Docs | 2026-11-17 | https://claude.ai/artifact/L9Rxy8r1ezamJxZFv7mjP3 | `zoom-phone-qrg---end-user-L9Rxy8r1ezamJxZFv7mjP3/` |
+| Zoom Phone QRG – Admin | Docs | 2026-11-17 | https://claude.ai/artifact/WrcEYszpxE3HzwG3yEbdUL | `zoom-phone-qrg---admin-WrcEYszpxE3HzwG3yEbdUL/` |
 | Recall | web page | 2026-11-08 | https://claude.ai/artifact/Utud5xqgrTqVyWzwiMCbzt | `recall-Utud5xqgrTqVyWzwiMCbzt/` |
 | Ben Bot | web page | 2026-11-14 | https://claude.ai/artifact/U3CtuTJwajYUDUHhgUP5a5 | `ben-bot-U3CtuTJwajYUDUHhgUP5a5/` |
 | Architect Review | web page | 2026-11-17 | https://claude.ai/artifact/P5bGKfxbGjapMLvidqagzp | `architect-review-P5bGKfxbGjapMLvidqagzp/` |
 | Ben | web page | 2026-11-14 | https://claude.ai/artifact/V8MzSAzTL5qAH52rU7MJfd | `ben-V8MzSAzTL5qAH52rU7MJfd/` |
 | CydArt | web page | 2026-11-12 | https://claude.ai/artifact/BuAG28eVyFs4ERLRL4FNF8 | `cydart-BuAG28eVyFs4ERLRL4FNF8/` |
-| Zoom Phone QRG – Connect and Basics | Docs | 2026-11-17 | https://claude.ai/artifact/H4avn3RgNyz4p7adVH7qXL | - |
+| Zoom Phone QRG – Connect and Basics | Docs | 2026-11-17 | https://claude.ai/artifact/H4avn3RgNyz4p7adVH7qXL | `zoom-phone-qrg---connect-and-basics-H4avn3RgNyz4p7adVH7qXL/` |
 | Architect Server | web page | 2026-11-17 | https://claude.ai/artifact/Etb18utCf71GMb1DZPQ5Lx | `architect-server-Etb18utCf71GMb1DZPQ5Lx/` |
-| Zoom Phone QRG – Ultra Basic Edition (Joke) | Docs | 2026-11-17 | https://claude.ai/artifact/7A2JR1p4JwFgqV4oi43jAC | - |
+| Zoom Phone QRG – Ultra Basic Edition (Joke) | Docs | 2026-11-17 | https://claude.ai/artifact/7A2JR1p4JwFgqV4oi43jAC | `zoom-phone-qrg---ultra-basic-edition--joke--7A2JR1p4JwFgqV4oi43jAC/` |
 | Architect User Manual | Docs | 2026-11-17 | https://claude.ai/artifact/Ara74TVUhXWULtzHFhrwfg | `architect-user-manual-Ara74TVUhXWULtzHFhrwfg/` |
 | CydFTP Download | web page | 2026-11-14 | https://claude.ai/artifact/F24EvnsHq6hkCBR3Zf8yyu | `cydftp-download-F24EvnsHq6hkCBR3Zf8yyu/` |
 | Planetguard | web page | 2026-11-03 | https://claude.ai/artifact/5ZvSAoKvuu4bjGyXoZa4Pr | `planetguard-5ZvSAoKvuu4bjGyXoZa4Pr/` |
